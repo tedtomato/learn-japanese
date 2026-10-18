@@ -12,7 +12,7 @@ import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
 import { generateLesson, generatePractice, generateRetry, demoExercises } from './generate.js';
 import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey } from '../progress.js';
-import { nextTidbit, tidbitCard } from '../tidbits.js';
+import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
 import { GRAMMAR } from '../content/grammar.js';
 import { jpItem, jpChunk, speechOf } from './text.js';
 import { explainCards } from './explain.js';
@@ -377,7 +377,7 @@ function introHtml(item, hint) {
       return html`<div class="jp jp-giant">${item.jp}</div><div class="intro-en">${item.en}</div>
         ${item.parts?.length > 1 ? html`<p class="parts">${item.parts.map(([p, m], i) => html`${i ? html`<b class="op">+</b>` : ''}<span class="part"><b class="jp">${p}</b><small>${m}</small></span>`)}<b class="op">=</b><span class="part"><b class="jp">${item.jp}</b><small>${item.en}</small></span></p>` : ''}
         <p class="intro-hint">📖 ${item.story}</p>
-        ${item.on ? html`<p class="muted small">On: ${item.on}${item.kun ? ` · Kun: ${item.kun}` : ''}</p>` : ''}
+        ${readings(item.on, item.kun)}
         ${item.words?.length ? html`<div class="jukugo">${item.words.map((id) => { const w = ITEMS.get(id); return html`<button class="jukugo-row" data-say="${w.kana}"><span class="jp">${jpItem(w, true)}</span><span>${w.en}</span></button>`; })}</div>` : ''}`;
     case 'kword':
       return html`<div class="jp-xl">${jpItem(item, true)}</div><div class="intro-romaji">${item.romaji}</div><div class="intro-en">${item.en}</div>

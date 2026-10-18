@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.18', date: '18 Oct 2026', changes: [
+    'Kanji readings explained in plain words: "Alone, say…" and "In longer words…" instead of kun / on',
+  ] },
   { version: '0.17', date: '18 Oct 2026', changes: [
     'Grammar cards: Japanese words bigger and no longer spread apart, so they read as one word',
   ] },

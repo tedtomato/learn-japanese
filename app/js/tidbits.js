@@ -64,9 +64,16 @@ export function tidbitBody(kind, item) {
   }
   return html`<div class="tidbit-kanji">
     <button class="kanji-big jp" data-say="${item.kun ? item.kun.split(' ')[0].replace(/[()]/g, '') : item.k}" aria-label="Play">${item.k}</button>
-    <div><b>${item.en}</b><div class="muted small">${item.kun ? `kun: ${item.kun} · ` : ''}on: ${item.on}</div>
-    <div class="small">e.g. <span class="jp">${item.ex}</span></div>
+    <div><b>${item.en}</b>${readings(item.on, item.kun)}
+    <div class="small">Example word: <span class="jp">${item.ex}</span></div>
     ${item.tip ? html`<div class="small muted">💡 ${item.tip}</div>` : ''}</div></div>`;
+}
+
+// A kanji's two kinds of reading, in plain words: its native word when it stands alone (kun)
+// and the sound it borrows from Chinese inside longer words (on).
+export function readings(on, kun) {
+  if (!on && !kun) return '';
+  return html`<div class="readings">${kun ? html`<div><span class="rd-label">Alone, say</span> ${kun}</div>` : ''}${on ? html`<div><span class="rd-label">In longer words</span> ${on}</div>` : ''}</div>`;
 }
 
 export function tidbitCard(kind, item, { next = false } = {}) {

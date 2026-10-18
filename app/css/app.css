@@ -801,3 +801,7 @@ ruby { padding: 0 3px; }
 .g-block rt { font-size: 11px; letter-spacing: 0; color: var(--muted); }
 .g-block small { font-size: 14px; color: var(--text); }
 .grammar-card .jp-inline, .grammar-card p .jp { font-weight: 700; }
+
+/* v0.18: kanji readings in plain words. */
+.readings { display: flex; flex-direction: column; gap: 2px; font-size: 14px; color: var(--text); margin: 4px 0; }
+.rd-label { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; margin-right: 4px; }

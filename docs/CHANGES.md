@@ -9,6 +9,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | "Nice to meet you" card and question bubble cut off on the right | ✅ long words shrink to fit, then wrap | 0.12 |
 | No pictures next to each answer | ✅ removed from answer choices (kept on the new-word card) | 0.12 |
 | Remove auto jump to next exercise (no time to tap Explain) | ✅ removed, with its setting | 0.13 |
+| Kanji peek: unclear "kun / on" lines under the meaning | ✅ plain labels: "Alone, say" / "In longer words" / "Example word" | 0.18 |
 | Grammar card: Japanese word hardly readable | ✅ bigger, bolder, letters kept together | 0.17 |
 | Japanese bridges crossing small streams on the path | ✅ two per unit | 0.16 |
 | Game logo picture when sharing on WhatsApp | ✅ picture attached (share sheet → WhatsApp); link preview shows the logo otherwise | 0.15 |

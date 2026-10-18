@@ -1,4 +1,4 @@
-// Hiragana, grouped the way they are taught. Each entry: [kana, romaji, memory hint].
+// Hiragana in chart order. Each entry: [kana, romaji, memory hint]. Katakana is derived from it.
 
 export const HIRAGANA_ROWS = [
   {
@@ -135,3 +135,30 @@ export const HIRAGANA_ROWS = [
 ];
 
 export const kanaId = (kana) => `k-${kana}`;
+
+// Small kana that change the sound before or after them. `say` is what to speak (a lone small
+// kana has no sound of its own).
+const SMALL = [
+  ['っ', 'small tsu', 'Small っ doubles the next sound with a tiny pause: きっぷ = kip-pu', 'きっぷ'],
+  ['ゃ', 'small ya', 'Small ゃ blends with the sound before it: し + ゃ = sha (でんしゃ densha)', 'しゃ'],
+  ['ゅ', 'small yu', 'Small ゅ blends with the sound before it: き + ゅ = kyu (きゅう kyuu)', 'きゅ'],
+  ['ょ', 'small yo', 'Small ょ blends with the sound before it: じ + ょ = jo (だいじょうぶ daijoubu)', 'じょ'],
+];
+
+const toKatakana = (h) => String.fromCharCode(h.charCodeAt(0) + 0x60);
+
+// Every character the course can teach: char → { romaji, hint, script, say }.
+export const KANA = new Map();
+for (const row of HIRAGANA_ROWS) {
+  for (const [k, romaji, hint] of row.kana) {
+    KANA.set(k, { romaji, hint, script: 'hiragana' });
+    KANA.set(toKatakana(k), { romaji, hint: `Katakana “${romaji}” — the same sound as hiragana ${k}. Katakana is used for foreign words.`, script: 'katakana' });
+  }
+}
+for (const [k, romaji, hint, say] of SMALL) {
+  KANA.set(k, { romaji, hint, script: 'hiragana', say });
+  KANA.set(toKatakana(k), { romaji, hint: `Katakana version of ${k}. ${hint}`, script: 'katakana', say: [...say].map(toKatakana).join('') });
+}
+KANA.set('ー', { romaji: 'long vowel', hint: 'The dash stretches the vowel before it: タクシー = ta-ku-shii', script: 'katakana', say: 'ター' });
+
+export const KATAKANA_ROWS = HIRAGANA_ROWS.map((row) => ({ ...row, kana: row.kana.map(([k, r]) => [toKatakana(k), r]) }));

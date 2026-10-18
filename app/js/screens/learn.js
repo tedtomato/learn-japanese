@@ -1,11 +1,14 @@
 // The learning path: sections → unit banners → winding track of lesson nodes.
-import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID } from '../course.js';
+import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID, NODES } from '../course.js';
+import { jpItem, speechOf } from '../lesson/text.js';
+import { rewardPopup } from '../fx.js';
 import { app, statsBar, toast, modal } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
-import { speak, sfx } from '../audio.js';
+import { speak } from '../audio.js';
 import { nextTidbit, tidbitCard } from '../tidbits.js';
+import { art } from '../art.js';
 import {
   currentNodeIndex, nodeLevel, isNodeDone, isNodeUnlocked, nodeNeedsReview, openChest, todayXp, currentHearts,
 } from '../progress.js';
@@ -26,13 +29,14 @@ function nodeIcon(node, st) {
   if (node.kind === 'chest') return icon('chest', 36);
   if (node.kind === 'review') return icon('trophy', 36);
   if (st === 'done' && nodeLevel(app.state, node) >= MAX_LEVEL) return icon('star', 34);
-  if (node.icon === 'kana') return html`<span class="node-kana jp">${ITEMS.get(node.items[0]).jp}</span>`;
-  if (node.icon === 'emoji') return html`<span class="node-emoji">${ITEMS.get(node.items[0]).emoji}</span>`;
+  if (node.kind === 'read' || node.kind === 'kanji') return html`<span class="node-kana jp">${ITEMS.get(node.items[0]).jp}</span>`;
+  if (node.kind === 'story') return icon('story', 36);
+  if (node.icon === 'art' && node.art) return art(node.art, 'node-art');
   return icon(node.icon === 'chat' ? 'chat' : 'star', 34);
 }
 
 function levelPips(node) {
-  if (node.kind !== 'lesson' || !isNodeDone(app.state, node)) return '';
+  if (!['lesson', 'read', 'kanji'].includes(node.kind) || !isNodeDone(app.state, node)) return '';
   const level = nodeLevel(app.state, node);
   return html`<span class="pips" aria-label="Level ${level} of ${MAX_LEVEL}">${Array.from({ length: MAX_LEVEL }, (_, i) => html`<i class="${i < level ? 'on' : ''}"></i>`)}</span>`;
 }
@@ -40,7 +44,7 @@ function levelPips(node) {
 function renderNode(node, i, current, now) {
   const st = nodeState(node, current, now);
   const offset = OFFSETS[i % OFFSETS.length];
-  const showCheer = st === 'current' && node.kind === 'lesson';
+  const showCheer = st === 'current' && node.kind !== 'chest';
   const cheer = CHEERS[node.index % CHEERS.length];
   return html`<div class="node-row" style="--x:${offset}px">
     ${showCheer ? html`<div class="node-mascot ${offset > 0 ? 'left' : 'right'}">
@@ -59,15 +63,16 @@ function renderNode(node, i, current, now) {
 }
 
 function unitGuide(unit) {
-  const ids = [...new Set(unit.nodes.flatMap((n) => n.items || []))];
-  const items = ids.map((id) => ITEMS.get(id));
+  const ids = [...new Set(unit.nodes.flatMap((n) => [...(n.items || []), ...(n.readWords || [])]))];
+  const items = ids.map((id) => ITEMS.get(id)).filter((it) => it.type !== 'dialogue');
   modal(
     html`<h2>${unit.title}</h2><p class="muted">Tap any card to hear it.</p>
-    <div class="guide">${items.map((it) => html`<button class="guide-card ${it.type}" data-say="${it.text || it.jp}">
-      <span class="jp guide-jp">${it.jp instanceof Array ? it.jp.join(' ') : it.jp}</span>
-      <span class="guide-romaji">${it.romaji}</span>
-      ${it.en ? html`<span class="guide-en">${it.emoji || ''} ${it.en}</span>` : ''}
-      ${it.hint ? html`<span class="guide-hint">${it.hint}</span>` : ''}
+    <div class="guide">${items.map((it) => html`<button class="guide-card ${it.type}" data-say="${speechOf(it)}">
+      ${it.art ? art(it.art, 'art-guide') : ''}
+      <span class="guide-jp">${jpItem(it, it.type === 'word' || it.type === 'sentence' || it.type === 'kword')}</span>
+      ${it.type === 'kana' ? html`<span class="guide-romaji">${it.romaji}</span>` : ''}
+      ${it.en ? html`<span class="guide-en">${it.en}</span>` : ''}
+      ${it.hint || it.note || it.story ? html`<span class="guide-hint">${it.note || it.story || it.hint}</span>` : ''}
     </button>`)}</div>`,
     [{ label: 'Close', kind: 'secondary' }],
   );
@@ -84,8 +89,7 @@ function nodePopover(nodeEl, node, st) {
     if (isNodeDone(app.state, node)) return toast('You already opened this chest.');
     const gems = openChest(app.state, node);
     app.save();
-    sfx('complete');
-    modal(html`<div class="center">${mascot('cheer', 110)}<h2>Treasure!</h2><p class="big-reward">${icon('gem', 30)} +${gems} gems</p></div>`, [{ label: 'Continue', onClick: () => app.go('#/learn') }]);
+    rewardPopup({ kind: 'chest', title: 'Treasure!', reward: html`${icon('gem', 30)} +${gems} gems`, onDone: () => app.go('#/learn') });
     return;
   }
   const level = nodeLevel(app.state, node);
@@ -102,6 +106,12 @@ function nodePopover(nodeEl, node, st) {
   mount(pop, html`<b>${node.title}</b><span>${sub}</span>
     <button class="btn btn-white btn-block">${hearts > 0 ? label : 'No hearts — practice to refill'}</button>`);
   nodeEl.closest('.node-wrap').append(pop);
+  // Keep the popover on screen when its node sits far left or right on the path.
+  const r = pop.getBoundingClientRect();
+  const margin = 12;
+  const shift = r.left < margin ? margin - r.left : r.right > innerWidth - margin ? innerWidth - margin - r.right : 0;
+  if (shift) pop.style.marginLeft = `${shift}px`;
+  pop.style.setProperty('--arrow', `${-shift}px`);
   pop.querySelector('button').addEventListener('click', () => app.go(hearts > 0 ? `#/lesson/${node.id}` : '#/practice'));
 }
 
@@ -112,7 +122,8 @@ export function renderLearn(root) {
   const xp = todayXp(state, now);
   const goal = state.dailyGoal;
   let n = 0;
-  const tb = nextTidbit(state);
+  const currentUnit = NODES[Math.min(current, NODES.length - 1)].unit;
+  const tb = nextTidbit(state, Math.random, ['fact', 'phrase', 'kanji'], { facts: currentUnit.facts, phrases: currentUnit.phrases });
   app.save();
 
   mount(root, html`<header class="topbar">${statsBar()}</header>

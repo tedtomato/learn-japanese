@@ -6,30 +6,38 @@ bringing back what you are about to forget. Kuri the shiba cheers you on.
 
 **Live app:** https://tedtomato.github.io/learn-japanese/
 
-## What's inside (v1)
+## What's inside
 
-- **Section 1 — Tokyo trip:** survival Japanese for a visit — hello and thank you, getting around
-  (station, subway, toilet, "where is…?"), food and konbini (ordering, paying the bill), shopping and
-  help. Taught by sound with romaji always shown, so no reading is needed yet.
-- **Section 2 — Hiragana:** all 46 base characters + 25 voiced ones (が, ぱ…), taught in small groups,
-  each followed by real words written only with characters you already know.
-- **Section 3 — First words:** numbers 1–10, introducing yourself, food and drink, and your first
-  sentences — now read in hiragana, with romaji hints fading out.
-- **Exercises:** new-character cards with memory hints, multiple choice (read / listen / recall),
-  match the pairs, spell words with kana tiles, and build sentences from a word bank.
-- **Listening:** every character, word and sentence is spoken with the device's Japanese voice
-  (normal and 🐢 slow).
-- **Keep repeating:** every item has its own memory strength (Leitner-style spaced repetition).
-  Lessons mix in about 30% review, mistakes come back before the lesson ends, lessons you are
-  forgetting get an orange refresh badge on the path, and the Practice tab builds a session from your
-  weakest items. Each lesson can be replayed up to level 5 with harder exercises and fewer romaji hints.
-- **Game layer:** streak with streak freezes, daily XP goal, 5 hearts (refill over time or through
-  practice), gems, treasure chests, unit trophies and achievements.
-- **Fun facts & phrases:** 200 facts about Japan, 52 travel phrases and 66 kanji pop up on the path and
-  as a quick break in lessons. Everything you discover is collected in the Practice tab, and the
-  phrasebook is always available with audio.
-- **Dark mode** (automatic or manual), works **offline**, progress saved on the device with
-  **backup / restore** to a file.
+**The path** — themed units of essential words, starting with what a visitor to Tokyo needs:
+
+| Section | Units |
+|---|---|
+| **Tokyo trip** | Hello & thank you (casual / polite / formal), Getting around, Food & drinks, Shopping & help |
+| **Everyday Japanese** | Numbers, People & jobs, Food words, Around you |
+| **Real Japanese** | Casual & slang, plus a Kana corner for the rest of the chart |
+
+- **Reading is spread through the units**: each unit has short *Read it* lessons for the characters
+  its own words use (hiragana, katakana, small っ/ゃ), most frequent first. Romaji is written over
+  each syllable until you can read every character of a word, then it fades away.
+- **Kanji, the radical + mnemonic way**: radicals first (人 口 木 氵 日 田 力 女 子), every kanji with
+  its parts (木 + 木 = 林) and a micro-story, then straight into compound words (入口 entrance,
+  出口 exit, 先生 teacher, 日本酒 sake). Kanji you spot in "Did you know?" cards come back in practice
+  as questions with their tip as a clue.
+- **Exercises**: new-word cards, trace the character (stroke order, direction, from memory), reading /
+  listening / meaning questions, match pairs, build sentences, fast natural-speed listening, say it out
+  loud (speech recognition), 15-second grammar cards, and two-person dialogues to understand.
+- **A cast of characters** — Ken, Yuki, Sora and Hana — speak every line with their own voice and
+  move their mouths while talking. Kuri the shiba stars on the main screens.
+- **Speed challenge**: every task has a countdown with a ticking finish; answers in time earn a speed
+  bonus. Correct answers move on automatically after a second.
+- **Keep repeating**: spaced repetition per word and character. Wrong *or hesitant* answers are noted,
+  come back in a "Let's correct the exercises you missed" round, and return sooner in later reviews.
+  *Explain my answer* breaks any answer down word by word.
+- **Game layer**: streak and week view, daily goal, hearts, gems, treasure chests, trophies,
+  achievements, sakura petals when you finish.
+- **Fun facts & phrases** about the unit's theme as breaks, all collected in the Practice tab.
+- **Dark mode**, works **offline**, **backup / restore**, "can't listen / speak now" pauses those tasks
+  for an hour.
 
 ## Install on your phone
 
@@ -80,5 +88,20 @@ tests/                                      node:test unit tests
 docs/                                       roadmap and design system
 ```
 
-Adding content is mostly editing `app/js/content/*.js`. The tests check that every word in a hiragana
-unit only uses characters taught up to that unit.
+Adding content is mostly editing `app/js/content/units.js` (words, sentences, dialogues),
+`kanji.js` and `grammar.js`. The course builder works out which characters each unit teaches; the
+tests check that every word becomes readable and every illustration and stroke file is bundled.
+
+Two dev scripts refresh bundled third-party data (run them only when adding characters or pictures):
+
+```sh
+node scripts/strokes.mjs /path/to/kanjivg     # → app/js/content/strokes.js
+node scripts/art.mjs /path/to/twemoji         # → app/art/*.svg
+```
+
+## Credits
+
+- Stroke-order data: [KanjiVG](https://kanjivg.tagaini.net) © Ulrich Apel, CC BY-SA 3.0 —
+  `app/js/content/strokes.js` is derived from it and shared under the same licence.
+- Illustrations: [Twemoji](https://github.com/jdecked/twemoji) © Twitter / X and contributors,
+  CC BY 4.0 (`app/art/`).

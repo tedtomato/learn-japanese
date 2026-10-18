@@ -1,4 +1,4 @@
-// Kuri, the shiba inu mascot. Moods: happy, cheer, sad.
+// Kuri, the shiba inu mascot. Moods: happy, cheer, sad. Always animated (bob, blink, ear twitch).
 import { raw } from './dom.js';
 
 const EYES = {
@@ -14,13 +14,13 @@ const MOUTH = {
 };
 
 export function mascotSvg(mood = 'happy', size = 96) {
-  return `<svg class="mascot" width="${size}" height="${size}" viewBox="0 0 120 120" role="img" aria-label="Kuri the shiba">
-  <path d="M22 50 28 12l30 24z" fill="#e48b3a"/><path d="M98 50 92 12 62 36z" fill="#e48b3a"/>
-  <path d="M29 42 32 22l15 13z" fill="#f6c7a1"/><path d="M91 42 88 22 73 35z" fill="#f6c7a1"/>
+  return `<svg class="mascot mood-${mood}" width="${size}" height="${size}" viewBox="0 0 120 120" role="img" aria-label="Kuri the shiba">
+  <g class="ear ear-l"><path d="M22 50 28 12l30 24z" fill="#e48b3a"/><path d="M29 42 32 22l15 13z" fill="#f6c7a1"/></g>
+  <g class="ear ear-r"><path d="M98 50 92 12 62 36z" fill="#e48b3a"/><path d="M91 42 88 22 73 35z" fill="#f6c7a1"/></g>
   <ellipse cx="60" cy="66" rx="44" ry="40" fill="#f0a04b"/>
   <path d="M60 106c-22 0-38-12-38-28 0-6 6-10 12-8 8 3 14 4 26 4s18-1 26-4c6-2 12 2 12 8 0 16-16 28-38 28z" fill="#fff6ea"/>
   <ellipse cx="40" cy="52" rx="7" ry="4" fill="#fff6ea"/><ellipse cx="80" cy="52" rx="7" ry="4" fill="#fff6ea"/>
-  ${EYES[mood] || EYES.happy}
+  <g class="dog-eyes">${EYES[mood] || EYES.happy}</g>
   <ellipse cx="60" cy="74" rx="7" ry="5" fill="#2b2b2b"/>
   ${MOUTH[mood] || MOUTH.happy}
   <ellipse cx="33" cy="76" rx="6" ry="4" fill="#ff9aa2" opacity=".7"/><ellipse cx="87" cy="76" rx="6" ry="4" fill="#ff9aa2" opacity=".7"/>

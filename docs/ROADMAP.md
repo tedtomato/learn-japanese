@@ -11,6 +11,15 @@
 - Fun facts, travel phrasebook and kanji peeks, shown between lessons and collected in the Practice tab
 - Light / dark mode, backup and restore
 
+## ✅ Done since v1
+- Tokyo-first course; hiragana and katakana spread through themed units ("Read it" lessons)
+- Romaji over each syllable, fading as you learn to read
+- Stroke-order tracing (KanjiVG), radical + mnemonic kanji with compound words, kanji clues in practice
+- Speaking (speech recognition), fast natural-speed listening, 15-second grammar cards, dialogues
+- Cast of four characters with their own voices; animated mascot; cartoon illustrations
+- Countdown + speed bonus, auto-continue, hesitation tracking and a "missed exercises" round
+- Explain my answer, themed fun-fact breaks, sakura finish, splash screen, reward pop-ups
+
 ## Phase 2 — Smarter repetition
 - Replace the Leitner boxes with a **forgetting-curve model** (half-life regression / FSRS-style): each
   item gets a memory half-life that grows with correct answers and shrinks with mistakes; items come

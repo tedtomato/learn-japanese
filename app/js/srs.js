@@ -5,16 +5,22 @@ const DAY = 24 * 60 * 60 * 1000;
 export const INTERVALS = [0, 0.5 * DAY, 1 * DAY, 3 * DAY, 7 * DAY, 16 * DAY, 35 * DAY];
 export const MAX_BOX = INTERVALS.length - 1;
 
-export function review(record, { right, wrong }, now) {
-  const prev = record || { box: 0, seen: 0, right: 0, wrong: 0 };
-  const box = wrong > 0 ? Math.max(0, prev.box - 2) : Math.min(MAX_BOX, prev.box + 1);
+// A hesitation (correct but slow) keeps the item in its box and brings it back sooner.
+export function review(record, { right, wrong, hesitated = 0 }, now) {
+  const prev = record || { box: 0, seen: 0, right: 0, wrong: 0, slow: 0 };
+  let box;
+  if (wrong > 0) box = Math.max(0, prev.box - 2);
+  else if (hesitated > 0) box = Math.max(prev.box, 1);
+  else box = Math.min(MAX_BOX, prev.box + 1);
+  const wait = hesitated > 0 && !wrong ? INTERVALS[box] / 2 : INTERVALS[box];
   return {
     box,
     seen: prev.seen + 1,
     right: prev.right + right,
     wrong: prev.wrong + wrong,
+    slow: (prev.slow || 0) + hesitated,
     last: now,
-    due: now + INTERVALS[box],
+    due: now + wait,
   };
 }
 

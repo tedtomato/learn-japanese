@@ -1,96 +1,160 @@
 // Builds the course tree (sections → units → path nodes) and the global item index from content.
-import { HIRAGANA_ROWS, kanaId } from './content/kana.js';
-import { KANA_UNIT_WORDS, WORD_UNITS } from './content/words.js';
-import { TOKYO_UNITS } from './content/tokyo.js';
+// Kana are not taught in separate sections: each unit gets "Read it" lessons for the characters
+// its own words use (most frequent first), so reading grows alongside vocabulary.
+import { KANA, kanaId } from './content/kana.js';
+import { SECTIONS_DATA, DIALOGUES } from './content/units.js';
+import { KANJI, RADICALS, KANJI_LESSONS } from './content/kanji.js';
+import { KANJI as PEEK_KANJI } from './content/extras.js';
 
 export const ITEMS = new Map();
+export const MAX_LEVEL = 5;
 const UNIT_COLORS = ['green', 'blue', 'purple', 'orange', 'red'];
+const READ_PER_UNIT = 12; // new characters per unit, split into "Read it" lessons of up to 4
+const READ_PER_LESSON = 4;
 
 function addItem(item) {
-  if (ITEMS.has(item.id)) throw new Error(`Duplicate item id ${item.id}`);
+  if (ITEMS.has(item.id)) {
+    const old = ITEMS.get(item.id);
+    if (old.jp.toString() !== item.jp.toString()) throw new Error(`Item id clash: ${item.id}`);
+    return item.id; // the same word reused later in the course
+  }
   ITEMS.set(item.id, item);
   return item.id;
 }
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const kanaChars = (text) => [...text].filter((c) => KANA.has(c));
 
-function addWord([jp, romaji, en, emoji], section, prefix = '') {
-  return addItem({ id: `${prefix}w-${slug(romaji)}`, type: 'word', jp, romaji, en, emoji, section });
+function kanaItem(ch) {
+  const info = KANA.get(ch);
+  return addItem({ id: kanaId(ch), type: 'kana', jp: ch, romaji: info.romaji, hint: info.hint, script: info.script, say: info.say });
 }
 
-function addSentence({ jp, romaji, en }, section, prefix = '') {
+function wordItem([jp, romaji, en, art, extra = {}], ctx) {
+  return addItem({ id: `w-${slug(romaji)}`, type: 'word', jp, romaji, en, art, note: extra.note, alt: extra.alt || [], unit: ctx.unit, section: ctx.section, chars: kanaChars(jp) });
+}
+
+function sentenceItem({ jp, romaji, en, alt = [] }, ctx) {
   const romajiChunks = romaji.split(' ');
   if (romajiChunks.length !== jp.length) throw new Error(`Romaji "${romaji}" must have one word per chunk`);
-  return addItem({ id: `${prefix}s-${slug(romaji)}`, type: 'sentence', jp, text: jp.join(''), romaji, romajiChunks, en, section });
+  const text = jp.join('');
+  return addItem({ id: `s-${slug(romaji)}`, type: 'sentence', jp, text, romaji, romajiChunks, en, accept: [en, ...alt], unit: ctx.unit, section: ctx.section, chars: kanaChars(text) });
 }
 
-function chunk(list, size) {
-  const out = [];
-  for (let i = 0; i < list.length; i += size) out.push(list.slice(i, i + size));
-  return out;
+// Kanji, their compound words, and radicals.
+const KANJI_BY_CHAR = new Map(KANJI.map((k) => [k.k, k]));
+function kanjiItem(ch) {
+  const k = KANJI_BY_CHAR.get(ch);
+  const wordIds = k.words.map(([jp, kana, romaji, en]) =>
+    addItem({ id: `kw-${jp}`, type: 'kword', jp, kana, romaji, en, kanji: [...jp].filter((c) => KANJI_BY_CHAR.has(c)), chars: [] }));
+  return { id: addItem({ id: `kj-${ch}`, type: 'kanji', jp: ch, en: k.meaning, on: k.on, kun: k.kun, parts: k.parts, story: k.story, say: k.words[0][1], words: wordIds, chars: [] }), wordIds };
+}
+function radicalItem(r) {
+  const rad = RADICALS.find((x) => x.r === r);
+  return addItem({ id: `rd-${r}`, type: 'radical', jp: r, en: rad.name, story: rad.story, chars: [] });
+}
+// Kanji peeks from the fun-facts collection: asked in practice with their tip as a clue.
+for (const k of PEEK_KANJI) {
+  const reading = (k.kun || '').split(' ')[0].replace(/[()]/g, '');
+  addItem({ id: `xk-${k.id}`, type: 'kanji', peek: true, jp: k.k, en: k.en, on: k.on, kun: k.kun, story: k.tip, say: reading || k.k, words: [], chars: [] });
+}
+export const peekId = (tidbitKanji) => `xk-${tidbitKanji.id}`;
+
+for (const d of Object.entries(DIALOGUES)) addItem({ id: `dl-${d[0]}`, type: 'dialogue', jp: d[0], ...d[1], chars: [] });
+
+// ---- Build the path ----
+const taught = new Set();
+let carry = [];
+const kanjiQueue = [...KANJI_LESSONS];
+
+// Marks words that every taught character can now spell, returning up to `max` of them.
+function newlyReadable(unitId, max = 6) {
+  const readable = [...ITEMS.values()].filter((it) => (it.type === 'word' || it.type === 'sentence') && !it.readAt
+    && it.chars.length && it.chars.every((c) => taught.has(c)));
+  readable.forEach((it) => (it.readAt = unitId));
+  return readable.slice(0, max).map((it) => it.id);
 }
 
-// Lessons, a chest after the second lesson, and a unit review trophy at the end.
-function buildNodes(unitId, lessons) {
-  const nodes = lessons.map((l, i) => ({ id: `${unitId}-l${i + 1}`, kind: 'lesson', title: l.title, items: l.items, icon: l.icon }));
-  if (nodes.length >= 3) nodes.splice(2, 0, { id: `${unitId}-chest`, kind: 'chest', title: 'Treasure chest' });
-  nodes.push({ id: `${unitId}-review`, kind: 'review', title: 'Unit review', items: lessons.flatMap((l) => l.items) });
-  return nodes;
+function readLessons(unitItems, unitId) {
+  const freq = new Map();
+  unitItems.forEach((id, i) => ITEMS.get(id).chars.forEach((c) => {
+    if (taught.has(c)) return;
+    const f = freq.get(c) || { n: 0, first: i };
+    f.n += 1;
+    freq.set(c, f);
+  }));
+  const fromUnit = [...freq].sort((a, b) => b[1].n - a[1].n || a[1].first - b[1].first).map(([c]) => c);
+  const pool = [...new Set([...fromUnit, ...carry.filter((c) => !taught.has(c))])];
+  const now = pool.slice(0, READ_PER_UNIT);
+  carry = pool.slice(READ_PER_UNIT);
+  const lessons = [];
+  for (let i = 0; i < now.length; i += READ_PER_LESSON) {
+    const chars = now.slice(i, i + READ_PER_LESSON);
+    chars.forEach((c) => taught.add(c));
+    lessons.push({ kind: 'read', title: `Read it: ${chars.join(' ')}`, items: chars.map(kanaItem), readWords: newlyReadable(unitId), icon: 'kana' });
+  }
+  return lessons;
 }
 
-function buildHiraganaSection() {
-  const units = HIRAGANA_ROWS.map((row, u) => {
-    const kanaIds = row.kana.map(([kana, romaji, hint]) =>
-      addItem({ id: kanaId(kana), type: 'kana', jp: kana, romaji, hint, section: 'hiragana' }),
-    );
-    const groupSize = kanaIds.length > 6 ? 5 : 3;
-    const kanaLessons = chunk(kanaIds, groupSize).map((ids) => ({
-      title: ids.map((id) => ITEMS.get(id).jp).join(' '),
-      items: ids,
-      icon: 'kana',
-    }));
-    const wordIds = (KANA_UNIT_WORDS[row.id] || []).map((w) => addWord(w, 'hiragana'));
-    const wordLessons = chunk(wordIds, wordIds.length > 6 ? 5 : 3).map((ids, i) => ({
-      title: i === 0 ? 'First words' : 'More words',
-      items: ids,
-      icon: 'word',
-    }));
-    return {
-      id: `hira-${row.id}`,
-      title: row.title,
-      desc: `Hiragana: ${row.kana.map((k) => k[0]).slice(0, 6).join(' ')}${row.kana.length > 6 ? ' …' : ''}`,
-      color: UNIT_COLORS[u % UNIT_COLORS.length],
-      nodes: buildNodes(`hira-${row.id}`, [...kanaLessons, ...wordLessons]),
-    };
+function kanjiLesson(spec) {
+  if (spec.radicals) return { kind: 'kanji', title: spec.title, items: spec.radicals.map(radicalItem), icon: 'radical' };
+  const made = spec.kanji.map(kanjiItem);
+  return { kind: 'kanji', title: spec.title, items: [...made.map((m) => m.id), ...new Set(made.flatMap((m) => m.wordIds))], icon: 'kanji' };
+}
+
+function buildUnit(section, unit, u, unitIndex, totalUnits) {
+  const ctx = { unit: unit.id, section: section.id };
+  const vocab = unit.lessons.map((l) => {
+    const words = (l.words || []).map((w) => wordItem(w, ctx));
+    const sentences = (l.sentences || []).map((s) => sentenceItem(s, ctx));
+    const items = [...words, ...sentences];
+    return { kind: 'lesson', title: l.title, items, grammar: l.grammar, icon: sentences.length && !words.length ? 'chat' : 'art', art: ITEMS.get(items[0]).art };
   });
-  return { id: 'hiragana', title: 'Hiragana', romajiUntilLevel: 1, readsKana: true, units };
-}
-
-// Sections taught with words and sentences (romajiUntilLevel: show romaji below this lesson level).
-function buildPhraseSection({ id, title, units: source, romajiUntilLevel, readsKana, prefix = '', colorShift = 0 }) {
-  const units = source.map((unit, u) => {
-    const lessons = unit.lessons.map((l) => {
-      const words = (l.words || []).map((w) => addWord(w, id, prefix));
-      const sentences = (l.sentences || []).map((s) => addSentence(s, id, prefix));
-      return { title: l.title, items: [...words, ...sentences], icon: sentences.length ? 'chat' : 'emoji' };
-    });
-    return {
-      id: `${id}-${unit.id}`,
-      title: unit.title,
-      desc: unit.desc,
-      color: UNIT_COLORS[(u + colorShift) % UNIT_COLORS.length],
-      nodes: buildNodes(`${id}-${unit.id}`, lessons),
-    };
+  const reads = readLessons(vocab.flatMap((l) => l.items), unit.id);
+  // Interleave: two vocabulary lessons, then a reading lesson, and so on.
+  const seq = [];
+  vocab.forEach((l, i) => {
+    seq.push(l);
+    if (i % 2 === 1 && reads.length) seq.push(reads.shift());
   });
-  return { id, title, romajiUntilLevel, readsKana, units };
+  seq.push(...reads);
+  // Kanji: spread the kanji lessons over the units after the first.
+  if (unitIndex > 0) {
+    const left = totalUnits - unitIndex;
+    const take = Math.ceil(kanjiQueue.length / left);
+    kanjiQueue.splice(0, take).forEach((spec) => seq.push(kanjiLesson(spec)));
+  }
+  if (unit.dialogues?.length) seq.push({ kind: 'story', title: 'Story time', items: unit.dialogues.map((d) => `dl-${d}`), icon: 'story' });
+
+  const id = `${section.id}-${unit.id}`;
+  const nodes = seq.map((n, i) => ({ ...n, id: `${id}-${n.kind[0]}${i + 1}` }));
+  if (nodes.length >= 3) nodes.splice(2, 0, { id: `${id}-chest`, kind: 'chest', title: 'Treasure chest' });
+  const reviewItems = [...new Set(seq.filter((n) => n.kind === 'lesson' || n.kind === 'read').flatMap((n) => [...n.items, ...(n.readWords || [])]))];
+  nodes.push({ id: `${id}-review`, kind: 'review', title: 'Unit review', items: reviewItems });
+  return { id, title: unit.title, desc: unit.desc, facts: unit.facts || [], phrases: unit.phrases || [], dialogueIds: (unit.dialogues || []).map((d) => `dl-${d}`), color: UNIT_COLORS[unitIndex % UNIT_COLORS.length], nodes };
 }
 
-// The Tokyo section comes first in the path but its items get a prefix so they never clash with
-// the same words taught again (in kana) later on.
-const tokyo = buildPhraseSection({ id: 'tokyo', title: 'Tokyo trip', units: TOKYO_UNITS, romajiUntilLevel: Infinity, readsKana: false, prefix: 't' });
-const hiragana = buildHiraganaSection();
-const words = buildPhraseSection({ id: 'words', title: 'First words', units: WORD_UNITS, romajiUntilLevel: 2, readsKana: true, colorShift: 1 });
-export const SECTIONS = [tokyo, hiragana, words];
+const allUnits = SECTIONS_DATA.flatMap((s) => s.units.map((u) => [s, u]));
+let unitCounter = 0;
+export const SECTIONS = SECTIONS_DATA.map((s) => ({
+  id: s.id,
+  title: s.title,
+  units: s.units.map((u, i) => buildUnit(s, u, i, unitCounter++, allUnits.length)),
+}));
+
+// Characters still untaught (words' leftovers first, then the rest of hiragana): a final
+// "Kana corner" so every word becomes readable and the full chart can be learned.
+const leftovers = [...new Set([...carry, ...[...KANA.keys()].filter((c) => KANA.get(c).script === 'hiragana')])].filter((c) => !taught.has(c));
+if (leftovers.length) {
+  const nodes = [];
+  for (let i = 0; i < leftovers.length; i += 5) {
+    const chars = leftovers.slice(i, i + 5);
+    chars.forEach((c) => taught.add(c));
+    nodes.push({ id: `kana-corner-r${nodes.length + 1}`, kind: 'read', title: `Read it: ${chars.join(' ')}`, items: chars.map(kanaItem), readWords: newlyReadable('kana-corner'), icon: 'kana' });
+  }
+  nodes.push({ id: 'kana-corner-review', kind: 'review', title: 'Kana review', items: nodes.flatMap((n) => n.items) });
+  SECTIONS[SECTIONS.length - 1].units.push({ id: 'kana-corner', title: 'Kana corner', desc: 'The rest of the hiragana chart', facts: [], phrases: [], dialogueIds: [], color: 'blue', nodes });
+}
 
 export const NODES = [];
 export const NODE_BY_ID = new Map();
@@ -104,5 +168,4 @@ SECTIONS.forEach((section, s) =>
   ),
 );
 
-export const MAX_LEVEL = 5;
-export const sectionOf = (item) => SECTIONS.find((s) => s.id === item.section);
+export const unitOfItem = (item) => SECTIONS.flatMap((s) => s.units).find((u) => u.id.endsWith(`-${item.unit}`));

@@ -26,7 +26,7 @@ export function defaultState(now = Date.now()) {
     items: {},
     stats: { lessons: 0, perfect: 0 },
     seen: { fact: [], phrase: [], kanji: [] },
-    settings: { theme: 'system', sfx: true, voiceRate: 0.85 },
+    settings: { theme: 'system', sfx: true, voiceRate: 0.85, speed: true, speaking: true },
   };
 }
 
@@ -144,7 +144,7 @@ export function currentNodeIndex(state) {
 export const isNodeUnlocked = (state, node) => isNodeDone(state, node) || node.index <= currentNodeIndex(state);
 
 export function nodeNeedsReview(state, node, now) {
-  if (node.kind !== 'lesson' || !isNodeDone(state, node)) return false;
+  if (!['lesson', 'read', 'kanji'].includes(node.kind) || !isNodeDone(state, node)) return false;
   const due = node.items.filter((id) => isDue(state.items[id], now)).length;
   return due > 0 && due >= node.items.length / 2;
 }
@@ -162,11 +162,11 @@ export const dueItemIds = (state, now) => learnedItemIds(state).filter((id) => i
 
 // ---- Finishing a session ----
 // results: Map itemId → { right, wrong }. mode: 'lesson' | 'practice'.
-export function completeSession(state, { node, mode, results, mistakes, now }) {
+export function completeSession(state, { node, mode, results, mistakes, now, bonusXp = 0 }) {
   for (const [id, r] of results) state.items[id] = review(state.items[id], r, now);
 
   const perfect = mistakes === 0;
-  const xp = XP_LESSON + (perfect ? XP_PERFECT_BONUS : 0);
+  const xp = XP_LESSON + (perfect ? XP_PERFECT_BONUS : 0) + bonusXp;
   state.xp += xp;
   const today = dayKey(now);
   const goalBefore = (state.daily[today] || 0) >= state.dailyGoal;

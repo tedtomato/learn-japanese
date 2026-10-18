@@ -1,11 +1,11 @@
 // Profile: stats, achievements, settings, backup and app version.
 import { ITEMS, NODES } from '../course.js';
 import { app, statsBar, toast, modal } from '../app.js';
-import { html, mount, $, $$ } from '../dom.js';
+import { html, mount, raw, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { speak, voiceStatus } from '../audio.js';
-import { VERSION } from '../version.js';
+import { versionLabel } from '../version.js';
 import { checkForUpdate, hardRefresh } from '../update.js';
 import {
   displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, defaultState, FREEZE_PRICE, MAX_FREEZES,
@@ -13,8 +13,8 @@ import {
 
 function achievements(state, now) {
   const learned = learnedItemIds(state).map((id) => ITEMS.get(id));
-  const kana = learned.filter((i) => i.type === 'kana').length;
-  const words = learned.filter((i) => i.type !== 'kana').length;
+  const kana = learned.filter((i) => i.type === 'kana' && i.script === 'hiragana').length;
+  const words = learned.filter((i) => i.type === 'word' || i.type === 'sentence').length;
   const unitsDone = NODES.filter((n) => n.kind === 'review' && isNodeDone(state, n)).length;
   const best = Math.max(state.streak.best, displayStreak(state, now));
   return [
@@ -22,6 +22,7 @@ function achievements(state, now) {
     { icon: 'あ', title: 'Kana collector', desc: 'Learn 25 hiragana', value: kana, goal: 25 },
     { icon: '🏆', title: 'Hiragana master', desc: 'Learn all 71 hiragana', value: kana, goal: 71 },
     { icon: '💬', title: 'Wordsmith', desc: 'Learn 50 words and phrases', value: words, goal: 50 },
+    { icon: '漢', title: 'Kanji explorer', desc: 'Learn 10 kanji', value: learned.filter((i) => i.type === 'kanji' && !i.peek).length, goal: 10 },
     { icon: '🔥', title: 'On fire', desc: 'Reach a 7 day streak', value: best, goal: 7 },
     { icon: '🎯', title: 'Sharpshooter', desc: '10 perfect lessons', value: state.stats.perfect, goal: 10 },
     { icon: '⚡', title: 'XP hunter', desc: 'Earn 500 XP', value: state.xp, goal: 500 },
@@ -36,10 +37,13 @@ const VOICE_TEXT = {
   no: 'No Japanese voice found. Install one in your phone settings (Accessibility → Spoken content / Text-to-speech) to hear audio.',
 };
 
+const fmtDate = (t) => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+
 export function renderProfile(root) {
   const { state } = app;
   const now = app.now();
   const learned = learnedItemIds(state);
+  const count = (...types) => learned.filter((id) => types.includes(ITEMS.get(id).type)).length;
   const s = state.settings;
   const seg = (name, value, options) => html`<div class="seg" data-setting="${name}">${options.map(([v, label]) =>
     html`<button class="${String(value) === String(v) ? 'on' : ''}" data-v="${v}">${label}</button>`)}</div>`;
@@ -48,14 +52,16 @@ export function renderProfile(root) {
   <main class="page profile">
     <section class="profile-head">
       <div class="avatar">${mascot('happy', 92)}</div>
-      <div><h1>My progress</h1><p class="muted">Learning since ${new Date(state.createdAt).toLocaleDateString()}</p></div>
+      <div><h1>My progress</h1><p class="muted">Learning since ${fmtDate(state.createdAt)}</p></div>
     </section>
 
     <div class="stat-grid">
       <div class="card stat-card"><span class="c-orange">${icon('flame', 26)}</span><b>${displayStreak(state, now)}</b><small>Day streak</small></div>
       <div class="card stat-card"><span class="c-gold">${icon('bolt', 26)}</span><b>${state.xp}</b><small>Total XP</small></div>
-      <div class="card stat-card"><span class="c-blue">${icon('kana', 26)}</span><b>${learned.filter((id) => ITEMS.get(id).type === 'kana').length}</b><small>Kana learned</small></div>
-      <div class="card stat-card"><span class="c-green">${icon('word', 26)}</span><b>${learned.filter((id) => ITEMS.get(id).type !== 'kana').length}</b><small>Words & phrases</small></div>
+      <a class="card stat-card link-card" href="#/practice/kana"><span class="c-blue">${icon('kana', 26)}</span><b>${count('kana')}</b><small>Kana learned ›</small></a>
+      <a class="card stat-card link-card" href="#/practice/words"><span class="c-green">${icon('word', 26)}</span><b>${count('word', 'sentence')}</b><small>Words & phrases ›</small></a>
+      <a class="card stat-card link-card" href="#/practice/kanji"><span class="c-purple">${raw('<b class="jp" style="font-size:22px">漢</b>')}</span><b>${count('kanji', 'kword', 'radical')}</b><small>Kanji & radicals ›</small></a>
+      <a class="card stat-card link-card" href="#/collection/fact"><span class="c-orange">${icon('book', 26)}</span><b>${state.seen.fact.length}</b><small>Fun facts ›</small></a>
     </div>
 
     <h2 class="sub-title">Achievements</h2>
@@ -78,6 +84,8 @@ export function renderProfile(root) {
     <div class="card settings">
       <div class="setting"><span>Appearance</span>${seg('theme', s.theme, [['system', 'Auto'], ['light', 'Light'], ['dark', 'Dark']])}</div>
       <div class="setting"><span>Daily goal</span>${seg('dailyGoal', state.dailyGoal, [[10, 'Casual'], [20, 'Regular'], [30, 'Serious'], [50, 'Intense']])}</div>
+      <div class="setting"><span>Speed challenge</span>${seg('speed', s.speed !== false, [[true, 'On'], [false, 'Off']])}</div>
+      <div class="setting"><span>Speaking tasks</span>${seg('speaking', s.speaking !== false, [[true, 'On'], [false, 'Off']])}</div>
       <div class="setting"><span>Sound effects</span>${seg('sfx', s.sfx, [[true, 'On'], [false, 'Off']])}</div>
       <div class="setting"><span>Voice speed</span>${seg('voiceRate', s.voiceRate, [[0.7, 'Slow'], [0.85, 'Normal'], [1, 'Fast']])}</div>
       <div class="setting column"><span>Japanese voice</span><small class="muted voice-status">${VOICE_TEXT[voiceStatus()]}</small>
@@ -95,13 +103,14 @@ export function renderProfile(root) {
 
     <h2 class="sub-title">About</h2>
     <div class="card settings">
-      <div class="setting"><span>App version</span><code class="version">${VERSION}</code></div>
+      <div class="setting"><span>App version</span><code class="version">${versionLabel()}</code></div>
       <button class="btn btn-white check-update">${icon('refresh', 18)} Check for updates</button>
       <button class="btn btn-ghost hard-refresh">Reload latest version</button>
       <p class="muted small">Not seeing an update? “Reload latest version” clears the app's cached files and loads it fresh from GitHub. Your progress is kept.</p>
       <button class="btn btn-danger-ghost reset">Reset all progress</button>
     </div>
     <p class="muted small center">Hajime — はじめ — means “beginning”.</p>
+    <p class="muted small center credits">Stroke order data: <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> (CC BY-SA 3.0). Illustrations: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a> (CC BY 4.0).</p>
   </main>`);
 
   $$('.seg', root).forEach((segEl) =>

@@ -1,44 +1,145 @@
-// Japanese speech (the device's built-in voice) and small sound effects.
+// Japanese speech with the device's voices, voice casting for the lesson characters, speech
+// recognition for speaking exercises, and small generated sound effects.
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
-let jaVoice = null;
+let jaVoices = [];
 let voiceCount = 0;
-let rate = 0.85;
+let baseRate = 0.85;
 
-function chooseVoice() {
+const FEMALE = /kyoko|o-?ren|haruka|ayumi|nanami|sayaka|mizuki|aoi|shiori|mei|female|女性|google 日本語|htm|jad/i;
+const MALE = /otoya|hattori|ichiro|keita|daichi|naoki|takumi|kenji|male(?!.)|男性|jab|jac/i;
+
+function loadVoices() {
   if (!synth) return;
   const voices = synth.getVoices();
   voiceCount = voices.length;
-  const ja = voices.filter((v) => /^ja([-_]|$)/i.test(v.lang));
-  const preferred = ['Google', 'Kyoko', 'O-ren', 'Otoya', 'Hattori', 'Nanami', 'Microsoft'];
-  jaVoice = preferred.map((p) => ja.find((v) => v.name.includes(p))).find(Boolean) || ja[0] || null;
+  jaVoices = voices.filter((v) => /^ja([-_]|$)/i.test(v.lang)).map((v) => ({
+    voice: v,
+    gender: MALE.test(v.name) ? 'male' : FEMALE.test(v.name) ? 'female' : 'unknown',
+  }));
 }
-
 if (synth) {
-  chooseVoice();
-  synth.addEventListener?.('voiceschanged', chooseVoice);
+  loadVoices();
+  synth.addEventListener?.('voiceschanged', loadVoices);
 }
 
-export const setVoiceRate = (r) => (rate = r);
+export const setVoiceRate = (r) => (baseRate = r);
 
-// 'yes' when a Japanese voice is installed, 'no' when the device lists voices but none are Japanese,
-// 'unknown' when the device has not listed its voices (iOS sometimes) — we still try then.
 export function voiceStatus() {
   if (!synth) return 'no';
-  if (jaVoice) return 'yes';
+  if (jaVoices.length) return 'yes';
   return voiceCount > 0 ? 'no' : 'unknown';
 }
+export const canSpeakAloud = () => voiceStatus() !== 'no';
 
-export const canSpeak = () => voiceStatus() !== 'no';
+// Each character has a voice: a matching male/female device voice when available, otherwise
+// the pitch does the work (a deep man, a high girl).
+const CAST = {
+  man: { gender: 'male', pitch: 0.9, fallbackPitch: 0.6, rate: 1 },
+  woman: { gender: 'female', pitch: 1.05, fallbackPitch: 1.05, rate: 1 },
+  boy: { gender: 'male', pitch: 1.35, fallbackPitch: 1.2, rate: 1.05 },
+  girl: { gender: 'female', pitch: 1.45, fallbackPitch: 1.45, rate: 1.05 },
+  narrator: { gender: 'female', pitch: 1, fallbackPitch: 1, rate: 1 },
+};
+export const SPEAKERS = ['man', 'woman', 'boy', 'girl'];
 
-export function speak(text, { slow = false } = {}) {
-  if (!synth || !text) return;
-  synth.cancel();
-  const u = new SpeechSynthesisUtterance(text);
-  u.lang = 'ja-JP';
-  if (jaVoice) u.voice = jaVoice;
-  u.rate = slow ? 0.5 : rate;
-  synth.speak(u);
+function voiceFor(speaker) {
+  const want = CAST[speaker] || CAST.narrator;
+  const exact = jaVoices.filter((v) => v.gender === want.gender);
+  if (exact.length) return { voice: exact[0].voice, pitch: want.pitch };
+  const other = jaVoices.find((v) => v.gender === 'unknown') || jaVoices[0];
+  return { voice: other?.voice || null, pitch: want.fallbackPitch };
+}
+
+// Speaks Japanese. opts: speaker, slow, fast, onStart, onEnd. Resolves when finished.
+export function speak(text, { speaker = 'narrator', slow = false, fast = false, onStart, onEnd } = {}) {
+  return new Promise((resolve) => {
+    if (!synth || !text) {
+      resolve();
+      return;
+    }
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const { voice, pitch } = voiceFor(speaker);
+    u.lang = 'ja-JP';
+    if (voice) u.voice = voice;
+    u.pitch = Math.min(2, pitch);
+    const cast = CAST[speaker] || CAST.narrator;
+    u.rate = slow ? 0.5 : fast ? Math.min(1.6, baseRate * 1.45) : baseRate * cast.rate;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      onEnd?.();
+      resolve();
+    };
+    u.onstart = () => onStart?.();
+    u.onend = finish;
+    u.onerror = finish;
+    // Some browsers never fire onend; give up after a generous estimate.
+    setTimeout(finish, 1500 + text.length * 400);
+    synth.speak(u);
+  });
+}
+
+export const stopSpeaking = () => synth?.cancel();
+
+// ---- Speech recognition ----
+const Recognition = typeof window !== 'undefined' ? window.SpeechRecognition || window.webkitSpeechRecognition : undefined;
+export const canRecognise = () => !!Recognition;
+
+// Listens once in Japanese; resolves with the alternatives heard ([] on silence / error).
+export function listen({ timeoutMs = 7000 } = {}) {
+  return new Promise((resolve) => {
+    if (!Recognition) {
+      resolve([]);
+      return;
+    }
+    const rec = new Recognition();
+    rec.lang = 'ja-JP';
+    rec.interimResults = false;
+    rec.maxAlternatives = 5;
+    let heard = [];
+    const timer = setTimeout(() => rec.stop(), timeoutMs);
+    rec.onresult = (e) => {
+      heard = [...e.results[0]].map((r) => r.transcript);
+    };
+    rec.onerror = () => {};
+    rec.onend = () => {
+      clearTimeout(timer);
+      resolve(heard);
+    };
+    try {
+      rec.start();
+    } catch {
+      clearTimeout(timer);
+      resolve([]);
+    }
+  });
+}
+
+const toHira = (s) => s.replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+const normJa = (s) => toHira(s).replace(/[\s、。！？!?.,・～〜ー]/g, '');
+
+function similarity(a, b) {
+  if (!a || !b) return 0;
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+    }
+  }
+  return 1 - d[a.length][b.length] / Math.max(a.length, b.length);
+}
+
+// Is what the recogniser heard close enough to the target (kana) or one of its other spellings?
+export function speechMatches(heard, targets) {
+  const goals = targets.map(normJa).filter(Boolean);
+  return heard.some((h) => {
+    const n = normJa(h);
+    return goals.some((g) => n.includes(g) || g.includes(n) && n.length >= g.length * 0.7 || similarity(n, g) >= 0.6);
+  });
 }
 
 // ---- Sound effects (generated, no audio files) ----
@@ -64,7 +165,12 @@ const SOUNDS = {
   correct: () => { tone(880, 0, 0.12); tone(1318, 0.09, 0.22); },
   wrong: () => { tone(220, 0, 0.18, 'square', 0.06); tone(180, 0.12, 0.25, 'square', 0.06); },
   tap: () => tone(660, 0, 0.05, 'triangle', 0.08),
+  tick: () => tone(1200, 0, 0.04, 'square', 0.05),
+  timeup: () => { tone(440, 0, 0.12, 'sawtooth', 0.06); tone(330, 0.12, 0.25, 'sawtooth', 0.06); },
+  bonus: () => [784, 988, 1175].forEach((f, i) => tone(f, i * 0.07, 0.15, 'triangle', 0.12)),
+  chest: () => [523, 659, 784, 1046, 1318].forEach((f, i) => tone(f, i * 0.08, 0.25, 'triangle', 0.12)),
   complete: () => [523, 659, 784, 1046].forEach((f, i) => tone(f, i * 0.11, 0.3, 'triangle', 0.14)),
+  stroke: () => tone(990, 0, 0.08, 'sine', 0.1),
 };
 
 export function sfx(name) {

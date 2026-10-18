@@ -7,6 +7,7 @@ import { renderPractice, renderCollection } from './screens/practice.js';
 import { renderProfile } from './screens/profile.js';
 import { startSession, lessonKey } from './lesson/player.js';
 import { initUpdates } from './update.js';
+import { splash } from './fx.js';
 
 const TABS = [
   ['learn', 'Learn', 'learn'],
@@ -31,7 +32,7 @@ function route() {
   document.body.classList.toggle('in-lesson', inSession);
   if (name === 'lesson') startSession(root, { nodeId: arg });
   else if (name === 'practice' && arg === 'go') startSession(root, {});
-  else if (name === 'practice') renderPractice(root);
+  else if (name === 'practice') renderPractice(root, arg);
   else if (name === 'collection') renderCollection(root, arg);
   else if (name === 'profile') renderProfile(root);
   else renderLearn(root);
@@ -49,5 +50,6 @@ window.addEventListener('hashchange', route);
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applySettings);
 
 applySettings();
+splash();
 route();
 initUpdates();

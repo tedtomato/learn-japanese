@@ -2,6 +2,7 @@
 import { FACTS, PHRASES, KANJI } from './content/extras.js';
 import { html } from './dom.js';
 import { icon } from './icons.js';
+import { art } from './art.js';
 
 export const KINDS = {
   fact: { list: FACTS, title: 'Did you know?', collection: 'Fun facts' },
@@ -21,6 +22,7 @@ const EMOJI = {
   globe: '🌐', bus: '🚌', plane: '✈️', siren: '🚨', medical: '🏥', hotel: '🏨', bank: '🏦',
 };
 export const emojiFor = (name) => EMOJI[name] || '🎌';
+export const EMOJI_USED = [...Object.values(EMOJI), '🎌'];
 
 // Text to speak for a phrase (drops the "～" placeholder).
 export const phraseSpeech = (p) => p.jp.replace(/[～~]/g, '');
@@ -28,30 +30,36 @@ export const phraseSpeech = (p) => p.jp.replace(/[～~]/g, '');
 const KIND_WEIGHTS = [['fact', 0.5], ['phrase', 0.35], ['kanji', 0.15]];
 
 // Picks something the learner has not seen yet (or anything, once all are seen) and marks it seen.
-export function nextTidbit(state, rng = Math.random, kinds = ['fact', 'phrase', 'kanji']) {
+// theme: { facts: [categories], phrases: [categories] } keeps breaks on the current unit's topic.
+export function nextTidbit(state, rng = Math.random, kinds = ['fact', 'phrase', 'kanji'], theme = {}) {
   const weights = KIND_WEIGHTS.filter(([k]) => kinds.includes(k));
   const total = weights.reduce((a, [, w]) => a + w, 0);
   let r = rng() * total;
   const kind = (weights.find(([, w]) => (r -= w) < 0) || weights[0])[0];
   const seen = new Set(state.seen[kind]);
-  const { list } = KINDS[kind];
+  const all = KINDS[kind].list;
+  const cats = kind === 'fact' ? theme.facts : kind === 'phrase' ? theme.phrases : null;
+  const themed = cats?.length ? all.filter((x) => cats.includes(x.category)) : [];
+  const list = themed.length ? themed : all;
   const fresh = list.filter((x) => !seen.has(x.id));
   const pool = fresh.length ? fresh : list;
   const item = pool[Math.floor(rng() * pool.length)];
   if (!seen.has(item.id)) state.seen[kind] = [...state.seen[kind], item.id];
+  // A spotted kanji joins practice, where it comes back as a question with its tip as a clue.
+  if (kind === 'kanji' && !state.items[`xk-${item.id}`]) state.items[`xk-${item.id}`] = { box: 0, seen: 0, right: 0, wrong: 0, last: 0, due: 0 };
   return { kind, item };
 }
 
 export function tidbitBody(kind, item) {
   if (kind === 'fact') {
-    return html`<div class="tidbit-head"><span class="tidbit-emoji">${emojiFor(item.icon)}</span><b>${item.title}</b></div>
+    return html`<div class="tidbit-head"><span class="tidbit-emoji">${art(emojiFor(item.icon))}</span><b>${item.title}</b></div>
       <p class="tidbit-text">${item.text}</p><small class="muted">${item.category}</small>`;
   }
   if (kind === 'phrase') {
     return html`<div class="tidbit-phrase">
       <button class="say-inline" data-say="${phraseSpeech(item)}" aria-label="Play">${icon('speaker', 22)}</button>
       <div><div class="jp jp-lg">${item.jp}</div><div class="tidbit-romaji">${item.romaji} <span class="muted">(${item.say})</span></div>
-      <div class="tidbit-en">${emojiFor(item.icon)} ${item.en}</div></div></div>`;
+      <div class="tidbit-en">${art(emojiFor(item.icon), 'art-inline')} ${item.en}</div></div></div>`;
   }
   return html`<div class="tidbit-kanji">
     <button class="kanji-big jp" data-say="${item.kun ? item.kun.split(' ')[0].replace(/[()]/g, '') : item.k}" aria-label="Play">${item.k}</button>

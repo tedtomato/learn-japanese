@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.25', date: '18 Oct 2026', changes: [
+    'Fixed: long Japanese answers (どうもありがとうございます) running off the screen — they now shrink, then wrap',
+  ] },
   { version: '0.24', date: '18 Oct 2026', changes: [
     'Each new hiragana comes with a word you already know: す as in すし (sushi), か as in からて (karate)…',
     'Katakana linked to everyday loanwords: タ as in タクシー (taxi), コ as in コーヒー (coffee)…',

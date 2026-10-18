@@ -447,7 +447,7 @@ function optionHtml(opt, ex) {
   if (ex.answerKind === 'en') return html`<span class="opt-label">${opt.en}</span>`;
   if (ex.answerKind === 'romaji') return html`<span class="opt-label">${opt.romaji}</span>`;
   const isKana = opt.type === 'kana';
-  return html`<span class="opt-label ${isKana ? 'jp-lg' : ''}">${isKana ? html`<span class="jp">${opt.jp}</span>` : jpItem(opt, ex.hint)}</span>`;
+  return html`<span class="opt-label fit ${isKana ? 'jp-lg' : ''}">${isKana ? html`<span class="jp">${opt.jp}</span>` : jpItem(opt, ex.hint)}</span>`;
 }
 
 function renderChoice(root, s) {

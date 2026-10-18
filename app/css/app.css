@@ -749,3 +749,13 @@ ruby { padding: 0 3px; }
 .ruby-on ruby + ruby { margin-left: 0; }
 .ruby-on:not(:has(.chunk)) { white-space: nowrap; }
 .bubble-lg .jp-lg { font-size: 26px; }
+/* v0.11: match cards always split the width in two; long words wrap inside their card. */
+.match { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+.match-btn { min-width: 0; overflow-wrap: anywhere; font-size: 17px; }
+.match-btn .ruby-on { white-space: normal; font-size: 20px; line-height: 1.9; }
+.match-btn rt { font-size: 12px; }
+.option { min-width: 0; }
+.match { grid-auto-rows: auto; gap: 10px; }
+.match-btn { min-height: 64px; padding: 8px; }
+.match-btn ruby { padding: 0 1px; }
+.match-btn .ruby-on { font-size: 18px; line-height: 1.8; }

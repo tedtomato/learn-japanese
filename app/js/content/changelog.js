@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.30', date: '18 Oct 2026', changes: [
+    'Tap any word of a Japanese sentence to hear it said (は is said "wa" as a particle)',
+  ] },
   { version: '0.29', date: '18 Oct 2026', changes: [
     'More romaji help: it stays until you know each character well (right over a few days), not after seeing it once',
     'Sentences keep their romaji until you know the sentence well',

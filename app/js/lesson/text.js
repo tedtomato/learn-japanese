@@ -16,9 +16,12 @@ export function jpWord(text, romaji, hint) {
 }
 
 // An item (word / sentence / kana / kanji word) as Japanese text.
+// Particles said on their own sound different from their letters: は "wa", へ "e", を "o".
+const PARTICLE_SOUND = { は: 'わ', へ: 'え', を: 'お' };
+
 export function jpItem(item, hint) {
   if (item.type === 'sentence') {
-    return html`<span class="jp ${hint ? 'ruby-on' : ''}">${item.jp.map((c, i) => html`<span class="chunk">${hint ? rubyWord(c, item.romajiChunks[i]) : c}</span>`)}</span>`;
+    return html`<span class="jp ${hint ? 'ruby-on' : ''}">${item.jp.map((c, i) => html`<span class="chunk" data-chunk="${PARTICLE_SOUND[c] || c}">${hint ? rubyWord(c, item.romajiChunks[i]) : c}</span>`)}</span>`;
   }
   if (item.type === 'kword') return hint ? html`<span class="jp ruby-on"><ruby>${item.jp}<rt>${item.kana}</rt></ruby></span>` : html`<span class="jp">${item.jp}</span>`;
   return jpWord(item.jp, item.romaji, hint && item.type === 'word');

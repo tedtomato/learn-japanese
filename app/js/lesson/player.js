@@ -198,6 +198,14 @@ function next(root, s) {
   startTimer(root, s, null);
   RENDERERS[s.current.type](root, s);
   fitText(root);
+  // Tap a word of the Japanese sentence to hear it (not in reading tests, where it would give the answer).
+  if (s.current.kind !== 'read') {
+    $$('.prompt-person .chunk', root).forEach((c) => c.addEventListener('click', () => {
+      c.classList.add('chunk-say');
+      setTimeout(() => c.classList.remove('chunk-say'), 700);
+      sayAs(root, s.speaker, c.dataset.chunk);
+    }));
+  }
   $$('.show-romaji', root).forEach((b) => b.addEventListener('click', () => {
     b.previousElementSibling?.classList.remove('rt-hidden');
     b.remove();

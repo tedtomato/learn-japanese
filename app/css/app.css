@@ -870,3 +870,7 @@ button.stat:active { transform: scale(.94); }
 .jp-prompt-wrap > .fit { max-width: 100%; }
 .rt-hidden rt { visibility: hidden; }
 .show-romaji { background: none; border: 0; padding: 2px 0; font: inherit; font-size: 13px; font-weight: 800; color: var(--blue-text); text-transform: uppercase; letter-spacing: .04em; }
+
+/* v0.30: tap a word of a Japanese sentence to hear it. */
+.prompt-person .chunk { cursor: pointer; border-radius: 8px; transition: background .2s, color .2s; }
+.prompt-person .chunk:active, .prompt-person .chunk.chunk-say { background: var(--blue-soft); color: var(--blue-text); }

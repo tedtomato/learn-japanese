@@ -1,5 +1,6 @@
 // Japanese text with optional romaji over each syllable (like furigana), as <ruby> markup.
 import { html, raw } from '../dom.js';
+import { art } from '../art.js';
 import { syllablesFor } from '../romaji.js';
 import { romajiOfChunk } from './generate.js';
 
@@ -26,6 +27,15 @@ export function jpItem(item, hint) {
 // A Japanese tile / chunk label, with romaji above when available.
 export function jpChunk(text, hint, romaji = romajiOfChunk(text)) {
   return hint && romaji ? rubyWord(text, romaji) : raw(text.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]));
+}
+
+// "As in すし (sushi)" for a kana: a word the learner already knows, with the kana highlighted.
+export function kanaExample(item) {
+  const ex = item.example;
+  if (!ex) return '';
+  const word = [...ex.jp].map((c) => (c === item.jp ? html`<mark>${c}</mark>` : c));
+  return html`<button class="kana-example" data-say="${ex.jp}">${ex.art ? art(ex.art, 'art-ex') : ''}
+    <span><small>As in</small> <b class="jp">${word}</b> <span class="ex-romaji">${ex.romaji}</span>${ex.en ? html` <small>(${ex.en})</small>` : ''}</span></button>`;
 }
 
 // What to say out loud for an item.

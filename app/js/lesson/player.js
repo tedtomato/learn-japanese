@@ -14,7 +14,7 @@ import { generateLesson, generatePractice, generateRetry, demoExercises } from '
 import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey } from '../progress.js';
 import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
 import { GRAMMAR } from '../content/grammar.js';
-import { jpItem, jpChunk, speechOf } from './text.js';
+import { jpItem, jpChunk, speechOf, kanaExample } from './text.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';
 import { rewardPopup } from '../fx.js';
@@ -371,7 +371,7 @@ function introHtml(item, hint) {
   switch (item.type) {
     case 'kana':
       return html`<div class="jp jp-giant">${item.jp}</div><div class="intro-romaji">${item.romaji}</div>
-        <p class="pill pill-blue">${item.script === 'katakana' ? 'Katakana' : 'Hiragana'}</p>${item.hint ? html`<p class="intro-hint">💡 ${item.hint}</p>` : ''}`;
+        <p class="pill pill-blue">${item.script === 'katakana' ? 'Katakana' : 'Hiragana'}</p>${kanaExample(item)}${item.hint ? html`<p class="intro-hint">💡 ${item.hint}</p>` : ''}`;
     case 'kanji':
     case 'radical':
       return html`<div class="jp jp-giant">${item.jp}</div><div class="intro-en">${item.en}</div>

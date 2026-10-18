@@ -3,7 +3,7 @@
 import { ITEMS } from '../course.js';
 import { GLOSSARY } from '../content/grammar.js';
 import { html } from '../dom.js';
-import { jpItem, jpChunk } from './text.js';
+import { jpItem, jpChunk, kanaExample } from './text.js';
 import { readings } from '../tidbits.js';
 
 const wordByJp = () => {
@@ -44,7 +44,7 @@ export function explainCards(item, { chosenLabel } = {}) {
       ${ex.length ? html`<p class="muted small">Used in:</p><ul>${ex.map((s) => html`<li><span class="jp">${s.text}</span> — ${s.en}</li>`)}</ul>` : ''}` });
   } else if (item.type === 'kana') {
     cards.push({ chip: item.jp, body: html`<p class="ex-lead"><span class="jp ex-key">${item.jp}</span> is read <b>“${item.romaji}”</b>.</p>
-      <p>${item.script === 'katakana' ? 'Katakana' : 'Hiragana'}. ${item.hint}</p>` });
+      ${kanaExample(item)}<p>${item.script === 'katakana' ? 'Katakana' : 'Hiragana'}. ${item.hint}</p>` });
   } else if (item.type === 'kanji' || item.type === 'radical') {
     cards.push({ chip: item.jp, body: html`<p class="ex-lead"><span class="jp ex-key">${item.jp}</span> means <b>“${item.en}”</b>.</p>
       ${item.parts?.length > 1 ? html`<p class="parts">${item.parts.map(([p, m], i) => html`${i ? ' + ' : ''}<span class="part"><b class="jp">${p}</b> ${m}</span>`)} = <b class="jp">${item.jp}</b></p>` : ''}

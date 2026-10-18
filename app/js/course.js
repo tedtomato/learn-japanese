@@ -1,6 +1,7 @@
 // Builds the course tree (sections → units → path nodes) and the global item index from content.
 // Kana are not taught in separate sections: each unit gets "Read it" lessons for the characters
 // its own words use (most frequent first), so reading grows alongside vocabulary.
+import { KANA_WORDS } from './content/kana-words.js';
 import { KANA, kanaId } from './content/kana.js';
 import { SECTIONS_DATA, DIALOGUES } from './content/units.js';
 import { KANJI, RADICALS, KANJI_LESSONS } from './content/kanji.js';
@@ -27,7 +28,9 @@ const kanaChars = (text) => [...text].filter((c) => KANA.has(c));
 
 function kanaItem(ch) {
   const info = KANA.get(ch);
-  return addItem({ id: kanaId(ch), type: 'kana', jp: ch, romaji: info.romaji, hint: info.hint, script: info.script, say: info.say });
+  const [word, wordRomaji, art, en] = KANA_WORDS[ch] || [];
+  return addItem({ id: kanaId(ch), type: 'kana', jp: ch, romaji: info.romaji, hint: info.hint, script: info.script, say: info.say,
+    example: word && { jp: word, romaji: wordRomaji, art, en } });
 }
 
 function wordItem([jp, romaji, en, art, extra = {}], ctx) {

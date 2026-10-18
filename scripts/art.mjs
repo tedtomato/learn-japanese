@@ -8,7 +8,7 @@ import { EMOJI_USED } from '../app/js/tidbits.js';
 
 const src = process.argv[2];
 const out = new URL('../app/art/', import.meta.url).pathname;
-const wanted = new Set([...ITEMS.values()].map((i) => i.art).filter(Boolean));
+const wanted = new Set([...ITEMS.values()].flatMap((i) => [i.art, i.example?.art]).filter(Boolean));
 EMOJI_USED.forEach((e) => wanted.add(e));
 ['🔥', '💎', '❤️', '⭐', '🏆', '🎁', '🧊', '🌱', '🎯', '⚡', '🗾', '📚', '💬', '🈁', '🎌', '⏱️', '🌸', '🔤'].forEach((e) => wanted.add(e));
 

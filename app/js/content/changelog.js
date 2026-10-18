@@ -1,6 +1,11 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.24', date: '18 Oct 2026', changes: [
+    'Each new hiragana comes with a word you already know: す as in すし (sushi), か as in からて (karate)…',
+    'Katakana linked to everyday loanwords: タ as in タクシー (taxi), コ as in コーヒー (coffee)…',
+    'Also shown in the unit Guide and in Explain',
+  ] },
   { version: '0.23', date: '18 Oct 2026', changes: [
     'A kanji is always shown first with its memory clue before you are asked to recognise it (also for kanji spotted in Kanji peek)',
     'The memory clue ("Remember it: …") now stands out on the kanji card',

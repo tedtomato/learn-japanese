@@ -809,3 +809,13 @@ ruby { padding: 0 3px; }
 
 /* v0.23: the kanji memory clue stands out on its first card. */
 .intro-clue { color: var(--text-strong); font-size: 17px; line-height: 1.4; background: var(--gold-soft, rgba(255, 200, 0, .12)); border-radius: 12px; padding: 8px 12px; }
+
+/* v0.24: kana linked to a word you already know ("As in すし sushi"). */
+.kana-example { display: flex; align-items: center; gap: 10px; text-align: left; padding: 8px 14px; border-radius: 14px; background: var(--card-2); border: 2px solid var(--border); border-bottom-width: 4px; color: var(--text); font-size: 16px; }
+.kana-example .art-ex { width: 40px; height: 40px; flex: none; }
+.kana-example b.jp { font-size: 22px; color: var(--text-strong); }
+.kana-example mark { background: none; color: var(--blue-text); text-decoration: underline 3px; text-underline-offset: 4px; }
+.kana-example .ex-romaji { font-weight: 800; color: var(--blue-text); }
+.kana-example small { color: var(--muted); }
+.guide-ex { font-size: 12px; color: var(--muted); }
+.guide-ex b { color: var(--text-strong); }

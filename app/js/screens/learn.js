@@ -77,7 +77,7 @@ function unitGuide(unit) {
     <div class="guide">${items.map((it) => html`<button class="guide-card ${it.type}" data-say="${speechOf(it)}">
       ${it.art ? art(it.art, 'art-guide') : ''}
       <span class="guide-jp fit">${jpItem(it, it.type === 'word' || it.type === 'sentence' || it.type === 'kword')}</span>
-      ${it.type === 'kana' ? html`<span class="guide-romaji">${it.romaji}</span>` : ''}
+      ${it.type === 'kana' ? html`<span class="guide-romaji">${it.romaji}</span>${it.example ? html`<span class="guide-ex">as in <b class="jp">${it.example.jp}</b> ${it.example.romaji}</span>` : ''}` : ''}
       ${it.en ? html`<span class="guide-en">${it.en}</span>` : ''}
       ${it.hint || it.note || it.story ? html`<span class="guide-hint">${it.note || it.story || it.hint}</span>` : ''}
     </button>`)}</div>`,

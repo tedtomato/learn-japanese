@@ -24,7 +24,7 @@ const FACT = {
 export const SECTIONS_DATA = [
   {
     id: 'tokyo',
-    title: 'Tokyo trip',
+    title: 'First trip to Japan',
     units: [
       {
         id: 'hello',

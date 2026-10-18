@@ -397,7 +397,12 @@ span.c-orange { color: var(--orange); } span.c-blue { color: var(--blue); } span
 .seg button.on { background: var(--blue); color: #fff; }
 .row-btns { display: flex; gap: 10px; flex-wrap: wrap; }
 .row-btns .btn { flex: 1; }
-.version { color: var(--muted); }
+.version { color: var(--blue-text); font-weight: 800; font-size: 13px; text-align: right; }
+.version-row { background: none; border: 0; padding: 0; width: 100%; text-align: left; }
+.changelog { display: flex; flex-direction: column; gap: 14px; }
+.changelog h3 { font-size: 17px; }
+.changelog h3 small { color: var(--muted); font-size: 13px; margin-left: 6px; }
+.changelog ul { margin: 6px 0 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; font-size: 15px; }
 
 /* ---------- Toast & modal ---------- */
 #toast {
@@ -621,7 +626,26 @@ span.c-purple { color: var(--purple); }
 .splash h1 { color: #fff; font-size: 40px; }
 .splash h1 .jp { display: block; font-size: 22px; opacity: .9; }
 .splash p { font-weight: 700; opacity: .92; }
-.splash-version { position: absolute; bottom: calc(18px + var(--safe-bottom)); left: 0; right: 0; text-align: center; color: rgba(255,255,255,.85); font-weight: 700; font-size: 12px; }
+.splash-go { margin-top: 18px; min-width: 220px; --t: var(--green-edge); animation: pulse .9s ease-in-out infinite alternate; }
+.splash-credits { position: absolute; bottom: calc(16px + var(--safe-bottom)); left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,.88); font-size: 12px; font-weight: 700; }
+.splash-credits .made { display: inline-flex; align-items: center; gap: 6px; }
+.claude-spark { width: 18px; height: 18px; fill: #d97757; filter: drop-shadow(0 0 1px rgba(255,255,255,.6)); animation: spark-spin 6s linear infinite, spark-pulse 1.6s ease-in-out infinite alternate; }
+@keyframes spark-spin { to { rotate: 360deg; } }
+@keyframes spark-pulse { from { scale: .9; } to { scale: 1.12; } }
+
+/* No accidental text selection or long-press menus anywhere in the app. */
+html, body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+
+/* Bottom menu: the chosen tab's icon bounces. */
+#nav a.bounce .icon { animation: nav-bounce .5s cubic-bezier(.3, 1.6, .5, 1); }
+#nav a:active .icon { transform: scale(.85); }
+@keyframes nav-bounce { 0% { transform: scale(.7) translateY(4px); } 60% { transform: scale(1.2) translateY(-4px); } 100% { transform: none; } }
+
+/* Computer / tablet gate */
+.gate { min-height: 100dvh; max-width: 520px; margin: 0 auto; padding: 32px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; text-align: center; }
+.gate h1 { font-size: 28px; }
+.gate-url { font-size: 20px; font-weight: 800; color: var(--blue-text); background: var(--blue-soft); border-radius: 14px; padding: 10px 16px; -webkit-user-select: all; user-select: all; }
+body.desktop-gate #nav { display: none; }
 .credits a { color: var(--blue-text); }
 .reward-pop { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(360px, calc(100% - 32px)); background: var(--card); border-radius: 28px; padding: 20px; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center; animation: pop .3s ease-out; }
 .fx-stage { position: relative; width: 160px; height: 140px; display: grid; place-items: center; }

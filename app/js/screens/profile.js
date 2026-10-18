@@ -6,6 +6,7 @@ import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { speak, voiceStatus } from '../audio.js';
 import { versionLabel } from '../version.js';
+import { CHANGELOG, APP_RELEASE } from '../content/changelog.js';
 import { checkForUpdate, hardRefresh } from '../update.js';
 import {
   displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, defaultState, FREEZE_PRICE, MAX_FREEZES,
@@ -103,7 +104,7 @@ export function renderProfile(root) {
 
     <h2 class="sub-title">About</h2>
     <div class="card settings">
-      <div class="setting"><span>App version</span><code class="version">${versionLabel()}</code></div>
+      <button class="setting version-row"><span>App version</span><span class="version">v${APP_RELEASE} · ${versionLabel()} ›</span></button>
       <button class="btn btn-white check-update">${icon('refresh', 18)} Check for updates</button>
       <button class="btn btn-ghost hard-refresh">Reload latest version</button>
       <p class="muted small">Not seeing an update? “Reload latest version” clears the app's cached files and loads it fresh from GitHub. Your progress is kept.</p>
@@ -160,6 +161,10 @@ export function renderProfile(root) {
     }
   });
   $('.check-update', root).addEventListener('click', () => checkForUpdate());
+  $('.version-row', root).addEventListener('click', () =>
+    modal(html`<h2>What's new</h2>
+      <div class="changelog">${CHANGELOG.map((r) => html`<section><h3>v${r.version} <small>${r.date}</small></h3>
+        <ul>${r.changes.map((c) => html`<li>${c}</li>`)}</ul></section>`)}</div>`, [{ label: 'Close', kind: 'secondary' }]));
   $('.hard-refresh', root).addEventListener('click', () => hardRefresh());
   $('.reset', root).addEventListener('click', () =>
     modal(html`<div class="center">${mascot('sad', 90)}<h2>Reset everything?</h2><p class="muted">All XP, streaks and lessons on this device will be erased. This cannot be undone.</p></div>`, [

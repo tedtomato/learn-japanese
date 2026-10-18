@@ -8,6 +8,7 @@ import { renderProfile } from './screens/profile.js';
 import { startSession, lessonKey } from './lesson/player.js';
 import { initUpdates } from './update.js';
 import { splash } from './fx.js';
+import { mascot } from './mascot.js';
 
 const TABS = [
   ['learn', 'Learn', 'learn'],
@@ -15,8 +16,34 @@ const TABS = [
   ['profile', 'Profile', 'profile'],
 ];
 
+let lastTab = null;
 function renderNav(active) {
-  mount($('#nav'), html`${TABS.map(([id, label, ic]) => html`<a href="#/${id}" class="${active === id ? 'on' : ''}">${icon(ic, 26)}<span>${label}</span></a>`)}`);
+  const changed = active !== lastTab;
+  lastTab = active;
+  mount($('#nav'), html`${TABS.map(([id, label, ic]) => html`<a href="#/${id}" class="${active === id ? 'on' : ''} ${active === id && changed ? 'bounce' : ''}">${icon(ic, 26)}<span>${label}</span></a>`)}`);
+}
+
+// Phones only: progress lives on one device and cannot be shared yet, so computers and tablets
+// get a friendly "open it on your phone" screen instead of the app.
+function isPhone() {
+  const ua = navigator.userAgent;
+  const mobile = /Android|iPhone|iPod|Mobile/i.test(ua);
+  const touch = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
+  const small = Math.min(screen.width, screen.height) <= 600;
+  return mobile && touch && small;
+}
+
+function phoneOnly() {
+  document.body.classList.add('desktop-gate');
+  const url = location.href.split('#')[0].split('?')[0];
+  mount($('#view'), html`<div class="gate">
+    ${mascot('happy', 130)}
+    <h1>Hajime is made for your phone</h1>
+    <p>Lessons, listening and speaking are designed for a phone in your hand — and your progress is saved on one device, so it can't move between computer and phone yet.</p>
+    <p>Open this address on your phone:</p>
+    <p class="gate-url">${url.replace(/^https?:\/\//, '')}</p>
+    <p class="muted small">Then add it to your home screen to install it.</p>
+  </div>`);
 }
 
 function route() {
@@ -46,10 +73,12 @@ document.addEventListener('keydown', (e) => {
   const root = $('#view .screen');
   if (root?.__session) lessonKey(root, e);
 });
-window.addEventListener('hashchange', route);
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applySettings);
 
 applySettings();
-splash();
-route();
+if (isPhone()) {
+  window.addEventListener('hashchange', route);
+  splash();
+  route();
+} else phoneOnly();
 initUpdates();

@@ -8,11 +8,11 @@ bringing back what you are about to forget. Kuri the shiba cheers you on.
 
 ## What's inside
 
-**The path** — themed units of essential words, starting with what a visitor to Tokyo needs:
+**The path** — themed units of essential words, starting with what a first-time visitor to Japan needs:
 
 | Section | Units |
 |---|---|
-| **Tokyo trip** | Hello & thank you (casual / polite / formal), Getting around, Food & drinks, Shopping & help |
+| **First trip to Japan** | Hello & thank you (casual / polite / formal), Getting around, Food & drinks, Shopping & help |
 | **Everyday Japanese** | Numbers, People & jobs, Food words, Around you |
 | **Real Japanese** | Casual & slang, plus a Kana corner for the rest of the chart |
 

@@ -10,6 +10,7 @@ import { startSession, lessonKey } from './lesson/player.js';
 import { initUpdates } from './update.js';
 import { splash } from './fx.js';
 import { mascot } from './mascot.js';
+import { showStreakCalendar } from './screens/streak.js';
 
 const TABS = [
   ['learn', 'Learn', 'learn'],
@@ -71,6 +72,11 @@ function route() {
     window.scrollTo(0, 0);
   }
 }
+
+// The flame in the top bar opens the streak calendar on every screen.
+document.addEventListener('click', (e) => {
+  if (e.target.closest('.stat-streak')) showStreakCalendar();
+});
 
 document.addEventListener('keydown', (e) => {
   const root = $('#view .screen');

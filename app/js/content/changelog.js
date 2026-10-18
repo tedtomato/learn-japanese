@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.28', date: '18 Oct 2026', changes: [
+    'New: tap the 🔥 streak in the top bar for a calendar of the days you studied, your best streak and freezes',
+  ] },
   { version: '0.27', date: '18 Oct 2026', changes: [
     "New: Today's review card on Learn — words learned before that are due again, with one-tap Review now",
   ] },

@@ -835,3 +835,32 @@ ruby { padding: 0 3px; }
 .review-icon { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue-text); flex: none; }
 .review-words { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .review-words .jp { padding: 4px 10px; border-radius: 10px; background: var(--card-2); border: 2px solid var(--border); font-size: 18px; color: var(--text-strong); }
+
+/* v0.28: streak calendar (tap the flame). */
+button.stat { background: none; border: 0; padding: 4px 8px; font: inherit; font-weight: 800; font-size: 17px; cursor: pointer; }
+button.stat:active { transform: scale(.94); }
+.streak-cal { display: flex; flex-direction: column; gap: 12px; }
+.streak-head { display: flex; align-items: center; gap: 12px; }
+.streak-head b { display: block; font-size: 22px; color: var(--text-strong); }
+.streak-head small { color: var(--muted); }
+.streak-flame { color: var(--faint); }
+.streak-flame.on { color: var(--orange, #ff9600); }
+.cal-nav { display: flex; align-items: center; justify-content: space-between; }
+.cal-nav .icon-btn { font-size: 26px; width: 40px; height: 40px; }
+.cal-nav .icon-btn:disabled { opacity: .3; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+.cal-weekdays span { font-size: 12px; font-weight: 800; color: var(--muted); }
+.cal-day { aspect-ratio: 1; border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 13px; color: var(--text); position: relative; }
+.cal-day small { font-size: 12px; font-weight: 700; }
+.cal-day.studied { background: var(--orange-soft); color: var(--orange, #ff9600); }
+.cal-day.studied small { color: var(--text-strong); }
+.cal-day.goal { background: var(--gold-soft); color: var(--gold-text); box-shadow: inset 0 0 0 2px var(--gold); }
+.cal-day.today { box-shadow: inset 0 0 0 2px var(--blue); }
+.cal-day.future { opacity: .4; }
+.streak-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; text-align: center; }
+.streak-stats div { background: var(--card-2); border: 2px solid var(--border); border-radius: 14px; padding: 8px 4px; }
+.streak-stats b { display: block; font-size: 20px; color: var(--text-strong); }
+.streak-stats small { font-size: 11px; color: var(--muted); font-weight: 700; }
+.cal-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin: 0 4px 0 8px; vertical-align: middle; }
+.cal-legend .dot.studied { background: var(--orange-soft); border: 2px solid var(--orange, #ff9600); }
+.cal-legend .dot.goal { background: var(--gold-soft); border: 2px solid var(--gold); }

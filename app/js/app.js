@@ -74,7 +74,7 @@ export function statsBar() {
   const hearts = currentHearts(state, now);
   return html`<div class="stats">
     <span class="stat stat-flag" title="Japanese"><svg width="34" height="24" viewBox="0 0 34 24" aria-hidden="true"><rect x="1" y="1" width="32" height="22" rx="5" fill="#fff" stroke="var(--border)" stroke-width="2"/><circle cx="17" cy="12" r="6" fill="#bc002d"/></svg></span>
-    <span class="stat stat-streak ${studiedToday(state, now) ? 'on' : ''}" title="Day streak">${icon('flame', 22)}<b>${streak}</b></span>
+    <button class="stat stat-streak ${studiedToday(state, now) ? 'on' : ''}" aria-label="Day streak: ${streak}. Open calendar">${icon('flame', 22)}<b>${streak}</b></button>
     <span class="stat stat-gems" title="Gems">${icon('gem', 22)}<b>${state.gems}</b></span>
     <span class="stat stat-hearts" title="Hearts">${icon('heart', 22)}<b>${hearts}</b></span>
   </div>`;

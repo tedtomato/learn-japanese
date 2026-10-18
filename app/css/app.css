@@ -773,3 +773,6 @@ ruby { padding: 0 3px; }
 .moss-light { fill: #8fd14f; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .edging { opacity: .85; } }
 :root[data-theme="dark"] .edging { opacity: .85; }
+/* Guide cards: long words shrink to fit the card (fitText), never spill into the next card. */
+.guide-card { min-width: 0; overflow: hidden; }
+.guide-jp.fit { align-self: stretch; max-width: 100%; }

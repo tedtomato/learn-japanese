@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.15', date: '18 Oct 2026', changes: [
+    'WhatsApp shares include the Hajime logo picture',
+    'Fixed: long words in the unit Guide spilling over the next card',
+  ] },
   { version: '0.14', date: '18 Oct 2026', changes: [
     'Zen pebbles and moss along both sides of the learning path',
   ] },

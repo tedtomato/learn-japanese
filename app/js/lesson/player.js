@@ -4,7 +4,7 @@
 // "Let's correct the exercises you missed" round.
 import { ITEMS, NODE_BY_ID, MAX_LEVEL } from '../course.js';
 import { app, modal } from '../app.js';
-import { html, mount, raw, $, $$ } from '../dom.js';
+import { html, mount, raw, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { person, nameOf } from '../characters.js';
@@ -392,19 +392,6 @@ function introHtml(item, hint) {
         ${item.note ? html`<p class="intro-hint">💡 ${item.note}</p>` : ''}`;
     }
   }
-}
-
-// Shrinks a one-line Japanese word until it fits its bubble (long words on narrow phones), then wraps.
-function fitText(root) {
-  $$('.fit', root).forEach((el) => {
-    let size = parseFloat(getComputedStyle(el).fontSize);
-    while (el.scrollWidth > el.clientWidth + 1 && size > 20) {
-      size -= 2;
-      el.style.fontSize = `${size}px`;
-    }
-    // Still too long: let it wrap onto two lines rather than go tiny.
-    if (el.scrollWidth > el.clientWidth + 1) $$('.ruby-on', el).concat(el).forEach((x) => { x.style.whiteSpace = 'normal'; x.style.wordBreak = 'break-all'; });
-  });
 }
 
 function renderIntro(root, s) {

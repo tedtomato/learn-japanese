@@ -22,3 +22,16 @@ export function mount(el, template) {
   el.innerHTML = template.__raw;
   return el;
 }
+
+// Shrinks a one-line Japanese word until it fits its bubble (long words on narrow phones), then wraps.
+export function fitText(root) {
+  $$('.fit', root).forEach((el) => {
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollWidth > el.clientWidth + 1 && size > 20) {
+      size -= 2;
+      el.style.fontSize = `${size}px`;
+    }
+    // Still too long: let it wrap onto two lines rather than go tiny.
+    if (el.scrollWidth > el.clientWidth + 1) $$('.ruby-on', el).concat(el).forEach((x) => { x.style.whiteSpace = 'normal'; x.style.wordBreak = 'break-all'; });
+  });
+}

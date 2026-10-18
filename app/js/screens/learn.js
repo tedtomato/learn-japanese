@@ -5,7 +5,7 @@ import { rewardPopup } from '../fx.js';
 import { decorFor, drawTrails } from '../scenery.js';
 import { wireShare } from '../share.js';
 import { app, statsBar, toast, modal } from '../app.js';
-import { html, mount, $, $$ } from '../dom.js';
+import { html, mount, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { speak } from '../audio.js';
@@ -73,7 +73,7 @@ function unitGuide(unit) {
     html`<h2>${unit.title}</h2><p class="muted">Tap any card to hear it.</p>
     <div class="guide">${items.map((it) => html`<button class="guide-card ${it.type}" data-say="${speechOf(it)}">
       ${it.art ? art(it.art, 'art-guide') : ''}
-      <span class="guide-jp">${jpItem(it, it.type === 'word' || it.type === 'sentence' || it.type === 'kword')}</span>
+      <span class="guide-jp fit">${jpItem(it, it.type === 'word' || it.type === 'sentence' || it.type === 'kword')}</span>
       ${it.type === 'kana' ? html`<span class="guide-romaji">${it.romaji}</span>` : ''}
       ${it.en ? html`<span class="guide-en">${it.en}</span>` : ''}
       ${it.hint || it.note || it.story ? html`<span class="guide-hint">${it.note || it.story || it.hint}</span>` : ''}
@@ -81,6 +81,7 @@ function unitGuide(unit) {
     [{ label: 'Close', kind: 'secondary' }],
   );
   $$('#modal [data-say]').forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
+  fitText($('#modal'));
 }
 
 function nodePopover(nodeEl, node, st) {

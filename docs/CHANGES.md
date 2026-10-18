@@ -9,6 +9,8 @@ Releases are listed in the in-app change log (Profile → App version).
 | "Nice to meet you" card and question bubble cut off on the right | ✅ long words shrink to fit, then wrap | 0.12 |
 | No pictures next to each answer | ✅ removed from answer choices (kept on the new-word card) | 0.12 |
 | Remove auto jump to next exercise (no time to tap Explain) | ✅ removed, with its setting | 0.13 |
+| Game logo picture when sharing on WhatsApp | ✅ picture attached (share sheet → WhatsApp); link preview shows the logo otherwise | 0.15 |
+| Unit Guide: long words spilling over the next card | ✅ | 0.15 |
 | Zen pebbles and moss around the path | ✅ | 0.14 |
 | Asked about kanji not learned yet | ✅ "Did you know" kanji stay in Practice; unlearned kanji not used as options | 0.12 |
 

@@ -793,3 +793,11 @@ ruby { padding: 0 3px; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stream, :root:not([data-theme="light"]) .bridge { opacity: .85; } }
 :root[data-theme="dark"] .stream, :root[data-theme="dark"] .bridge { opacity: .85; }
 @media (prefers-reduced-motion: reduce) { .stream-ripple { animation: none; } }
+
+/* v0.17: grammar blocks — bigger, tightly spaced Japanese so words read as words. */
+.g-block { padding: 8px 14px 10px; }
+.g-block .jp { font-size: 30px; line-height: 1.6; font-weight: 700; letter-spacing: 0; }
+.g-block ruby { padding: 0; }
+.g-block rt { font-size: 11px; letter-spacing: 0; color: var(--muted); }
+.g-block small { font-size: 14px; color: var(--text); }
+.grammar-card .jp-inline, .grammar-card p .jp { font-weight: 700; }

@@ -66,7 +66,7 @@ export function startSession(root, { nodeId, itemIds, demo } = {}) {
       ? generateLesson(node, app.state, { ...opts, level: nodeLevel(app.state, node) })
       : generatePractice(app.state, { ...opts, itemIds });
   if (!session.exercises.length) return app.go('#/practice');
-  // Now and then, a fun fact or useful phrase about the unit's theme as a short break.
+  // Now and then, an interesting fact about Japan (on the unit's theme) as a short break.
   if (!demo && session.exercises.length >= 8 && node?.kind !== 'story' && Math.random() < 0.5) {
     session.exercises.splice(Math.floor(session.exercises.length / 2), 0, { type: 'tidbit', itemIds: [] });
   }
@@ -744,10 +744,10 @@ function renderDialogue(root, s) {
 
 function renderTidbit(root, s) {
   const unit = s.node?.unit;
-  const t = nextTidbit(app.state, Math.random, ['fact', 'phrase'], { facts: unit?.facts, phrases: unit?.phrases });
+  const t = nextTidbit(app.state, Math.random, ['fact'], { facts: unit?.facts });
   app.save();
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">Quick break</span></p>
-    ${speakerBubble(s, t.kind === 'fact' ? `Did you know? Something about ${unit ? unit.title.toLowerCase() : 'Japan'}…` : 'Here is a phrase you can use on your trip!')}
+    ${speakerBubble(s, 'Did you know? A fun fact about Japan…')}
     ${tidbitCard(t.kind, t.item)}`);
   $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   wireShare($('.lesson-body', root));

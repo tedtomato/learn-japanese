@@ -9,6 +9,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | "Nice to meet you" card and question bubble cut off on the right | ✅ long words shrink to fit, then wrap | 0.12 |
 | No pictures next to each answer | ✅ removed from answer choices (kept on the new-word card) | 0.12 |
 | Remove auto jump to next exercise (no time to tap Explain) | ✅ removed, with its setting | 0.13 |
+| Breaks: interesting facts about Japan, not useful phrases | ✅ (phrases stay in the Phrasebook and on the Learn page) | 0.22 |
 | Stick to the original female voice; use a new adult female character for now | ✅ Mika added; Yuki and Mika only, natural voice; Ken, Sora and Hana kept for later | 0.21 |
 | Ken still has a weird voice | ✅ no more heavy pitch shift (sounded robotic). A real male voice needs one installed on the phone | 0.20 |
 | Missing a proper man voice | ✅ male voices detected (Android jac/jad, Apple, Microsoft); per-character voice picker in Profile; deeper fallback. Needs a male Japanese voice installed on the phone | 0.19 |

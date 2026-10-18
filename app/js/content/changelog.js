@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.22', date: '18 Oct 2026', changes: [
+    'Lesson breaks now show interesting facts about Japan only, no more useful phrases',
+  ] },
   { version: '0.21', date: '18 Oct 2026', changes: [
     'New character: Mika. For now, Yuki and Mika speak in all lessons and dialogues',
     "Everyone uses your phone's normal Japanese voice, unchanged — no more odd-sounding voices",

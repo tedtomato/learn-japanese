@@ -733,3 +733,19 @@ body.test-mode::after { content: 'TEST MODE'; position: fixed; top: calc(4px + v
 .trophy-share { display: flex; align-items: center; gap: 12px; width: 100%; background: var(--gold-soft); border-radius: 18px; padding: 12px 14px; text-align: left; }
 .trophy-share > div { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
 .trophy-share b { color: var(--text-strong); }
+
+/* v0.9: readable romaji, smaller play buttons */
+rt { font-size: max(13px, 0.55em); letter-spacing: .01em; }
+.tile rt { font-size: 13px; }
+.option rt, .match-btn rt { font-size: 14px; }
+.opt-romaji, .romaji-hint { font-size: 16px; }
+.ruby-on { line-height: 2.1; }
+.speaker { width: 72px; height: 72px; border-radius: 20px; box-shadow: 0 5px 0 var(--blue-edge); }
+.speaker .icon { width: 30px; height: 30px; }
+.speaker.slow { width: 52px; height: 52px; border-radius: 16px; }
+.speaker.slow .icon { width: 24px; height: 24px; }
+.speakers { padding: 4px 0; gap: 12px; align-items: center; }
+ruby { padding: 0 3px; }
+.ruby-on ruby + ruby { margin-left: 0; }
+.ruby-on:not(:has(.chunk)) { white-space: nowrap; }
+.bubble-lg .jp-lg { font-size: 26px; }

@@ -54,7 +54,7 @@ export const SECTIONS_DATA = [
             ['すみません', 'sumimasen', 'excuse me / sorry', '🙋', { note: 'To get attention (even to call a waiter), to apologise, or as a light thank-you.' }],
           ] },
           { title: 'See you!', words: [
-            ['じゃあね', 'jaa ne', 'bye (casual)', '👋', { note: 'With friends and family. さようなら sounds like a long or final farewell, so it is rarely used.' }],
+            ['じゃあね', 'jaa ne', 'bye (casual)', '🏃', { note: 'With friends and family. さようなら sounds like a long or final farewell, so it is rarely used.' }],
             ['またね', 'mata ne', 'see you', '🔁', { note: 'Casual "see you again".' }],
             ['おやすみ', 'oyasumi', 'good night (casual)', '😴', { note: 'With friends and family.' }],
             ['おやすみなさい', 'oyasumi nasai', 'good night (polite)', '🌙' ],

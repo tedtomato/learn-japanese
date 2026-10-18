@@ -1,6 +1,11 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.9', date: '18 Oct 2026', changes: [
+    'Bigger romaji above the Japanese — easier to read',
+    'Smaller play buttons so the answers fit on screen',
+    'Words no longer break across lines; "bye" has its own picture',
+  ] },
   { version: '0.8', date: '18 Oct 2026', changes: [
     'Share on WhatsApp: "Did you know?" facts, phrases and kanji peeks',
     'Share unlocked achievements from Profile, and unit trophies when you earn them',

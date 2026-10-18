@@ -3,6 +3,12 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 6 — 18 Oct 2026
+| Request | Status | Release |
+|---|---|---|
+| English (romaji) text too small | ✅ ~40% bigger | 0.9 |
+| Sound button too big | ✅ 72 px (was 110 px) | 0.9 |
+
 ## Batch 5 — 18 Oct 2026
 | Request | Status | Release |
 |---|---|---|

@@ -110,12 +110,13 @@ function nodePopover(nodeEl, node, st) {
   mount(pop, html`<b>${node.title}</b><span>${sub}</span>
     <button class="btn btn-white btn-block">${hearts > 0 ? label : 'No hearts — practice to refill'}</button>`);
   nodeEl.closest('.node-wrap').append(pop);
-  // Keep the popover on screen when its node sits far left or right on the path.
-  const r = pop.getBoundingClientRect();
+  // Place the popover under its node but always fully on screen (nodes sit left or right on the path).
+  const wrap = nodeEl.closest('.node-wrap').getBoundingClientRect();
+  const width = pop.offsetWidth;
   const margin = 12;
-  const shift = r.left < margin ? margin - r.left : r.right > innerWidth - margin ? innerWidth - margin - r.right : 0;
-  if (shift) pop.style.marginLeft = `${shift}px`;
-  pop.style.setProperty('--arrow', `${-shift}px`);
+  const left = Math.min(Math.max(wrap.left + wrap.width / 2 - width / 2, margin), document.documentElement.clientWidth - margin - width);
+  pop.style.left = `${left - wrap.left}px`;
+  pop.style.transform = 'none';
   pop.querySelector('button').addEventListener('click', () => app.go(hearts > 0 ? `#/lesson/${node.id}` : '#/practice'));
 }
 

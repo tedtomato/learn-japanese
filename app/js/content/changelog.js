@@ -3,6 +3,7 @@
 export const CHANGELOG = [
   { version: '0.11', date: '18 Oct 2026', changes: [
     'Fixed: matching pairs pushed off the screen by long words',
+    'Fixed: lesson pop-up on the path cut off at the screen edge',
   ] },
   { version: '0.10', date: '18 Oct 2026', changes: [
     'More time before the next exercise: 2.5 s after a right answer, 5 s after a wrong one',

@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.7', date: '18 Oct 2026', changes: [
+    'The learning path is now a garden trail of stepping stones',
+    'Bonsai trees, zen stones, bushes, grass and stone lanterns along the way',
+  ] },
   { version: '0.6', date: '18 Oct 2026', changes: [
     'Hidden test lab: double-tap the dog on Profile. Uses a separate test copy — your real progress is safe',
     'Lab: unlock all levels, learn all kana, fill hearts & gems, try any task type, jump to any lesson',

@@ -2,6 +2,7 @@
 import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID, NODES } from '../course.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 import { rewardPopup } from '../fx.js';
+import { decorFor, drawTrails } from '../scenery.js';
 import { app, statsBar, toast, modal } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
@@ -46,9 +47,11 @@ function renderNode(node, i, current, now) {
   const offset = OFFSETS[i % OFFSETS.length];
   const showCheer = st === 'current' && node.kind !== 'chest';
   const cheer = CHEERS[node.index % CHEERS.length];
+  const side = offset > 0 ? 'left' : 'right';
   return html`<div class="node-row" style="--x:${offset}px">
-    ${showCheer ? html`<div class="node-mascot ${offset > 0 ? 'left' : 'right'}">
-      <div class="bubble"><b class="jp">${cheer[0]}</b><small>${cheer[1]}</small></div>${mascot('happy', 64)}</div>` : ''}
+    ${showCheer ? html`<div class="node-mascot ${side}">
+      <div class="bubble"><b class="jp">${cheer[0]}</b><small>${cheer[1]}</small></div>${mascot('happy', 64)}</div>`
+      : html`<div class="decor-slot ${side}">${decorFor(i)}</div>`}
     <div class="node-wrap">
       ${st === 'current' ? html`<div class="start-bubble">${node.kind === 'chest' ? 'OPEN' : 'START'}</div>` : ''}
       <button class="node node-${node.kind} st-${st} c-${node.unit.color}" data-node="${node.id}" aria-label="${node.title}">
@@ -171,5 +174,9 @@ export function renderLearn(root) {
   );
 
   const target = $('.st-current', root) || $('.unit', root);
-  requestAnimationFrame(() => target?.scrollIntoView({ block: 'center' }));
+  requestAnimationFrame(() => {
+    drawTrails(root);
+    target?.scrollIntoView({ block: 'center' });
+  });
+  document.fonts?.ready.then(() => drawTrails(root));
 }

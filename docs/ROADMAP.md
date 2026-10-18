@@ -17,7 +17,7 @@
 - Stroke-order tracing (KanjiVG), radical + mnemonic kanji with compound words, kanji clues in practice
 - Speaking (speech recognition), fast natural-speed listening, 15-second grammar cards, dialogues
 - Cast of four characters with their own voices; animated mascot; cartoon illustrations
-- Countdown + speed bonus, auto-continue, hesitation tracking and a "missed exercises" round
+- Countdown + speed bonus, hesitation tracking and a "missed exercises" round
 - Explain my answer, themed fun-fact breaks, sakura finish, splash screen, reward pop-ups
 
 ## Phase 2 — Smarter repetition

@@ -376,7 +376,7 @@ function introHtml(item, hint) {
     case 'radical':
       return html`<div class="jp jp-giant">${item.jp}</div><div class="intro-en">${item.en}</div>
         ${item.parts?.length > 1 ? html`<p class="parts">${item.parts.map(([p, m], i) => html`${i ? html`<b class="op">+</b>` : ''}<span class="part"><b class="jp">${p}</b><small>${m}</small></span>`)}<b class="op">=</b><span class="part"><b class="jp">${item.jp}</b><small>${item.en}</small></span></p>` : ''}
-        <p class="intro-hint">📖 ${item.story}</p>
+        <p class="intro-clue">💡 <b>Remember it:</b> ${item.story}</p>
         ${readings(item.on, item.kun)}
         ${item.words?.length ? html`<div class="jukugo">${item.words.map((id) => { const w = ITEMS.get(id); return html`<button class="jukugo-row" data-say="${w.kana}"><span class="jp">${jpItem(w, true)}</span><span>${w.en}</span></button>`; })}</div>` : ''}`;
     case 'kword':

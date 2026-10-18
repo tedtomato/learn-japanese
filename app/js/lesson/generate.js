@@ -53,7 +53,8 @@ export function romajiOfChunk(chunk) {
 }
 
 export const enWords = (en) => en.split(/\s+/).filter(Boolean);
-const isNew = (state, id) => !state.items[id];
+// Never answered yet (a kanji only spotted in a Kanji peek card counts as new): show its card first.
+const isNew = (state, id) => !state.items[id]?.seen;
 
 // ---- What the learner can read ----
 export function knownChars(state, extraIds = []) {
@@ -300,7 +301,8 @@ export function generatePractice(state, { rng = makeRng(), now = Date.now(), ite
   const ids = itemIds || pickReview(state, [], 8, rng, now, { peeks: true });
   if (!ids.length) return { exercises: [], itemIds: [] };
   const ctx = context({ state, sessionIds: ids, level: 3, rng, canListen, canSpeak, advanced: true });
-  const list = ids.map((id) => buildExercise(ITEMS.get(id), questionType(ITEMS.get(id), 'any', ctx), ctx));
+  const intros = ids.filter((id) => isNew(state, id)).map((id) => ({ type: 'intro', itemId: id, itemIds: [] }));
+  const list = ids.map((id) => buildExercise(ITEMS.get(id), questionType(ITEMS.get(id), isNew(state, id) ? 'easy' : 'any', ctx), ctx));
   let n = 0;
   while (list.length < size - 1 && n < 20) {
     const item = ITEMS.get(ids[n % ids.length]);
@@ -310,7 +312,7 @@ export function generatePractice(state, { rng = makeRng(), now = Date.now(), ite
   const body = spread(list, rng);
   const match = matchExercise(ids, ctx);
   if (match) body.splice(Math.floor(body.length / 2), 0, match);
-  return { exercises: body, itemIds: ids };
+  return { exercises: [...intros, ...body], itemIds: ids };
 }
 
 // Fresh questions for items the learner got wrong or hesitated on, for the end-of-lesson retry.

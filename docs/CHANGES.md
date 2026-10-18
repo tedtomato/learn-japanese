@@ -9,6 +9,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | "Nice to meet you" card and question bubble cut off on the right | ✅ long words shrink to fit, then wrap | 0.12 |
 | No pictures next to each answer | ✅ removed from answer choices (kept on the new-word card) | 0.12 |
 | Remove auto jump to next exercise (no time to tap Explain) | ✅ removed, with its setting | 0.13 |
+| Show a kanji once with a memory clue before asking to recognise it | ✅ any never-answered item gets its card first (lessons and Practice); clue highlighted | 0.23 |
 | Breaks: interesting facts about Japan, not useful phrases | ✅ (phrases stay in the Phrasebook and on the Learn page) | 0.22 |
 | Stick to the original female voice; use a new adult female character for now | ✅ Mika added; Yuki and Mika only, natural voice; Ken, Sora and Hana kept for later | 0.21 |
 | Ken still has a weird voice | ✅ no more heavy pitch shift (sounded robotic). A real male voice needs one installed on the phone | 0.20 |

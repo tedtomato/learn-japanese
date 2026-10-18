@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.23', date: '18 Oct 2026', changes: [
+    'A kanji is always shown first with its memory clue before you are asked to recognise it (also for kanji spotted in Kanji peek)',
+    'The memory clue ("Remember it: …") now stands out on the kanji card',
+  ] },
   { version: '0.22', date: '18 Oct 2026', changes: [
     'Lesson breaks now show interesting facts about Japan only, no more useful phrases',
   ] },

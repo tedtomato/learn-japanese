@@ -134,5 +134,9 @@ test('kanji only spotted in a fact card are not asked on the path, only in pract
     const { exercises } = generateLesson(NODES[0], state, { rng: makeRng(i), now: T0 });
     assert.ok(!exercises.some((e) => (e.itemIds || []).includes(peek.id) || (e.options || []).includes(peek.id)));
   }
-  assert.ok(generatePractice(state, { now: T0 }).itemIds.includes(peek.id));
+  const practice = generatePractice(state, { now: T0 });
+  assert.ok(practice.itemIds.includes(peek.id));
+  // Shown once, with its memory clue, before any question about it.
+  const first = practice.exercises.findIndex((e) => e.itemId === peek.id);
+  assert.equal(practice.exercises[first].type, 'intro');
 });

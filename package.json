@@ -1,0 +1,12 @@
+{
+  "name": "hajime",
+  "private": true,
+  "description": "Hajime: learn Japanese from zero, one short lesson a day.",
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs",
+    "serve": "node scripts/build.mjs && node scripts/serve.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

@@ -1,0 +1,163 @@
+// The learning path: sections → unit banners → winding track of lesson nodes.
+import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID } from '../course.js';
+import { app, statsBar, toast, modal } from '../app.js';
+import { html, mount, $, $$ } from '../dom.js';
+import { icon } from '../icons.js';
+import { mascot } from '../mascot.js';
+import { speak, sfx } from '../audio.js';
+import { nextTidbit, tidbitCard } from '../tidbits.js';
+import {
+  currentNodeIndex, nodeLevel, isNodeDone, isNodeUnlocked, nodeNeedsReview, openChest, todayXp, currentHearts,
+} from '../progress.js';
+
+const OFFSETS = [0, 44, 70, 44, 0, -44, -70, -44];
+const CHEERS = [['がんばって！', 'You can do it!'], ['いいね！', 'Nice!'], ['すごい！', 'Amazing!'], ['ファイト！', 'Keep going!']];
+
+function nodeState(node, current, now) {
+  const { state } = app;
+  if (node.index === current) return 'current';
+  if (!isNodeUnlocked(state, node)) return 'locked';
+  if (nodeNeedsReview(state, node, now)) return 'stale';
+  return 'done';
+}
+
+function nodeIcon(node, st) {
+  if (st === 'locked') return node.kind === 'chest' ? icon('chest', 34) : node.kind === 'review' ? icon('trophy', 34) : icon('lock', 30);
+  if (node.kind === 'chest') return icon('chest', 36);
+  if (node.kind === 'review') return icon('trophy', 36);
+  if (st === 'done' && nodeLevel(app.state, node) >= MAX_LEVEL) return icon('star', 34);
+  if (node.icon === 'kana') return html`<span class="node-kana jp">${ITEMS.get(node.items[0]).jp}</span>`;
+  return icon(node.icon === 'chat' ? 'chat' : 'star', 34);
+}
+
+function levelPips(node) {
+  if (node.kind !== 'lesson' || !isNodeDone(app.state, node)) return '';
+  const level = nodeLevel(app.state, node);
+  return html`<span class="pips" aria-label="Level ${level} of ${MAX_LEVEL}">${Array.from({ length: MAX_LEVEL }, (_, i) => html`<i class="${i < level ? 'on' : ''}"></i>`)}</span>`;
+}
+
+function renderNode(node, i, current, now) {
+  const st = nodeState(node, current, now);
+  const offset = OFFSETS[i % OFFSETS.length];
+  const showCheer = st === 'current' && node.kind === 'lesson';
+  const cheer = CHEERS[node.index % CHEERS.length];
+  return html`<div class="node-row" style="--x:${offset}px">
+    ${showCheer ? html`<div class="node-mascot ${offset > 0 ? 'left' : 'right'}">
+      <div class="bubble"><b class="jp">${cheer[0]}</b><small>${cheer[1]}</small></div>${mascot('happy', 64)}</div>` : ''}
+    <div class="node-wrap">
+      ${st === 'current' ? html`<div class="start-bubble">${node.kind === 'chest' ? 'OPEN' : 'START'}</div>` : ''}
+      <button class="node node-${node.kind} st-${st} c-${node.unit.color}" data-node="${node.id}" aria-label="${node.title}">
+        ${nodeIcon(node, st)}
+        ${st === 'stale' ? html`<span class="node-badge" title="Needs review">${icon('refresh', 14)}</span>` : ''}
+        ${st === 'done' && node.kind !== 'chest' ? html`<span class="node-check">${icon('check', 14)}</span>` : ''}
+      </button>
+      ${levelPips(node)}
+      ${node.kind === 'review' ? html`<div class="node-label">${node.unit.title} trophy</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function unitGuide(unit) {
+  const ids = [...new Set(unit.nodes.flatMap((n) => n.items || []))];
+  const items = ids.map((id) => ITEMS.get(id));
+  modal(
+    html`<h2>${unit.title}</h2><p class="muted">Tap any card to hear it.</p>
+    <div class="guide">${items.map((it) => html`<button class="guide-card ${it.type}" data-say="${it.text || it.jp}">
+      <span class="jp guide-jp">${it.jp instanceof Array ? it.jp.join(' ') : it.jp}</span>
+      <span class="guide-romaji">${it.romaji}</span>
+      ${it.en ? html`<span class="guide-en">${it.emoji || ''} ${it.en}</span>` : ''}
+      ${it.hint ? html`<span class="guide-hint">${it.hint}</span>` : ''}
+    </button>`)}</div>`,
+    [{ label: 'Close', kind: 'secondary' }],
+  );
+  $$('#modal [data-say]').forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
+}
+
+function nodePopover(nodeEl, node, st) {
+  document.querySelector('.popover')?.remove();
+  if (st === 'locked') {
+    toast('Finish the steps above to unlock this.');
+    return;
+  }
+  if (node.kind === 'chest') {
+    if (isNodeDone(app.state, node)) return toast('You already opened this chest.');
+    const gems = openChest(app.state, node);
+    app.save();
+    sfx('complete');
+    modal(html`<div class="center">${mascot('cheer', 110)}<h2>Treasure!</h2><p class="big-reward">${icon('gem', 30)} +${gems} gems</p></div>`, [{ label: 'Continue', onClick: () => app.go('#/learn') }]);
+    return;
+  }
+  const level = nodeLevel(app.state, node);
+  const hearts = currentHearts(app.state, app.now());
+  const isReview = node.kind === 'review';
+  const sub = isReview
+    ? (level ? 'Trophy earned — review the whole unit again' : 'Review everything in this unit to earn the trophy')
+    : st === 'stale'
+      ? 'Some of this is fading. A quick refresh will lock it in.'
+      : level >= MAX_LEVEL ? 'Legendary! Keep it fresh with a replay.' : level ? `Level ${level} of ${MAX_LEVEL}` : 'New lesson';
+  const label = level ? (level >= MAX_LEVEL && !isReview ? 'Replay +10 XP' : 'Practice +10 XP') : 'Start +10 XP';
+  const pop = document.createElement('div');
+  pop.className = `popover c-${node.unit.color}`;
+  mount(pop, html`<b>${node.title}</b><span>${sub}</span>
+    <button class="btn btn-white btn-block">${hearts > 0 ? label : 'No hearts — practice to refill'}</button>`);
+  nodeEl.closest('.node-wrap').append(pop);
+  pop.querySelector('button').addEventListener('click', () => app.go(hearts > 0 ? `#/lesson/${node.id}` : '#/practice'));
+}
+
+export function renderLearn(root) {
+  const now = app.now();
+  const { state } = app;
+  const current = currentNodeIndex(state);
+  const xp = todayXp(state, now);
+  const goal = state.dailyGoal;
+  let n = 0;
+  const tb = nextTidbit(state);
+  app.save();
+
+  mount(root, html`<header class="topbar">${statsBar()}</header>
+  <main class="page learn">
+    <section class="card goal-card">
+      <div class="goal-icon">${icon('bolt', 22)}</div>
+      <div class="goal-text"><b>Daily goal</b><span>${Math.min(xp, goal)} / ${goal} XP</span></div>
+      ${xp >= goal ? html`<span class="pill pill-gold">${icon('check', 14)} Done!</span>` : ''}
+      <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (xp / goal) * 100)}%"></div></div>
+    </section>
+    <div class="tidbit-slot">${tidbitCard(tb.kind, tb.item, { next: true })}</div>
+    ${SECTIONS.map((section, s) => html`
+      <h2 class="section-title"><span>Section ${s + 1}</span>${section.title}</h2>
+      ${section.units.map((unit, u) => html`
+        <section class="unit" id="unit-${unit.id}">
+          <div class="unit-banner c-${unit.color}">
+            <div><span class="unit-kicker">Unit ${u + 1}</span><h3>${unit.title}</h3><p>${unit.desc}</p></div>
+            <button class="btn-guide" data-guide="${unit.id}">${icon('book', 18)}<span>Guide</span></button>
+          </div>
+          <div class="track">${unit.nodes.map((node) => renderNode(node, n++, current, now))}</div>
+        </section>`)}`)}
+    <div class="path-end">${mascot(current >= n ? 'cheer' : 'happy', 90)}<p>${current >= n ? 'You finished every lesson! More units are coming — keep practising.' : 'More units are on the way: katakana, kanji and conversations.'}</p></div>
+  </main>`);
+
+  $$('.node', root).forEach((el) =>
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const node = NODE_BY_ID.get(el.dataset.node);
+      nodePopover(el, node, [...el.classList].find((c) => c.startsWith('st-')).slice(3));
+    }),
+  );
+  root.addEventListener('click', () => document.querySelector('.popover')?.remove());
+  const wireTidbit = () => {
+    $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
+    $('.next-tidbit', root)?.addEventListener('click', () => {
+      const t = nextTidbit(app.state);
+      app.save();
+      mount($('.tidbit-slot', root), tidbitCard(t.kind, t.item, { next: true }));
+      wireTidbit();
+    });
+  };
+  wireTidbit();
+  $$('[data-guide]', root).forEach((b) =>
+    b.addEventListener('click', () => unitGuide(SECTIONS.flatMap((s) => s.units).find((u) => u.id === b.dataset.guide))),
+  );
+
+  const target = $('.st-current', root) || $('.unit', root);
+  requestAnimationFrame(() => target?.scrollIntoView({ block: 'center' }));
+}

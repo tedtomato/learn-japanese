@@ -805,3 +805,7 @@ ruby { padding: 0 3px; }
 /* v0.18: kanji readings in plain words. */
 .readings { display: flex; flex-direction: column; gap: 2px; font-size: 14px; color: var(--text); margin: 4px 0; }
 .rd-label { color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; margin-right: 4px; }
+
+/* v0.19: per-character voice picker. */
+.voice-pick { display: grid; grid-template-columns: 48px 46px 1fr auto; align-items: center; gap: 8px; width: 100%; }
+.voice-pick select { min-width: 0; width: 100%; font: inherit; font-size: 14px; padding: 8px; border-radius: 12px; border: 2px solid var(--border); background: var(--card-2); color: var(--text); }

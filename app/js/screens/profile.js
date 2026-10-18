@@ -4,7 +4,8 @@ import { app, statsBar, toast, modal } from '../app.js';
 import { html, mount, raw, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
-import { speak, voiceStatus } from '../audio.js';
+import { speak, voiceStatus, japaneseVoices, SPEAKERS } from '../audio.js';
+import { nameOf } from '../characters.js';
 import { versionLabel } from '../version.js';
 import { CHANGELOG, APP_RELEASE } from '../content/changelog.js';
 import { checkForUpdate, hardRefresh } from '../update.js';
@@ -39,6 +40,22 @@ const VOICE_TEXT = {
   unknown: 'Your device has not listed its voices yet. Tap test to check.',
   no: 'No Japanese voice found. Install one in your phone settings (Accessibility → Spoken content / Text-to-speech) to hear audio.',
 };
+
+const WHO = { man: 'man', woman: 'woman', boy: 'boy', girl: 'girl' };
+const GENDER = { male: ' (male)', female: ' (female)', unknown: '' };
+
+// Pick which of the phone's Japanese voices each character uses.
+function characterVoices(picked) {
+  const voices = japaneseVoices();
+  if (voices.length < 2) {
+    return html`<div class="setting column"><span>Character voices</span><small class="muted">Your phone offers ${voices.length ? 'one Japanese voice' : 'no Japanese voice yet'}, so Ken's is made deeper. For a real male voice, add more Japanese voices in your phone settings (Text-to-speech → Google speech engine → Japanese → pick a male voice), then reopen the app.</small></div>`;
+  }
+  return html`<div class="setting column"><span>Character voices</span>
+    ${SPEAKERS.map((who) => html`<div class="voice-pick"><b>${nameOf(who)}</b><small class="muted">${WHO[who]}</small>
+      <select data-who="${who}"><option value="">Automatic</option>${voices.map((v) => html`<option value="${v.name}" ${picked[who] === v.name ? 'selected' : ''}>${v.name}${GENDER[v.gender]}</option>`)}</select>
+      <button class="icon-btn play-voice" data-who="${who}" aria-label="Play">${icon('speaker', 20)}</button></div>`)}
+  </div>`;
+}
 
 const fmtDate = (t) => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
@@ -94,6 +111,7 @@ export function renderProfile(root) {
       <div class="setting"><span>Voice speed</span>${seg('voiceRate', s.voiceRate, [[0.7, 'Slow'], [0.85, 'Normal'], [1, 'Fast']])}</div>
       <div class="setting column"><span>Japanese voice</span><small class="muted voice-status">${VOICE_TEXT[voiceStatus()]}</small>
         <button class="btn btn-white test-voice">${icon('speaker', 18)} Test: こんにちは</button></div>
+      ${characterVoices(s.voices || {})}
     </div>
 
     <h2 class="sub-title">Backup</h2>
@@ -131,6 +149,12 @@ export function renderProfile(root) {
       if (name === 'voiceRate') speak('こんにちは');
     }),
   );
+  $$('.voice-pick select', root).forEach((sel) => sel.addEventListener('change', () => {
+    state.settings.voices = { ...state.settings.voices, [sel.dataset.who]: sel.value };
+    app.save();
+    speak('こんにちは、はじめまして。', { speaker: sel.dataset.who });
+  }));
+  $$('.play-voice', root).forEach((b) => b.addEventListener('click', () => speak('こんにちは、はじめまして。', { speaker: b.dataset.who })));
   $('.test-voice', root).addEventListener('click', () => {
     speak('こんにちは');
     setTimeout(() => ($('.voice-status', root).textContent = VOICE_TEXT[voiceStatus()]), 600);

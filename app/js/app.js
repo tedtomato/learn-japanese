@@ -2,7 +2,7 @@
 import { loadState, saveState, currentHearts, displayStreak, studiedToday, STORAGE_KEY, TEST_STORAGE_KEY } from './progress.js';
 import { html, mount, $ } from './dom.js';
 import { icon } from './icons.js';
-import { setSfx, setVoiceRate } from './audio.js';
+import { setSfx, setVoiceRate, setVoiceChoice } from './audio.js';
 
 const storage = (() => {
   try {
@@ -56,7 +56,7 @@ export const app = {
 };
 
 export function applySettings() {
-  const { theme, sfx, voiceRate } = app.state.settings;
+  const { theme, sfx, voiceRate, voices } = app.state.settings;
   const root = document.documentElement;
   if (theme === 'system') root.removeAttribute('data-theme');
   else root.dataset.theme = theme;
@@ -65,6 +65,7 @@ export function applySettings() {
   document.body.classList.toggle('test-mode', app.testMode);
   setSfx(sfx);
   setVoiceRate(voiceRate);
+  setVoiceChoice(voices);
 }
 
 export function statsBar() {

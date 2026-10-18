@@ -3,6 +3,7 @@ import { FACTS, PHRASES, KANJI } from './content/extras.js';
 import { html } from './dom.js';
 import { icon } from './icons.js';
 import { art } from './art.js';
+import { shareButton, tidbitShareText } from './share.js';
 
 export const KINDS = {
   fact: { list: FACTS, title: 'Did you know?', collection: 'Fun facts' },
@@ -72,5 +73,6 @@ export function tidbitCard(kind, item, { next = false } = {}) {
   return html`<section class="card tidbit tidbit-${kind}">
     <div class="tidbit-kicker"><span>${KINDS[kind].title}</span>${next ? html`<button class="link next-tidbit">Another ${icon('arrow', 14)}</button>` : ''}</div>
     ${tidbitBody(kind, item)}
+    <div class="tidbit-actions">${shareButton(tidbitShareText(kind, item))}</div>
   </section>`;
 }

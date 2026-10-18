@@ -17,7 +17,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Hidden test screen on Profile (double tap) to try features / unlock all, without touching real progress | ✅ double-tap the dog on Profile | 0.6 |
 | App number not showing | ✅ on start screen and under My progress | 0.6 |
 | Vegetation, bonsai trees, zen stones along the learning path, showing a path | ✅ | 0.7 |
-| Share trophies and "Did you know?" on WhatsApp | 🚧 chunk 4 | |
+| Share trophies and "Did you know?" on WhatsApp | ✅ (facts, phrases, kanji, achievements, unit trophies) | 0.8 |
 
 ## Batch 4
 | Request | Status | Release |

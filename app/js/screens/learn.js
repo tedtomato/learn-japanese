@@ -3,6 +3,7 @@ import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID, NODES } from '../course.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 import { rewardPopup } from '../fx.js';
 import { decorFor, drawTrails } from '../scenery.js';
+import { wireShare } from '../share.js';
 import { app, statsBar, toast, modal } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
@@ -160,6 +161,7 @@ export function renderLearn(root) {
   );
   root.addEventListener('click', () => document.querySelector('.popover')?.remove());
   const wireTidbit = () => {
+    wireShare($('.tidbit-slot', root));
     $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
     $('.next-tidbit', root)?.addEventListener('click', () => {
       const t = nextTidbit(app.state);

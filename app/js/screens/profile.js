@@ -9,6 +9,7 @@ import { versionLabel } from '../version.js';
 import { CHANGELOG, APP_RELEASE } from '../content/changelog.js';
 import { checkForUpdate, hardRefresh } from '../update.js';
 import { askOpenLab } from './lab.js';
+import { shareButton, wireShare } from '../share.js';
 import {
   displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, defaultState, FREEZE_PRICE, MAX_FREEZES,
 } from '../progress.js';
@@ -73,7 +74,7 @@ export function renderProfile(root) {
       return html`<div class="ach ${done ? 'done' : ''}"><span class="ach-icon jp">${a.icon}</span>
         <div class="ach-body"><b>${a.title}</b><small>${a.desc}</small>
         <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (a.value / a.goal) * 100)}%"></div></div></div>
-        <span class="ach-count">${Math.min(a.value, a.goal)}/${a.goal}</span></div>`;
+        ${done ? shareButton(`🏆 I unlocked "${a.title}" (${a.desc}) learning Japanese with Hajime!`, '') : html`<span class="ach-count">${Math.min(a.value, a.goal)}/${a.goal}</span>`}</div>`;
     })}</div>
 
     <h2 class="sub-title">Shop</h2>
@@ -162,6 +163,7 @@ export function renderProfile(root) {
       toast(err.message || 'Could not read that file.');
     }
   });
+  wireShare(root);
   // Hidden: a double tap on the avatar opens the test lab.
   let lastTap = 0;
   $('.avatar', root).addEventListener('click', () => {

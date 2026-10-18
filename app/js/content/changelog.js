@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.8', date: '18 Oct 2026', changes: [
+    'Share on WhatsApp: "Did you know?" facts, phrases and kanji peeks',
+    'Share unlocked achievements from Profile, and unit trophies when you earn them',
+  ] },
   { version: '0.7', date: '18 Oct 2026', changes: [
     'The learning path is now a garden trail of stepping stones',
     'Bonsai trees, zen stones, bushes, grass and stone lanterns along the way',

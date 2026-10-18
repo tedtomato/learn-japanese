@@ -724,3 +724,12 @@ body.test-mode::after { content: 'TEST MODE'; position: fixed; top: calc(4px + v
 @keyframes plant-sway { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg); } }
 @keyframes lantern-glow { from { opacity: .6; } to { opacity: 1; } }
 @media (max-width: 360px) { .decor { width: 44px; height: 44px; } }
+
+/* ---------- Share ---------- */
+.share-btn { display: inline-flex; align-items: center; gap: 6px; border: 0; border-radius: 999px; background: #25d366; color: #fff; font-weight: 800; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; padding: 7px 12px; box-shadow: 0 3px 0 #1da851; }
+.share-btn:active { transform: translateY(3px); box-shadow: none; }
+.share-btn span:empty { display: none; }
+.tidbit-actions { display: flex; justify-content: flex-end; }
+.trophy-share { display: flex; align-items: center; gap: 12px; width: 100%; background: var(--gold-soft); border-radius: 18px; padding: 12px 14px; text-align: left; }
+.trophy-share > div { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.trophy-share b { color: var(--text-strong); }

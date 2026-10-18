@@ -18,6 +18,7 @@ import { jpItem, jpChunk, speechOf } from './text.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';
 import { rewardPopup } from '../fx.js';
+import { shareButton, wireShare } from '../share.js';
 
 const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', 'すごい！', 'You got it!', 'Perfect!', 'いいね！'];
 const HOUR = 60 * 60 * 1000;
@@ -756,6 +757,7 @@ function renderTidbit(root, s) {
     ${speakerBubble(s, t.kind === 'fact' ? `Did you know? Something about ${unit ? unit.title.toLowerCase() : 'Japan'}…` : 'Here is a phrase you can use on your trip!')}
     ${tidbitCard(t.kind, t.item)}`);
   $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
+  wireShare($('.lesson-body', root));
   if (t.kind === 'phrase') sayAs(root, s.speaker, t.item.jp.replace(/[～~]/g, ''));
   footer(root, s, { canCheck: true, text: 'Continue', onCheck: () => { s.done += 1; next(root, s); } });
 }
@@ -804,8 +806,10 @@ function finish(root, s) {
       <div class="result blue"><span>Time</span><b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b></div>
     </div>
     ${weekStrip(now)}
+    ${s.node?.kind === 'review' ? html`<div class="trophy-share">${art('🏆', 'art-lg')}<div><b>${s.node.unit.title} trophy earned!</b>${shareButton(`🏆 I earned the "${s.node.unit.title}" trophy learning Japanese with Hajime! ${summary.streak > 1 ? `🔥 ${summary.streak} day streak.` : ''}`, 'Share on WhatsApp')}</div></div>` : ''}
     <button class="btn btn-primary btn-block continue">Continue</button>
   </div>`);
+  wireShare(root);
   $('.continue', root).addEventListener('click', () => {
     const go = () => app.go(location.hash.startsWith('#/lab') ? '#/lab' : s.mode === 'practice' ? '#/practice' : '#/learn');
     if (summary.goalReached) rewardPopup({ kind: 'bonus', title: 'Daily goal reached!', reward: html`${icon('gem', 30)} +5 gems`, text: 'Come back tomorrow to keep your streak going.', onDone: go });

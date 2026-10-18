@@ -9,7 +9,8 @@ import { art } from '../art.js';
 import { speak } from '../audio.js';
 import { strength } from '../srs.js';
 import { learnedItemIds, dueItemIds } from '../progress.js';
-import { KINDS, emojiFor, phraseSpeech, tidbitBody } from '../tidbits.js';
+import { KINDS, emojiFor, phraseSpeech, tidbitCard } from '../tidbits.js';
+import { wireShare } from '../share.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 
 const level = (st) => (st === 0 ? 'none' : st < 0.34 ? 'weak' : st < 0.67 ? 'mid' : 'strong');
@@ -104,7 +105,8 @@ export function renderCollection(root, kind) {
         ? html`<div class="word-list">${list.map((p) => html`<button class="word-row phrase-row" data-say="${phraseSpeech(p)}">
             ${art(emojiFor(p.icon), 'art-row')}
             <span class="phrase-main"><span class="jp word-jp">${p.jp}</span><small>${p.romaji} · ${p.en}</small></span></button>`)}</div>`
-        : html`<div class="tidbit-list">${list.map((x) => html`<section class="card tidbit tidbit-${kind}">${tidbitBody(kind, x)}</section>`)}</div>`}`)}
+        : html`<div class="tidbit-list">${list.map((x) => tidbitCard(kind, x))}</div>`}`)}
   </main>`);
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
+  wireShare(root);
 }

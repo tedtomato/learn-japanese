@@ -759,3 +759,9 @@ ruby { padding: 0 3px; }
 .match-btn { min-height: 64px; padding: 8px; }
 .match-btn ruby { padding: 0 1px; }
 .match-btn .ruby-on { font-size: 18px; line-height: 1.8; }
+
+/* v0.12: intro bubble never wider than the screen; Japanese line shrinks to fit (see fitText in player.js). */
+.prompt-person .bubble-lg { min-width: 0; overflow: hidden; }
+.prompt-person .intro-card { padding: 16px 4px; min-width: 0; max-width: 100%; }
+.intro-card .fit { max-width: 100%; }
+.prompt-person .bubble-lg > .fit { min-width: 0; flex: 1; }

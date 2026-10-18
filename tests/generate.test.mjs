@@ -125,3 +125,14 @@ test('tidbits follow the unit theme and are not repeated until all have been see
   const peek = nextTidbit(state, rng, ['kanji']);
   assert.ok(state.items[`xk-${peek.item.id}`], 'a spotted kanji joins practice');
 });
+
+test('kanji only spotted in a fact card are not asked on the path, only in practice', () => {
+  const peek = [...ITEMS.values()].find((i) => i.peek);
+  const state = defaultState();
+  state.items[peek.id] = { box: 0, seen: 0, right: 0, wrong: 0, last: 0, due: 0 };
+  for (let i = 0; i < 20; i++) {
+    const { exercises } = generateLesson(NODES[0], state, { rng: makeRng(i), now: T0 });
+    assert.ok(!exercises.some((e) => (e.itemIds || []).includes(peek.id) || (e.options || []).includes(peek.id)));
+  }
+  assert.ok(generatePractice(state, { now: T0 }).itemIds.includes(peek.id));
+});

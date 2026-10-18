@@ -1,6 +1,12 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.12', date: '18 Oct 2026', changes: [
+    'Fixed: long Japanese words running off the right of the screen — they now shrink, then wrap',
+    'No more pictures next to the answer choices',
+    'Kanji from "Did you know" cards are only asked in Practice, never in path lessons',
+    'Answer choices never show kanji you have not learned',
+  ] },
   { version: '0.11', date: '18 Oct 2026', changes: [
     'Fixed: matching pairs pushed off the screen by long words',
     'Fixed: lesson pop-up on the path cut off at the screen edge',

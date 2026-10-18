@@ -199,6 +199,7 @@ function next(root, s) {
   s.speaker = pickOne(SPEAKERS);
   startTimer(root, s, null);
   RENDERERS[s.current.type](root, s);
+  fitText(root);
 }
 
 function retryIntro(root, s) {
@@ -396,12 +397,25 @@ function introHtml(item, hint) {
       const len = (item.text || item.jp).length;
       const size = len <= 4 ? 'jp-xl' : len <= 7 ? 'jp-l2' : 'jp-l3';
       return html`${item.art ? art(item.art, 'art-xl') : ''}
-        <div class="${size}">${jpItem(item, hint)}</div>
+        <div class="${size} fit">${jpItem(item, hint)}</div>
         ${!hint ? html`<div class="intro-romaji">${item.romaji}</div>` : ''}
         <div class="intro-en">${item.en}</div>
         ${item.note ? html`<p class="intro-hint">💡 ${item.note}</p>` : ''}`;
     }
   }
+}
+
+// Shrinks a one-line Japanese word until it fits its bubble (long words on narrow phones), then wraps.
+function fitText(root) {
+  $$('.fit', root).forEach((el) => {
+    let size = parseFloat(getComputedStyle(el).fontSize);
+    while (el.scrollWidth > el.clientWidth + 1 && size > 20) {
+      size -= 2;
+      el.style.fontSize = `${size}px`;
+    }
+    // Still too long: let it wrap onto two lines rather than go tiny.
+    if (el.scrollWidth > el.clientWidth + 1) $$('.ruby-on', el).concat(el).forEach((x) => { x.style.whiteSpace = 'normal'; x.style.wordBreak = 'break-all'; });
+  });
 }
 
 function renderIntro(root, s) {
@@ -450,11 +464,11 @@ function promptFor(root, s, ex, item) {
   const big = item.type === 'kana';
   // No play button when the task is to read it — hearing it would give the answer away.
   return speakerBubble(s, html`${ex.kind === 'read' ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 22)}</button>`}
-    <div class="${big ? 'jp-huge' : 'jp-lg'}">${big ? html`<span class="jp">${item.jp}</span>` : jpItem(item, ex.hint)}</div>`);
+    <div class="${big ? 'jp-huge' : 'jp-lg fit'}">${big ? html`<span class="jp">${item.jp}</span>` : jpItem(item, ex.hint)}</div>`);
 }
 
 function optionHtml(opt, ex) {
-  if (ex.answerKind === 'en') return html`${opt.art ? art(opt.art, 'art-opt') : ''}<span class="opt-label">${opt.en}</span>`;
+  if (ex.answerKind === 'en') return html`<span class="opt-label">${opt.en}</span>`;
   if (ex.answerKind === 'romaji') return html`<span class="opt-label">${opt.romaji}</span>`;
   const isKana = opt.type === 'kana';
   return html`<span class="opt-label ${isKana ? 'jp-lg' : ''}">${isKana ? html`<span class="jp">${opt.jp}</span>` : jpItem(opt, ex.hint)}</span>`;

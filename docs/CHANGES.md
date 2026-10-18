@@ -3,6 +3,13 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 7 — 18 Oct 2026
+| Request | Status | Release |
+|---|---|---|
+| "Nice to meet you" card and question bubble cut off on the right | ✅ long words shrink to fit, then wrap | 0.12 |
+| No pictures next to each answer | ✅ removed from answer choices (kept on the new-word card) | 0.12 |
+| Asked about kanji not learned yet | ✅ "Did you know" kanji stay in Practice; unlearned kanji not used as options | 0.12 |
+
 ## Batch 6 — 18 Oct 2026
 | Request | Status | Release |
 |---|---|---|

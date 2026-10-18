@@ -84,12 +84,14 @@ function questionType(item, difficulty, ctx) {
 
 // Items of the same type the learner knows (plus this session's), used as wrong answers.
 function distractorPool(item, ctx) {
-  const same = (id) => ITEMS.get(id)?.type === item.type && id !== item.id;
+  const same = (id) => ITEMS.get(id)?.type === item.type && id !== item.id && (item.peek || !ITEMS.get(id).peek);
   let pool = [...new Set([...ctx.sessionIds, ...ctx.knownIds])].filter(same);
-  if (pool.length < 3) {
+  // Kanji options come from what the learner has met; unmet ones only top up a question that would have one option.
+  const kanjiLike = ['kanji', 'kword', 'radical'].includes(item.type);
+  if (pool.length < (kanjiLike ? 2 : 3)) {
     const extra = [...ITEMS.values()].filter((i) => i.type === item.type && !i.peek && i.id !== item.id && !pool.includes(i.id)
       && (i.unit === item.unit || item.type !== 'word'));
-    pool = [...pool, ...shuffle(extra, ctx.rng).slice(0, 6 - pool.length).map((i) => i.id)];
+    pool = [...pool, ...shuffle(extra, ctx.rng).slice(0, (kanjiLike ? 2 : 6) - pool.length).map((i) => i.id)];
   }
   return pool;
 }
@@ -224,8 +226,10 @@ export function context({ state, sessionIds, level, rng, canListen = true, canSp
   };
 }
 
-function pickReview(state, exclude, count, rng, now) {
-  const learned = Object.keys(state.items).filter((id) => ITEMS.has(id) && !exclude.includes(id) && ITEMS.get(id).type !== 'dialogue');
+// Kanji only spotted in a "Did you know" card (peeks) are never taught on the path, so they stay in Practice.
+function pickReview(state, exclude, count, rng, now, { peeks = false } = {}) {
+  const learned = Object.keys(state.items).filter((id) => ITEMS.has(id) && !exclude.includes(id) && ITEMS.get(id).type !== 'dialogue'
+    && (peeks || !ITEMS.get(id).peek));
   const urgent = learned.sort(byUrgency(state.items, now)).slice(0, Math.max(count * 2, 6));
   return shuffle(urgent, rng).slice(0, count);
 }
@@ -293,7 +297,7 @@ function generateStory(node, state, { rng = makeRng() } = {}) {
 
 // A practice session made from the learner's weakest and most overdue items.
 export function generatePractice(state, { rng = makeRng(), now = Date.now(), itemIds = null, size = 10, canListen = true, canSpeak = false } = {}) {
-  const ids = itemIds || pickReview(state, [], 8, rng, now);
+  const ids = itemIds || pickReview(state, [], 8, rng, now, { peeks: true });
   if (!ids.length) return { exercises: [], itemIds: [] };
   const ctx = context({ state, sessionIds: ids, level: 3, rng, canListen, canSpeak, advanced: true });
   const list = ids.map((id) => buildExercise(ITEMS.get(id), questionType(ITEMS.get(id), 'any', ctx), ctx));

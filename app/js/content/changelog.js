@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.10', date: '18 Oct 2026', changes: [
+    'More time before the next exercise: 2.5 s after a right answer, 5 s after a wrong one',
+    'New setting: Auto-continue — Normal, Relaxed (4 s / 8 s) or Off (tap Continue)',
+  ] },
   { version: '0.9', date: '18 Oct 2026', changes: [
     'Bigger romaji above the Japanese — easier to read',
     'Smaller play buttons so the answers fit on screen',

@@ -88,6 +88,7 @@ export function renderProfile(root) {
     <div class="card settings">
       <div class="setting"><span>Appearance</span>${seg('theme', s.theme, [['system', 'Auto'], ['light', 'Light'], ['dark', 'Dark']])}</div>
       <div class="setting"><span>Daily goal</span>${seg('dailyGoal', state.dailyGoal, [[10, 'Casual'], [20, 'Regular'], [30, 'Serious'], [50, 'Intense']])}</div>
+      <div class="setting"><span>Auto-continue</span>${seg('autoNext', s.autoNext || 'normal', [['normal', 'Normal'], ['relaxed', 'Relaxed'], ['off', 'Off']])}</div>
       <div class="setting"><span>Speed challenge</span>${seg('speed', s.speed !== false, [[true, 'On'], [false, 'Off']])}</div>
       <div class="setting"><span>Speaking tasks</span>${seg('speaking', s.speaking !== false, [[true, 'On'], [false, 'Off']])}</div>
       <div class="setting"><span>Sound effects</span>${seg('sfx', s.sfx, [[true, 'On'], [false, 'Off']])}</div>

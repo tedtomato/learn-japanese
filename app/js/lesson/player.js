@@ -304,10 +304,13 @@ function result(root, s, ok, opts = {}) {
     $('.check', foot).classList.remove('auto');
     showExplain(root, s, item, ok ? null : opts.chosenLabel, go);
   });
-  // Move on automatically: 1 s after a correct answer, a little longer after a wrong one.
-  const wait = ok ? 1000 : 3500;
-  $('.check', foot).style.setProperty('--auto', `${wait}ms`);
-  if (!outOfHearts) s.autoTimer = setTimeout(go, wait);
+  // Move on automatically after a pause (Settings → Auto-continue: normal, relaxed or off).
+  const pace = { normal: [2500, 5000], relaxed: [4000, 8000] }[app.state.settings.autoNext || 'normal'];
+  if (pace && !outOfHearts) {
+    const wait = ok ? pace[0] : pace[1];
+    $('.check', foot).style.setProperty('--auto', `${wait}ms`);
+    s.autoTimer = setTimeout(go, wait);
+  } else $('.check', foot).classList.remove('auto');
 }
 
 function showExplain(root, s, item, chosenLabel, go) {

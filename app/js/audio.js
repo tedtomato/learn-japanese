@@ -34,34 +34,22 @@ export function voiceStatus() {
 }
 export const canSpeakAloud = () => voiceStatus() !== 'no';
 
-// Each character has a voice: the one picked in Profile, else a matching male/female device voice,
-// else pitch and pace hint at it (a slightly lower, calmer man; a higher girl) — stronger shifts sound robotic.
+// Lessons use the phone's own Japanese voice as it is: Yuki and Mika share it, unchanged, since
+// pitch tricks to fake other voices sound robotic. Kept for later: man, boy and girl casts.
 const CAST = {
-  man: { gender: 'male', pitch: 0.95, fallbackPitch: 0.8, rate: 1, fallbackRate: 0.95 },
-  woman: { gender: 'female', pitch: 1.05, fallbackPitch: 1.05, rate: 1 },
-  boy: { gender: 'male', pitch: 1.3, fallbackPitch: 1.2, rate: 1.05 },
-  girl: { gender: 'female', pitch: 1.45, fallbackPitch: 1.45, rate: 1.05 },
-  narrator: { gender: 'female', pitch: 1, fallbackPitch: 1, rate: 1 },
+  woman: { gender: 'female', pitch: 1, rate: 1 },
+  woman2: { gender: 'female', pitch: 1, rate: 1 },
+  man: { gender: 'male', pitch: 1, rate: 1 },
+  boy: { gender: 'male', pitch: 1, rate: 1 },
+  girl: { gender: 'female', pitch: 1, rate: 1 },
+  narrator: { gender: 'female', pitch: 1, rate: 1 },
 };
-export const SPEAKERS = ['man', 'woman', 'boy', 'girl'];
-
-let chosen = {};
-export const setVoiceChoice = (map) => (chosen = map || {});
-export const japaneseVoices = () => jaVoices.map((v) => ({ name: v.voice.name, gender: v.gender }));
+export const SPEAKERS = ['woman', 'woman2'];
 
 function voiceFor(speaker) {
   const want = CAST[speaker] || CAST.narrator;
-  const fits = (v) => ({ voice: v.voice, pitch: v.gender === want.gender ? want.pitch : want.fallbackPitch,
-    rate: v.gender === want.gender ? want.rate : want.fallbackRate || want.rate });
-  const picked = jaVoices.find((v) => v.voice.name === chosen[speaker]);
-  if (picked) return fits(picked);
-  const exact = jaVoices.find((v) => v.gender === want.gender);
-  if (exact) return fits(exact);
-  // No matching voice: men take a different voice from the women when the phone has several.
-  const pool = jaVoices.filter((v) => v.gender === 'unknown');
-  const list = pool.length ? pool : jaVoices;
-  const other = want.gender === 'male' ? list[list.length - 1] : list[0];
-  return other ? fits(other) : { voice: null, pitch: want.fallbackPitch, rate: want.fallbackRate || want.rate };
+  const match = jaVoices.find((v) => v.gender === want.gender) || jaVoices.find((v) => v.gender === 'unknown') || jaVoices[0];
+  return { voice: match?.voice || null, pitch: want.pitch, rate: want.rate };
 }
 
 // Speaks Japanese. opts: speaker, slow, fast, onStart, onEnd. Resolves when finished.

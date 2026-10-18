@@ -1,4 +1,5 @@
-// The lesson cast: Ken (man), Yuki (woman), Sora (boy) and Hana (girl). Flat cartoon SVGs that
+// The lesson cast: Yuki and Mika (women) speak in lessons for now, as phones only have a female
+// Japanese voice; Ken (man), Sora (boy) and Hana (girl) wait for later. Flat cartoon SVGs that
 // blink while idle and move their mouth while their voice is speaking (.talking on the wrapper).
 import { raw } from './dom.js';
 
@@ -9,6 +10,10 @@ const PEOPLE = {
   woman: { name: 'Yuki', skin: '#f6d0b1', hair: '#5a3825', top: '#ff4b9a', topDark: '#d93a80', legs: '#4b4b4b', kid: false,
     hairBack: '<path d="M30 52c-2-22 12-36 30-36s32 14 30 36l2 26c-6 4-14 5-20 3V56H48v25c-6 2-14 1-20-3z"/>',
     hairFront: '<path d="M34 48c2-16 12-25 26-25 15 0 25 9 26 24-10-2-18-8-23-15-5 9-15 15-29 16z"/>' },
+  woman2: { name: 'Mika', skin: '#f3c9a5', hair: '#1f1a1d', top: '#58cc02', topDark: '#58a700', legs: '#3c4a8a', kid: false,
+    hairBack: '<path d="M30 50c-1-20 12-33 30-33s31 13 30 33l-2 16c-5 3-10 3-14 1V52H46v15c-4 2-9 2-14-1z"/>',
+    hairFront: '<path d="M33 50c1-17 12-27 27-27s26 10 27 27c-9 0-19-3-27-10-7 7-17 10-27 10z"/>',
+    extra: '<circle cx="34" cy="64" r="2.6" fill="#ffc800"/><circle cx="86" cy="64" r="2.6" fill="#ffc800"/>' },
   boy: { name: 'Sora', skin: '#e9b48a', hair: '#1f1f26', top: '#ffc800', topDark: '#e5a500', legs: '#2f6fd6', kid: true,
     hairFront: '<path d="M34 44l4-14 8 6 6-12 8 9 8-10 6 12 8-5 2 15c-9-5-20-7-30-6-8 1-15 3-20 5z"/>' },
   girl: { name: 'Hana', skin: '#f7d6bd', hair: '#2a1f1a', top: '#ce82ff', topDark: '#a559e3', legs: '#ce82ff', kid: true,

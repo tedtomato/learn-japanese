@@ -54,7 +54,7 @@ export function splash() {
   const close = () => {
     if (closed) return;
     closed = true;
-    speak('はじめ！', { speaker: 'girl' });
+    speak('はじめ！', { speaker: 'woman' });
     sfx('bonus');
     el.classList.add('out');
     setTimeout(() => el.remove(), 450);

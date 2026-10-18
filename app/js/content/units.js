@@ -320,7 +320,7 @@ export const SECTIONS_DATA = [
 export const DIALOGUES = {
   'd-station': {
     title: 'At the station',
-    cast: ['woman', 'man'],
+    cast: ['woman', 'woman2'],
     lines: [
       { who: 0, jp: 'すみません、えきはどこですか。', en: 'Excuse me, where is the station?' },
       { who: 1, jp: 'まっすぐです。それから、みぎです。', en: 'Straight ahead. Then, to the right.' },
@@ -331,7 +331,7 @@ export const DIALOGUES = {
   },
   'd-coffee': {
     title: 'At the café',
-    cast: ['man', 'girl'],
+    cast: ['woman2', 'woman'],
     lines: [
       { who: 0, jp: 'コーヒーをください。', en: 'A coffee please.' },
       { who: 1, jp: 'ホットですか、アイスですか。', en: 'Hot or iced?' },
@@ -342,7 +342,7 @@ export const DIALOGUES = {
   },
   'd-price': {
     title: 'At a shop',
-    cast: ['woman', 'boy'],
+    cast: ['woman', 'woman2'],
     lines: [
       { who: 0, jp: 'これはいくらですか。', en: 'How much is this?' },
       { who: 1, jp: 'ごひゃくえんです。', en: 'It is 500 yen.' },
@@ -353,7 +353,7 @@ export const DIALOGUES = {
   },
   'd-card': {
     title: 'Paying',
-    cast: ['man', 'woman'],
+    cast: ['woman2', 'woman'],
     lines: [
       { who: 0, jp: 'カードでいいですか。', en: 'Is a card okay?' },
       { who: 1, jp: 'すみません、げんきんだけです。', en: 'Sorry, cash only.' },
@@ -364,7 +364,7 @@ export const DIALOGUES = {
   },
   'd-meet': {
     title: 'Meeting someone',
-    cast: ['man', 'woman'],
+    cast: ['woman2', 'woman'],
     lines: [
       { who: 0, jp: 'はじめまして、たなかです。', en: 'Nice to meet you, I\'m Tanaka.' },
       { who: 1, jp: 'はじめまして、ゆきです。せんせいです。', en: 'Nice to meet you, I\'m Yuki. I\'m a teacher.' },
@@ -375,7 +375,7 @@ export const DIALOGUES = {
   },
   'd-ramen': {
     title: 'Hungry friends',
-    cast: ['boy', 'girl'],
+    cast: ['woman2', 'woman'],
     lines: [
       { who: 0, jp: 'おなかすいた！', en: 'I\'m hungry!' },
       { who: 1, jp: 'ラーメンたべよう！めっちゃおいしいよ。', en: 'Let\'s eat ramen! It\'s super good.' },
@@ -386,7 +386,7 @@ export const DIALOGUES = {
   },
   'd-maji': {
     title: 'Big news',
-    cast: ['girl', 'boy'],
+    cast: ['woman', 'woman2'],
     lines: [
       { who: 0, jp: 'あしたにほんにいくよ！', en: 'I\'m going to Japan tomorrow!' },
       { who: 1, jp: 'まじ？やばい！', en: 'Really? Amazing!' },

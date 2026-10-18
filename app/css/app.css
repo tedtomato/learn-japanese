@@ -826,3 +826,12 @@ ruby { padding: 0 3px; }
 .fit-tight .ruby-on ruby + ruby { margin-left: 0; }
 .fit-tight rt { font-size: 10px; letter-spacing: -0.02em; }
 .fit-tight .ruby-on, .fit-tight .jp { font-size: inherit; }
+
+/* v0.27: Today's review card on Learn. */
+.review-card { display: flex; flex-direction: column; gap: 12px; }
+.review-head { display: flex; align-items: center; gap: 12px; }
+.review-head b { display: block; color: var(--text-strong); font-size: 18px; }
+.review-head span { color: var(--muted); font-size: 14px; }
+.review-icon { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: var(--blue-soft); color: var(--blue-text); flex: none; }
+.review-words { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.review-words .jp { padding: 4px 10px; border-radius: 10px; background: var(--card-2); border: 2px solid var(--border); font-size: 18px; color: var(--text-strong); }

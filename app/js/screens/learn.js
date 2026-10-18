@@ -12,11 +12,25 @@ import { speak } from '../audio.js';
 import { nextTidbit, tidbitCard } from '../tidbits.js';
 import { art } from '../art.js';
 import {
-  currentNodeIndex, nodeLevel, isNodeDone, isNodeUnlocked, nodeNeedsReview, openChest, todayXp, currentHearts,
+  currentNodeIndex, nodeLevel, isNodeDone, isNodeUnlocked, nodeNeedsReview, openChest, todayXp, currentHearts, dueItemIds,
 } from '../progress.js';
 
 const OFFSETS = [0, 44, 70, 44, 0, -44, -70, -44];
 const CHEERS = [['がんばって！', 'You can do it!'], ['いいね！', 'Nice!'], ['すごい！', 'Amazing!'], ['ファイト！', 'Keep going!']];
+
+// Words learned before that are due again today (spaced repetition), with a one-tap review.
+function reviewCard(state, now) {
+  const due = dueItemIds(state, now).filter((id) => state.items[id].seen > 0);
+  if (!due.length) return '';
+  const words = due.map((id) => ITEMS.get(id)).filter((it) => it && it.type !== 'kana').slice(0, 4);
+  const minutes = Math.max(1, Math.round(Math.min(due.length, 8) * 0.3));
+  return html`<section class="card review-card">
+    <div class="review-head"><div class="review-icon">${icon('refresh', 22)}</div>
+      <div><b>Today's review</b><span>${due.length} ${due.length === 1 ? 'word' : 'words'} to refresh · about ${minutes} min</span></div></div>
+    ${words.length ? html`<p class="review-words">${words.map((w) => html`<span class="jp">${w.jp}</span>`)}${due.length > words.length ? html`<span class="muted">+${due.length - words.length}</span>` : ''}</p>` : ''}
+    <button class="btn btn-secondary btn-block start-review">Review now</button>
+  </section>`;
+}
 
 function nodeState(node, current, now) {
   const { state } = app;
@@ -143,6 +157,7 @@ export function renderLearn(root) {
       ${xp >= goal ? html`<span class="pill pill-gold">${icon('check', 14)} Done!</span>` : ''}
       <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (xp / goal) * 100)}%"></div></div>
     </section>
+    ${reviewCard(state, now)}
     <div class="tidbit-slot">${tidbitCard(tb.kind, tb.item, { next: true })}</div>
     ${SECTIONS.map((section, s) => html`
       <h2 class="section-title"><span>Section ${s + 1}</span>${section.title}</h2>
@@ -165,6 +180,7 @@ export function renderLearn(root) {
     }),
   );
   root.addEventListener('click', () => document.querySelector('.popover')?.remove());
+  $('.start-review', root)?.addEventListener('click', () => app.go('#/practice/go'));
   const wireTidbit = () => {
     wireShare($('.tidbit-slot', root));
     $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));

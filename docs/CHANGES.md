@@ -9,6 +9,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | "Nice to meet you" card and question bubble cut off on the right | ✅ long words shrink to fit, then wrap | 0.12 |
 | No pictures next to each answer | ✅ removed from answer choices (kept on the new-word card) | 0.12 |
 | Remove auto jump to next exercise (no time to tap Explain) | ✅ removed, with its setting | 0.13 |
+| Practise again the next day what was learnt the day before | ✅ already scheduled (spaced repetition); now a Today's review card on Learn shows what's due, one tap to review | 0.27 |
 | Long Japanese answer option cut off on the right | ✅ shrinks, then wraps (0.25); with romaji shown, romaji packs tighter first so it stays on one line (0.26) | 0.26 |
 | Link hiragana to words people know, like sushi | ✅ 56 hiragana + 49 katakana linked to a familiar word, with picture; tap to hear | 0.24 |
 | Show a kanji once with a memory clue before asking to recognise it | ✅ any never-answered item gets its card first (lessons and Practice); clue highlighted | 0.23 |

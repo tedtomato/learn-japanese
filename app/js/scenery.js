@@ -1,5 +1,6 @@
 // Garden scenery for the learning path: a stepping-stone trail between the lesson circles and
-// little bonsai trees, zen stones, bushes and lanterns beside it, with pebbles and moss along its edges.
+// little bonsai trees, zen stones, bushes and lanterns beside it, with pebbles and moss along its edges,
+// and small streams crossed by red garden bridges.
 import { raw } from './dom.js';
 
 const DECOR = {
@@ -46,8 +47,12 @@ export function drawTrails(root) {
     svg.setAttribute('class', 'trail');
     svg.setAttribute('width', box.width);
     svg.setAttribute('height', box.height);
-    svg.innerHTML = `<path d="${d}" class="trail-bed"/><path d="${d}" class="trail-stones"/>`;
-    svg.insertAdjacentHTML('beforeend', edging(svg.querySelector('.trail-bed'), box.width, pts));
+    const rows = [...track.querySelectorAll('.node-row')];
+    const streams = rows.flatMap((row, i) => (row.classList.contains('stream-after') && pts[i + 1] ? [(pts[i].y + pts[i + 1].y) / 2] : []));
+    svg.innerHTML = streams.map((y) => streamPath(y, box.width)).join('')
+      + `<path d="${d}" class="trail-bed"/><path d="${d}" class="trail-stones"/>`;
+    const bed = svg.querySelector('.trail-bed');
+    svg.insertAdjacentHTML('beforeend', edging(bed, box.width, pts, streams) + streams.map((y) => bridge(bed, y)).join(''));
     track.prepend(svg);
   });
 }
@@ -59,7 +64,7 @@ const noise = (n) => {
 };
 
 // Zen pebbles and moss tufts scattered along both edges of the trail.
-function edging(path, width, nodes) {
+function edging(path, width, nodes, streams = []) {
   const len = path.getTotalLength();
   const out = [];
   for (let at = 20, i = 0; at < len - 20; at += 12 + noise(i) * 14, i += 1) {
@@ -72,7 +77,8 @@ function edging(path, width, nodes) {
     const off = side * (28 + noise(i + 0.25) * 40);
     const x = p.x - (dy / n) * off;
     const y = p.y + (dx / n) * off;
-    if (x < 8 || x > width - 8 || nodes.some((c) => Math.hypot(c.x - x, c.y - y) < 48)) continue;
+    if (x < 8 || x > width - 8 || nodes.some((c) => Math.hypot(c.x - x, c.y - y) < 48)
+      || streams.some((sy) => Math.abs(sy - y) < 24)) continue;
     out.push(noise(i + 0.75) < 0.55 ? pebbles(x, y, i) : moss(x, y, i));
   }
   return `<g class="edging">${out.join('')}</g>`;
@@ -95,4 +101,35 @@ function moss(x, y, i) {
   return `<g class="moss"><circle cx="${(x - r * 0.7).toFixed(1)}" cy="${(y + 1).toFixed(1)}" r="${(r * 0.75).toFixed(1)}" class="moss-dark"/>`
     + `<circle cx="${x.toFixed(1)}" cy="${(y - 1).toFixed(1)}" r="${r.toFixed(1)}" class="moss-mid"/>`
     + `<circle cx="${(x + r * 0.8).toFixed(1)}" cy="${(y + 1.5).toFixed(1)}" r="${(r * 0.6).toFixed(1)}" class="moss-light"/></g>`;
+}
+
+// A gently winding stream right across the garden at height y.
+function streamPath(y, width) {
+  let d = `M-20 ${y}`;
+  for (let x = -20, k = 0; x < width + 20; x += 60, k += 1) d += ` Q${x + 30} ${y + (k % 2 ? 7 : -7)} ${x + 60} ${y}`;
+  return `<g class="stream"><path d="${d}" class="stream-bank"/><path d="${d}" class="stream-water"/><path d="${d}" class="stream-ripple"/></g>`;
+}
+
+// A red arched garden bridge, seen from above, laid along the trail where it crosses the stream.
+function bridge(path, y) {
+  const len = path.getTotalLength();
+  let lo = 0;
+  let hi = len;
+  for (let k = 0; k < 24; k++) {
+    const mid = (lo + hi) / 2;
+    if (path.getPointAtLength(mid).y < y) lo = mid;
+    else hi = mid;
+  }
+  const p = path.getPointAtLength(lo);
+  const q = path.getPointAtLength(Math.min(lo + 2, len));
+  const angle = (Math.atan2(q.y - p.y, q.x - p.x) * 180) / Math.PI;
+  const posts = [-27, 0, 27].map((x) => `<circle cx="${x}" cy="-14" r="3.4"/><circle cx="${x}" cy="14" r="3.4"/>`).join('');
+  return `<g class="bridge" transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${angle.toFixed(1)})">
+    <ellipse class="bridge-shadow" cx="2" cy="4" rx="34" ry="18"/>
+    <rect class="bridge-deck" x="-30" y="-12" width="60" height="24" rx="4"/>
+    <path class="bridge-planks" d="M-20 -12v24M-10 -12v24M0 -12v24M10 -12v24M20 -12v24"/>
+    <rect class="bridge-arch" x="-12" y="-12" width="24" height="24"/>
+    <rect class="bridge-rail" x="-30" y="-16.5" width="60" height="5" rx="2.5"/>
+    <rect class="bridge-rail" x="-30" y="11.5" width="60" height="5" rx="2.5"/>
+    <g class="bridge-posts">${posts}</g></g>`;
 }

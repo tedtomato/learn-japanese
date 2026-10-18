@@ -49,7 +49,10 @@ function renderNode(node, i, current, now) {
   const showCheer = st === 'current' && node.kind !== 'chest';
   const cheer = CHEERS[node.index % CHEERS.length];
   const side = offset > 0 ? 'left' : 'right';
-  return html`<div class="node-row" style="--x:${offset}px">
+  // Every few steps the path crosses a little stream on a red garden bridge (drawn by drawTrails).
+  const k = node.unit.nodes.indexOf(node);
+  const stream = k % 4 === 2 && k < node.unit.nodes.length - 1;
+  return html`<div class="node-row ${stream ? 'stream-after' : ''}" style="--x:${offset}px">
     ${showCheer ? html`<div class="node-mascot ${side}">
       <div class="bubble"><b class="jp">${cheer[0]}</b><small>${cheer[1]}</small></div>${mascot('happy', 64)}</div>`
       : html`<div class="decor-slot ${side}">${decorFor(i)}</div>`}

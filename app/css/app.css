@@ -776,3 +776,20 @@ ruby { padding: 0 3px; }
 /* Guide cards: long words shrink to fit the card (fitText), never spill into the next card. */
 .guide-card { min-width: 0; overflow: hidden; }
 .guide-jp.fit { align-self: stretch; max-width: 100%; }
+
+/* v0.16: streams across the garden, crossed by red arched bridges. */
+.node-row.stream-after { margin-bottom: 70px; }
+.stream path { fill: none; stroke-linecap: round; }
+.stream-bank { stroke: #4aa3d6; stroke-width: 34; opacity: .45; }
+.stream-water { stroke: #7fd0f5; stroke-width: 24; }
+.stream-ripple { stroke: #e6f7ff; stroke-width: 1.6; stroke-dasharray: 5 40; opacity: .7; animation: ripple 3s linear infinite; }
+@keyframes ripple { to { stroke-dashoffset: -90; } }
+.bridge-shadow { fill: rgba(0,0,0,.14); }
+.bridge-deck { fill: #b8743a; }
+.bridge-planks { stroke: #8f5426; stroke-width: 1.4; }
+.bridge-arch { fill: #fff; opacity: .16; }
+.bridge-rail { fill: #e0402e; }
+.bridge-posts circle { fill: #ffcc33; stroke: #c98a00; stroke-width: 1; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stream, :root:not([data-theme="light"]) .bridge { opacity: .85; } }
+:root[data-theme="dark"] .stream, :root[data-theme="dark"] .bridge { opacity: .85; }
+@media (prefers-reduced-motion: reduce) { .stream-ripple { animation: none; } }

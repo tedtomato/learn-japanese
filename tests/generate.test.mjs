@@ -71,11 +71,13 @@ test('new items are introduced (and new characters traced) before being asked ab
   }
 });
 
-test('romaji hints fade once every character of a word has been learned', () => {
+test('romaji hints fade only once every character of a word is well known', () => {
   const state = defaultState(T0);
   const word = [...ITEMS.values()].find((i) => i.type === 'word' && i.jp === 'いいえ');
   assert.equal(canRead(word, knownChars(state)), false);
   for (const ch of word.chars) state.items[`k-${ch}`] = { box: 1, due: T0 + 1e9, seen: 1, right: 1, wrong: 0 };
+  assert.equal(canRead(word, knownChars(state)), false, 'seen once is not enough');
+  for (const ch of word.chars) state.items[`k-${ch}`].box = 3;
   assert.equal(canRead(word, knownChars(state)), true);
 });
 

@@ -864,3 +864,9 @@ button.stat:active { transform: scale(.94); }
 .cal-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin: 0 4px 0 8px; vertical-align: middle; }
 .cal-legend .dot.studied { background: var(--orange-soft); border: 2px solid var(--orange, #ff9600); }
 .cal-legend .dot.goal { background: var(--gold-soft); border: 2px solid var(--gold); }
+
+/* v0.29: romaji on demand — kept in the layout but hidden until "Show romaji" is tapped. */
+.jp-prompt-wrap { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; flex: 1; }
+.jp-prompt-wrap > .fit { max-width: 100%; }
+.rt-hidden rt { visibility: hidden; }
+.show-romaji { background: none; border: 0; padding: 2px 0; font: inherit; font-size: 13px; font-weight: 800; color: var(--blue-text); text-transform: uppercase; letter-spacing: .04em; }

@@ -57,9 +57,16 @@ export const enWords = (en) => en.split(/\s+/).filter(Boolean);
 const isNew = (state, id) => !state.items[id]?.seen;
 
 // ---- What the learner can read ----
+// A character counts as readable once it has been answered right in a few sessions (box 3, which
+// takes a couple of days), not the first time it is seen. extraIds: characters taught right now.
+export const SOLID_BOX = 3;
 export function knownChars(state, extraIds = []) {
   const set = new Set();
-  for (const id of [...Object.keys(state.items), ...extraIds]) {
+  for (const id of Object.keys(state.items)) {
+    const it = ITEMS.get(id);
+    if (it?.type === 'kana' && state.items[id].box >= SOLID_BOX) set.add(it.jp);
+  }
+  for (const id of extraIds) {
     const it = ITEMS.get(id);
     if (it?.type === 'kana') set.add(it.jp);
   }
@@ -214,14 +221,17 @@ function spread(list, rng) {
 
 export function context({ state, sessionIds, level, rng, canListen = true, canSpeak = false, advanced = false, readMode = false }) {
   const knownIds = Object.keys(state.items).filter((id) => ITEMS.has(id));
-  const chars = knownChars(state, sessionIds);
+  // Reading lessons count the characters they are teaching; other lessons only well-known ones.
+  const chars = knownChars(state, readMode ? sessionIds : []);
+  const always = state.settings?.romaji === 'always';
   return {
     rng, level, canListen, canSpeak, advanced, sessionIds, knownIds, chars,
-    // Romaji over Japanese: until the learner can read every character of the word, and on the
-    // very first lesson; reading lessons always hide it for words they can read.
+    // Romaji over Japanese: until the learner reads every character of the word well; sentences
+    // keep it until the sentence itself is well known; "Always" in settings keeps it on.
     romajiHint: (item) => {
       if (!['word', 'sentence'].includes(item.type)) return false;
-      if (!canRead(item, chars)) return true;
+      if (always || !canRead(item, chars)) return true;
+      if (item.type === 'sentence' && !readMode && !(state.items[item.id]?.box >= SOLID_BOX)) return true;
       return !readMode && level < 1 && isNew(state, item.id);
     },
   };

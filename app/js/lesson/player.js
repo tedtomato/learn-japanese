@@ -198,6 +198,10 @@ function next(root, s) {
   startTimer(root, s, null);
   RENDERERS[s.current.type](root, s);
   fitText(root);
+  $$('.show-romaji', root).forEach((b) => b.addEventListener('click', () => {
+    b.previousElementSibling?.classList.remove('rt-hidden');
+    b.remove();
+  }));
 }
 
 function retryIntro(root, s) {
@@ -439,8 +443,11 @@ function promptFor(root, s, ex, item) {
   }
   const big = item.type === 'kana';
   // No play button when the task is to read it — hearing it would give the answer away.
+  // Romaji hidden: offer it on demand (not when the task is to read it), kept in place so nothing jumps.
+  const canPeek = !big && !ex.hint && ex.kind !== 'read' && ['word', 'sentence'].includes(item.type);
   return speakerBubble(s, html`${ex.kind === 'read' ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 22)}</button>`}
-    <div class="${big ? 'jp-huge' : 'jp-lg fit'}">${big ? html`<span class="jp">${item.jp}</span>` : jpItem(item, ex.hint)}</div>`);
+    <div class="jp-prompt-wrap"><div class="${big ? 'jp-huge' : 'jp-lg fit'} ${canPeek ? 'rt-hidden' : ''}">${big ? html`<span class="jp">${item.jp}</span>` : jpItem(item, ex.hint || canPeek)}</div>
+    ${canPeek ? html`<button class="show-romaji">Show romaji</button>` : ''}</div>`);
 }
 
 function optionHtml(opt, ex) {

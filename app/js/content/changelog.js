@@ -1,6 +1,12 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.29', date: '18 Oct 2026', changes: [
+    'More romaji help: it stays until you know each character well (right over a few days), not after seeing it once',
+    'Sentences keep their romaji until you know the sentence well',
+    'New: "Show romaji" button when romaji is hidden',
+    'New setting: Romaji help — Auto or Always',
+  ] },
   { version: '0.28', date: '18 Oct 2026', changes: [
     'New: tap the 🔥 streak in the top bar for a calendar of the days you studied, your best streak and freezes',
   ] },

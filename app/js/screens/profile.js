@@ -91,6 +91,7 @@ export function renderProfile(root) {
       <div class="setting"><span>Speed challenge</span>${seg('speed', s.speed !== false, [[true, 'On'], [false, 'Off']])}</div>
       <div class="setting"><span>Speaking tasks</span>${seg('speaking', s.speaking !== false, [[true, 'On'], [false, 'Off']])}</div>
       <div class="setting"><span>Sound effects</span>${seg('sfx', s.sfx, [[true, 'On'], [false, 'Off']])}</div>
+      <div class="setting"><span>Romaji help</span>${seg('romaji', s.romaji || 'auto', [['auto', 'Auto'], ['always', 'Always']])}</div>
       <div class="setting"><span>Voice speed</span>${seg('voiceRate', s.voiceRate, [[0.7, 'Slow'], [0.85, 'Normal'], [1, 'Fast']])}</div>
       <div class="setting column"><span>Japanese voice</span><small class="muted voice-status">${VOICE_TEXT[voiceStatus()]}</small>
         <button class="btn btn-white test-voice">${icon('speaker', 18)} Test: こんにちは</button></div>

@@ -8,6 +8,7 @@ Releases are listed in the in-app change log (Profile → App version).
 |---|---|---|
 | English (romaji) text too small | ✅ ~40% bigger | 0.9 |
 | Sound button too big | ✅ 72 px (was 110 px) | 0.9 |
+| "Check update" says latest but app stuck on v0.8 | ✅ cause: Pages was also publishing straight from the branch and overwrote each release; source switched to GitHub Actions | 0.10 |
 | Moves too quickly to the next exercise | ✅ 2.5 s / 5 s, plus Auto-continue setting (Normal / Relaxed / Off) | 0.10 |
 
 ## Batch 5 — 18 Oct 2026

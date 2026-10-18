@@ -92,3 +92,18 @@ test('sentence tiles never offer the same word twice', () => {
     }
   }
 });
+
+test('Tokyo section comes first and never asks to read or spell kana without romaji', () => {
+  assert.equal(NODES[0].section.id, 'tokyo');
+  const state = defaultState(T0);
+  for (const node of NODES.filter((n) => n.section.id === 'tokyo' && n.kind !== 'chest')) {
+    for (const level of [0, 4]) {
+      const { exercises } = generateLesson(node, state, { level, rng: makeRng(node.index + level), now: T0 });
+      for (const ex of exercises) {
+        assert.notEqual(ex.mode, 'spell', node.id);
+        if (ex.type === 'build' && ex.mode !== 'jp2en') assert.ok(ex.tileRomaji?.every(Boolean), `${node.id}: tiles without romaji ${ex.tiles}`);
+        if (ex.type === 'choice' || ex.type === 'build') assert.ok(ex.hint, `${node.id}: romaji hint missing`);
+      }
+    }
+  }
+});

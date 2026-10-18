@@ -3,7 +3,7 @@
 ## ✅ Phase 1 — Foundations (v1)
 - Installable offline web app, hosted on GitHub Pages, auto-updating from `main`
 - Learning path: sections → units → lessons, chests, unit review trophies, 5 levels per lesson
-- Hiragana (71 characters) + first words and sentences (greetings, numbers, introductions, food)
+- Tokyo trip phrases first (taught by sound + romaji), then hiragana (71 characters) and first words / sentences
 - Exercises: intro cards, multiple choice (read / listen / recall), match pairs, kana spelling, sentence building
 - Japanese text-to-speech with slow mode
 - Spaced repetition per item, review mixed into lessons, fading lessons flagged on the path, Practice session

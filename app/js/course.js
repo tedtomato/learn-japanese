@@ -1,6 +1,7 @@
 // Builds the course tree (sections → units → path nodes) and the global item index from content.
 import { HIRAGANA_ROWS, kanaId } from './content/kana.js';
 import { KANA_UNIT_WORDS, WORD_UNITS } from './content/words.js';
+import { TOKYO_UNITS } from './content/tokyo.js';
 
 export const ITEMS = new Map();
 const UNIT_COLORS = ['green', 'blue', 'purple', 'orange', 'red'];
@@ -13,12 +14,14 @@ function addItem(item) {
 
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-function addWord([jp, romaji, en, emoji], section) {
-  return addItem({ id: `w-${slug(romaji)}`, type: 'word', jp, romaji, en, emoji, section });
+function addWord([jp, romaji, en, emoji], section, prefix = '') {
+  return addItem({ id: `${prefix}w-${slug(romaji)}`, type: 'word', jp, romaji, en, emoji, section });
 }
 
-function addSentence({ jp, romaji, en }, section) {
-  return addItem({ id: `s-${slug(romaji)}`, type: 'sentence', jp, text: jp.join(''), romaji, en, section });
+function addSentence({ jp, romaji, en }, section, prefix = '') {
+  const romajiChunks = romaji.split(' ');
+  if (romajiChunks.length !== jp.length) throw new Error(`Romaji "${romaji}" must have one word per chunk`);
+  return addItem({ id: `${prefix}s-${slug(romaji)}`, type: 'sentence', jp, text: jp.join(''), romaji, romajiChunks, en, section });
 }
 
 function chunk(list, size) {
@@ -60,28 +63,34 @@ function buildHiraganaSection() {
       nodes: buildNodes(`hira-${row.id}`, [...kanaLessons, ...wordLessons]),
     };
   });
-  return { id: 'hiragana', title: 'Hiragana', romajiUntilLevel: 1, units };
+  return { id: 'hiragana', title: 'Hiragana', romajiUntilLevel: 1, readsKana: true, units };
 }
 
-function buildWordsSection() {
-  const units = WORD_UNITS.map((unit, u) => {
+// Sections taught with words and sentences (romajiUntilLevel: show romaji below this lesson level).
+function buildPhraseSection({ id, title, units: source, romajiUntilLevel, readsKana, prefix = '', colorShift = 0 }) {
+  const units = source.map((unit, u) => {
     const lessons = unit.lessons.map((l) => {
-      const words = (l.words || []).map((w) => addWord(w, 'words'));
-      const sentences = (l.sentences || []).map((s) => addSentence(s, 'words'));
-      return { title: l.title, items: [...words, ...sentences], icon: sentences.length ? 'chat' : 'word' };
+      const words = (l.words || []).map((w) => addWord(w, id, prefix));
+      const sentences = (l.sentences || []).map((s) => addSentence(s, id, prefix));
+      return { title: l.title, items: [...words, ...sentences], icon: sentences.length ? 'chat' : 'emoji' };
     });
     return {
-      id: `words-${unit.id}`,
+      id: `${id}-${unit.id}`,
       title: unit.title,
       desc: unit.desc,
-      color: UNIT_COLORS[(u + 1) % UNIT_COLORS.length],
-      nodes: buildNodes(`words-${unit.id}`, lessons),
+      color: UNIT_COLORS[(u + colorShift) % UNIT_COLORS.length],
+      nodes: buildNodes(`${id}-${unit.id}`, lessons),
     };
   });
-  return { id: 'words', title: 'First words', romajiUntilLevel: 2, units };
+  return { id, title, romajiUntilLevel, readsKana, units };
 }
 
-export const SECTIONS = [buildHiraganaSection(), buildWordsSection()];
+// The Tokyo section comes first in the path but its items get a prefix so they never clash with
+// the same words taught again (in kana) later on.
+const tokyo = buildPhraseSection({ id: 'tokyo', title: 'Tokyo trip', units: TOKYO_UNITS, romajiUntilLevel: Infinity, readsKana: false, prefix: 't' });
+const hiragana = buildHiraganaSection();
+const words = buildPhraseSection({ id: 'words', title: 'First words', units: WORD_UNITS, romajiUntilLevel: 2, readsKana: true, colorShift: 1 });
+export const SECTIONS = [tokyo, hiragana, words];
 
 export const NODES = [];
 export const NODE_BY_ID = new Map();

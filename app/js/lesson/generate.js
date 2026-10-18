@@ -31,13 +31,26 @@ const QUESTION_TYPES = {
 };
 
 const JP_FILLERS = ['は', 'が', 'を', 'の', 'です', 'か'];
+const FILLER_ROMAJI = { は: 'wa', が: 'ga', を: 'o', の: 'no', です: 'desu', か: 'ka' };
+
+// Romaji for any sentence chunk, used to label Japanese tiles while hints are on.
+let chunkRomaji;
+function romajiOfChunk(chunk) {
+  if (!chunkRomaji) {
+    chunkRomaji = new Map(Object.entries(FILLER_ROMAJI));
+    for (const item of ITEMS.values()) {
+      if (item.type === 'sentence') item.jp.forEach((c, i) => chunkRomaji.has(c) || chunkRomaji.set(c, item.romajiChunks[i]));
+    }
+  }
+  return chunkRomaji.get(chunk) || '';
+}
 const EN_FILLERS = ['the', 'is', 'a', 'you', 'I', 'my', 'please', 'what', 'this', 'like', 'are'];
 
 export const enWords = (en) => en.split(/\s+/).filter(Boolean);
 
 function allowed(type, item, ctx) {
   if (type.startsWith('audio') || type === 'build-audio') return ctx.hasVoice;
-  if (type === 'spell') return [...item.jp].length <= 5;
+  if (type === 'spell') return sectionOf(item).readsKana && [...item.jp].length <= 5;
   return true;
 }
 
@@ -124,7 +137,9 @@ function buildExercise(item, type, ctx) {
       const others = sentencePool(ctx).flatMap((s) => s.jp);
       const extra = tileDistractors(answer, [...others, ...JP_FILLERS], 3, ctx);
       const mode = type === 'build-audio' ? 'audio' : 'en2jp';
-      return { ...base, type: 'build', mode, answer, tiles: shuffle([...answer, ...extra], ctx.rng), instruction: mode === 'audio' ? 'Tap what you hear' : 'Translate into Japanese' };
+      const tiles = shuffle([...answer, ...extra], ctx.rng);
+      const tileRomaji = base.hint ? tiles.map(romajiOfChunk) : null;
+      return { ...base, type: 'build', mode, answer, tiles, tileRomaji, instruction: mode === 'audio' ? 'Tap what you hear' : 'Translate into Japanese' };
     }
     default:
       throw new Error(`Unknown question type ${type}`);
@@ -146,7 +161,7 @@ function matchExercise(ids, ctx) {
     return true;
   }).slice(0, 5);
   if (pairs.length < 3) return null;
-  return { type: 'match', itemIds: pairs, pairs, right, instruction: 'Tap the matching pairs' };
+  return { type: 'match', itemIds: pairs, pairs, right, hint: ctx.romajiHint(ITEMS.get(pairs[0])), instruction: 'Tap the matching pairs' };
 }
 
 // Spread exercises so the same item does not come up twice in a row when avoidable.

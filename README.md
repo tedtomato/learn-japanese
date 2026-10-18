@@ -8,10 +8,13 @@ bringing back what you are about to forget. Kuri the shiba cheers you on.
 
 ## What's inside (v1)
 
-- **Section 1 — Hiragana:** all 46 base characters + 25 voiced ones (が, ぱ…), taught in small groups,
+- **Section 1 — Tokyo trip:** survival Japanese for a visit — hello and thank you, getting around
+  (station, subway, toilet, "where is…?"), food and konbini (ordering, paying the bill), shopping and
+  help. Taught by sound with romaji always shown, so no reading is needed yet.
+- **Section 2 — Hiragana:** all 46 base characters + 25 voiced ones (が, ぱ…), taught in small groups,
   each followed by real words written only with characters you already know.
-- **Section 2 — First words:** greetings, numbers 1–10, introducing yourself, ordering food and drink,
-  and your first sentences.
+- **Section 3 — First words:** numbers 1–10, introducing yourself, food and drink, and your first
+  sentences — now read in hiragana, with romaji hints fading out.
 - **Exercises:** new-character cards with memory hints, multiple choice (read / listen / recall),
   match the pairs, spell words with kana tiles, and build sentences from a word bank.
 - **Listening:** every character, word and sentence is spoken with the device's Japanese voice

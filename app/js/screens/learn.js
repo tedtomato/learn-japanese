@@ -27,6 +27,7 @@ function nodeIcon(node, st) {
   if (node.kind === 'review') return icon('trophy', 36);
   if (st === 'done' && nodeLevel(app.state, node) >= MAX_LEVEL) return icon('star', 34);
   if (node.icon === 'kana') return html`<span class="node-kana jp">${ITEMS.get(node.items[0]).jp}</span>`;
+  if (node.icon === 'emoji') return html`<span class="node-emoji">${ITEMS.get(node.items[0]).emoji}</span>`;
   return icon(node.icon === 'chat' ? 'chat' : 'star', 34);
 }
 

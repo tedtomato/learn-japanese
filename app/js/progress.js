@@ -141,7 +141,7 @@ export function currentNodeIndex(state) {
   return i === -1 ? NODES.length : i;
 }
 
-export const isNodeUnlocked = (state, node) => node.index <= currentNodeIndex(state);
+export const isNodeUnlocked = (state, node) => isNodeDone(state, node) || node.index <= currentNodeIndex(state);
 
 export function nodeNeedsReview(state, node, now) {
   if (node.kind !== 'lesson' || !isNodeDone(state, node)) return false;

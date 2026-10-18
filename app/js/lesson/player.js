@@ -267,6 +267,11 @@ function renderChoice(root, s) {
   });
 }
 
+function tileButton(ex, i, jpTiles, extra = '') {
+  const sub = ex.tileRomaji?.[i];
+  return html`<button class="tile ${extra} ${jpTiles ? 'jp' : ''}" data-i="${i}">${ex.tiles[i]}${sub ? html`<small class="tile-romaji">${sub}</small>` : ''}</button>`;
+}
+
 function renderBuild(root, s) {
   const ex = s.current;
   const item = ITEMS.get(ex.itemId);
@@ -276,19 +281,19 @@ function renderBuild(root, s) {
   else if (ex.mode === 'audio') prompt = speakerButtons(say(item));
   else prompt = promptBubble(html`<button class="say-inline" data-say="${say(item)}" aria-label="Play">${icon('speaker', 22)}</button>
     <div class="en-prompt">${item.emoji ? html`<span class="emoji">${item.emoji}</span>` : ''}${item.en}
-    ${ex.hint ? html`<div class="romaji-hint">${item.romaji}</div>` : ''}</div>`);
+    ${ex.hint && ex.mode === 'spell' ? html`<div class="romaji-hint">${item.romaji}</div>` : ''}</div>`);
 
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
     ${prompt}
     <div class="answer-line" aria-label="Your answer"></div>
-    <div class="bank">${ex.tiles.map((t, i) => html`<button class="tile ${jpTiles ? 'jp' : ''}" data-i="${i}">${t}</button>`)}</div>`);
+    <div class="bank">${ex.tiles.map((t, i) => tileButton(ex, i, jpTiles))}</div>`);
   wirePlay(root);
   if (ex.mode !== 'spell' && ex.mode !== 'en2jp') speak(say(item));
 
   const placed = [];
   const line = $('.answer-line', root);
   const redraw = () => {
-    mount(line, html`${placed.map((i) => html`<button class="tile placed ${jpTiles ? 'jp' : ''}" data-i="${i}">${ex.tiles[i]}</button>`)}`);
+    mount(line, html`${placed.map((i) => tileButton(ex, i, jpTiles, 'placed'))}`);
     $$('.bank .tile', root).forEach((b) => b.classList.toggle('used', placed.includes(Number(b.dataset.i))));
     $$('.tile.placed', line).forEach((b) =>
       b.addEventListener('click', () => {
@@ -330,7 +335,7 @@ function renderMatch(root, s) {
   const right = [...ex.pairs].sort(() => Math.random() - 0.5);
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
     <div class="match">
-      <div class="match-col">${left.map((id) => html`<button class="option match-btn jp" data-side="l" data-id="${id}">${ITEMS.get(id).jp}</button>`)}</div>
+      <div class="match-col">${left.map((id) => html`<button class="option match-btn jp" data-side="l" data-id="${id}">${ITEMS.get(id).jp}${ex.hint ? html`<small class="opt-romaji">${ITEMS.get(id).romaji}</small>` : ''}</button>`)}</div>
       <div class="match-col">${right.map((id) => html`<button class="option match-btn" data-side="r" data-id="${id}">${label(ITEMS.get(id), ex.right)}</button>`)}</div>
     </div>`);
   const sel = { l: null, r: null };

@@ -175,6 +175,7 @@ span.c-orange { color: var(--orange); } span.c-blue { color: var(--blue); } span
 
 .track { display: flex; flex-direction: column; align-items: center; gap: 30px; padding: 64px 0 36px; }
 .node-kana { font-size: 34px; line-height: 1; }
+.node-emoji { font-size: 32px; line-height: 1; }
 .node-row:has(.start-bubble) { margin-top: 44px; }
 .node-row { position: relative; width: 100%; display: flex; justify-content: center; }
 .node-row:has(.popover) { z-index: 12; }
@@ -291,6 +292,9 @@ span.c-orange { color: var(--orange); } span.c-blue { color: var(--blue); } span
 .bank { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; padding-top: 8px; }
 .tile { min-height: 48px; padding: 8px 14px; border-radius: 14px; background: var(--card); border: 2px solid var(--border); border-bottom-width: 4px; font-size: 18px; color: var(--text-strong); }
 .tile.jp { font-size: 22px; }
+.tile { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; }
+.tile-romaji { font-family: var(--font); font-size: 12px; font-weight: 700; color: var(--muted); line-height: 1.1; }
+.tile.used .tile-romaji { color: transparent; }
 .tile.used { background: var(--disabled); border-color: var(--disabled); color: transparent; pointer-events: none; }
 .tile:active { transform: translateY(2px); border-bottom-width: 2px; }
 

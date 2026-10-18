@@ -90,32 +90,6 @@ export const KANA_UNIT_WORDS = {
 // Section 2: first words and sentences. Lessons list words introduced, then sentences.
 export const WORD_UNITS = [
   {
-    id: 'greetings',
-    title: 'Greetings',
-    desc: 'Say hello, thank you and goodbye',
-    lessons: [
-      { title: 'Hello', words: [
-        ['おはよう', 'ohayou', 'good morning', '🌄'],
-        ['こんにちは', 'konnichiwa', 'hello', '👋'],
-        ['こんばんは', 'konbanwa', 'good evening', '🌆'],
-      ] },
-      { title: 'Goodbye', words: [
-        ['さようなら', 'sayounara', 'goodbye', '🫡'],
-        ['おやすみ', 'oyasumi', 'good night', '😴'],
-        ['ありがとう', 'arigatou', 'thank you', '🙏'],
-      ] },
-      { title: 'Yes and no', words: [
-        ['はい', 'hai', 'yes', '✅'],
-        ['いいえ', 'iie', 'no', '❌'],
-        ['すみません', 'sumimasen', 'excuse me', '🙇'],
-      ] },
-      { title: 'Polite phrases', sentences: [
-        { jp: ['おはよう', 'ございます'], romaji: 'ohayou gozaimasu', en: 'Good morning' },
-        { jp: ['ありがとう', 'ございます'], romaji: 'arigatou gozaimasu', en: 'Thank you very much' },
-      ] },
-    ],
-  },
-  {
     id: 'numbers',
     title: 'Numbers 1–10',
     desc: 'Count from one to ten',

@@ -1,5 +1,5 @@
 // Garden scenery for the learning path: a stepping-stone trail between the lesson circles and
-// little bonsai trees, zen stones, bushes and lanterns beside it.
+// little bonsai trees, zen stones, bushes and lanterns beside it, with pebbles and moss along its edges.
 import { raw } from './dom.js';
 
 const DECOR = {
@@ -47,6 +47,52 @@ export function drawTrails(root) {
     svg.setAttribute('width', box.width);
     svg.setAttribute('height', box.height);
     svg.innerHTML = `<path d="${d}" class="trail-bed"/><path d="${d}" class="trail-stones"/>`;
+    svg.insertAdjacentHTML('beforeend', edging(svg.querySelector('.trail-bed'), box.width, pts));
     track.prepend(svg);
   });
+}
+
+// Same numbers on every redraw, so the pebbles don't jump around.
+const noise = (n) => {
+  const x = Math.sin(n * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+// Zen pebbles and moss tufts scattered along both edges of the trail.
+function edging(path, width, nodes) {
+  const len = path.getTotalLength();
+  const out = [];
+  for (let at = 20, i = 0; at < len - 20; at += 12 + noise(i) * 14, i += 1) {
+    const p = path.getPointAtLength(at);
+    const q = path.getPointAtLength(Math.min(at + 1, len));
+    const dx = q.x - p.x;
+    const dy = q.y - p.y;
+    const n = Math.hypot(dx, dy) || 1;
+    const side = noise(i + 0.5) < 0.5 ? -1 : 1;
+    const off = side * (28 + noise(i + 0.25) * 40);
+    const x = p.x - (dy / n) * off;
+    const y = p.y + (dx / n) * off;
+    if (x < 8 || x > width - 8 || nodes.some((c) => Math.hypot(c.x - x, c.y - y) < 48)) continue;
+    out.push(noise(i + 0.75) < 0.55 ? pebbles(x, y, i) : moss(x, y, i));
+  }
+  return `<g class="edging">${out.join('')}</g>`;
+}
+
+function pebbles(x, y, i) {
+  const count = 1 + Math.floor(noise(i + 0.1) * 3);
+  let g = '';
+  for (let k = 0; k < count; k++) {
+    const rx = 4.5 + noise(i * 3 + k) * 4;
+    const px = x + (k - (count - 1) / 2) * 11 + noise(i + k + 0.3) * 3;
+    const py = y + (noise(i + k + 0.6) - 0.5) * 6;
+    g += `<ellipse class="pebble pebble-${(i + k) % 3}" cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" rx="${rx.toFixed(1)}" ry="${(rx * 0.68).toFixed(1)}"/>`;
+  }
+  return g;
+}
+
+function moss(x, y, i) {
+  const r = 7 + noise(i + 0.9) * 5;
+  return `<g class="moss"><circle cx="${(x - r * 0.7).toFixed(1)}" cy="${(y + 1).toFixed(1)}" r="${(r * 0.75).toFixed(1)}" class="moss-dark"/>`
+    + `<circle cx="${x.toFixed(1)}" cy="${(y - 1).toFixed(1)}" r="${r.toFixed(1)}" class="moss-mid"/>`
+    + `<circle cx="${(x + r * 0.8).toFixed(1)}" cy="${(y + 1.5).toFixed(1)}" r="${(r * 0.6).toFixed(1)}" class="moss-light"/></g>`;
 }

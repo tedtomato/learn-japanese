@@ -762,3 +762,14 @@ ruby { padding: 0 3px; }
 .prompt-person .intro-card { padding: 16px 4px; min-width: 0; max-width: 100%; }
 .intro-card .fit { max-width: 100%; }
 .prompt-person .bubble-lg > .fit { min-width: 0; flex: 1; }
+
+/* v0.14: zen pebbles and moss along the trail edges. */
+.edging .pebble { stroke: rgba(0,0,0,.18); stroke-width: 1.2; }
+.pebble-0 { fill: #b5bec4; }
+.pebble-1 { fill: #9aa5ad; }
+.pebble-2 { fill: #d3d9dd; }
+.moss-dark { fill: #4a8f12; }
+.moss-mid { fill: #6bbf2a; }
+.moss-light { fill: #8fd14f; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .edging { opacity: .85; } }
+:root[data-theme="dark"] .edging { opacity: .85; }

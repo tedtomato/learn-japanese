@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.14', date: '18 Oct 2026', changes: [
+    'Zen pebbles and moss along both sides of the learning path',
+  ] },
   { version: '0.13', date: '18 Oct 2026', changes: [
     'No more automatic jump to the next exercise: tap Continue when ready, so there is always time for Explain',
     'Auto-continue setting removed',

@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.26', date: '18 Oct 2026', changes: [
+    'Fixed: long answers with romaji (どうもありがとうございます) still cut off — the romaji now packs tighter so the word fits on one line',
+  ] },
   { version: '0.25', date: '18 Oct 2026', changes: [
     'Fixed: long Japanese answers (どうもありがとうございます) running off the screen — they now shrink, then wrap',
   ] },

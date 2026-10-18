@@ -23,15 +23,23 @@ export function mount(el, template) {
   return el;
 }
 
-// Shrinks a one-line Japanese word until it fits its bubble (long words on narrow phones), then wraps.
+// Shrinks a one-line Japanese word until it fits its box (long words on narrow phones): first the
+// font, then tighter romaji spacing and a little smaller, and only then lets it wrap.
 export function fitText(root) {
   $$('.fit', root).forEach((el) => {
-    let size = parseFloat(getComputedStyle(el).fontSize);
-    while (el.scrollWidth > el.clientWidth + 1 && size > 20) {
-      size -= 2;
-      el.style.fontSize = `${size}px`;
+    const over = () => el.scrollWidth > el.clientWidth + 1;
+    const shrink = (min) => {
+      let size = parseFloat(getComputedStyle(el).fontSize);
+      while (over() && size > min) {
+        size -= 1;
+        el.style.fontSize = `${size}px`;
+      }
+    };
+    shrink(20);
+    if (over()) {
+      el.classList.add('fit-tight');
+      shrink(15);
     }
-    // Still too long: let it wrap onto two lines rather than go tiny.
-    if (el.scrollWidth > el.clientWidth + 1) $$('.ruby-on', el).concat(el).forEach((x) => { x.style.whiteSpace = 'normal'; x.style.wordBreak = 'break-all'; });
+    if (over()) $$('.ruby-on', el).concat(el).forEach((x) => { x.style.whiteSpace = 'normal'; x.style.wordBreak = 'break-all'; });
   });
 }

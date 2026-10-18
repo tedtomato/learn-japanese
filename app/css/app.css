@@ -821,3 +821,8 @@ ruby { padding: 0 3px; }
 .guide-ex b { color: var(--text-strong); }
 /* Long Japanese answers shrink, then wrap, inside their option (fitText). */
 .option .opt-label.fit { flex: 1; min-width: 0; max-width: 100%; overflow: hidden; }
+/* fitText's second step for long words: romaji packed tight so the characters sit closer. */
+.fit-tight ruby { padding: 0; }
+.fit-tight .ruby-on ruby + ruby { margin-left: 0; }
+.fit-tight rt { font-size: 10px; letter-spacing: -0.02em; }
+.fit-tight .ruby-on, .fit-tight .jp { font-size: inherit; }

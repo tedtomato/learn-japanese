@@ -3,6 +3,7 @@ import { NODES, MAX_LEVEL, ITEMS } from './course.js';
 import { review, isDue } from './srs.js';
 
 export const STORAGE_KEY = 'hajime.progress.v1';
+export const TEST_STORAGE_KEY = 'hajime.test-progress.v1'; // test mode keeps its own copy
 export const MAX_HEARTS = 5;
 export const HEART_REFILL_MS = 30 * 60 * 1000;
 export const XP_LESSON = 10;
@@ -192,18 +193,18 @@ export function completeSession(state, { node, mode, results, mistakes, now, bon
 }
 
 // ---- Saving on the device ----
-export function loadState(storage, now = Date.now()) {
+export function loadState(storage, now = Date.now(), key = STORAGE_KEY) {
   try {
-    const raw = storage?.getItem(STORAGE_KEY);
+    const raw = storage?.getItem(key);
     return migrate(raw ? JSON.parse(raw) : null, now);
   } catch {
     return defaultState(now);
   }
 }
 
-export function saveState(storage, state) {
+export function saveState(storage, state, key = STORAGE_KEY) {
   try {
-    storage?.setItem(STORAGE_KEY, JSON.stringify(state));
+    storage?.setItem(key, JSON.stringify(state));
     return true;
   } catch {
     return false;

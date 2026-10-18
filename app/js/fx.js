@@ -4,7 +4,7 @@ import { html, mount, raw, $ } from './dom.js';
 import { mascot } from './mascot.js';
 import { sfx, speak } from './audio.js';
 import { icon } from './icons.js';
-import { versionLabel } from './version.js';
+import { APP_RELEASE } from './content/changelog.js';
 
 const CHEST = `<svg class="fx-chest" viewBox="0 0 120 100" aria-hidden="true">
   <g class="fx-rays">${Array.from({ length: 12 }, (_, i) => `<rect x="58" y="-30" width="4" height="34" rx="2" transform="rotate(${i * 30} 60 50)"/>`).join('')}</g>
@@ -47,7 +47,7 @@ export function splash() {
   el.className = 'splash';
   mount(el, html`<div class="splash-inner">${mascot('cheer', 150)}<h1>Hajime <span class="jp">はじめ</span></h1><p>Learn Japanese, one day at a time</p>
       <button class="btn btn-white splash-go">Tap to start</button></div>
-    <div class="splash-credits"><span class="beta">Beta version - Oct 26</span>
+    <div class="splash-credits"><span class="beta">Beta version - Oct 26 · v${APP_RELEASE}</span>
       <span class="made">Created by Seb and Claude AI ${raw(CLAUDE_SPARK)}</span></div>`);
   document.body.append(el);
   let closed = false;

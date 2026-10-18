@@ -1,6 +1,11 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.6', date: '18 Oct 2026', changes: [
+    'Hidden test lab: double-tap the dog on Profile. Uses a separate test copy — your real progress is safe',
+    'Lab: unlock all levels, learn all kana, fill hearts & gems, try any task type, jump to any lesson',
+    'App version number shown on the start screen and under My progress',
+  ] },
   { version: '0.5', date: '18 Oct 2026', changes: [
     'Phone-only: the app now asks you to open it on a mobile phone',
     'Text on screen can no longer be selected by accident',

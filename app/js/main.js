@@ -5,6 +5,7 @@ import { icon } from './icons.js';
 import { renderLearn } from './screens/learn.js';
 import { renderPractice, renderCollection } from './screens/practice.js';
 import { renderProfile } from './screens/profile.js';
+import { renderLab } from './screens/lab.js';
 import { startSession, lessonKey } from './lesson/player.js';
 import { initUpdates } from './update.js';
 import { splash } from './fx.js';
@@ -55,16 +56,18 @@ function route() {
   $('#modal').classList.remove('open');
   app.inLesson = false;
 
-  const inSession = name === 'lesson' || (name === 'practice' && arg === 'go');
+  const inSession = name === 'lesson' || (name === 'practice' && arg === 'go') || (name === 'lab' && !!arg);
   document.body.classList.toggle('in-lesson', inSession);
   if (name === 'lesson') startSession(root, { nodeId: arg });
   else if (name === 'practice' && arg === 'go') startSession(root, {});
+  else if (name === 'lab' && arg) startSession(root, { demo: arg });
+  else if (name === 'lab') renderLab(root);
   else if (name === 'practice') renderPractice(root, arg);
   else if (name === 'collection') renderCollection(root, arg);
   else if (name === 'profile') renderProfile(root);
   else renderLearn(root);
   if (!inSession) {
-    renderNav(name === 'collection' ? 'practice' : TABS.some(([id]) => id === name) ? name : 'learn');
+    renderNav(name === 'collection' ? 'practice' : name === 'lab' ? 'profile' : TABS.some(([id]) => id === name) ? name : 'learn');
     window.scrollTo(0, 0);
   }
 }

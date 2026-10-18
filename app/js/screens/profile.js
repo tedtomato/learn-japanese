@@ -8,6 +8,7 @@ import { speak, voiceStatus } from '../audio.js';
 import { versionLabel } from '../version.js';
 import { CHANGELOG, APP_RELEASE } from '../content/changelog.js';
 import { checkForUpdate, hardRefresh } from '../update.js';
+import { askOpenLab } from './lab.js';
 import {
   displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, defaultState, FREEZE_PRICE, MAX_FREEZES,
 } from '../progress.js';
@@ -51,9 +52,10 @@ export function renderProfile(root) {
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page profile">
+    ${app.testMode ? html`<a class="card test-banner" href="#/lab"><b>🧪 Test mode is on</b><span>Open the test lab ›</span></a>` : ''}
     <section class="profile-head">
       <div class="avatar">${mascot('happy', 92)}</div>
-      <div><h1>My progress</h1><p class="muted">Learning since ${fmtDate(state.createdAt)}</p></div>
+      <div><h1>My progress</h1><p class="muted">Learning since ${fmtDate(state.createdAt)}</p><p class="app-ver">Hajime v${APP_RELEASE}</p></div>
     </section>
 
     <div class="stat-grid">
@@ -159,6 +161,13 @@ export function renderProfile(root) {
     } catch (err) {
       toast(err.message || 'Could not read that file.');
     }
+  });
+  // Hidden: a double tap on the avatar opens the test lab.
+  let lastTap = 0;
+  $('.avatar', root).addEventListener('click', () => {
+    const t = Date.now();
+    if (t - lastTap < 400) askOpenLab();
+    lastTap = t;
   });
   $('.check-update', root).addEventListener('click', () => checkForUpdate());
   $('.version-row', root).addEventListener('click', () =>

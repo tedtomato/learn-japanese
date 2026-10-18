@@ -315,3 +315,37 @@ export function generateRetry(itemIds, state, { rng = makeRng(), canListen = tru
   return itemIds.map((id) => ITEMS.get(id)).filter((it) => QUESTION_TYPES[it?.type])
     .map((it) => ({ ...buildExercise(it, questionType(it, 'easy', ctx), ctx), retry: true }));
 }
+
+// Test screen: a short session made only of one kind of task, from items anywhere in the course.
+export const DEMO_KINDS = {
+  trace: 'Trace characters', read: 'Read words', speak: 'Speak & repeat', fast: 'Fast listening',
+  grammar: 'Grammar cards', dialogue: 'Dialogues', kanji: 'Kanji & clues', match: 'Match pairs',
+  build: 'Build sentences', listen: 'Listening', intro: 'New word cards',
+};
+
+export function demoExercises(kind, state, { rng = makeRng() } = {}) {
+  const all = [...ITEMS.values()];
+  const of = (type, n) => shuffle(all.filter((i) => i.type === type && !i.peek), rng).slice(0, n);
+  const ids = (list) => list.map((i) => i.id);
+  // Pretend every character is known so reading tasks can be tried straight away.
+  const fakeState = { ...state, items: Object.fromEntries(all.filter((i) => i.type === 'kana').map((i) => [i.id, { box: 1 }])) };
+  const ctx = context({ state: fakeState, sessionIds: [], level: 3, rng, canListen: true, canSpeak: true, advanced: true });
+  const make = (list, type) => list.map((it) => buildExercise(it, type, ctx));
+  switch (kind) {
+    case 'trace': return [...of('kana', 3), ...of('kanji', 1)].map((it) => ({ type: 'trace', itemId: it.id, itemIds: [it.id], kind: 'trace' }));
+    case 'read': return make(of('word', 5), 'read');
+    case 'speak': return make([...of('word', 3), ...of('sentence', 2)], 'speak');
+    case 'fast': return make(of('sentence', 4), 'fast');
+    case 'grammar': return Object.keys(GRAMMAR).map((g) => ({ type: 'grammar', grammarId: g, itemIds: [], kind: 'grammar' }));
+    case 'dialogue': return all.filter((i) => i.type === 'dialogue').map((d) => dialogueExercise(d.id, ctx));
+    case 'kanji': {
+      const ks = of('kanji', 3);
+      return [...ks.map((k) => ({ type: 'intro', itemId: k.id, itemIds: [] })), ...make(ks, 'kanji2meaning'), ...make(of('kword', 2), 'kword2reading')];
+    }
+    case 'match': return [matchExercise(ids(of('word', 5)), ctx), matchExercise(ids(of('kana', 5)), ctx)].filter(Boolean);
+    case 'build': return [...make(of('sentence', 2), 'build-jp2en'), ...make(of('sentence', 2), 'build-en2jp')];
+    case 'listen': return [...make(of('word', 3), 'audio2jp'), ...make(of('sentence', 2), 'build-audio')];
+    case 'intro': return of('word', 4).map((w) => ({ type: 'intro', itemId: w.id, itemIds: [], hint: true }));
+    default: return [];
+  }
+}

@@ -1,5 +1,5 @@
 // Shared app context: progress state, saving, navigation, toasts and modals.
-import { loadState, saveState, currentHearts, displayStreak, studiedToday } from './progress.js';
+import { loadState, saveState, currentHearts, displayStreak, studiedToday, STORAGE_KEY, TEST_STORAGE_KEY } from './progress.js';
 import { html, mount, $ } from './dom.js';
 import { icon } from './icons.js';
 import { setSfx, setVoiceRate } from './audio.js';
@@ -12,11 +12,36 @@ const storage = (() => {
   }
 })();
 
+// Test mode (hidden, from Profile) plays on a separate copy of the progress so the real one is
+// never touched. The flag survives reloads until test mode is switched off.
+const TEST_FLAG = 'hajime.test-mode';
+const readFlag = () => {
+  try {
+    return storage?.getItem(TEST_FLAG) === '1';
+  } catch {
+    return false;
+  }
+};
+const keyFor = (test) => (test ? TEST_STORAGE_KEY : STORAGE_KEY);
+
 export const app = {
-  state: loadState(storage),
+  testMode: readFlag(),
+  state: loadState(storage, Date.now(), keyFor(readFlag())),
   now: () => Date.now(),
   save() {
-    saveState(storage, app.state);
+    saveState(storage, app.state, keyFor(app.testMode));
+    applySettings();
+  },
+  setTestMode(on) {
+    app.save();
+    app.testMode = on;
+    try {
+      if (on) storage?.setItem(TEST_FLAG, '1');
+      else storage?.removeItem(TEST_FLAG);
+    } catch {
+      /* ignore */
+    }
+    app.state = loadState(storage, Date.now(), keyFor(on));
     applySettings();
   },
   replaceState(next) {
@@ -37,6 +62,7 @@ export function applySettings() {
   else root.dataset.theme = theme;
   const bg = getComputedStyle(root).getPropertyValue('--bg').trim();
   document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', bg || '#f7f9fa'));
+  document.body.classList.toggle('test-mode', app.testMode);
   setSfx(sfx);
   setVoiceRate(voiceRate);
 }

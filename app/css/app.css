@@ -692,3 +692,16 @@ body.desktop-gate #nav { display: none; }
 @media (min-width: 1024px) {
   .page { padding-top: 24px; }
 }
+
+/* ---------- Test mode & lab ---------- */
+body.test-mode::after { content: 'TEST MODE'; position: fixed; top: calc(4px + var(--safe-top)); left: 50%; transform: translateX(-50%); z-index: 90;
+  background: var(--orange); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .08em; padding: 2px 10px; border-radius: 999px; pointer-events: none; }
+.test-banner { display: flex; justify-content: space-between; align-items: center; background: var(--orange-soft); border-color: var(--orange); color: var(--text-strong); }
+.test-banner span { color: var(--orange); font-weight: 800; font-size: 14px; }
+.lab-banner { display: flex; gap: 12px; align-items: center; }
+.lab-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.lab-grid .btn { font-size: 13px; min-height: 48px; padding: 10px; }
+.lab-unit summary { cursor: pointer; display: flex; justify-content: space-between; gap: 8px; }
+.lab-nodes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.lab-node { font-size: 13px; font-weight: 700; padding: 6px 10px; border-radius: 10px; border: 2px solid var(--border); color: var(--blue-text); }
+.app-ver { display: inline-block; margin-top: 4px; font-size: 12px; font-weight: 800; color: var(--blue-text); background: var(--blue-soft); border-radius: 999px; padding: 2px 10px; }

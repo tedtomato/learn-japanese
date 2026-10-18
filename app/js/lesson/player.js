@@ -10,7 +10,7 @@ import { mascot } from '../mascot.js';
 import { person, nameOf } from '../characters.js';
 import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
-import { generateLesson, generatePractice, generateRetry } from './generate.js';
+import { generateLesson, generatePractice, generateRetry, demoExercises } from './generate.js';
 import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey } from '../progress.js';
 import { nextTidbit, tidbitCard } from '../tidbits.js';
 import { GRAMMAR } from '../content/grammar.js';
@@ -46,11 +46,12 @@ const listenOff = () => (app.state.settings.listenOffUntil || 0) > app.now();
 const speakOff = () => (app.state.settings.speakOffUntil || 0) > app.now();
 const needsListening = (ex) => ex.prompt === 'audio' || ['audio', 'fast'].includes(ex.mode) || ex.type === 'dialogue' || ex.type === 'speak';
 
-export function startSession(root, { nodeId, itemIds } = {}) {
+export function startSession(root, { nodeId, itemIds, demo } = {}) {
   const now = app.now();
   const node = nodeId ? NODE_BY_ID.get(nodeId) : null;
-  if (nodeId && (!node || node.kind === 'chest' || !isNodeUnlocked(app.state, node))) return app.go('#/learn');
+  if (nodeId && (!node || node.kind === 'chest' || (!isNodeUnlocked(app.state, node) && !app.testMode))) return app.go('#/learn');
   const mode = node ? 'lesson' : 'practice';
+  if (demo && !app.testMode) return app.go('#/profile'); // demos only ever touch test progress
   if (mode === 'lesson' && currentHearts(app.state, now) <= 0) return app.go('#/practice');
 
   const opts = {
@@ -58,12 +59,14 @@ export function startSession(root, { nodeId, itemIds } = {}) {
     canListen: canSpeakAloud() && !listenOff(),
     canSpeak: canRecognise() && canSpeakAloud() && !speakOff() && app.state.settings.speaking !== false,
   };
-  const session = node
-    ? generateLesson(node, app.state, { ...opts, level: nodeLevel(app.state, node) })
-    : generatePractice(app.state, { ...opts, itemIds });
+  const session = demo
+    ? { exercises: demoExercises(demo, app.state), itemIds: [] }
+    : node
+      ? generateLesson(node, app.state, { ...opts, level: nodeLevel(app.state, node) })
+      : generatePractice(app.state, { ...opts, itemIds });
   if (!session.exercises.length) return app.go('#/practice');
   // Now and then, a fun fact or useful phrase about the unit's theme as a short break.
-  if (session.exercises.length >= 8 && node?.kind !== 'story' && Math.random() < 0.5) {
+  if (!demo && session.exercises.length >= 8 && node?.kind !== 'story' && Math.random() < 0.5) {
     session.exercises.splice(Math.floor(session.exercises.length / 2), 0, { type: 'tidbit', itemIds: [] });
   }
 
@@ -118,7 +121,7 @@ function cleanup(s) {
 function quit(s) {
   cleanup(s);
   app.inLesson = false;
-  app.go(location.hash.startsWith('#/practice') ? '#/practice' : '#/learn');
+  app.go(location.hash.startsWith('#/practice') ? '#/practice' : location.hash.startsWith('#/lab') ? '#/lab' : '#/learn');
 }
 
 function updateProgress(root, s) {
@@ -804,7 +807,7 @@ function finish(root, s) {
     <button class="btn btn-primary btn-block continue">Continue</button>
   </div>`);
   $('.continue', root).addEventListener('click', () => {
-    const go = () => app.go(s.mode === 'practice' ? '#/practice' : '#/learn');
+    const go = () => app.go(location.hash.startsWith('#/lab') ? '#/lab' : s.mode === 'practice' ? '#/practice' : '#/learn');
     if (summary.goalReached) rewardPopup({ kind: 'bonus', title: 'Daily goal reached!', reward: html`${icon('gem', 30)} +5 gems`, text: 'Come back tomorrow to keep your streak going.', onDone: go });
     else go();
   });

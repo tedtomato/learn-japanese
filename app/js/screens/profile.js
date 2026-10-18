@@ -6,7 +6,7 @@ import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { speak, voiceStatus } from '../audio.js';
 import { VERSION } from '../version.js';
-import { checkForUpdate } from '../update.js';
+import { checkForUpdate, hardRefresh } from '../update.js';
 import {
   displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, defaultState, FREEZE_PRICE, MAX_FREEZES,
 } from '../progress.js';
@@ -97,6 +97,8 @@ export function renderProfile(root) {
     <div class="card settings">
       <div class="setting"><span>App version</span><code class="version">${VERSION}</code></div>
       <button class="btn btn-white check-update">${icon('refresh', 18)} Check for updates</button>
+      <button class="btn btn-ghost hard-refresh">Reload latest version</button>
+      <p class="muted small">Not seeing an update? “Reload latest version” clears the app's cached files and loads it fresh from GitHub. Your progress is kept.</p>
       <button class="btn btn-danger-ghost reset">Reset all progress</button>
     </div>
     <p class="muted small center">Hajime — はじめ — means “beginning”.</p>
@@ -148,7 +150,8 @@ export function renderProfile(root) {
       toast(err.message || 'Could not read that file.');
     }
   });
-  $('.check-update', root).addEventListener('click', () => checkForUpdate(true));
+  $('.check-update', root).addEventListener('click', () => checkForUpdate());
+  $('.hard-refresh', root).addEventListener('click', () => hardRefresh());
   $('.reset', root).addEventListener('click', () =>
     modal(html`<div class="center">${mascot('sad', 90)}<h2>Reset everything?</h2><p class="muted">All XP, streaks and lessons on this device will be erased. This cannot be undone.</p></div>`, [
       { label: 'Keep my progress' },

@@ -40,7 +40,8 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (url.origin !== self.location.origin) return;
+  if (url.origin !== self.location.origin || url.pathname.endsWith('/version.json')) return;
+  if (request.cache === 'reload' || request.cache === 'no-store') return; // explicit fresh downloads
   if (request.mode === 'navigate') {
     event.respondWith(caches.match('./index.html', { cacheName: CACHE }).then((res) => res || fetch(request)));
     return;

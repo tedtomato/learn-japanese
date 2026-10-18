@@ -15,7 +15,9 @@ createServer(async (req, res) => {
   const file = join(dir, path.endsWith('/') ? `${path}index.html` : path);
   try {
     const body = await readFile(file);
-    res.writeHead(200, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
+    // PAGES_CACHE=1 mimics GitHub Pages, which lets browsers cache every file for 10 minutes.
+    const cache = process.env.PAGES_CACHE ? 'max-age=600' : 'no-cache';
+    res.writeHead(200, { 'Content-Type': TYPES[extname(file)] || 'application/octet-stream', 'Cache-Control': cache });
     res.end(body);
   } catch {
     res.writeHead(404).end('Not found');

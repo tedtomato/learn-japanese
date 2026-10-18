@@ -501,8 +501,6 @@ rt { font-family: var(--font); font-size: 0.42em; font-weight: 700; color: var(-
 .fb-actions { display: flex; gap: 10px; }
 .fb-actions .check { flex: 1; position: relative; overflow: hidden; }
 .fb-actions .explain { flex: none; }
-.check.auto .auto-fill { position: absolute; left: 0; bottom: 0; height: 4px; width: 100%; background: rgba(255,255,255,.7); transform-origin: left; animation: auto-fill var(--auto, 1s) linear forwards; }
-.check:not(.auto) .auto-fill { display: none; }
 .fb-badges { margin-top: 4px; display: flex; gap: 6px; flex-wrap: wrap; }
 .fb-badges .pill { font-size: 11px; padding: 4px 10px; }
 .interlude { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; text-align: center; }
@@ -673,7 +671,6 @@ body.desktop-gate #nav { display: none; }
 @keyframes pulse { from { opacity: 1; transform: scale(1); } to { opacity: .6; transform: scale(1.15); } }
 @keyframes march { to { stroke-dashoffset: -14; } }
 @keyframes mic-pulse { to { box-shadow: 0 6px 0 var(--red-edge), 0 0 0 22px transparent; } }
-@keyframes auto-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes petal-fall { 0% { transform: translate(0, 0) rotate(0); } 25% { transform: translate(18px, 25vh) rotate(90deg); } 50% { transform: translate(-12px, 50vh) rotate(180deg); } 75% { transform: translate(16px, 75vh) rotate(270deg); } 100% { transform: translate(-6px, 105vh) rotate(360deg); } }
 @keyframes lid-open { to { transform: rotate(-28deg) translate(-6px, -10px); } }
 @keyframes ray-in { to { opacity: .55; } }

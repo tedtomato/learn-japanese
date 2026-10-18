@@ -81,7 +81,7 @@ export function startSession(root, { nodeId, itemIds, demo } = {}) {
     retryRound: false,
     startedAt: now,
     current: null, checked: false,
-    timer: null, autoTimer: null,
+    timer: null,
   };
   app.inLesson = true;
   root.__session = s;
@@ -115,7 +115,6 @@ function renderShell(root, s) {
 
 function cleanup(s) {
   stopTimer(s);
-  clearTimeout(s.autoTimer);
   stopSpeaking();
 }
 
@@ -176,7 +175,6 @@ function stopTimer(s) {
 
 // ---------- Flow ----------
 function next(root, s) {
-  clearTimeout(s.autoTimer);
   stopTimer(s);
   stopSpeaking();
   $('.explain-sheet', root).hidden = true;
@@ -292,26 +290,17 @@ function result(root, s, ok, opts = {}) {
     </div>
     <div class="fb-actions">
       ${canExplain ? html`<button class="btn btn-ghost explain">Explain</button>` : ''}
-      <button class="btn ${ok ? 'btn-primary' : 'btn-danger'} check auto"><span>${ok ? 'Continue' : 'Got it'}</span><i class="auto-fill"></i></button>
+      <button class="btn ${ok ? 'btn-primary' : 'btn-danger'} check">${ok ? 'Continue' : 'Got it'}</button>
     </div></div>`);
+  // No auto-continue: the learner moves on when ready, so there is always time to tap Explain.
   const go = () => {
-    clearTimeout(s.autoTimer);
     if (outOfHearts) noHearts(root, s);
     else next(root, s);
   };
   $('.check', foot).addEventListener('click', go);
   $('.explain', foot)?.addEventListener('click', () => {
-    clearTimeout(s.autoTimer);
-    $('.check', foot).classList.remove('auto');
     showExplain(root, s, item, ok ? null : opts.chosenLabel, go);
   });
-  // Move on automatically after a pause (Settings → Auto-continue: normal, relaxed or off).
-  const pace = { normal: [2500, 5000], relaxed: [4000, 8000] }[app.state.settings.autoNext || 'normal'];
-  if (pace && !outOfHearts) {
-    const wait = ok ? pace[0] : pace[1];
-    $('.check', foot).style.setProperty('--auto', `${wait}ms`);
-    s.autoTimer = setTimeout(go, wait);
-  } else $('.check', foot).classList.remove('auto');
 }
 
 function showExplain(root, s, item, chosenLabel, go) {

@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.13', date: '18 Oct 2026', changes: [
+    'No more automatic jump to the next exercise: tap Continue when ready, so there is always time for Explain',
+    'Auto-continue setting removed',
+  ] },
   { version: '0.12', date: '18 Oct 2026', changes: [
     'Fixed: long Japanese words running off the right of the screen — they now shrink, then wrap',
     'No more pictures next to the answer choices',

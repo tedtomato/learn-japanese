@@ -8,6 +8,7 @@ Releases are listed in the in-app change log (Profile → App version).
 |---|---|---|
 | "Nice to meet you" card and question bubble cut off on the right | ✅ long words shrink to fit, then wrap | 0.12 |
 | No pictures next to each answer | ✅ removed from answer choices (kept on the new-word card) | 0.12 |
+| Remove auto jump to next exercise (no time to tap Explain) | ✅ removed, with its setting | 0.13 |
 | Asked about kanji not learned yet | ✅ "Did you know" kanji stay in Practice; unlearned kanji not used as options | 0.12 |
 
 ## Batch 6 — 18 Oct 2026
@@ -18,7 +19,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | "Check update" says latest but app stuck on v0.8 | ✅ cause: Pages was also publishing straight from the branch and overwrote each release; source switched to GitHub Actions | 0.10 |
 | Matching pairs: right column pushed off screen by long words | ✅ | 0.11 |
 | Lesson pop-up on the path cut off at the left edge | ✅ positioned inside the screen | 0.11 |
-| Moves too quickly to the next exercise | ✅ 2.5 s / 5 s, plus Auto-continue setting (Normal / Relaxed / Off) | 0.10 |
+| Moves too quickly to the next exercise | ✅ 2.5 s / 5 s, plus Auto-continue setting — later removed entirely (0.13) | 0.10 |
 
 ## Batch 5 — 18 Oct 2026
 | Request | Status | Release |

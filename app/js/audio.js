@@ -35,9 +35,9 @@ export function voiceStatus() {
 export const canSpeakAloud = () => voiceStatus() !== 'no';
 
 // Each character has a voice: the one picked in Profile, else a matching male/female device voice,
-// else pitch and pace do the work (a deep, slower man; a high girl).
+// else pitch and pace hint at it (a slightly lower, calmer man; a higher girl) — stronger shifts sound robotic.
 const CAST = {
-  man: { gender: 'male', pitch: 0.95, fallbackPitch: 0.45, rate: 1, fallbackRate: 0.92 },
+  man: { gender: 'male', pitch: 0.95, fallbackPitch: 0.8, rate: 1, fallbackRate: 0.95 },
   woman: { gender: 'female', pitch: 1.05, fallbackPitch: 1.05, rate: 1 },
   boy: { gender: 'male', pitch: 1.3, fallbackPitch: 1.2, rate: 1.05 },
   girl: { gender: 'female', pitch: 1.45, fallbackPitch: 1.45, rate: 1.05 },

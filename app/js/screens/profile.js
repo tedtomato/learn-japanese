@@ -48,7 +48,7 @@ const GENDER = { male: ' (male)', female: ' (female)', unknown: '' };
 function characterVoices(picked) {
   const voices = japaneseVoices();
   if (voices.length < 2) {
-    return html`<div class="setting column"><span>Character voices</span><small class="muted">Your phone offers ${voices.length ? 'one Japanese voice' : 'no Japanese voice yet'}, so Ken's is made deeper. For a real male voice, add more Japanese voices in your phone settings (Text-to-speech → Google speech engine → Japanese → pick a male voice), then reopen the app.</small></div>`;
+    return html`<div class="setting column"><span>Character voices</span><small class="muted">Your phone offers ${voices.length ? 'one Japanese voice' : 'no Japanese voice yet'}, so Ken uses it slightly lower. For a real male voice, add more Japanese voices in your phone settings (Text-to-speech → Google speech engine → Japanese → pick a male voice), then reopen the app.</small></div>`;
   }
   return html`<div class="setting column"><span>Character voices</span>
     ${SPEAKERS.map((who) => html`<div class="voice-pick"><b>${nameOf(who)}</b><small class="muted">${WHO[who]}</small>

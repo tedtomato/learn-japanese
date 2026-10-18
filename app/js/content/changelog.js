@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.20', date: '18 Oct 2026', changes: [
+    'Ken no longer sounds robotic on phones without a male voice: only slightly lower, not distorted',
+  ] },
   { version: '0.19', date: '18 Oct 2026', changes: [
     'Ken now uses a real male voice when your phone has one (better voice detection)',
     'New: Profile → Character voices, to pick the voice for Ken, Yuki, Sora and Hana',

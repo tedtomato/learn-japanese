@@ -92,7 +92,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 1
 .topbar-back h1 { font-size: 20px; }
 .stats { max-width: var(--page); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .stat { display: inline-flex; align-items: center; gap: 6px; font-weight: 800; font-size: 17px; padding: 4px 8px; border-radius: 12px; }
-.stat-flag { font-size: 24px; padding: 0 4px; }
+.stat-flag { padding: 0 4px; }
 .stat-streak { color: var(--faint); }
 .stat-streak.on { color: var(--orange); }
 .stat-gems { color: var(--blue); }
@@ -177,6 +177,7 @@ span.c-orange { color: var(--orange); } span.c-blue { color: var(--blue); } span
 .node-kana { font-size: 34px; line-height: 1; }
 .node-row:has(.start-bubble) { margin-top: 44px; }
 .node-row { position: relative; width: 100%; display: flex; justify-content: center; }
+.node-row:has(.popover) { z-index: 12; }
 .node-wrap { position: relative; transform: translateX(var(--x)); display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .node {
   --c: var(--green); --ce: var(--green-edge);

@@ -676,7 +676,7 @@ function renderMatch(root, s) {
     const l = ITEMS.get(id);
     const r = ITEMS.get(right[i]);
     return [
-      html`<button class="option match-btn" data-side="l" data-id="${id}">${l.type === 'kana' ? html`<span class="jp jp-lg">${l.jp}</span>` : jpItem(l, ex.hint)}</button>`,
+      html`<button class="option match-btn" data-side="l" data-id="${id}">${l.type === 'kana' ? html`<span class="jp jp-lg">${l.jp}</span>` : ['kanji', 'radical'].includes(l.type) ? html`<span class="jp match-kanji">${l.jp}</span>` : jpItem(l, ex.hint)}</button>`,
       html`<button class="option match-btn" data-side="r" data-id="${right[i]}">${label(r, ex.right)}</button>`,
     ];
   });

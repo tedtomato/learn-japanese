@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.35', date: '19 Oct 2026', changes: [
+    'Kanji in matching pairs are big enough to see their strokes',
+  ] },
   { version: '0.34', date: '19 Oct 2026', changes: [
     'Romaji packed close over the characters everywhere, like on grammar cards, so words read as words',
     'Kanji answer options are big and centred',

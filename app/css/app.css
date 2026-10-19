@@ -885,3 +885,5 @@ ruby, .k-char { transition: color .12s; }
 .tile-word ruby { padding: 0 1px; }
 .answer-line { min-height: 56px; background-image: none; padding: 4px 0; }
 .lesson-body:has(.answer-line) { gap: 14px; }
+.dl-line.tappable { cursor: pointer; }
+.chunk ruby.k-on, .chunk .k-char.k-on { color: var(--blue-text); }

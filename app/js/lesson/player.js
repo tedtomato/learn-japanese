@@ -203,7 +203,7 @@ function next(root, s) {
     $$('.prompt-person .chunk', root).forEach((c) => c.addEventListener('click', () => {
       c.classList.add('chunk-say');
       setTimeout(() => c.classList.remove('chunk-say'), 700);
-      sayAs(root, s.speaker, c.dataset.chunk);
+      sayAs(root, s.speaker, c.dataset.chunk, { highlight: c });
     }));
   }
   $$('.show-romaji', root).forEach((b) => b.addEventListener('click', () => {
@@ -362,9 +362,14 @@ function speakerBubble(s, content, { big = false } = {}) {
 
 // Speaks as the exercise's character, animating their mouth while the voice plays and lighting
 // up each syllable of the Japanese on screen as it is said.
-function sayAs(root, who, text, opts = {}) {
+let activeKaraoke = null;
+
+// opts.highlight: the element showing the text (else the matching word on screen is found).
+function sayAs(root, who, text, { highlight, ...opts } = {}) {
   const wrap = $(`.person-wrap[data-who="${who}"]`, root) || $('.person-wrap', root);
-  const k = karaoke(root, text);
+  activeKaraoke?.stop(); // a new voice cuts the previous one, so its highlight goes too
+  const k = karaoke(root, text, highlight);
+  activeKaraoke = k;
   return speak(text, {
     ...opts,
     speaker: who,
@@ -384,16 +389,29 @@ const withoutRomaji = (el) => {
 
 // Syllable highlighting for the Japanese being spoken: steps through the syllables (romaji ruby, or
 // the characters) at the voice's pace, and jumps to where the voice is when the device reports it.
-function karaoke(root, text) {
-  const target = $$('.intro-card .jp-xl, .intro-card .jp-l2, .intro-card .jp-l3, .prompt-person .jp-lg, .prompt-person .jp-xl', root)
-    .find((el) => plain(withoutRomaji(el)) === plain(text));
+function karaoke(root, text, el) {
+  const target = el || $$('.intro-card .jp-xl, .intro-card .jp-l2, .intro-card .jp-l3, .prompt-person .jp-lg, .prompt-person .jp-xl', root)
+    .find((x) => plain(withoutRomaji(x)) === plain(text));
   if (!target) return null;
   let units = [...target.querySelectorAll('ruby')];
   if (!units.length) {
-    const jp = target.querySelector('.jp') || target;
-    if (jp.children.length) return null;
-    jp.innerHTML = [...jp.textContent].map((c) => `<span class="k-char">${c}</span>`).join('');
-    units = [...jp.querySelectorAll('.k-char')];
+    // No romaji: light up the characters themselves (split into spans once).
+    if (!target.querySelector('.k-char')) {
+      const walker = document.createTreeWalker(target, NodeFilter.SHOW_TEXT);
+      const nodes = [];
+      while (walker.nextNode()) if (walker.currentNode.textContent.trim()) nodes.push(walker.currentNode);
+      nodes.forEach((n) => {
+        const frag = document.createDocumentFragment();
+        [...n.textContent].forEach((c) => {
+          const span = document.createElement('span');
+          span.className = 'k-char';
+          span.textContent = c;
+          frag.append(span);
+        });
+        n.replaceWith(frag);
+      });
+    }
+    units = [...target.querySelectorAll('.k-char')].filter((u) => plain(u.textContent));
   }
   // Character offset of each syllable in the spoken text, for boundary events.
   const starts = [];
@@ -791,7 +809,8 @@ function renderDialogue(root, s) {
       if (!row) return;
       row.hidden = false;
       row.classList.add('speaking');
-      await sayAs(root, d.cast[l.who], l.jp);
+      const shown = $('.dl-jp', row);
+      await sayAs(root, d.cast[l.who], l.jp, { highlight: shown.textContent === '…' ? null : shown });
       row.classList.remove('speaking');
       await new Promise((r) => setTimeout(r, 250));
     }
@@ -814,6 +833,8 @@ function renderDialogue(root, s) {
       row.hidden = false;
       $('.dl-jp', row).textContent = l.jp;
       $('.dl-en', row).hidden = false;
+      row.classList.add('tappable');
+      row.onclick = () => sayAs(root, d.cast[l.who], l.jp, { highlight: $('.dl-jp', row) });
     });
     result(root, s, ok, { answerText: ex.answer, noHeart: true });
   };

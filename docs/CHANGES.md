@@ -7,7 +7,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Request | Status | Release |
 |---|---|---|
 | Translate-into-Japanese screen truncated; too much space under the English | ✅ tiles keep words on one line (they were stacking vertically); smaller answer area | 0.32 |
-| Highlight the syllables in dialogues and tapped words | 🚧 next | — |
+| Highlight the syllables in dialogues and tapped words | ✅ (dialogue text is hidden while listening, so highlighting starts once it is revealed) | 0.33 |
 | Highlight the syllables when a phrase is spoken | ✅ karaoke-style, follows the voice's pace (and its position when the phone reports it) | 0.31 |
 
 ## Batch 7 — 18 Oct 2026

@@ -10,6 +10,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Kanji answer options too small | ✅ 44 px, centred | 0.34 |
 | Kanji too small in matching pairs | ✅ 38 px | 0.35 |
 | Practice list: kanji words overflowing their box | ✅ box widens, word on one line | 0.36 |
+| Strength bar too low for words I know well | ✅ bar = half review schedule progress + half accuracy (after a few answers); fades when overdue | 0.38 |
 | Practice: same kanji listed several times; too much content on one page | ✅ one entry per character; Words / Kanji / Kana tabs; one-line entries | 0.37 |
 | Translate-into-Japanese screen truncated; too much space under the English | ✅ tiles keep words on one line (they were stacking vertically); smaller answer area | 0.32 |
 | Highlight the syllables in dialogues and tapped words | ✅ (dialogue text is hidden while listening, so highlighting starts once it is revealed) | 0.33 |

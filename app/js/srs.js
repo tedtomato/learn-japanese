@@ -26,13 +26,18 @@ export function review(record, { right, wrong, hesitated = 0 }, now) {
 
 export const isDue = (record, now) => !!record && record.due <= now;
 
-// 0..1: how well the item is remembered right now. Fades as it gets overdue.
+// 0..1: how well the item is known right now, for the progress bars. Half from how far it has
+// moved through the review schedule, half from how often it is answered right (trusted once there
+// are a handful of answers); fades when a review is overdue.
 export function strength(record, now) {
-  if (!record) return 0;
-  const base = record.box / MAX_BOX;
+  if (!record || !record.seen) return 0;
+  const answers = (record.right || 0) + (record.wrong || 0);
+  const accuracy = answers ? record.right / answers : 0;
+  const confidence = Math.min(1, answers / 6);
+  const base = 0.5 * (record.box / MAX_BOX) + 0.5 * accuracy * confidence;
   if (now <= record.due) return Math.max(0.15, base);
   const overdue = (now - record.due) / Math.max(INTERVALS[record.box], DAY);
-  return Math.max(0.05, base * Math.max(0, 1 - overdue * 0.5));
+  return Math.max(0.05, base * Math.max(0.4, 1 - overdue * 0.3));
 }
 
 // Most urgent first: overdue items, then weak boxes, then the rest by due date.

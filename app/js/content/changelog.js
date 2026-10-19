@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.38', date: '19 Oct 2026', changes: [
+    'Progress bars now count how often you answer a word right, not only how many days it has been reviewed',
+  ] },
   { version: '0.37', date: '19 Oct 2026', changes: [
     'Practice: each kanji is listed once (no more 人 three times)',
     'Practice: lists split into tabs — Words · Kanji · Kana — with one short line per entry',

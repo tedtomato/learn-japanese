@@ -904,3 +904,10 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 .kanji-chip { white-space: nowrap; }
 .kanji-chip.wide { width: auto; min-width: 44px; padding: 0 8px; font-size: 22px; }
 .kanji-chip.xwide { font-size: 18px; }
+
+/* v0.37: Practice lists in tabs, one line per entry. */
+.practice-tabs { display: flex; width: 100%; }
+.practice-tabs button { flex: 1; font-size: 15px; padding: 10px 6px; }
+.practice-tabs small { opacity: .75; font-size: 12px; }
+.word-main b, .word-main small, .word-main .word-jp { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.small-title { font-size: 17px; margin-top: 4px; }

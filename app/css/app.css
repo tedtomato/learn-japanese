@@ -899,3 +899,8 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 .options.grid .opt-label.fit { flex: none; text-align: center; }
 .opt-kanji { font-size: 44px; line-height: 1.15; font-weight: 500; }
 .match-kanji { font-size: 38px; line-height: 1.1; font-weight: 500; }
+
+/* v0.36: kanji words (日本, 日曜日) stay on one line in the Practice list. */
+.kanji-chip { white-space: nowrap; }
+.kanji-chip.wide { width: auto; min-width: 44px; padding: 0 8px; font-size: 22px; }
+.kanji-chip.xwide { font-size: 18px; }

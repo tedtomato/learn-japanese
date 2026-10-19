@@ -65,7 +65,7 @@ export function renderPractice(root, focus) {
 
     <h2 class="sub-title" id="sec-kanji">Kanji & radicals (${kanji.length})</h2>
     ${kanji.length ? html`<div class="word-list">${kanji.map((k) => html`<button class="word-row" data-say="${speechOf(k)}">
-        <span class="kanji-chip jp">${k.jp}</span>
+        <span class="kanji-chip jp ${[...k.jp].length > 1 ? 'wide' : ''} ${[...k.jp].length > 2 ? 'xwide' : ''}">${k.jp}</span>
         <span class="word-main"><b>${k.en}</b><small>${k.type === 'kword' ? `${k.kana} · ${k.romaji}` : k.story || ''}</small></span>
         ${meter(k)}</button>`)}</div>`
       : html`<p class="muted">Kanji lessons appear along the path from the second unit.</p>`}

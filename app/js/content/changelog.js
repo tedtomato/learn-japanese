@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.36', date: '19 Oct 2026', changes: [
+    'Fixed: kanji words (日本, 日曜日) spilling out of their box in the Practice list',
+  ] },
   { version: '0.35', date: '19 Oct 2026', changes: [
     'Kanji in matching pairs are big enough to see their strokes',
   ] },

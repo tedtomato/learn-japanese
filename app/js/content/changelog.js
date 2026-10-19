@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.32', date: '19 Oct 2026', changes: [
+    'Fixed: answer tiles with romaji showed each character stacked vertically and pushed tiles off the screen',
+    'Tighter space under the English sentence in "Translate into Japanese"',
+  ] },
   { version: '0.31', date: '19 Oct 2026', changes: [
     'Syllables light up one by one while a word or phrase is spoken (also with the slow button)',
   ] },

@@ -582,7 +582,8 @@ function renderChoice(root, s) {
 
 function tileButton(ex, i, jpTiles, extra = '') {
   const sub = ex.tileRomaji?.[i];
-  return html`<button class="tile ${extra} ${jpTiles ? 'jp' : ''}" data-i="${i}">${jpTiles && sub ? jpChunk(ex.tiles[i], true, sub) : ex.tiles[i]}</button>`;
+  // The word's syllables sit side by side in one row (the tile itself stacks its content).
+  return html`<button class="tile ${extra} ${jpTiles ? 'jp' : ''}" data-i="${i}">${jpTiles && sub ? html`<span class="ruby-on tile-word">${jpChunk(ex.tiles[i], true, sub)}</span>` : ex.tiles[i]}</button>`;
 }
 
 function renderBuild(root, s) {

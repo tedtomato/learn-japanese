@@ -879,3 +879,9 @@ button.stat:active { transform: scale(.94); }
 ruby.k-on, .k-char.k-on { color: var(--blue-text); text-shadow: 0 0 12px color-mix(in srgb, var(--blue) 45%, transparent); }
 ruby.k-on rt { color: var(--blue-text); }
 ruby, .k-char { transition: color .12s; }
+
+/* v0.32: answer tiles keep a word on one line; tighter answer area under the prompt. */
+.tile-word { white-space: nowrap; line-height: 1.7; }
+.tile-word ruby { padding: 0 1px; }
+.answer-line { min-height: 56px; background-image: none; padding: 4px 0; }
+.lesson-body:has(.answer-line) { gap: 14px; }

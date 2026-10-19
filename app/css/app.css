@@ -887,3 +887,14 @@ ruby, .k-char { transition: color .12s; }
 .lesson-body:has(.answer-line) { gap: 14px; }
 .dl-line.tappable { cursor: pointer; }
 .chunk ruby.k-on, .chunk .k-char.k-on { color: var(--blue-text); }
+
+/* v0.34: romaji packed close over the characters everywhere (as on grammar cards), so words read as words. */
+ruby { padding: 0; }
+.ruby-on ruby + ruby { margin-left: 0; }
+rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
+.option rt, .match-btn rt, .tile rt { font-size: 12px; }
+.match-btn ruby, .tile-word ruby { padding: 0; }
+
+/* Answer labels sit centred in grid options; kanji answers are big enough to read their strokes. */
+.options.grid .opt-label.fit { flex: none; text-align: center; }
+.opt-kanji { font-size: 44px; line-height: 1.15; font-weight: 500; }

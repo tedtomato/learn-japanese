@@ -356,7 +356,7 @@ export function demoExercises(kind, state, { rng = makeRng() } = {}) {
     case 'dialogue': return all.filter((i) => i.type === 'dialogue').map((d) => dialogueExercise(d.id, ctx));
     case 'kanji': {
       const ks = of('kanji', 3);
-      return [...ks.map((k) => ({ type: 'intro', itemId: k.id, itemIds: [] })), ...make(ks, 'kanji2meaning'), ...make(of('kword', 2), 'kword2reading')];
+      return [...ks.map((k) => ({ type: 'intro', itemId: k.id, itemIds: [] })), ...make(ks.slice(0, 2), 'meaning2kanji'), ...make(ks, 'kanji2meaning'), ...make(of('kword', 2), 'kword2reading')];
     }
     case 'match': return [matchExercise(ids(of('word', 5)), ctx), matchExercise(ids(of('kana', 5)), ctx)].filter(Boolean);
     case 'build': return [...make(of('sentence', 2), 'build-jp2en'), ...make(of('sentence', 2), 'build-en2jp')];

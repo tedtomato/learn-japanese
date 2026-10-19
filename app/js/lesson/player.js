@@ -360,10 +360,77 @@ function speakerBubble(s, content, { big = false } = {}) {
     <div class="bubble bubble-lg">${content}</div></div>`;
 }
 
-// Speaks as the exercise's character, animating their mouth while the voice plays.
+// Speaks as the exercise's character, animating their mouth while the voice plays and lighting
+// up each syllable of the Japanese on screen as it is said.
 function sayAs(root, who, text, opts = {}) {
   const wrap = $(`.person-wrap[data-who="${who}"]`, root) || $('.person-wrap', root);
-  return speak(text, { ...opts, speaker: who, onStart: () => wrap?.classList.add('talking'), onEnd: () => wrap?.classList.remove('talking') });
+  const k = karaoke(root, text);
+  return speak(text, {
+    ...opts,
+    speaker: who,
+    onStart: (info) => { wrap?.classList.add('talking'); k?.start(info?.rate || 1); },
+    onBoundary: (i) => k?.at(i),
+    onEnd: () => { wrap?.classList.remove('talking'); k?.stop(); },
+  });
+}
+
+const plain = (t) => t.replace(/[\s、。！？!?.,…]/g, '');
+const rubyText = (el) => [...el.childNodes].filter((n) => n.nodeName !== 'RT').map((n) => n.textContent).join('');
+const withoutRomaji = (el) => {
+  const copy = el.cloneNode(true);
+  copy.querySelectorAll('rt').forEach((r) => r.remove());
+  return copy.textContent;
+};
+
+// Syllable highlighting for the Japanese being spoken: steps through the syllables (romaji ruby, or
+// the characters) at the voice's pace, and jumps to where the voice is when the device reports it.
+function karaoke(root, text) {
+  const target = $$('.intro-card .jp-xl, .intro-card .jp-l2, .intro-card .jp-l3, .prompt-person .jp-lg, .prompt-person .jp-xl', root)
+    .find((el) => plain(withoutRomaji(el)) === plain(text));
+  if (!target) return null;
+  let units = [...target.querySelectorAll('ruby')];
+  if (!units.length) {
+    const jp = target.querySelector('.jp') || target;
+    if (jp.children.length) return null;
+    jp.innerHTML = [...jp.textContent].map((c) => `<span class="k-char">${c}</span>`).join('');
+    units = [...jp.querySelectorAll('.k-char')];
+  }
+  // Character offset of each syllable in the spoken text, for boundary events.
+  const starts = [];
+  let pos = 0;
+  units.forEach((u) => {
+    const t = u.tagName === 'RUBY' ? rubyText(u) : u.textContent;
+    const at = text.indexOf(t, pos);
+    starts.push(at === -1 ? pos : at);
+    pos = (at === -1 ? pos : at) + t.length;
+  });
+  let timer = null;
+  let current = -1;
+  const show = (i) => {
+    if (i === current || i >= units.length) return;
+    units[current]?.classList.remove('k-on');
+    current = i;
+    units[i]?.classList.add('k-on');
+  };
+  const stop = () => {
+    clearInterval(timer);
+    units.forEach((u) => u.classList.remove('k-on'));
+    current = -1;
+  };
+  return {
+    start(rate) {
+      stop();
+      show(0);
+      // About 6 syllables a second at normal speed.
+      timer = setInterval(() => (current < units.length - 1 ? show(current + 1) : clearInterval(timer)), 170 / rate);
+    },
+    at(charIndex) {
+      let i = 0;
+      while (i + 1 < starts.length && starts[i + 1] <= charIndex) i += 1;
+      show(i);
+    },
+    stop,
+  };
 }
 
 function playButtons(text, { slow = true } = {}) {

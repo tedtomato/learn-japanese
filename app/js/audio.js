@@ -53,7 +53,7 @@ function voiceFor(speaker) {
 }
 
 // Speaks Japanese. opts: speaker, slow, fast, onStart, onEnd. Resolves when finished.
-export function speak(text, { speaker = 'narrator', slow = false, fast = false, onStart, onEnd } = {}) {
+export function speak(text, { speaker = 'narrator', slow = false, fast = false, onStart, onEnd, onBoundary } = {}) {
   return new Promise((resolve) => {
     if (!synth || !text) {
       resolve();
@@ -73,7 +73,9 @@ export function speak(text, { speaker = 'narrator', slow = false, fast = false, 
       onEnd?.();
       resolve();
     };
-    u.onstart = () => onStart?.();
+    u.onstart = () => onStart?.({ rate: u.rate });
+    // Where the voice is in the text, on devices that report it (used to highlight syllables).
+    u.onboundary = (e) => onBoundary?.(e.charIndex);
     u.onend = finish;
     u.onerror = finish;
     // Some browsers never fire onend; give up after a generous estimate.

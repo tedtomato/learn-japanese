@@ -874,3 +874,8 @@ button.stat:active { transform: scale(.94); }
 /* v0.30: tap a word of a Japanese sentence to hear it. */
 .prompt-person .chunk { cursor: pointer; border-radius: 8px; transition: background .2s, color .2s; }
 .prompt-person .chunk:active, .prompt-person .chunk.chunk-say { background: var(--blue-soft); color: var(--blue-text); }
+
+/* v0.31: syllables light up while the phrase is spoken. */
+ruby.k-on, .k-char.k-on { color: var(--blue-text); text-shadow: 0 0 12px color-mix(in srgb, var(--blue) 45%, transparent); }
+ruby.k-on rt { color: var(--blue-text); }
+ruby, .k-char { transition: color .12s; }

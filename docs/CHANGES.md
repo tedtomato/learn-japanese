@@ -3,6 +3,11 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 8 — 19 Oct 2026
+| Request | Status | Release |
+|---|---|---|
+| Highlight the syllables when a phrase is spoken | ✅ karaoke-style, follows the voice's pace (and its position when the phone reports it) | 0.31 |
+
 ## Batch 7 — 18 Oct 2026
 | Request | Status | Release |
 |---|---|---|

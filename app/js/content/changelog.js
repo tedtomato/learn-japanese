@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.42', date: '20 Oct 2026', changes: [
+    'Lesson breaks sometimes show a kanji to spot (about one in five); it joins Kanji spotted and comes back in Practice',
+  ] },
   { version: '0.41', date: '20 Oct 2026', changes: [
     'Home screen: the phrase / fact / kanji card is gone, so the path starts right under your goals',
   ] },

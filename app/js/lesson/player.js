@@ -859,10 +859,11 @@ function renderDialogue(root, s) {
 
 function renderTidbit(root, s) {
   const unit = s.node?.unit;
-  const t = nextTidbit(app.state, Math.random, ['fact'], { facts: unit?.facts });
+  // Mostly a fact about Japan; about one break in four shows a kanji to spot (it then comes back in Practice).
+  const t = nextTidbit(app.state, Math.random, ['fact', 'kanji'], { facts: unit?.facts });
   app.save();
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">Quick break</span></p>
-    ${speakerBubble(s, 'Did you know? A fun fact about Japan…')}
+    ${speakerBubble(s, t.kind === 'kanji' ? "Here's a kanji you'll see in Japan…" : 'Did you know? A fun fact about Japan…')}
     ${tidbitCard(t.kind, t.item)}`);
   $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   wireShare($('.lesson-body', root));

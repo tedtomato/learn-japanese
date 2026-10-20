@@ -1,15 +1,13 @@
 // The learning path: sections → unit banners → winding track of lesson nodes.
-import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID, NODES } from '../course.js';
+import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID } from '../course.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 import { rewardPopup } from '../fx.js';
 import { decorFor, drawTrails } from '../scenery.js';
-import { wireShare } from '../share.js';
 import { app, statsBar, toast, modal } from '../app.js';
 import { html, mount, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { speak } from '../audio.js';
-import { nextTidbit, tidbitCard } from '../tidbits.js';
 import { art } from '../art.js';
 import {
   currentNodeIndex, nodeLevel, isNodeDone, isNodeUnlocked, nodeNeedsReview, openChest, todayXp, currentHearts, dueItemIds,
@@ -145,9 +143,6 @@ export function renderLearn(root) {
   const xp = todayXp(state, now);
   const goal = state.dailyGoal;
   let n = 0;
-  const currentUnit = NODES[Math.min(current, NODES.length - 1)].unit;
-  const tb = nextTidbit(state, Math.random, ['fact', 'phrase', 'kanji'], { facts: currentUnit.facts, phrases: currentUnit.phrases });
-  app.save();
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page learn">
@@ -158,7 +153,6 @@ export function renderLearn(root) {
       <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (xp / goal) * 100)}%"></div></div>
     </section>
     ${reviewCard(state, now)}
-    <div class="tidbit-slot">${tidbitCard(tb.kind, tb.item, { next: true })}</div>
     ${SECTIONS.map((section, s) => html`
       <h2 class="section-title"><span>Section ${s + 1}</span>${section.title}</h2>
       ${section.units.map((unit, u) => html`
@@ -181,17 +175,6 @@ export function renderLearn(root) {
   );
   root.addEventListener('click', () => document.querySelector('.popover')?.remove());
   $('.start-review', root)?.addEventListener('click', () => app.go('#/practice/go'));
-  const wireTidbit = () => {
-    wireShare($('.tidbit-slot', root));
-    $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
-    $('.next-tidbit', root)?.addEventListener('click', () => {
-      const t = nextTidbit(app.state);
-      app.save();
-      mount($('.tidbit-slot', root), tidbitCard(t.kind, t.item, { next: true }));
-      wireTidbit();
-    });
-  };
-  wireTidbit();
   $$('[data-guide]', root).forEach((b) =>
     b.addEventListener('click', () => unitGuide(SECTIONS.flatMap((s) => s.units).find((u) => u.id === b.dataset.guide))),
   );

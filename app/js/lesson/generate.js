@@ -334,6 +334,22 @@ function generateStory(node, state, { rng = makeRng() } = {}) {
   return { exercises: node.items.map((id) => dialogueExercise(id, ctx)), itemIds: [] };
 }
 
+// Kanji-only practice: the learner's kanji, kanji words, radicals and spotted kanji (one per character),
+// most urgent first.
+export function kanjiPracticeIds(state, now, count = 8) {
+  const seen = new Set();
+  return Object.keys(state.items)
+    .filter((id) => ['kanji', 'kword', 'radical'].includes(ITEMS.get(id)?.type))
+    .sort(byUrgency(state.items, now))
+    .filter((id) => {
+      const jp = ITEMS.get(id).jp;
+      if (seen.has(jp)) return false;
+      seen.add(jp);
+      return true;
+    })
+    .slice(0, count);
+}
+
 // A practice session made from the learner's weakest and most overdue items.
 export function generatePractice(state, { rng = makeRng(), now = Date.now(), itemIds = null, size = 10, canListen = true, canSpeak = false } = {}) {
   const ids = itemIds || pickReview(state, [], 8, rng, now, { peeks: true });

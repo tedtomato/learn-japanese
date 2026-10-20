@@ -58,7 +58,12 @@ export function renderPractice(root, focus) {
         <span class="word-main"><span class="word-jp">${jpItem(w, false)}</span><small>${w.romaji} · ${w.en}</small></span>
         ${meter(st)}</button>`)}</div>`
       : html`<p class="muted">Words you learn will be listed here, weakest first.</p>`),
-    kanji: () => (kanji.length ? html`<div class="word-list">${kanji.map(({ it: k, st }) => html`<button class="word-row" data-say="${speechOf(k)}">
+    kanji: () => (kanji.length ? html`<section class="card kanji-practice">
+        <span class="kanji-chip jp">漢</span>
+        <div><b>Kanji practice</b><small>${kanji.length >= 3 ? 'Only kanji, weakest first — about 2 min' : 'Learn 3 kanji to unlock'}</small></div>
+        <button class="btn btn-secondary start-kanji" ${kanji.length >= 3 ? '' : 'disabled'}>Start</button>
+      </section>
+      <div class="word-list">${kanji.map(({ it: k, st }) => html`<button class="word-row" data-say="${speechOf(k)}">
         <span class="kanji-chip jp ${[...k.jp].length > 1 ? 'wide' : ''} ${[...k.jp].length > 2 ? 'xwide' : ''}">${k.jp}</span>
         <span class="word-main"><b>${k.en}</b><small>${reading(k)}</small></span>
         ${meter(st)}</button>`)}</div>`
@@ -96,6 +101,7 @@ export function renderPractice(root, focus) {
   </main>`);
 
   $('.start-practice', root).addEventListener('click', () => app.go('#/practice/go'));
+  $('.start-kanji', root)?.addEventListener('click', () => app.go('#/practice/kanji-go'));
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
   $$('[data-tab]', root).forEach((b) => b.addEventListener('click', () => {
     lastTab = b.dataset.tab;

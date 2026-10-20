@@ -919,3 +919,8 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 /* v0.43: hint shows the sound in romaji, highlighted. */
 .kana-example .ex-romaji mark { background: var(--gold-soft); color: var(--gold-text); border-radius: 4px; padding: 0 2px; }
 .kana-example .hint-kana { font-size: 16px; color: var(--muted); }
+
+/* v0.44: Kanji practice entry on the Kanji tab. */
+.kanji-practice { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; margin-bottom: 12px; }
+.kanji-practice b { display: block; color: var(--text-strong); }
+.kanji-practice small { color: var(--muted); font-size: 13px; }

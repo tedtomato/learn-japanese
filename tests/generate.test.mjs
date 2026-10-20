@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { generateLesson, generatePractice, generateRetry, makeRng, knownChars, canRead } from '../app/js/lesson/generate.js';
+import { generateLesson, generatePractice, generateRetry, makeRng, knownChars, canRead, kanjiPracticeIds } from '../app/js/lesson/generate.js';
 import { NODES, ITEMS } from '../app/js/course.js';
 import { defaultState, completeSession } from '../app/js/progress.js';
 import { nextTidbit } from '../app/js/tidbits.js';
@@ -176,4 +176,15 @@ test('reading lessons practise familiar words (すし, ねこ…) once their cha
     for (const id of node.items) state.items[id] = { box: 1, seen: 1, right: 1, wrong: 0, last: T0, due: T0 };
   }
   assert.ok(lessonsWithFamiliar >= nodes.length / 2, `${lessonsWithFamiliar} of ${nodes.length}`);
+});
+
+test('kanji practice uses only kanji, each character once', () => {
+  const state = defaultState(T0);
+  for (const it of ITEMS.values()) if (['kanji', 'kword', 'radical', 'word', 'kana'].includes(it.type)) state.items[it.id] = { box: 1, seen: 1, right: 1, wrong: 0, last: T0, due: T0 };
+  const ids = kanjiPracticeIds(state, T0);
+  assert.ok(ids.length >= 3);
+  assert.ok(ids.every((id) => ['kanji', 'kword', 'radical'].includes(ITEMS.get(id).type)));
+  assert.equal(new Set(ids.map((id) => ITEMS.get(id).jp)).size, ids.length);
+  const { exercises } = generatePractice(state, { itemIds: ids, now: T0 });
+  assert.ok(exercises.every((e) => (e.itemIds || [e.itemId]).every((id) => !id || ['kanji', 'kword', 'radical'].includes(ITEMS.get(id).type))));
 });

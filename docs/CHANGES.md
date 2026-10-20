@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 9 — 20 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| Kanji-only practice mode | ✅ Practice → Kanji tab → Start (8 kanji, one per character, most urgent first; unlocks at 3 kanji) | 0.44 |
 | Hints not useful (word shown only in hiragana) | ✅ romaji word with the sound highlighted, kana underneath | 0.43 |
 | Show a kanji in lesson breaks sometimes | ✅ ~1 break in 5 | 0.42 |
 | Remove the useful phrase/fact card from the home screen | ✅ (facts still appear as lesson breaks; phrases in the Phrasebook) | 0.41 |

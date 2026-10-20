@@ -163,3 +163,17 @@ test('first "Read it" lesson is gentle: check after each new kana, fewer choices
     }
   }
 });
+
+test('reading lessons practise familiar words (すし, ねこ…) once their characters are known', () => {
+  const nodes = NODES.filter((n) => n.kind === 'read');
+  const state = defaultState(T0);
+  let lessonsWithFamiliar = 0;
+  for (const node of nodes) {
+    const { exercises } = generateLesson(node, state, { rng: makeRng(3), now: T0, level: 0 });
+    const fam = exercises.filter((e) => ITEMS.get(e.itemId)?.type === 'fword');
+    if (fam.length) lessonsWithFamiliar += 1;
+    for (const e of fam) assert.ok(ITEMS.get(e.itemId).chars.every((c) => state.items[`k-${c}`] || node.items.includes(`k-${c}`)));
+    for (const id of node.items) state.items[id] = { box: 1, seen: 1, right: 1, wrong: 0, last: T0, due: T0 };
+  }
+  assert.ok(lessonsWithFamiliar >= nodes.length / 2, `${lessonsWithFamiliar} of ${nodes.length}`);
+});

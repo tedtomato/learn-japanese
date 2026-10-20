@@ -1,5 +1,5 @@
 // Turns a path node (or a practice request) into a list of exercises.
-import { ITEMS } from '../course.js';
+import { FAMILIAR_IDS, ITEMS } from '../course.js';
 import { byUrgency } from '../srs.js';
 import { GRAMMAR } from '../content/grammar.js';
 import { STROKES } from '../content/strokes.js';
@@ -33,6 +33,7 @@ const QUESTION_TYPES = {
   kanji: { easy: ['kanji2meaning'], hard: ['meaning2kanji', 'kanji2meaning'] },
   kword: { easy: ['kword2meaning'], hard: ['kword2reading', 'kword2meaning'] },
   radical: { easy: ['radical2meaning'], hard: ['meaning2radical'] },
+  fword: { easy: ['read'], hard: ['read'] },
 };
 
 const JP_FILLERS = ['は', 'が', 'を', 'の', 'です', 'か', 'と'];
@@ -92,12 +93,14 @@ function questionType(item, difficulty, ctx) {
 
 // Items of the same type the learner knows (plus this session's), used as wrong answers.
 function distractorPool(item, ctx) {
-  const same = (id) => ITEMS.get(id)?.type === item.type && id !== item.id && (item.peek || !ITEMS.get(id).peek);
+  const katakana = (it) => /[ァ-ヶ]/.test(it.jp);
+  const same = (id) => ITEMS.get(id)?.type === item.type && id !== item.id && (item.peek || !ITEMS.get(id).peek)
+    && (item.type !== 'fword' || katakana(ITEMS.get(id)) === katakana(item));
   let pool = [...new Set([...ctx.sessionIds, ...ctx.knownIds])].filter(same);
   // Kanji options come from what the learner has met; unmet ones only top up a question that would have one option.
   const kanjiLike = ['kanji', 'kword', 'radical'].includes(item.type);
   if (pool.length < (kanjiLike ? 2 : 3)) {
-    const extra = [...ITEMS.values()].filter((i) => i.type === item.type && !i.peek && i.id !== item.id && !pool.includes(i.id)
+    const extra = [...ITEMS.values()].filter((i) => same(i.id) && !i.peek && !pool.includes(i.id)
       && (i.unit === item.unit || item.type !== 'word'));
     pool = [...pool, ...shuffle(extra, ctx.rng).slice(0, (kanjiLike ? 2 : 6) - pool.length).map((i) => i.id)];
   }
@@ -145,7 +148,7 @@ function buildExercise(item, type, ctx) {
   const base = { itemIds: [item.id], itemId: item.id, hint: ctx.romajiHint(item), kind: type };
   // Gentle kana questions (first time through a "Read it" lesson) have no countdown.
   const choice = (prompt, answerKind, instruction) => ({ ...base, type: 'choice', prompt, answerKind, options: choiceOptions(item, answerKind, ctx), instruction,
-    untimed: !!(ctx.gentle && item.type === 'kana') });
+    untimed: !!(ctx.gentle && ['kana', 'fword'].includes(item.type)) });
   switch (type) {
     case 'kana2romaji': return choice('jp', 'romaji', 'What sound is this?');
     case 'romaji2kana': return choice('romaji', 'kana', `Which one is “${item.romaji}”?`);
@@ -287,6 +290,17 @@ export function generateLesson(node, state, opts = {}) {
     const first = buildExercise(item, questionType(item, level >= 2 || isReview ? 'any' : 'easy', ctx), ctx);
     (!isNew(state, id) || isReview ? rest : head).push(first);
     if (!isReview) rest.push(buildExercise(item, questionType(item, level >= 1 ? 'hard' : 'any', ctx), ctx));
+  }
+  // Reading practice with words the learner already knows, written with this lesson's characters.
+  if (readMode) {
+    const fresh = new Set(targets.map((id) => ITEMS.get(id).jp));
+    // Any character met before counts here (not only well-known ones): it is practice, with a picture after.
+    const met = new Set([...fresh, ...Object.keys(state.items).map((id) => ITEMS.get(id)).filter((i) => i?.type === 'kana').map((i) => i.jp)]);
+    const familiar = FAMILIAR_IDS.map((id) => ITEMS.get(id))
+      .filter((w) => canRead(w, met) && w.chars.some((c) => fresh.has(c)));
+    for (const w of shuffle(familiar, rng).slice(0, 2)) {
+      rest.push({ ...buildExercise(w, 'read', ctx), instruction: 'You know this word! How do you read it?' });
+    }
   }
   for (const id of readWords) rest.push(buildExercise(ITEMS.get(id), pick(['read', 'jp2en'].filter((t) => allowed(t, ITEMS.get(id), ctx)), rng) || 'jp2en', ctx));
   for (const id of reviewIds) rest.push(buildExercise(ITEMS.get(id), questionType(ITEMS.get(id), 'any', ctx), ctx));

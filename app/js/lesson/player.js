@@ -298,7 +298,7 @@ function result(root, s, ok, opts = {}) {
       <span class="fb-icon">${icon(ok ? 'check' : 'close', 26)}</span>
       <div><b>${ok ? pickOne(PRAISE) : 'Correct answer:'}</b>
       ${!ok && opts.answerText ? html`<p class="jp-mix">${opts.answerText}</p>` : ''}
-      ${opts.meaning ? html`<p class="fb-meaning">${opts.meaning}</p>` : ''}
+      ${opts.meaning ? html`<p class="fb-meaning">${item?.type === 'fword' && item.art ? art(item.art, 'art-inline') : ''} ${opts.meaning}</p>` : ''}
       ${badges.length ? html`<p class="fb-badges">${badges}</p>` : ''}</div>
     </div>
     <div class="fb-actions">

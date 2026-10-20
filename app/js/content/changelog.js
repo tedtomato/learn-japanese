@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.40', date: '20 Oct 2026', changes: [
+    'Read it lessons now practise words you already know — すし, ねこ, からて, タクシー… — as soon as you have their characters, with the picture after you answer',
+  ] },
   { version: '0.39', date: '20 Oct 2026', changes: [
     'Gentler hiragana: right after each new character, an easy two-choice check before the next one',
     'First time through a Read it lesson: 3 choices instead of 4, no countdown, and no look-alike characters (さ/ち, ね/れ/わ…) side by side',

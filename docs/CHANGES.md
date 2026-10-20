@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 9 — 20 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| Practise hiragana with common words | ✅ up to 2 familiar-word reading questions per Read it lesson (in ~21 of 27 lessons), untimed the first time, picture after answering | 0.40 |
 | Hiragana learning too difficult | ✅ learn-one-check-one, 3 choices, no look-alikes, untimed first time, picture-word hint, memory word in feedback, no giveaway audio | 0.39 |
 
 ## Batch 8 — 19 Oct 2026

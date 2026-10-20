@@ -63,6 +63,14 @@ for (const k of PEEK_KANJI) {
 }
 export const peekId = (tidbitKanji) => `xk-${tidbitKanji.id}`;
 
+// Words learners already know (すし, ねこ, タクシー…), for reading practice as soon as their characters are learned.
+export const FAMILIAR_IDS = [];
+for (const [word, romaji, art, en] of new Map(Object.values(KANA_WORDS).map((w) => [w[0], w])).values()) {
+  const id = `fw-${word}`;
+  addItem({ id, type: 'fword', jp: word, romaji: romaji.toLowerCase(), en: en ? `${romaji} (${en})` : romaji, art, chars: kanaChars(word) });
+  FAMILIAR_IDS.push(id);
+}
+
 for (const d of Object.entries(DIALOGUES)) addItem({ id: `dl-${d[0]}`, type: 'dialogue', jp: d[0], ...d[1], chars: [] });
 
 // ---- Build the path ----

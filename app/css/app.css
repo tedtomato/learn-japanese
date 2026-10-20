@@ -916,3 +916,6 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 .kana-hint { display: flex; justify-content: center; margin-top: -6px; }
 .kana-hint .link { font-weight: 800; color: var(--gold-text); background: none; border: 0; font-size: 15px; }
 .hint-body .kana-example { cursor: default; }
+/* v0.43: hint shows the sound in romaji, highlighted. */
+.kana-example .ex-romaji mark { background: var(--gold-soft); color: var(--gold-text); border-radius: 4px; padding: 0 2px; }
+.kana-example .hint-kana { font-size: 16px; color: var(--muted); }

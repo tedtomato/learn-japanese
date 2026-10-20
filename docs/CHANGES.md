@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 9 — 20 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| Hints not useful (word shown only in hiragana) | ✅ romaji word with the sound highlighted, kana underneath | 0.43 |
 | Show a kanji in lesson breaks sometimes | ✅ ~1 break in 5 | 0.42 |
 | Remove the useful phrase/fact card from the home screen | ✅ (facts still appear as lesson breaks; phrases in the Phrasebook) | 0.41 |
 | Practise hiragana with common words | ✅ up to 2 familiar-word reading questions per Read it lesson (in ~21 of 27 lessons), untimed the first time, picture after answering | 0.40 |

@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.43', date: '20 Oct 2026', changes: [
+    'Better hints: the word you know is shown in romaji with the sound highlighted (😀 e·moji), not only in hiragana you cannot read yet',
+  ] },
   { version: '0.42', date: '20 Oct 2026', changes: [
     'Lesson breaks sometimes show a kanji to spot (about one in five); it joins Kanji spotted and comes back in Practice',
   ] },

@@ -39,7 +39,10 @@ export function kanaExample(item, { asHint = false } = {}) {
   if (!ex) return '';
   const word = [...ex.jp].map((c) => (c === item.jp ? html`<mark>${c}</mark>` : c));
   if (asHint) {
-    return html`<span class="kana-example">${ex.art ? art(ex.art, 'art-ex') : ''}<span><small>Think of</small> <b class="jp">${word}</b>${ex.en ? html` <small>(${ex.en})</small>` : ''}</span></span>`;
+    // The word in romaji with this character's sound highlighted (e·moji), since the kana can't be read yet.
+    const parts = syllablesFor(ex.jp, ex.romaji);
+    const sound = parts ? parts.map((p) => (p.text.includes(item.jp) ? html`<mark>${p.romaji}</mark>` : p.romaji)) : ex.romaji;
+    return html`<span class="kana-example">${ex.art ? art(ex.art, 'art-ex') : ''}<span><small>${parts && parts[0].text.includes(item.jp) ? 'Like the start of' : 'Like in'}</small> <b class="ex-romaji">${sound}</b>${ex.en ? html` <small>(${ex.en})</small>` : ''}<br><span class="jp hint-kana">${word}</span></span></span>`;
   }
   return html`<button class="kana-example" data-say="${ex.jp}">${ex.art ? art(ex.art, 'art-ex') : ''}
     <span><small>As in</small> <b class="jp">${word}</b> <span class="ex-romaji">${ex.romaji}</span>${ex.en ? html` <small>(${ex.en})</small>` : ''}</span></button>`;

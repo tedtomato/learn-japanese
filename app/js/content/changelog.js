@@ -1,6 +1,12 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.39', date: '20 Oct 2026', changes: [
+    'Gentler hiragana: right after each new character, an easy two-choice check before the next one',
+    'First time through a Read it lesson: 3 choices instead of 4, no countdown, and no look-alike characters (さ/ち, ね/れ/わ…) side by side',
+    'New 💡 Hint on character questions: a picture and a word you know (think of うまみ)',
+    'Wrong answers remind you of the memory word; "What sound is this?" no longer has a play button that gave the answer away',
+  ] },
   { version: '0.38', date: '19 Oct 2026', changes: [
     'Progress bars now count how often you answer a word right, not only how many days it has been reviewed',
   ] },

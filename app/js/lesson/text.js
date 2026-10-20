@@ -33,10 +33,14 @@ export function jpChunk(text, hint, romaji = romajiOfChunk(text)) {
 }
 
 // "As in すし (sushi)" for a kana: a word the learner already knows, with the kana highlighted.
-export function kanaExample(item) {
+// asHint: in a question, show only the picture and the word in kana, so the learner recalls the sound.
+export function kanaExample(item, { asHint = false } = {}) {
   const ex = item.example;
   if (!ex) return '';
   const word = [...ex.jp].map((c) => (c === item.jp ? html`<mark>${c}</mark>` : c));
+  if (asHint) {
+    return html`<span class="kana-example">${ex.art ? art(ex.art, 'art-ex') : ''}<span><small>Think of</small> <b class="jp">${word}</b>${ex.en ? html` <small>(${ex.en})</small>` : ''}</span></span>`;
+  }
   return html`<button class="kana-example" data-say="${ex.jp}">${ex.art ? art(ex.art, 'art-ex') : ''}
     <span><small>As in</small> <b class="jp">${word}</b> <span class="ex-romaji">${ex.romaji}</span>${ex.en ? html` <small>(${ex.en})</small>` : ''}</span></button>`;
 }

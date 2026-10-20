@@ -3,6 +3,11 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 9 — 20 Oct 2026
+| Request | Status | Release |
+|---|---|---|
+| Hiragana learning too difficult | ✅ learn-one-check-one, 3 choices, no look-alikes, untimed first time, picture-word hint, memory word in feedback, no giveaway audio | 0.39 |
+
 ## Batch 8 — 19 Oct 2026
 | Request | Status | Release |
 |---|---|---|

@@ -911,3 +911,8 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 .practice-tabs small { opacity: .75; font-size: 12px; }
 .word-main b, .word-main small, .word-main .word-jp { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .small-title { font-size: 17px; margin-top: 4px; }
+
+/* v0.39: gentle kana — hint under the prompt. */
+.kana-hint { display: flex; justify-content: center; margin-top: -6px; }
+.kana-hint .link { font-weight: 800; color: var(--gold-text); background: none; border: 0; font-size: 15px; }
+.hint-body .kana-example { cursor: default; }

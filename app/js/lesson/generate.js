@@ -106,16 +106,24 @@ function distractorPool(item, ctx) {
 
 const LABEL = { romaji: (i) => i.romaji, kana: (i) => i.jp, jp: (i) => i.jp, en: (i) => i.en };
 
+// Characters beginners mix up; while learning, they are not offered as each other's wrong answers.
+const LOOK_ALIKES = ['さちき', 'ねれわ', 'ぬめ', 'はほけ', 'るろ', 'いりこ', 'うらつ', 'あお', 'まも', 'たな', 'シツ', 'ソン', 'クケタ', 'ウワ', 'コロ', 'チテ'];
+const lookAlike = (a, b) => LOOK_ALIKES.some((g) => g.includes(a) && g.includes(b));
+
+// ctx.wrongCount: how many wrong answers to offer (3 normally; fewer in gentle kana lessons).
 function choiceOptions(item, answerKind, ctx) {
   const label = LABEL[answerKind];
   const seen = new Set([label(item)]);
+  const wanted = ctx.wrongCount ?? (ctx.gentle && item.type === 'kana' ? 2 : 3);
   const options = [];
   for (const id of shuffle(distractorPool(item, ctx), ctx.rng)) {
-    const l = label(ITEMS.get(id));
+    const other = ITEMS.get(id);
+    const l = label(other);
     if (!l || seen.has(l)) continue;
+    if (ctx.gentle && item.type === 'kana' && lookAlike(item.jp, other.jp)) continue;
     seen.add(l);
     options.push(id);
-    if (options.length === 3) break;
+    if (options.length === wanted) break;
   }
   return shuffle([...options, item.id], ctx.rng);
 }
@@ -135,7 +143,9 @@ const sentencePool = (ctx) => [...new Set([...ctx.sessionIds, ...ctx.knownIds])]
 
 function buildExercise(item, type, ctx) {
   const base = { itemIds: [item.id], itemId: item.id, hint: ctx.romajiHint(item), kind: type };
-  const choice = (prompt, answerKind, instruction) => ({ ...base, type: 'choice', prompt, answerKind, options: choiceOptions(item, answerKind, ctx), instruction });
+  // Gentle kana questions (first time through a "Read it" lesson) have no countdown.
+  const choice = (prompt, answerKind, instruction) => ({ ...base, type: 'choice', prompt, answerKind, options: choiceOptions(item, answerKind, ctx), instruction,
+    untimed: !!(ctx.gentle && item.type === 'kana') });
   switch (type) {
     case 'kana2romaji': return choice('jp', 'romaji', 'What sound is this?');
     case 'romaji2kana': return choice('romaji', 'kana', `Which one is “${item.romaji}”?`);
@@ -260,6 +270,8 @@ export function generateLesson(node, state, opts = {}) {
   const reviewIds = pickReview(state, [...node.items, ...readWords], isReview ? 2 : Math.max(2, Math.round(targets.length * 0.6)), rng, now);
   const ctx = context({ state, sessionIds: [...targets, ...readWords, ...reviewIds], level, rng, readMode,
     canListen: opts.canListen !== false, canSpeak: !!opts.canSpeak, advanced: node.sectionIndex > 0 || level >= 2 });
+  // First time through a "Read it" lesson: fewer choices, no look-alikes, no countdown.
+  ctx.gentle = readMode && level === 0;
   const goal = isReview ? 14 : 9 + Math.min(level, 4);
 
   const head = [];
@@ -269,6 +281,8 @@ export function generateLesson(node, state, opts = {}) {
     if (isNew(state, id)) {
       head.push({ type: 'intro', itemId: id, itemIds: [], hint: ctx.romajiHint(item) || item.type === 'kana' });
       if (hasStrokes(item) && item.type !== 'radical') head.push({ type: 'trace', itemId: id, itemIds: [id], kind: 'trace' });
+      // Learn one, check one: a two-choice question on the new character before the next one.
+      if (ctx.gentle && item.type === 'kana') head.push(buildExercise(item, 'kana2romaji', { ...ctx, wrongCount: 1 }));
     }
     const first = buildExercise(item, questionType(item, level >= 2 || isReview ? 'any' : 'easy', ctx), ctx);
     (!isNew(state, id) || isReview ? rest : head).push(first);

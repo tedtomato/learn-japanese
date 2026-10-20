@@ -142,3 +142,24 @@ test('kanji only spotted in a fact card are not asked on the path, only in pract
   const first = practice.exercises.findIndex((e) => e.itemId === peek.id);
   assert.equal(practice.exercises[first].type, 'intro');
 });
+
+test('first "Read it" lesson is gentle: check after each new kana, fewer choices, no look-alikes, no countdown', () => {
+  const node = NODES.find((n) => n.kind === 'read');
+  const state = defaultState(T0);
+  const LOOK = ['さちき', 'ねれわ', 'ぬめ', 'はほけ', 'るろ', 'いりこ', 'うらつ', 'あお', 'まも', 'たな'];
+  for (let seed = 0; seed < 15; seed++) {
+    const { exercises } = generateLesson(node, state, { rng: makeRng(seed), now: T0, level: 0 });
+    for (const id of node.items) {
+      const intro = exercises.findIndex((e) => e.type === 'intro' && e.itemId === id);
+      const check = exercises.findIndex((e, i) => i > intro && e.type === 'choice' && e.itemId === id);
+      const nextIntro = exercises.findIndex((e, i) => i > intro && e.type === 'intro');
+      assert.ok(check > intro && (nextIntro === -1 || check < nextIntro), `${id} is checked before the next character`);
+      assert.equal(exercises[check].options.length, 2);
+    }
+    for (const e of exercises.filter((x) => x.type === 'choice' && ITEMS.get(x.itemId).type === 'kana')) {
+      assert.ok(e.options.length <= 3 && e.untimed);
+      const me = ITEMS.get(e.itemId).jp;
+      for (const o of e.options) if (o !== e.itemId) assert.ok(!LOOK.some((g) => g.includes(me) && g.includes(ITEMS.get(o).jp)), `${me} vs ${ITEMS.get(o).jp}`);
+    }
+  }
+});

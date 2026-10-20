@@ -27,6 +27,7 @@ const pickOne = (list) => list[Math.floor(Math.random() * list.length)];
 
 // Seconds allowed for a task; null = untimed.
 function timeLimit(ex) {
+  if (ex.untimed) return null;
   const audio = ex.prompt === 'audio' || ex.mode === 'audio' || ex.mode === 'fast' ? 3 : 0;
   switch (ex.type) {
     case 'choice': return (ex.kind === 'read' ? 10 : 12) + audio;
@@ -257,7 +258,7 @@ function result(root, s, ok, opts = {}) {
   const ex = s.current;
   const timing = opts.timing ?? stopTimer(s);
   const ids = ex.itemIds || [];
-  const hesitated = ok && timing && timing.ratio > 0.6;
+  const hesitated = ok && ((timing && timing.ratio > 0.6) || !!ex.hinted);
   const onTime = ok && timing && !timing.late;
   if (timing) s.timedCount += 1;
   if (onTime) s.speedBonus += 1;
@@ -291,7 +292,7 @@ function result(root, s, ok, opts = {}) {
   foot.className = `lesson-foot ${ok ? 'good' : 'bad'}`;
   const badges = [];
   if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} Speed bonus</span>`);
-  if (hesitated) badges.push(html`<span class="pill pill-orange">A bit slow — we'll practise it again</span>`);
+  if (hesitated) badges.push(html`<span class="pill pill-orange">${ex.hinted ? 'Used a hint' : 'A bit slow'} — we'll practise it again</span>`);
   mount(foot, html`<div class="foot-inner feedback">
     <div class="fb-text">
       <span class="fb-icon">${icon(ok ? 'check' : 'close', 26)}</span>
@@ -538,7 +539,9 @@ function promptFor(root, s, ex, item) {
   // No play button when the task is to read it — hearing it would give the answer away.
   // Romaji hidden: offer it on demand (not when the task is to read it), kept in place so nothing jumps.
   const canPeek = !big && !ex.hint && ex.kind !== 'read' && ['word', 'sentence'].includes(item.type);
-  return speakerBubble(s, html`${ex.kind === 'read' ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 22)}</button>`}
+  // Reading tests (a word, or a kana asked for its sound) have no play button: hearing it is the answer.
+  const isReading = ex.kind === 'read' || (item.type === 'kana' && ex.answerKind === 'romaji');
+  return speakerBubble(s, html`${isReading ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 22)}</button>`}
     <div class="jp-prompt-wrap"><div class="${big ? 'jp-huge' : 'jp-lg fit'} ${canPeek ? 'rt-hidden' : ''}">${big ? html`<span class="jp">${item.jp}</span>` : jpItem(item, ex.hint || canPeek)}</div>
     ${canPeek ? html`<button class="show-romaji">Show romaji</button>` : ''}</div>`);
 }
@@ -557,8 +560,15 @@ function renderChoice(root, s) {
   const grid = ['kana', 'romaji'].includes(ex.answerKind) || (ex.answerKind === 'jp' && ['kanji', 'radical'].includes(item.type));
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
     ${promptFor(root, s, ex, item)}
+    ${item.type === 'kana' && item.example ? html`<div class="kana-hint"><button class="link hint-btn">💡 Hint</button><div class="hint-body" hidden>${kanaExample(item, { asHint: true })}</div></div>` : ''}
     <div class="options ${grid ? 'grid' : 'list'}">${ex.options.map((id, i) => html`<button class="option" data-id="${id}"><span class="key">${i + 1}</span>${optionHtml(ITEMS.get(id), ex)}</button>`)}</div>`);
   wirePlay(root, s);
+  // The memory word as a hint; using it brings the character back sooner (like a hesitation).
+  $('.hint-btn', root)?.addEventListener('click', (e) => {
+    e.currentTarget.remove();
+    $('.hint-body', root).hidden = false;
+    ex.hinted = true;
+  });
   $('.clue-btn', root)?.addEventListener('click', (e) => {
     e.currentTarget.hidden = true;
     $('.clue', root).hidden = false;
@@ -577,7 +587,7 @@ function renderChoice(root, s) {
       else if (b.dataset.id === chosen) b.classList.add('wrong');
     });
     if (['word', 'sentence', 'kana', 'kword'].includes(item.type)) sayAs(root, s.speaker, speechOf(item));
-    const meaning = item.en && ex.answerKind !== 'en' ? `${item.jp} = ${item.en}` : item.type === 'kana' ? `${item.jp} = ${item.romaji}` : item.romaji ? `${item.jp} · ${item.romaji}` : null;
+    const meaning = item.en && ex.answerKind !== 'en' ? `${item.jp} = ${item.en}` : item.type === 'kana' ? `${item.jp} = ${item.romaji}${item.example ? ` — as in ${item.example.jp} (${item.example.romaji})` : ''}` : item.romaji ? `${item.jp} · ${item.romaji}` : null;
     result(root, s, ok, { answerText: label(item, ex.answerKind === 'kana' ? 'jp' : ex.answerKind), meaning, chosenLabel: ok ? null : label(ITEMS.get(chosen), ex.answerKind === 'kana' ? 'jp' : ex.answerKind) });
   };
   const choose = (btn) => {

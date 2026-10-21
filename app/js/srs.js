@@ -26,15 +26,16 @@ export function review(record, { right, wrong, hesitated = 0 }, now) {
 
 export const isDue = (record, now) => !!record && record.due <= now;
 
-// 0..1: how well the item is known right now, for the progress bars. Half from how far it has
-// moved through the review schedule, half from how often it is answered right (trusted once there
-// are a handful of answers); fades when a review is overdue.
+// 0..1: how well the item is known right now, for the progress bars. Mostly how often it is answered
+// right (trusted once there are a handful of answers), plus how well it has lasted between reviews
+// (full once it has survived a gap of about 3 days); fades when a review is overdue.
 export function strength(record, now) {
   if (!record || !record.seen) return 0;
   const answers = (record.right || 0) + (record.wrong || 0);
   const accuracy = answers ? record.right / answers : 0;
   const confidence = Math.min(1, answers / 6);
-  const base = 0.5 * (record.box / MAX_BOX) + 0.5 * accuracy * confidence;
+  const lasting = Math.min(1, record.box / 3);
+  const base = 0.65 * accuracy * confidence + 0.35 * lasting;
   if (now <= record.due) return Math.max(0.15, base);
   const overdue = (now - record.due) / Math.max(INTERVALS[record.box], DAY);
   return Math.max(0.05, base * Math.max(0.4, 1 - overdue * 0.3));

@@ -58,7 +58,7 @@ function explainMeter(item, state, now) {
       <li>Right <b>${rec.right || 0}</b> of <b>${answers}</b> times</li>
       <li>Next review: <b>${next}</b></li>
     </ul>
-    <p class="muted small">The bar shows how well you know it: half from how often you answer it right, half from how far it has moved through spaced reviews (1 day, 3 days, a week, 2 weeks, 5 weeks). It fades when a review is overdue. <b>Green</b> strong · <b>yellow</b> okay · <b>orange</b> fading.</p>
+    <p class="muted small">The bar shows how well you know it: mostly how often you answer it right, plus how well it has stuck between reviews (full once you remember it after a few days). Reviews then space out — 1 day, 3 days, a week, 2 weeks, 5 weeks — and the bar fades if one is overdue. <b>Green</b> strong · <b>yellow</b> okay · <b>orange</b> fading.</p>
   </div>`, [{ label: 'Got it', kind: 'secondary' }]);
 }
 

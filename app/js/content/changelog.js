@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.56', date: '22 Oct 2026', changes: [
+    'Progress bars make more sense: mostly how often you are right, plus whether a word has stuck for a few days (17 right out of 18 now shows Strong)',
+  ] },
   { version: '0.55', date: '22 Oct 2026', changes: [
     'The end of the path is now a roadblock with cones and a 工事中 ("under construction") sign — more units on the way',
   ] },

@@ -7,6 +7,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Request | Status | Release |
 |---|---|---|
 | Tap progress bars (words, kanji…) to see what they mean | ✅ | 0.52 |
+| Progress bar "Okay 57%" for a word right 17 of 18 times doesn't make sense | ✅ ⅔ accuracy + ⅓ lasting (full after surviving ~3 days); explanation text updated | 0.56 |
 | Roadblock instead of the dog at the end of the path (more units on the way) | ✅ barrier, cones, blinking lamps, 工事中 sign | 0.55 |
 | Fun facts quiz answers don't work / give too much away | ✅ 200 written questions (one per fact), plausible wrong answers on the same topic, answer never in the question, fact shown after answering | 0.54 |
 | Quiz (multiple choice) about fun facts already shown | ✅ Practice → Fun facts → Quiz me (from 4 facts seen); fact name hidden, pick it from 4; +1 gem each | 0.53 |

@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.53', date: '21 Oct 2026', changes: [
+    'New: Fun facts quiz — Practice → Fun facts → Quiz me. 5 questions about facts you have read, +1 gem per right answer',
+  ] },
   { version: '0.52', date: '21 Oct 2026', changes: [
     'Practice: tap a progress bar to see what it means — how well you know the word, right answers, and the next review',
   ] },

@@ -975,3 +975,12 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .meter-word .jp { font-size: 26px; }
 .meter-lg { width: 100%; height: 14px; }
 .meter-help ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }
+
+/* v0.53: fun facts quiz. */
+.quiz-card { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; }
+.quiz-text { font-size: 17px; line-height: 1.5; color: var(--text-strong); }
+.quiz-count { margin-bottom: -6px; }
+.quiz-reveal { background: var(--card-2); border-radius: 14px; padding: 12px 14px; line-height: 1.5; }
+.quiz-after { display: flex; flex-direction: column; gap: 12px; }
+.quiz-end { align-items: center; text-align: center; padding-top: 40px; }
+.quiz-end h1 { font-size: 44px; }

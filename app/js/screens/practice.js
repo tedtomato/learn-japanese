@@ -11,6 +11,7 @@ import { strength } from '../srs.js';
 import { learnedItemIds, dueItemIds } from '../progress.js';
 import { KINDS, emojiFor, phraseSpeech, tidbitCard } from '../tidbits.js';
 import { wireShare } from '../share.js';
+import { QUIZ_MIN_FACTS } from './factquiz.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 
 const level = (st) => (st === 0 ? 'none' : st < 0.34 ? 'weak' : st < 0.67 ? 'mid' : 'strong');
@@ -165,6 +166,9 @@ export function renderCollection(root, kind) {
 
   mount(root, html`<header class="topbar topbar-back"><a class="icon-btn" href="#/practice" aria-label="Back">${icon('close', 24)}</a><h1>${info.collection}</h1></header>
   <main class="page">
+    ${kind === 'fact' ? (items.length >= QUIZ_MIN_FACTS
+      ? html`<a class="card kanji-practice" href="#/quiz"><span class="kanji-chip">${art('❓', 'art-row')}</span><div><b>Quiz me</b><small>5 questions about facts you have read · +1 gem each</small></div><span class="btn btn-secondary">Start</span></a>`
+      : html`<p class="muted small">Discover ${QUIZ_MIN_FACTS} facts to unlock the quiz.</p>`) : ''}
     ${kind !== 'phrase' ? html`<p class="muted">${items.length ? `${items.length} of ${info.list.length} found.` : 'Nothing found yet.'} ${locked ? 'Keep doing lessons to discover more — they pop up on your path and during lessons.' : 'You found them all!'}${kind === 'kanji' ? ' Spotted kanji also come back in practice, with their tip as a clue.' : ''}</p>` : html`<p class="muted">Tap a phrase to hear it.</p>`}
     ${[...groups].map(([g, list]) => html`${g && g !== 'Basic kanji' ? html`<h2 class="sub-title">${g}</h2>` : ''}
       ${kind === 'phrase'

@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.55', date: '22 Oct 2026', changes: [
+    'The end of the path is now a roadblock with cones and a 工事中 ("under construction") sign — more units on the way',
+  ] },
   { version: '0.54', date: '22 Oct 2026', changes: [
     'Fun facts quiz rewritten: a real question for every fact with four believable answers (e.g. "In what year was Tokyo Tower built?"), and the fact only shows after you answer',
   ] },

@@ -133,3 +133,20 @@ function bridge(path, y) {
     <rect class="bridge-rail" x="-30" y="11.5" width="60" height="5" rx="2.5"/>
     <g class="bridge-posts">${posts}</g></g>`;
 }
+
+// End of the path: a roadblock with cones and a 工事中 ("under construction") sign.
+export const ROADBLOCK = `<svg class="roadblock" viewBox="0 0 220 150" role="img" aria-label="Road under construction">
+  <defs><pattern id="rb-stripes" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <rect width="24" height="24" fill="#ff9600"/><rect width="12" height="24" fill="#fff"/></pattern></defs>
+  <ellipse cx="110" cy="138" rx="100" ry="9" fill="rgba(0,0,0,.18)"/>
+  <rect x="38" y="40" width="10" height="96" rx="3" fill="#9aa5ad"/><rect x="172" y="40" width="10" height="96" rx="3" fill="#9aa5ad"/>
+  <rect x="30" y="128" width="26" height="8" rx="3" fill="#6b7780"/><rect x="164" y="128" width="26" height="8" rx="3" fill="#6b7780"/>
+  <rect x="18" y="50" width="184" height="26" rx="6" fill="url(#rb-stripes)" stroke="#e08500" stroke-width="3"/>
+  <rect x="18" y="88" width="184" height="22" rx="6" fill="url(#rb-stripes)" stroke="#e08500" stroke-width="3"/>
+  <circle cx="43" cy="36" r="7" fill="#ffd23f"><animate attributeName="opacity" values="1;.25;1" dur="1.2s" repeatCount="indefinite"/></circle>
+  <circle cx="177" cy="36" r="7" fill="#ffd23f"><animate attributeName="opacity" values=".25;1;.25" dur="1.2s" repeatCount="indefinite"/></circle>
+  <g transform="translate(86 8)"><rect width="48" height="30" rx="5" fill="#fff" stroke="#e5484d" stroke-width="3"/>
+    <text x="24" y="21" text-anchor="middle" font-size="15" font-weight="800" fill="#e5484d" font-family="'M PLUS Rounded 1c', sans-serif">工事中</text></g>
+  <g transform="translate(2 100)"><path d="M10 36 16 4h6l6 32z" fill="#ff9600"/><path d="M12 26h14l1 5H11z" fill="#fff"/><rect x="4" y="34" width="30" height="5" rx="2" fill="#e08500"/></g>
+  <g transform="translate(184 100)"><path d="M10 36 16 4h6l6 32z" fill="#ff9600"/><path d="M12 26h14l1 5H11z" fill="#fff"/><rect x="4" y="34" width="30" height="5" rx="2" fill="#e08500"/></g>
+</svg>`;

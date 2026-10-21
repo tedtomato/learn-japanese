@@ -2,9 +2,9 @@
 import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID } from '../course.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 import { rewardPopup } from '../fx.js';
-import { decorFor, drawTrails } from '../scenery.js';
+import { decorFor, drawTrails, ROADBLOCK } from '../scenery.js';
 import { app, statsBar, toast, modal } from '../app.js';
-import { html, mount, $, $$, fitText } from '../dom.js';
+import { html, mount, raw, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { speak } from '../audio.js';
@@ -191,7 +191,7 @@ export function renderLearn(root) {
           </div>
           <div class="track">${unit.nodes.map((node) => renderNode(node, n++, current, now))}</div>
         </section>`)}`)}
-    <div class="path-end">${mascot(current >= n ? 'cheer' : 'happy', 90)}<p>${current >= n ? 'You finished every lesson! More units are coming — keep practising.' : 'More units are on the way: katakana, kanji and conversations.'}</p></div>
+    <div class="path-end">${raw(ROADBLOCK)}<p><b>${current >= n ? 'You finished every lesson!' : 'Road under construction'}</b><br>${current >= n ? 'More units are coming — keep practising.' : 'More units are on the way: katakana, kanji and conversations.'}</p></div>
   </main>`);
 
   $$('.node', root).forEach((el) =>

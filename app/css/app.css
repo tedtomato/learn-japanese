@@ -987,3 +987,7 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .quiz-reveal { display: flex; gap: 12px; align-items: flex-start; }
 .quiz-reveal .art-row { flex: none; }
 .quiz-text { font-weight: 800; font-size: 19px; }
+
+/* v0.55: roadblock at the end of the path. */
+.path-end .roadblock { width: 200px; height: auto; display: block; margin: 0 auto 6px; }
+.path-end p b { color: var(--text-strong); }

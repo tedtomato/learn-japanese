@@ -110,7 +110,8 @@ function streamPath(y, width) {
   return `<g class="stream"><path d="${d}" class="stream-bank"/><path d="${d}" class="stream-water"/><path d="${d}" class="stream-ripple"/></g>`;
 }
 
-// A red arched garden bridge, seen from above, laid along the trail where it crosses the stream.
+// A red arched garden bridge (taiko-bashi) seen from the side, like the other garden pieces, standing
+// where the trail crosses the stream, with its reflection in the water.
 function bridge(path, y) {
   const len = path.getTotalLength();
   let lo = 0;
@@ -121,17 +122,26 @@ function bridge(path, y) {
     else hi = mid;
   }
   const p = path.getPointAtLength(lo);
-  const q = path.getPointAtLength(Math.min(lo + 2, len));
-  const angle = (Math.atan2(q.y - p.y, q.x - p.x) * 180) / Math.PI;
-  const posts = [-27, 0, 27].map((x) => `<circle cx="${x}" cy="-14" r="3.4"/><circle cx="${x}" cy="14" r="3.4"/>`).join('');
-  return `<g class="bridge" transform="translate(${p.x.toFixed(1)} ${p.y.toFixed(1)}) rotate(${angle.toFixed(1)})">
-    <ellipse class="bridge-shadow" cx="2" cy="4" rx="34" ry="18"/>
-    <rect class="bridge-deck" x="-30" y="-12" width="60" height="24" rx="4"/>
-    <path class="bridge-planks" d="M-20 -12v24M-10 -12v24M0 -12v24M10 -12v24M20 -12v24"/>
-    <rect class="bridge-arch" x="-12" y="-12" width="24" height="24"/>
-    <rect class="bridge-rail" x="-30" y="-16.5" width="60" height="5" rx="2.5"/>
-    <rect class="bridge-rail" x="-30" y="11.5" width="60" height="5" rx="2.5"/>
-    <g class="bridge-posts">${posts}</g></g>`;
+  // The deck is a gentle arch; the railing follows it 16 px higher, posts stand on the deck.
+  const W = 64;
+  const RISE = 26;
+  const deckY = (x) => 6 - RISE * (1 - (x / W) ** 2);
+  const curve = (dy) => {
+    let d = '';
+    for (let x = -W; x <= W; x += 8) d += `${d ? 'L' : 'M'}${x} ${(deckY(x) + dy).toFixed(1)} `;
+    return d;
+  };
+  const posts = [-48, -32, -16, 0, 16, 32, 48].map((x) => `<rect x="${x - 2}" y="${(deckY(x) - 16).toFixed(1)}" width="4" height="16" class="bridge-post"/>`).join('');
+  return `<g class="bridge" transform="translate(${p.x.toFixed(1)} ${(y + 2).toFixed(1)})">
+    <path d="${curve(0)}" class="bridge-reflection" transform="scale(1 -0.5) translate(0 -26)"/>
+    <path d="${curve(5)}" class="bridge-beam"/>
+    <path d="${curve(0)}" class="bridge-deck"/>
+    ${posts}
+    <path d="${curve(-8)}" class="bridge-rail bridge-rail-low"/>
+    <path d="${curve(-16)}" class="bridge-rail"/>
+    <rect x="${-W - 4}" y="-14" width="8" height="24" rx="2" class="bridge-end"/><rect x="${W - 4}" y="-14" width="8" height="24" rx="2" class="bridge-end"/>
+    <circle cx="${-W}" cy="-17" r="5" class="bridge-cap"/><circle cx="${W}" cy="-17" r="5" class="bridge-cap"/>
+  </g>`;
 }
 
 // End of the path: a roadblock with cones and a 工事中 ("under construction") sign.

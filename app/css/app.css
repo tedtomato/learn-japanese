@@ -784,12 +784,6 @@ ruby { padding: 0 3px; }
 .stream-water { stroke: #7fd0f5; stroke-width: 24; }
 .stream-ripple { stroke: #e6f7ff; stroke-width: 1.6; stroke-dasharray: 5 40; opacity: .7; animation: ripple 3s linear infinite; }
 @keyframes ripple { to { stroke-dashoffset: -90; } }
-.bridge-shadow { fill: rgba(0,0,0,.14); }
-.bridge-deck { fill: #b8743a; }
-.bridge-planks { stroke: #8f5426; stroke-width: 1.4; }
-.bridge-arch { fill: #fff; opacity: .16; }
-.bridge-rail { fill: #e0402e; }
-.bridge-posts circle { fill: #ffcc33; stroke: #c98a00; stroke-width: 1; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .stream, :root:not([data-theme="light"]) .bridge { opacity: .85; } }
 :root[data-theme="dark"] .stream, :root[data-theme="dark"] .bridge { opacity: .85; }
 @media (prefers-reduced-motion: reduce) { .stream-ripple { animation: none; } }
@@ -992,3 +986,14 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .path-end .roadblock { width: 200px; height: auto; display: block; margin: 0 auto 6px; }
 .path-end p b { color: var(--text-strong); }
 .guide-kicker { color: var(--muted); margin-bottom: -8px; }
+
+/* v0.58: side-view red taiko bridge. */
+.bridge path { fill: none; stroke-linecap: round; }
+.bridge-deck { stroke: #a8622f; stroke-width: 5; }
+.bridge-beam { stroke: #c7342a; stroke-width: 6; }
+.bridge-rail { stroke: #e0402e; stroke-width: 4.5; }
+.bridge-rail-low { stroke-width: 3; }
+.bridge-post, .bridge-end { fill: #e0402e; }
+.bridge-end { fill: #c7342a; }
+.bridge-cap { fill: #ffcc33; stroke: #c98a00; stroke-width: 1; }
+.bridge-reflection { stroke: #e0402e; stroke-width: 4; opacity: .16; }

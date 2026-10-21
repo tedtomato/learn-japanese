@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.58', date: '22 Oct 2026', changes: [
+    'New bridges: red arched Japanese garden bridges (taiko-bashi) seen from the side, like the other garden pieces',
+  ] },
   { version: '0.57', date: '22 Oct 2026', changes: [
     'Unit banners on the path and the unit Guide now read "Section 1 – Unit 4" (lessons and pop-ups already did)',
   ] },

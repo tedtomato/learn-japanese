@@ -7,6 +7,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Request | Status | Release |
 |---|---|---|
 | Tap progress bars (words, kanji…) to see what they mean | ✅ | 0.52 |
+| Fun facts quiz answers don't work / give too much away | ✅ 200 written questions (one per fact), plausible wrong answers on the same topic, answer never in the question, fact shown after answering | 0.54 |
 | Quiz (multiple choice) about fun facts already shown | ✅ Practice → Fun facts → Quiz me (from 4 facts seen); fact name hidden, pick it from 4; +1 gem each | 0.53 |
 | Notifications | ✅ option A: daily reminder via periodic background sync (Android Chrome, installed app; quiet before 9:00 and after 22:00; only if not studied today). Option B (GitHub-sent push at a fixed time) ⏳ not done | 0.51 |
 | Profile: Day streak opens the calendar | ✅ | 0.50 |

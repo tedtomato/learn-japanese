@@ -85,3 +85,14 @@ test('gems buy a full set of hearts, only when some are missing and gems suffice
   loseHeart(s, now);
   assert.equal(buyHearts(s, now), false, 'not enough gems');
 });
+
+test('every fun fact has a fair quiz question', async () => {
+  const { FACT_QUIZ } = await import('../app/js/content/fact-quiz.js');
+  for (const f of FACTS) {
+    const e = FACT_QUIZ[f.id];
+    assert.ok(e, `fact ${f.id} has a question`);
+    assert.equal(e.wrong.length, 3);
+    assert.ok(!e.q.toLowerCase().includes(e.a.toLowerCase()), `fact ${f.id}: answer not in the question`);
+    assert.equal(new Set([e.a, ...e.wrong].map((x) => x.toLowerCase())).size, 4, `fact ${f.id}: four different answers`);
+  }
+});

@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.49', date: '21 Oct 2026', changes: [
+    'Tap the Daily goal card to see what XP is, how you earn it, the reward for reaching the goal — and change your goal',
+  ] },
   { version: '0.48', date: '21 Oct 2026', changes: [
     'Lessons show where you are: "Section 1 – Unit 4" at the top of the lesson and in the lesson pop-up on the path',
   ] },

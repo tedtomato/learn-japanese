@@ -30,6 +30,34 @@ function reviewCard(state, now) {
   </section>`;
 }
 
+// What XP and the daily goal are, with a quick way to change the goal.
+const GOALS = [[10, 'Casual', '1 lesson'], [20, 'Regular', '2 lessons'], [30, 'Serious', '3 lessons'], [50, 'Intense', '5 lessons']];
+function explainGoal() {
+  const { state } = app;
+  const xp = todayXp(state, app.now());
+  const render = () => html`<div class="goal-help">
+    <h2>Daily goal</h2>
+    <p><b>XP</b> (experience points) measure how much you practised. Today: <b class="goal-today">${xp} / ${state.dailyGoal} XP</b>.</p>
+    <ul>
+      <li>${icon('star', 16)} Each lesson or practice: <b>+10 XP</b></li>
+      <li>${icon('check', 16)} No mistakes: <b>+5 XP</b></li>
+      <li>${icon('bolt', 16)} Quick answers: up to <b>+10 XP</b> speed bonus</li>
+    </ul>
+    <p>Reach your goal to earn <b>+5 gems</b>. Studying any amount each day keeps your 🔥 streak going.</p>
+    <p class="muted small">Choose your goal:</p>
+    <div class="goal-choices">${GOALS.map(([v, name, hint]) => html`<button class="goal-choice ${state.dailyGoal === v ? 'on' : ''}" data-goal="${v}"><b>${name}</b><small>${v} XP · ${hint}</small></button>`)}</div>
+  </div>`;
+  // The path behind shows the new goal once the sheet is closed.
+  modal(render(), [{ label: 'Got it', kind: 'secondary', onClick: () => window.dispatchEvent(new HashChangeEvent('hashchange')) }]);
+  const wire = () => $$('#modal .goal-choice').forEach((b) => b.addEventListener('click', () => {
+    state.dailyGoal = Number(b.dataset.goal);
+    app.save();
+    $$('#modal .goal-choice').forEach((x) => x.classList.toggle('on', x === b));
+    $('#modal .goal-today').textContent = `${xp} / ${state.dailyGoal} XP`;
+  }));
+  wire();
+}
+
 function nodeState(node, current, now) {
   const { state } = app;
   if (node.index === current) return 'current';
@@ -146,7 +174,7 @@ export function renderLearn(root) {
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page learn">
-    <section class="card goal-card">
+    <section class="card goal-card" role="button" tabindex="0" aria-label="About the daily goal">
       <div class="goal-icon">${icon('bolt', 22)}</div>
       <div class="goal-text"><b>Daily goal</b><span>${Math.min(xp, goal)} / ${goal} XP</span></div>
       ${xp >= goal ? html`<span class="pill pill-gold">${icon('check', 14)} Done!</span>` : ''}
@@ -175,6 +203,7 @@ export function renderLearn(root) {
   );
   root.addEventListener('click', () => document.querySelector('.popover')?.remove());
   $('.start-review', root)?.addEventListener('click', () => app.go('#/practice/go'));
+  $('.goal-card', root).addEventListener('click', explainGoal);
   $$('[data-guide]', root).forEach((b) =>
     b.addEventListener('click', () => unitGuide(SECTIONS.flatMap((s) => s.units).find((u) => u.id === b.dataset.guide))),
   );

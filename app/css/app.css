@@ -949,3 +949,15 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 /* v0.48: section and unit numbers on lessons. */
 .lesson-meta b { color: var(--text-strong); font-weight: 800; }
 .pop-kicker { display: block; font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; opacity: .8; }
+
+/* v0.49: daily goal explained. */
+.goal-card { cursor: pointer; }
+.goal-help { display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.goal-help ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 6px; }
+.goal-help li { display: flex; align-items: center; gap: 8px; }
+.goal-help li svg { color: var(--gold-text); flex: none; }
+.goal-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.goal-choice { display: flex; flex-direction: column; align-items: flex-start; padding: 10px 12px; border-radius: 14px; border: 2px solid var(--border); border-bottom-width: 4px; background: var(--card-2); color: var(--text); text-align: left; }
+.goal-choice b { color: var(--text-strong); }
+.goal-choice small { color: var(--muted); font-size: 12px; }
+.goal-choice.on { border-color: var(--blue); background: var(--blue-soft); }

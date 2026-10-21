@@ -57,11 +57,12 @@ function route() {
   $('#modal').classList.remove('open');
   app.inLesson = false;
 
-  const inSession = name === 'lesson' || (name === 'practice' && (arg === 'go' || arg === 'kanji-go')) || (name === 'lab' && !!arg);
+  const inSession = name === 'lesson' || (name === 'practice' && (arg === 'go' || arg === 'kanji-go' || arg === 'hiragana-go' || arg === 'katakana-go')) || (name === 'lab' && !!arg);
   document.body.classList.toggle('in-lesson', inSession);
   if (name === 'lesson') startSession(root, { nodeId: arg });
   else if (name === 'practice' && arg === 'go') startSession(root, {});
   else if (name === 'practice' && arg === 'kanji-go') startSession(root, { kanjiOnly: true });
+  else if (name === 'practice' && /^(hiragana|katakana)-go$/.test(arg)) startSession(root, { kanaScript: arg.replace('-go', '') });
   else if (name === 'lab' && arg) startSession(root, { demo: arg });
   else if (name === 'lab') renderLab(root);
   else if (name === 'practice') renderPractice(root, arg);

@@ -188,3 +188,24 @@ test('kanji practice uses only kanji, each character once', () => {
   const { exercises } = generatePractice(state, { itemIds: ids, now: T0 });
   assert.ok(exercises.every((e) => (e.itemIds || [e.itemId]).every((id) => !id || ['kanji', 'kword', 'radical'].includes(ITEMS.get(id).type))));
 });
+
+test('first Read it lesson teaches two characters, practises them together, then the next two', () => {
+  const node = NODES.find((n) => n.kind === 'read' && n.items.length === 4);
+  const { exercises } = generateLesson(node, defaultState(T0), { rng: makeRng(5), now: T0, level: 0, canListen: true });
+  const [a, b, c] = node.items;
+  const introC = exercises.findIndex((e) => e.type === 'intro' && e.itemId === c);
+  const pairQs = exercises.slice(0, introC).filter((e) => e.kind === 'audio2kana');
+  assert.equal(pairQs.length, 2);
+  for (const q of pairQs) assert.deepEqual([...q.options].sort(), [a, b].sort());
+});
+
+test('kana practice: weakest characters of one script, gentle questions', async () => {
+  const { kanaPracticeIds } = await import('../app/js/lesson/generate.js');
+  const state = defaultState(T0);
+  for (const it of ITEMS.values()) if (it.type === 'kana') state.items[it.id] = { box: 1, seen: 1, right: 1, wrong: 0, last: T0, due: T0 };
+  const ids = kanaPracticeIds(state, T0, 'hiragana');
+  assert.equal(ids.length, 8);
+  assert.ok(ids.every((id) => ITEMS.get(id).script === 'hiragana'));
+  const { exercises } = generatePractice(state, { itemIds: ids, now: T0, gentle: true });
+  for (const e of exercises.filter((x) => x.type === 'choice')) assert.ok(e.options.length <= 3 && e.untimed);
+});

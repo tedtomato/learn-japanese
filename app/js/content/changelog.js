@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.46', date: '21 Oct 2026', changes: [
+    'Hiragana in smaller steps: two new characters at a time, practised together (hear it, pick it) before the next two',
+    'New: Hiragana practice and Katakana practice on Practice → Kana — your weakest characters, 3 choices, hints, no countdown',
+  ] },
   { version: '0.45', date: '21 Oct 2026', changes: [
     'New: a 🔥 "5 in a row!" celebration for every 5 right answers in a row',
   ] },

@@ -212,7 +212,7 @@ function matchExercise(ids, ctx) {
     return true;
   }).slice(0, 5);
   if (pairs.length < 3) return null;
-  return { type: 'match', itemIds: pairs, pairs, right, hint: type === 'word' && pairs.some((id) => ctx.romajiHint(ITEMS.get(id))), instruction: 'Tap the matching pairs' };
+  return { type: 'match', untimed: !!ctx.gentle, itemIds: pairs, pairs, right, hint: type === 'word' && pairs.some((id) => ctx.romajiHint(ITEMS.get(id))), instruction: 'Tap the matching pairs' };
 }
 
 function dialogueExercise(id, ctx) {
@@ -279,16 +279,29 @@ export function generateLesson(node, state, opts = {}) {
 
   const head = [];
   const rest = [];
+  const pair = [];
   for (const id of targets) {
     const item = ITEMS.get(id);
+    const gentleKana = ctx.gentle && item.type === 'kana' && isNew(state, id);
     if (isNew(state, id)) {
       head.push({ type: 'intro', itemId: id, itemIds: [], hint: ctx.romajiHint(item) || item.type === 'kana' });
       if (hasStrokes(item) && item.type !== 'radical') head.push({ type: 'trace', itemId: id, itemIds: [id], kind: 'trace' });
       // Learn one, check one: a two-choice question on the new character before the next one.
-      if (ctx.gentle && item.type === 'kana') head.push(buildExercise(item, 'kana2romaji', { ...ctx, wrongCount: 1 }));
+      if (gentleKana) head.push(buildExercise(item, 'kana2romaji', { ...ctx, wrongCount: 1 }));
+    }
+    // Small steps: every two new characters are practised together (hear it, pick it) before the next ones.
+    if (gentleKana) {
+      pair.push(id);
+      if (pair.length === 2) {
+        for (const pid of shuffle(pair, rng)) {
+          const type = ctx.canListen ? 'audio2kana' : 'romaji2kana';
+          head.push({ ...buildExercise(ITEMS.get(pid), type, ctx), options: shuffle([...pair], rng) });
+        }
+        pair.length = 0;
+      }
     }
     const first = buildExercise(item, questionType(item, level >= 2 || isReview ? 'any' : 'easy', ctx), ctx);
-    (!isNew(state, id) || isReview ? rest : head).push(first);
+    (!isNew(state, id) || isReview || gentleKana ? rest : head).push(first);
     if (!isReview) rest.push(buildExercise(item, questionType(item, level >= 1 ? 'hard' : 'any', ctx), ctx));
   }
   // Reading practice with words the learner already knows, written with this lesson's characters.
@@ -350,11 +363,20 @@ export function kanjiPracticeIds(state, now, count = 8) {
     .slice(0, count);
 }
 
+// Kana practice: the learner's weakest characters of one script (most urgent first).
+export function kanaPracticeIds(state, now, script = 'hiragana', count = 8) {
+  return Object.keys(state.items)
+    .filter((id) => ITEMS.get(id)?.type === 'kana' && ITEMS.get(id).script === script && !ITEMS.get(id).say)
+    .sort(byUrgency(state.items, now))
+    .slice(0, count);
+}
+
 // A practice session made from the learner's weakest and most overdue items.
-export function generatePractice(state, { rng = makeRng(), now = Date.now(), itemIds = null, size = 10, canListen = true, canSpeak = false } = {}) {
+export function generatePractice(state, { rng = makeRng(), now = Date.now(), itemIds = null, size = 10, canListen = true, canSpeak = false, gentle = false } = {}) {
   const ids = itemIds || pickReview(state, [], 8, rng, now, { peeks: true });
   if (!ids.length) return { exercises: [], itemIds: [] };
-  const ctx = context({ state, sessionIds: ids, level: 3, rng, canListen, canSpeak, advanced: true });
+  const ctx = context({ state, sessionIds: ids, level: gentle ? 0 : 3, rng, canListen, canSpeak, advanced: !gentle });
+  ctx.gentle = gentle;
   const intros = ids.filter((id) => isNew(state, id)).map((id) => ({ type: 'intro', itemId: id, itemIds: [] }));
   const list = ids.map((id) => buildExercise(ITEMS.get(id), questionType(ITEMS.get(id), isNew(state, id) ? 'easy' : 'any', ctx), ctx));
   let n = 0;

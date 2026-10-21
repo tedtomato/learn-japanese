@@ -7,7 +7,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Request | Status | Release |
 |---|---|---|
 | Animation overlay for a streak of 5 good answers in a row | ✅ at 5, 10, 15… with sound | 0.45 |
-| Hiragana still difficult — what else? | 🚧 next: smaller steps (2 at a time), hear-and-pick, Kana practice | — |
+| Hiragana still difficult — what else? | ✅ two new characters at a time with a hear-and-pick mini practice; gentle Hiragana / Katakana practice drills on the Kana tab | 0.46 |
 
 ## Batch 9 — 20 Oct 2026
 | Request | Status | Release |

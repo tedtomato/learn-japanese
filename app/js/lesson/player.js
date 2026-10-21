@@ -10,7 +10,7 @@ import { mascot } from '../mascot.js';
 import { person, nameOf } from '../characters.js';
 import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
-import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds } from './generate.js';
+import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds } from './generate.js';
 import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey } from '../progress.js';
 import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
 import { GRAMMAR } from '../content/grammar.js';
@@ -48,7 +48,7 @@ const listenOff = () => (app.state.settings.listenOffUntil || 0) > app.now();
 const speakOff = () => (app.state.settings.speakOffUntil || 0) > app.now();
 const needsListening = (ex) => ex.prompt === 'audio' || ['audio', 'fast'].includes(ex.mode) || ex.type === 'dialogue' || ex.type === 'speak';
 
-export function startSession(root, { nodeId, itemIds, demo, kanjiOnly } = {}) {
+export function startSession(root, { nodeId, itemIds, demo, kanjiOnly, kanaScript } = {}) {
   const now = app.now();
   const node = nodeId ? NODE_BY_ID.get(nodeId) : null;
   if (nodeId && (!node || node.kind === 'chest' || (!isNodeUnlocked(app.state, node) && !app.testMode))) return app.go('#/learn');
@@ -65,10 +65,12 @@ export function startSession(root, { nodeId, itemIds, demo, kanjiOnly } = {}) {
     ? { exercises: demoExercises(demo, app.state), itemIds: [] }
     : node
       ? generateLesson(node, app.state, { ...opts, level: nodeLevel(app.state, node) })
-      : generatePractice(app.state, { ...opts, itemIds: kanjiOnly ? kanjiPracticeIds(app.state, now) : itemIds });
+      : kanaScript
+        ? generatePractice(app.state, { ...opts, itemIds: kanaPracticeIds(app.state, now, kanaScript), gentle: true })
+        : generatePractice(app.state, { ...opts, itemIds: kanjiOnly ? kanjiPracticeIds(app.state, now) : itemIds });
   if (!session.exercises.length) return app.go('#/practice');
   // Now and then, an interesting fact about Japan (on the unit's theme) as a short break.
-  if (!demo && !kanjiOnly && session.exercises.length >= 8 && node?.kind !== 'story' && Math.random() < 0.5) {
+  if (!demo && !kanjiOnly && !kanaScript && session.exercises.length >= 8 && node?.kind !== 'story' && Math.random() < 0.5) {
     session.exercises.splice(Math.floor(session.exercises.length / 2), 0, { type: 'tidbit', itemIds: [] });
   }
 

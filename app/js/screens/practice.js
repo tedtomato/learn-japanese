@@ -68,9 +68,18 @@ export function renderPractice(root, focus) {
         <span class="word-main"><b>${k.en}</b><small>${reading(k)}</small></span>
         ${meter(st)}</button>`)}</div>`
       : html`<p class="muted">Kanji lessons appear along the path from the second unit.</p>`),
-    kana: () => html`<p class="muted legend"><i class="dot strong"></i>Strong <i class="dot mid"></i>Okay <i class="dot weak"></i>Fading <i class="dot none"></i>Not learned</p>
+    kana: () => html`${kanaCard('hiragana', 'あ', 'Hiragana practice')}${kanaCard('katakana', 'ア', 'Katakana practice')}<p class="muted legend"><i class="dot strong"></i>Strong <i class="dot mid"></i>Okay <i class="dot weak"></i>Fading <i class="dot none"></i>Not learned</p>
       <h3 class="sub-title small-title">Hiragana</h3>${chart(HIRAGANA_ROWS, state, now)}
       <h3 class="sub-title small-title">Katakana</h3>${chart(KATAKANA_ROWS, state, now)}`,
+  };
+  // Drill cards for each script: gentle questions on the 8 weakest characters (from 3 learned).
+  const kanaCount = (script) => learned.filter((id) => ITEMS.get(id).type === 'kana' && ITEMS.get(id).script === script).length;
+  const kanaCard = (script, ch, title) => {
+    const n = kanaCount(script);
+    if (!n) return '';
+    return html`<section class="card kanji-practice"><span class="kanji-chip jp">${ch}</span>
+      <div><b>${title}</b><small>${n >= 3 ? 'Your weakest characters, with hints — no rush' : 'Learn 3 characters to unlock'}</small></div>
+      <button class="btn btn-secondary start-kana" data-script="${script}" ${n >= 3 ? '' : 'disabled'}>Start</button></section>`;
   };
   const TABS = [['words', 'Words', words.length], ['kanji', 'Kanji', kanji.length], ['kana', 'Kana', null]];
 
@@ -102,6 +111,7 @@ export function renderPractice(root, focus) {
 
   $('.start-practice', root).addEventListener('click', () => app.go('#/practice/go'));
   $('.start-kanji', root)?.addEventListener('click', () => app.go('#/practice/kanji-go'));
+  $$('.start-kana', root).forEach((b) => b.addEventListener('click', () => app.go(`#/practice/${b.dataset.script}-go`)));
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
   $$('[data-tab]', root).forEach((b) => b.addEventListener('click', () => {
     lastTab = b.dataset.tab;

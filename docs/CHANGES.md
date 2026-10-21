@@ -7,6 +7,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Request | Status | Release |
 |---|---|---|
 | Tap progress bars (words, kanji…) to see what they mean | ✅ | 0.52 |
+| Bridge orientation wrong (went along the water) | ✅ along the path over the stream, seen slightly from the side: red arch visible, rails, posts, gold caps | 0.59 |
 | Bridges: side view, Japanese style (like the photo) | ✅ red arched taiko bridge with posts, rails, gold caps, reflection | 0.58 |
 | Progress bar "Okay 57%" for a word right 17 of 18 times doesn't make sense | ✅ ⅔ accuracy + ⅓ lasting (full after surviving ~3 days); explanation text updated | 0.56 |
 | Roadblock instead of the dog at the end of the path (more units on the way) | ✅ barrier, cones, blinking lamps, 工事中 sign | 0.55 |

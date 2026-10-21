@@ -110,8 +110,9 @@ function streamPath(y, width) {
   return `<g class="stream"><path d="${d}" class="stream-bank"/><path d="${d}" class="stream-water"/><path d="${d}" class="stream-ripple"/></g>`;
 }
 
-// A red arched garden bridge (taiko-bashi) seen from the side, like the other garden pieces, standing
-// where the trail crosses the stream, with its reflection in the water.
+// A red arched garden bridge (taiko-bashi) laid along the trail over the stream, seen from the same
+// slight front angle as the lesson circles: wooden deck on top, its red edge showing below, red rails
+// standing up on posts, gold caps, and a light band where the arch is highest.
 function bridge(path, y) {
   const len = path.getTotalLength();
   let lo = 0;
@@ -121,26 +122,31 @@ function bridge(path, y) {
     if (path.getPointAtLength(mid).y < y) lo = mid;
     else hi = mid;
   }
-  const p = path.getPointAtLength(lo);
-  // The deck is a gentle arch; the railing follows it 16 px higher, posts stand on the deck.
-  const W = 64;
-  const RISE = 26;
-  const deckY = (x) => 6 - RISE * (1 - (x / W) ** 2);
-  const curve = (dy) => {
-    let d = '';
-    for (let x = -W; x <= W; x += 8) d += `${d ? 'L' : 'M'}${x} ${(deckY(x) + dy).toFixed(1)} `;
-    return d;
-  };
-  const posts = [-48, -32, -16, 0, 16, 32, 48].map((x) => `<rect x="${x - 2}" y="${(deckY(x) - 16).toFixed(1)}" width="4" height="16" class="bridge-post"/>`).join('');
-  return `<g class="bridge" transform="translate(${p.x.toFixed(1)} ${(y + 2).toFixed(1)})">
-    <path d="${curve(0)}" class="bridge-reflection" transform="scale(1 -0.5) translate(0 -26)"/>
-    <path d="${curve(5)}" class="bridge-beam"/>
-    <path d="${curve(0)}" class="bridge-deck"/>
-    ${posts}
-    <path d="${curve(-8)}" class="bridge-rail bridge-rail-low"/>
-    <path d="${curve(-16)}" class="bridge-rail"/>
-    <rect x="${-W - 4}" y="-14" width="8" height="24" rx="2" class="bridge-end"/><rect x="${W - 4}" y="-14" width="8" height="24" rx="2" class="bridge-end"/>
-    <circle cx="${-W}" cy="-17" r="5" class="bridge-cap"/><circle cx="${W}" cy="-17" r="5" class="bridge-cap"/>
+  const a = path.getPointAtLength(Math.max(0, lo - 32));
+  const b = path.getPointAtLength(Math.min(len, lo + 32));
+  const L = Math.hypot(b.x - a.x, b.y - a.y) || 1;
+  const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
+  // Local frame: u runs along the bridge (0 → L), v across it (deck from -14 to 14). The side that
+  // faces right on screen shows the red arch, as when the bridge is seen slightly from the side.
+  const flip = Math.cos((angle * Math.PI) / 180 + Math.PI / 2) < 0 ? -1 : 1;
+  const W = 14;
+  const S = W * flip; // the visible side
+  const planks = Array.from({ length: 7 }, (_, i) => {
+    const u = (L * (i + 1)) / 8;
+    return `<line x1="${u.toFixed(1)}" y1="${-W}" x2="${u.toFixed(1)}" y2="${W}" class="bridge-plank"/>`;
+  }).join('');
+  const posts = (v) => Array.from({ length: 5 }, (_, i) => `<circle cx="${((L * i) / 4).toFixed(1)}" cy="${v}" r="2.6" class="bridge-post"/>`).join('');
+  return `<g class="bridge" transform="translate(${a.x.toFixed(1)} ${a.y.toFixed(1)}) rotate(${angle.toFixed(1)})">
+    <ellipse cx="${(L / 2).toFixed(1)}" cy="0" rx="${(L / 2 + 6).toFixed(1)}" ry="${W + 8}" class="bridge-shadow"/>
+    <path d="M0 ${S} Q${(L / 2).toFixed(1)} ${S + 24 * flip} ${L.toFixed(1)} ${S}" class="bridge-arch"/>
+    <rect x="0" y="${-W}" width="${L.toFixed(1)}" height="${W * 2}" rx="3" class="bridge-deck"/>
+    ${planks}
+    <rect x="${(L / 2 - 6).toFixed(1)}" y="${-W}" width="12" height="${W * 2}" class="bridge-crest"/>
+    <line x1="0" y1="${-W}" x2="${L.toFixed(1)}" y2="${-W}" class="bridge-rail"/>
+    <line x1="0" y1="${W}" x2="${L.toFixed(1)}" y2="${W}" class="bridge-rail"/>
+    ${posts(-W)}${posts(W)}
+    <circle cx="0" cy="${-W}" r="4.2" class="bridge-cap"/><circle cx="0" cy="${W}" r="4.2" class="bridge-cap"/>
+    <circle cx="${L.toFixed(1)}" cy="${-W}" r="4.2" class="bridge-cap"/><circle cx="${L.toFixed(1)}" cy="${W}" r="4.2" class="bridge-cap"/>
   </g>`;
 }
 

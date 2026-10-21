@@ -987,13 +987,12 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .path-end p b { color: var(--text-strong); }
 .guide-kicker { color: var(--muted); margin-bottom: -8px; }
 
-/* v0.58: side-view red taiko bridge. */
-.bridge path { fill: none; stroke-linecap: round; }
-.bridge-deck { stroke: #a8622f; stroke-width: 5; }
-.bridge-beam { stroke: #c7342a; stroke-width: 6; }
-.bridge-rail { stroke: #e0402e; stroke-width: 4.5; }
-.bridge-rail-low { stroke-width: 3; }
-.bridge-post, .bridge-end { fill: #e0402e; }
-.bridge-end { fill: #c7342a; }
+/* v0.58: red taiko bridge along the trail, seen slightly from the side like the lesson circles. */
+.bridge-shadow { fill: rgba(0, 40, 80, .22); }
+.bridge-arch { fill: none; stroke: #c7342a; stroke-width: 7; stroke-linecap: round; }
+.bridge-deck { fill: #c98a4f; stroke: #8f5426; stroke-width: 1.2; }
+.bridge-plank { stroke: #a8692f; stroke-width: 1.2; }
+.bridge-crest { fill: #f2c08a; opacity: .45; }
+.bridge-rail { stroke: #e0402e; stroke-width: 4; stroke-linecap: round; }
+.bridge-post { fill: #b52c23; }
 .bridge-cap { fill: #ffcc33; stroke: #c98a00; stroke-width: 1; }
-.bridge-reflection { stroke: #e0402e; stroke-width: 4; opacity: .16; }

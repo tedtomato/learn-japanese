@@ -1,7 +1,7 @@
 // Practice hub: personalised review session, collections, kana charts, kanji and words learned.
 import { ITEMS } from '../course.js';
 import { HIRAGANA_ROWS, KATAKANA_ROWS, kanaId } from '../content/kana.js';
-import { app, statsBar } from '../app.js';
+import { app, statsBar, modal } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
@@ -39,6 +39,28 @@ function uniqueKanji(items, state, now) {
 
 let lastTab = 'words';
 
+const LEVEL_NAME = { strong: 'Strong', mid: 'Okay', weak: 'Fading', none: 'Not learned' };
+const DAY = 24 * 60 * 60 * 1000;
+
+// What a progress bar means, for this word: how it is measured and where this one stands.
+function explainMeter(item, state, now) {
+  const rec = state.items[item.id] || {};
+  const st = strength(rec, now);
+  const answers = (rec.right || 0) + (rec.wrong || 0);
+  const days = Math.round(((rec.due || now) - now) / DAY);
+  const next = !rec.seen ? 'after your first answer' : days <= 0 ? (now - rec.due > DAY ? 'overdue — practise it soon' : 'today') : days === 1 ? 'tomorrow' : `in ${days} days`;
+  modal(html`<div class="meter-help">
+    <p class="meter-word"><span class="jp">${item.jp}</span> · ${item.en}</p>
+    <span class="meter meter-lg s-${level(st)}"><i style="width:${Math.round(st * 100)}%"></i></span>
+    <p><b>${LEVEL_NAME[level(st)]}</b> — ${Math.round(st * 100)}% known</p>
+    <ul>
+      <li>Right <b>${rec.right || 0}</b> of <b>${answers}</b> times</li>
+      <li>Next review: <b>${next}</b></li>
+    </ul>
+    <p class="muted small">The bar shows how well you know it: half from how often you answer it right, half from how far it has moved through spaced reviews (1 day, 3 days, a week, 2 weeks, 5 weeks). It fades when a review is overdue. <b>Green</b> strong · <b>yellow</b> okay · <b>orange</b> fading.</p>
+  </div>`, [{ label: 'Got it', kind: 'secondary' }]);
+}
+
 export function renderPractice(root, focus) {
   const { state } = app;
   const now = app.now();
@@ -49,14 +71,15 @@ export function renderPractice(root, focus) {
   const words = learned.map((id) => ITEMS.get(id)).filter((i) => i.type === 'word' || i.type === 'sentence')
     .map((it) => ({ it, st: strength(state.items[it.id], now) })).sort((x, y) => x.st - y.st);
   const kanji = uniqueKanji(learned.map((id) => ITEMS.get(id)).filter((i) => ['kanji', 'radical', 'kword'].includes(i.type)), state, now);
-  const meter = (st) => html`<span class="meter s-${level(st)}"><i style="width:${Math.round(st * 100)}%"></i></span>`;
+  // The bar sits in a bigger tap area that explains it.
+  const meter = (st, id) => html`<span class="meter-hit" data-meter="${id}" role="button" aria-label="What this bar means"><span class="meter s-${level(st)}"><i style="width:${Math.round(st * 100)}%"></i></span></span>`;
   const reading = (k) => (k.type === 'kword' ? `${k.kana} · ${k.romaji}` : [k.kun, k.on].filter(Boolean)[0] || '');
 
   const lists = {
     words: () => (words.length ? html`<div class="word-list">${words.map(({ it: w, st }) => html`<button class="word-row" data-say="${speechOf(w)}">
         ${w.art ? art(w.art, 'art-row') : html`<span class="art-row"></span>`}
         <span class="word-main"><span class="word-jp">${jpItem(w, false)}</span><small>${w.romaji} · ${w.en}</small></span>
-        ${meter(st)}</button>`)}</div>`
+        ${meter(st, w.id)}</button>`)}</div>`
       : html`<p class="muted">Words you learn will be listed here, weakest first.</p>`),
     kanji: () => (kanji.length ? html`<section class="card kanji-practice">
         <span class="kanji-chip jp">漢</span>
@@ -66,7 +89,7 @@ export function renderPractice(root, focus) {
       <div class="word-list">${kanji.map(({ it: k, st }) => html`<button class="word-row" data-say="${speechOf(k)}">
         <span class="kanji-chip jp ${[...k.jp].length > 1 ? 'wide' : ''} ${[...k.jp].length > 2 ? 'xwide' : ''}">${k.jp}</span>
         <span class="word-main"><b>${k.en}</b><small>${reading(k)}</small></span>
-        ${meter(st)}</button>`)}</div>`
+        ${meter(st, k.id)}</button>`)}</div>`
       : html`<p class="muted">Kanji lessons appear along the path from the second unit.</p>`),
     kana: () => html`${kanaCard('hiragana', 'あ', 'Hiragana practice')}${kanaCard('katakana', 'ア', 'Katakana practice')}<p class="muted legend"><i class="dot strong"></i>Strong <i class="dot mid"></i>Okay <i class="dot weak"></i>Fading <i class="dot none"></i>Not learned</p>
       <h3 class="sub-title small-title">Hiragana</h3>${chart(HIRAGANA_ROWS, state, now)}
@@ -106,6 +129,7 @@ export function renderPractice(root, focus) {
 
     <h2 class="sub-title" id="sec-learned">What you've learned</h2>
     <div class="seg practice-tabs" role="tablist">${TABS.map(([id, label, n]) => html`<button role="tab" class="${id === tab ? 'on' : ''}" data-tab="${id}">${label}${n != null ? html` <small>${n}</small>` : ''}</button>`)}</div>
+    ${tab !== 'kana' ? html`<p class="muted small list-help">Weakest first. Tap a bar to see what it means.</p>` : ''}
     <div class="practice-list">${lists[tab]()}</div>
   </main>`);
 
@@ -113,6 +137,10 @@ export function renderPractice(root, focus) {
   $('.start-kanji', root)?.addEventListener('click', () => app.go('#/practice/kanji-go'));
   $$('.start-kana', root).forEach((b) => b.addEventListener('click', () => app.go(`#/practice/${b.dataset.script}-go`)));
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
+  $$('[data-meter]', root).forEach((m) => m.addEventListener('click', (e) => {
+    e.stopPropagation();
+    explainMeter(ITEMS.get(m.dataset.meter), state, now);
+  }));
   $$('[data-tab]', root).forEach((b) => b.addEventListener('click', () => {
     lastTab = b.dataset.tab;
     renderPractice(root, b.dataset.tab);

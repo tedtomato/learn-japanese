@@ -966,3 +966,12 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 /* v0.51: daily reminder setting. */
 .setting-note { display: block; font-size: 12px; font-weight: 600; }
 .btn-small { padding: 8px 14px; font-size: 13px; min-height: 0; }
+
+/* v0.52: progress bars explained. */
+.meter-hit { cursor: pointer; padding: 14px 4px; margin: -14px -4px; display: inline-flex; }
+.list-help { margin: -4px 0 0; }
+.meter-help { display: flex; flex-direction: column; gap: 10px; }
+.meter-word { font-size: 18px; font-weight: 800; color: var(--text-strong); }
+.meter-word .jp { font-size: 26px; }
+.meter-lg { width: 100%; height: 14px; }
+.meter-help ul { margin: 0; padding-left: 18px; display: flex; flex-direction: column; gap: 4px; }

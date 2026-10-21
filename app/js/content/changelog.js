@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.52', date: '21 Oct 2026', changes: [
+    'Practice: tap a progress bar to see what it means — how well you know the word, right answers, and the next review',
+  ] },
   { version: '0.51', date: '21 Oct 2026', changes: [
     'New: Daily reminder (Profile → settings). A notification once a day if you have not studied yet, with your streak and words to review. Android Chrome, app on the home screen',
   ] },

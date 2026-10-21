@@ -1,6 +1,12 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.60', date: '22 Oct 2026', changes: [
+    'Beginner focus: section 1 is all about words and phrases — no kana lessons. Later units get one short hiragana lesson each, and the rest of hiragana is at the end (Kana corner)',
+    'Katakana is no longer taught for now (words like タクシー keep their romaji)',
+    'Kanji lessons start in the very first unit',
+    'Your finished lessons are carried over to the new path',
+  ] },
   { version: '0.59', date: '22 Oct 2026', changes: [
     'Bridges replaced by simple stepping stones across the streams',
   ] },

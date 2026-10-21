@@ -91,10 +91,10 @@ export function renderPractice(root, focus) {
         <span class="kanji-chip jp ${[...k.jp].length > 1 ? 'wide' : ''} ${[...k.jp].length > 2 ? 'xwide' : ''}">${k.jp}</span>
         <span class="word-main"><b>${k.en}</b><small>${reading(k)}</small></span>
         ${meter(st, k.id)}</button>`)}</div>`
-      : html`<p class="muted">Kanji lessons appear along the path from the second unit.</p>`),
+      : html`<p class="muted">Kanji lessons appear along the path from the first unit.</p>`),
     kana: () => html`${kanaCard('hiragana', 'あ', 'Hiragana practice')}${kanaCard('katakana', 'ア', 'Katakana practice')}<p class="muted legend"><i class="dot strong"></i>Strong <i class="dot mid"></i>Okay <i class="dot weak"></i>Fading <i class="dot none"></i>Not learned</p>
       <h3 class="sub-title small-title">Hiragana</h3>${chart(HIRAGANA_ROWS, state, now)}
-      <h3 class="sub-title small-title">Katakana</h3>${chart(KATAKANA_ROWS, state, now)}`,
+      ${kanaCount('katakana') ? html`<h3 class="sub-title small-title">Katakana</h3>${chart(KATAKANA_ROWS, state, now)}` : ''}`,
   };
   // Drill cards for each script: gentle questions on the 8 weakest characters (from 3 learned).
   const kanaCount = (script) => learned.filter((id) => ITEMS.get(id).type === 'kana' && ITEMS.get(id).script === script).length;

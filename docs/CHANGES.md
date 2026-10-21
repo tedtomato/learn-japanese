@@ -3,6 +3,13 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 11 — 22 Oct 2026
+| Request | Status | Release |
+|---|---|---|
+| No katakana for now | ✅ no katakana lessons; Katakana practice/chart only shown if some were already learned | 0.60 |
+| Less hiragana until the end | ✅ none in section 1, one 4-character lesson per unit after, the rest in the Kana corner at the end | 0.60 |
+| Priority: key words, phrases and travel kanji | 🚧 kanji from unit 1 (0.60); travel-sign kanji first — 入口/出口, toilets, station, directions, east/west/south/north exits | 0.61 |
+
 ## Batch 10 — 21 Oct 2026
 | Request | Status | Release |
 |---|---|---|

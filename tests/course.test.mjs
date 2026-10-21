@@ -14,13 +14,16 @@ test('the course starts with Tokyo phrases and has no hiragana-only sections', (
   assert.equal(SECTIONS[0].id, 'tokyo');
   assert.ok(SECTIONS.every((s) => !/hiragana/i.test(s.title)));
   assert.equal(new Set(NODES.map((n) => n.id)).size, NODES.length);
-  // Reading lessons are spread through the themed units.
+  // No kana in section 1, a little hiragana per unit after that, never katakana.
+  assert.ok(SECTIONS[0].units.every((u) => !u.nodes.some((n) => n.kind === 'read')));
   const unitsWithReading = SECTIONS.flatMap((s) => s.units).filter((u) => u.nodes.some((n) => n.kind === 'read'));
-  assert.ok(unitsWithReading.length >= 8);
+  assert.ok(unitsWithReading.length >= 4);
+  const readChars = NODES.filter((n) => n.kind === 'read').flatMap((n) => n.items.map((id) => ITEMS.get(id)));
+  assert.ok(readChars.every((k) => k.script === 'hiragana'));
 });
 
-test('every word and sentence becomes readable within the course', () => {
-  const unreadable = [...ITEMS.values()].filter((i) => (i.type === 'word' || i.type === 'sentence') && !i.readAt);
+test('every hiragana word and sentence becomes readable within the course', () => {
+  const unreadable = [...ITEMS.values()].filter((i) => (i.type === 'word' || i.type === 'sentence') && !i.readAt && i.chars.every((c) => KANA.get(c).script === 'hiragana'));
   assert.deepEqual(unreadable.map((i) => i.jp.toString()), []);
 });
 

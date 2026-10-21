@@ -14,9 +14,12 @@ export const FREEZE_PRICE = 50;
 export const HEARTS_PRICE = 30; // gems for a full set of hearts
 export const MAX_FREEZES = 2;
 
+export const COURSE_VERSION = 2; // bumped when the path is rebuilt, so finished lessons are carried over
+
 export function defaultState(now = Date.now()) {
   return {
     version: 1,
+    course: COURSE_VERSION,
     createdAt: now,
     xp: 0,
     daily: {},
@@ -36,7 +39,7 @@ export function defaultState(now = Date.now()) {
 export function migrate(raw, now = Date.now()) {
   const base = defaultState(now);
   if (!raw || typeof raw !== 'object') return base;
-  return {
+  const state = {
     ...base,
     ...raw,
     streak: { ...base.streak, ...raw.streak },
@@ -48,6 +51,28 @@ export function migrate(raw, now = Date.now()) {
     items: raw.items || {},
     daily: raw.daily || {},
   };
+  if (raw.course !== COURSE_VERSION) state.nodes = carryOverNodes(state, raw.nodes || {});
+  state.course = COURSE_VERSION;
+  return state;
+}
+
+// After the path is rebuilt, node ids may point at different lessons: a lesson counts as done
+// when all its words were already learned; chests, reviews and stories keep their old state.
+function carryOverNodes(state, old) {
+  const nodes = {};
+  const unitStarted = new Set(Object.keys(old).filter((k) => old[k]?.level > 0).map((k) => k.replace(/-[^-]+$/, '')));
+  for (const n of NODES) {
+    const unitId = n.unit.id;
+    if (n.kind === 'chest' || n.kind === 'review') {
+      if (old[n.id]) nodes[n.id] = old[n.id];
+    } else if (n.kind === 'story') {
+      const lessonsDone = n.unit.nodes.filter((x) => x.kind === 'lesson').every((x) => nodes[x.id]);
+      if (lessonsDone && Object.keys(old).some((k) => k.startsWith(`${unitId}-s`) && old[k]?.level > 0)) nodes[n.id] = { level: 1 };
+    } else if (unitStarted.has(unitId) && n.items.every((id) => state.items[id])) {
+      nodes[n.id] = { level: Math.max(1, old[n.id]?.level || 0) };
+    }
+  }
+  return nodes;
 }
 
 // ---- Days (local time) ----

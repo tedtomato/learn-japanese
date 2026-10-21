@@ -191,7 +191,7 @@ export function renderLearn(root) {
           </div>
           <div class="track">${unit.nodes.map((node) => renderNode(node, n++, current, now))}</div>
         </section>`)}`)}
-    <div class="path-end">${raw(ROADBLOCK)}<p><b>${current >= n ? 'You finished every lesson!' : 'Road under construction'}</b><br>${current >= n ? 'More units are coming — keep practising.' : 'More units are on the way: katakana, kanji and conversations.'}</p></div>
+    <div class="path-end">${raw(ROADBLOCK)}<p><b>${current >= n ? 'You finished every lesson!' : 'Road under construction'}</b><br>${current >= n ? 'More units are coming — keep practising.' : 'More units are on the way: phrases, kanji and conversations.'}</p></div>
   </main>`);
 
   $$('.node', root).forEach((el) =>

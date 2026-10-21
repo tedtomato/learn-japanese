@@ -68,3 +68,14 @@ test('backups round-trip and old saves gain new fields', () => {
   assert.equal(old.settings.theme, 'dark');
   assert.equal(old.settings.sfx, true);
 });
+
+test('after a course rebuild, lessons whose words were learned stay done', () => {
+  const lesson = NODES.find((n) => n.kind === 'lesson');
+  const kanji = NODES.find((n) => n.kind === 'kanji' && n.unit === lesson.unit);
+  const items = Object.fromEntries(lesson.items.map((id) => [id, { box: 2, seen: 1, right: 1, wrong: 0, last: 0, due: 0 }]));
+  const state = migrate({ nodes: { [`${lesson.unit.id}-l9`]: { level: 2 }, [`${lesson.unit.id}-chest`]: { level: 1 } }, items });
+  assert.ok(state.nodes[lesson.id]);
+  assert.ok(state.nodes[`${lesson.unit.id}-chest`]);
+  assert.ok(!state.nodes[kanji.id], 'new kanji lesson still to do');
+  assert.deepEqual(migrate(state).nodes, state.nodes);
+});

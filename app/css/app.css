@@ -961,3 +961,4 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 .goal-choice b { color: var(--text-strong); }
 .goal-choice small { color: var(--muted); font-size: 12px; }
 .goal-choice.on { border-color: var(--blue); background: var(--blue-soft); }
+button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%; }

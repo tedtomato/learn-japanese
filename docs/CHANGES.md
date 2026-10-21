@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 10 — 21 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| Profile: Day streak opens the calendar | ✅ | 0.50 |
 | Explain the daily XP goal when tapping on it | ✅ explanation + goal picker | 0.49 |
 | Write "Section 1 – Unit 4" etc. | ✅ lesson header and path pop-up | 0.48 |
 | Use gems to buy hearts | ✅ 30 gems = full hearts; from the top-bar heart or the Out of hearts screen (lesson continues) | 0.47 |

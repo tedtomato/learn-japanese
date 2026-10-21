@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.50', date: '21 Oct 2026', changes: [
+    'Profile: tap Day streak to open your streak calendar',
+  ] },
   { version: '0.49', date: '21 Oct 2026', changes: [
     'Tap the Daily goal card to see what XP is, how you earn it, the reward for reaching the goal — and change your goal',
   ] },

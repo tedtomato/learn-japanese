@@ -9,6 +9,7 @@ import { versionLabel } from '../version.js';
 import { CHANGELOG, APP_RELEASE } from '../content/changelog.js';
 import { checkForUpdate, hardRefresh } from '../update.js';
 import { askOpenLab } from './lab.js';
+import { showStreakCalendar } from './streak.js';
 import { shareButton, wireShare } from '../share.js';
 import {
   displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, defaultState, FREEZE_PRICE, MAX_FREEZES,
@@ -60,7 +61,7 @@ export function renderProfile(root) {
     </section>
 
     <div class="stat-grid">
-      <div class="card stat-card"><span class="c-orange">${icon('flame', 26)}</span><b>${displayStreak(state, now)}</b><small>Day streak</small></div>
+      <button class="card stat-card link-card streak-tile"><span class="c-orange">${icon('flame', 26)}</span><b>${displayStreak(state, now)}</b><small>Day streak ›</small></button>
       <div class="card stat-card"><span class="c-gold">${icon('bolt', 26)}</span><b>${state.xp}</b><small>Total XP</small></div>
       <a class="card stat-card link-card" href="#/practice/kana"><span class="c-blue">${icon('kana', 26)}</span><b>${count('kana')}</b><small>Kana learned ›</small></a>
       <a class="card stat-card link-card" href="#/practice/words"><span class="c-green">${icon('word', 26)}</span><b>${count('word', 'sentence')}</b><small>Words & phrases ›</small></a>
@@ -132,6 +133,7 @@ export function renderProfile(root) {
       if (name === 'voiceRate') speak('こんにちは');
     }),
   );
+  $('.streak-tile', root).addEventListener('click', showStreakCalendar);
   $('.test-voice', root).addEventListener('click', () => {
     speak('こんにちは');
     setTimeout(() => ($('.voice-status', root).textContent = VOICE_TEXT[voiceStatus()]), 600);

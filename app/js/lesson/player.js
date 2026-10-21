@@ -103,7 +103,7 @@ function renderShell(root, s) {
         : html`<span class="pill pill-blue">Practice</span>`}
     </header>
     <div class="timer ${timed ? '' : 'off'}" aria-live="off"><span class="timer-n"></span><div class="timer-bar"><i></i></div></div>
-    ${s.node ? html`<div class="lesson-meta">${s.node.unit.title} · ${s.node.title}${s.node.kind === 'lesson' ? ` · Level ${Math.min(level + 1, MAX_LEVEL)}` : ''}</div>` : ''}
+    ${s.node ? html`<div class="lesson-meta"><b>Section ${s.node.sectionIndex + 1} – Unit ${s.node.unitIndex + 1}</b> · ${s.node.title}${s.node.kind === 'lesson' ? ` · Level ${Math.min(level + 1, MAX_LEVEL)}` : ''}</div>` : ''}
     <main class="lesson-body"></main>
     <footer class="lesson-foot"></footer>
     <div class="explain-sheet" hidden></div>

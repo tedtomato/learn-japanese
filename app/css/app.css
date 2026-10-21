@@ -945,3 +945,7 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 .hearts-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
 .hearts-row span { color: var(--disabled); }
 .hearts-row span.on { color: var(--red); animation: pop .3s ease-out both; }
+
+/* v0.48: section and unit numbers on lessons. */
+.lesson-meta b { color: var(--text-strong); font-weight: 800; }
+.pop-kicker { display: block; font-size: 12px; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; opacity: .8; }

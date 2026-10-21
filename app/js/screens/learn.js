@@ -123,7 +123,7 @@ function nodePopover(nodeEl, node, st) {
   const label = level ? (level >= MAX_LEVEL && !isReview ? 'Replay +10 XP' : 'Practice +10 XP') : 'Start +10 XP';
   const pop = document.createElement('div');
   pop.className = `popover c-${node.unit.color}`;
-  mount(pop, html`<b>${node.title}</b><span>${sub}</span>
+  mount(pop, html`<small class="pop-kicker">Section ${node.sectionIndex + 1} – Unit ${node.unitIndex + 1}</small><b>${node.title}</b><span>${sub}</span>
     <button class="btn btn-white btn-block">${hearts > 0 ? label : 'No hearts — practice to refill'}</button>`);
   nodeEl.closest('.node-wrap').append(pop);
   // Place the popover under its node but always fully on screen (nodes sit left or right on the path).

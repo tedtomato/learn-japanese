@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.48', date: '21 Oct 2026', changes: [
+    'Lessons show where you are: "Section 1 – Unit 4" at the top of the lesson and in the lesson pop-up on the path',
+  ] },
   { version: '0.47', date: '21 Oct 2026', changes: [
     'New: buy hearts with gems — tap ❤️ in the top bar, or use Refill on the Out of hearts screen to carry on the lesson (30 gems for a full set)',
   ] },

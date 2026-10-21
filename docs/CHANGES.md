@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 10 — 21 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| Write "Section 1 – Unit 4" etc. | ✅ lesson header and path pop-up | 0.48 |
 | Use gems to buy hearts | ✅ 30 gems = full hearts; from the top-bar heart or the Out of hearts screen (lesson continues) | 0.47 |
 | Animation overlay for a streak of 5 good answers in a row | ✅ at 5, 10, 15… with sound | 0.45 |
 | Hiragana still difficult — what else? | ✅ two new characters at a time with a hear-and-pick mini practice; gentle Hiragana / Katakana practice drills on the Kana tab | 0.46 |

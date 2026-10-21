@@ -14,7 +14,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Notifications | ✅ option A: daily reminder via periodic background sync (Android Chrome, installed app; quiet before 9:00 and after 22:00; only if not studied today). Option B (GitHub-sent push at a fixed time) ⏳ not done | 0.51 |
 | Profile: Day streak opens the calendar | ✅ | 0.50 |
 | Explain the daily XP goal when tapping on it | ✅ explanation + goal picker | 0.49 |
-| Write "Section 1 – Unit 4" etc. | ✅ lesson header and path pop-up | 0.48 |
+| Write "Section 1 – Unit 4" etc. | ✅ lesson header and path pop-up (0.48); unit banners and Guide (0.57) | 0.57 |
 | Use gems to buy hearts | ✅ 30 gems = full hearts; from the top-bar heart or the Out of hearts screen (lesson continues) | 0.47 |
 | Animation overlay for a streak of 5 good answers in a row | ✅ at 5, 10, 15… with sound | 0.45 |
 | Hiragana still difficult — what else? | ✅ two new characters at a time with a hear-and-pick mini practice; gentle Hiragana / Katakana practice drills on the Kana tab | 0.46 |

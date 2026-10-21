@@ -991,3 +991,4 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 /* v0.55: roadblock at the end of the path. */
 .path-end .roadblock { width: 200px; height: auto; display: block; margin: 0 auto 6px; }
 .path-end p b { color: var(--text-strong); }
+.guide-kicker { color: var(--muted); margin-bottom: -8px; }

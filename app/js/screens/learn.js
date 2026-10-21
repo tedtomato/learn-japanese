@@ -113,7 +113,7 @@ function unitGuide(unit) {
   const ids = [...new Set(unit.nodes.flatMap((n) => [...(n.items || []), ...(n.readWords || [])]))];
   const items = ids.map((id) => ITEMS.get(id)).filter((it) => it.type !== 'dialogue');
   modal(
-    html`<h2>${unit.title}</h2><p class="muted">Tap any card to hear it.</p>
+    html`<p class="unit-kicker guide-kicker">Section ${unit.nodes[0].sectionIndex + 1} – Unit ${unit.nodes[0].unitIndex + 1}</p><h2>${unit.title}</h2><p class="muted">Tap any card to hear it.</p>
     <div class="guide">${items.map((it) => html`<button class="guide-card ${it.type}" data-say="${speechOf(it)}">
       ${it.art ? art(it.art, 'art-guide') : ''}
       <span class="guide-jp fit">${jpItem(it, it.type === 'word' || it.type === 'sentence' || it.type === 'kword')}</span>
@@ -186,7 +186,7 @@ export function renderLearn(root) {
       ${section.units.map((unit, u) => html`
         <section class="unit" id="unit-${unit.id}">
           <div class="unit-banner c-${unit.color}">
-            <div><span class="unit-kicker">Unit ${u + 1}</span><h3>${unit.title}</h3><p>${unit.desc}</p></div>
+            <div><span class="unit-kicker">Section ${s + 1} – Unit ${u + 1}</span><h3>${unit.title}</h3><p>${unit.desc}</p></div>
             <button class="btn-guide" data-guide="${unit.id}">${icon('book', 18)}<span>Guide</span></button>
           </div>
           <div class="track">${unit.nodes.map((node) => renderNode(node, n++, current, now))}</div>

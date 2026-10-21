@@ -17,7 +17,7 @@ import { GRAMMAR } from '../content/grammar.js';
 import { jpItem, jpChunk, speechOf, kanaExample } from './text.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';
-import { rewardPopup } from '../fx.js';
+import { rewardPopup, comboBurst } from '../fx.js';
 import { shareButton, wireShare } from '../share.js';
 
 const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', 'すごい！', 'You got it!', 'Perfect!', 'いいね！'];
@@ -266,6 +266,12 @@ function result(root, s, ok, opts = {}) {
   if (ok) {
     s.done += 1;
     record(s, ids, 'right');
+    // Every 5 right answers in a row (that count), a short celebration.
+    s.combo = (s.combo || 0) + 1;
+    if (s.combo % 5 === 0) {
+      comboBurst(s.combo);
+      setTimeout(() => sfx('bonus'), 150);
+    }
     if (hesitated) {
       record(s, ids, 'hesitated');
       ids.forEach((id) => s.missed.add(id));
@@ -273,6 +279,7 @@ function result(root, s, ok, opts = {}) {
     sfx('correct');
   } else {
     s.mistakes += 1;
+    s.combo = 0;
     record(s, ids, 'wrong');
     ids.forEach((id) => s.missed.add(id));
     sfx('wrong');

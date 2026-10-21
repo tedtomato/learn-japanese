@@ -3,6 +3,12 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 10 — 21 Oct 2026
+| Request | Status | Release |
+|---|---|---|
+| Animation overlay for a streak of 5 good answers in a row | ✅ at 5, 10, 15… with sound | 0.45 |
+| Hiragana still difficult — what else? | 🚧 next: smaller steps (2 at a time), hear-and-pick, Kana practice | — |
+
 ## Batch 9 — 20 Oct 2026
 | Request | Status | Release |
 |---|---|---|

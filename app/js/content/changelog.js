@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.45', date: '21 Oct 2026', changes: [
+    'New: a 🔥 "5 in a row!" celebration for every 5 right answers in a row',
+  ] },
   { version: '0.44', date: '20 Oct 2026', changes: [
     'New: Kanji practice — Practice → Kanji tab → Start. Only your kanji, weakest first, no hearts lost',
   ] },

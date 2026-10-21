@@ -61,3 +61,16 @@ export function splash() {
   };
   el.addEventListener('click', close);
 }
+
+// "5 in a row!" burst over the lesson: a flame, the count and a ring of sparks; gone after ~1.6 s.
+export function comboBurst(count) {
+  document.querySelector('.combo')?.remove();
+  const el = document.createElement('div');
+  el.className = 'combo';
+  el.setAttribute('aria-live', 'polite');
+  const sparks = Array.from({ length: 12 }, (_, i) => `<i style="--a:${i * 30}deg"></i>`).join('');
+  el.innerHTML = `<div class="combo-card"><div class="combo-sparks">${sparks}</div><div class="combo-flame">🔥</div>
+    <b>${count} in a row!</b><span>${count >= 10 ? 'Unstoppable!' : 'On fire!'}</span></div>`;
+  document.body.append(el);
+  setTimeout(() => el.remove(), 1700);
+}

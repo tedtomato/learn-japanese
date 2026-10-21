@@ -11,6 +11,7 @@ export const XP_PERFECT_BONUS = 5;
 export const GEMS_LESSON = 2;
 export const GEMS_CHEST = 15;
 export const FREEZE_PRICE = 50;
+export const HEARTS_PRICE = 30; // gems for a full set of hearts
 export const MAX_FREEZES = 2;
 
 export function defaultState(now = Date.now()) {
@@ -219,4 +220,12 @@ export function importBackup(text, now = Date.now()) {
   const data = JSON.parse(text);
   if (!data || data.app !== 'hajime' || typeof data.progress !== 'object') throw new Error('This is not a Hajime backup file.');
   return migrate(data.progress, now);
+}
+
+// Gems for a full set of hearts (only when some are missing).
+export function buyHearts(state, now) {
+  if (state.gems < HEARTS_PRICE || currentHearts(state, now) >= MAX_HEARTS) return false;
+  state.gems -= HEARTS_PRICE;
+  state.hearts = { count: MAX_HEARTS, updatedAt: now };
+  return true;
 }

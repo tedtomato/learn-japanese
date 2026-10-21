@@ -11,7 +11,7 @@ import { person, nameOf } from '../characters.js';
 import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
 import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds } from './generate.js';
-import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey } from '../progress.js';
+import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey, buyHearts, HEARTS_PRICE } from '../progress.js';
 import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
 import { GRAMMAR } from '../content/grammar.js';
 import { jpItem, jpChunk, speechOf, kanaExample } from './text.js';
@@ -347,8 +347,17 @@ function showExplain(root, s, item, chosenLabel, go) {
 
 function noHearts(root, s) {
   cleanup(s);
-  modal(html`<div class="center">${mascot('sad', 100)}<h2>Out of hearts</h2><p class="muted">Hearts refill over time. A practice session earns one back right away — and practice never costs hearts.</p></div>`, [
-    { label: 'Practice to earn hearts', onClick: () => { app.inLesson = false; app.go('#/practice/go'); } },
+  const canBuy = app.state.gems >= HEARTS_PRICE;
+  modal(html`<div class="center">${mascot('sad', 100)}<h2>Out of hearts</h2><p class="muted">Hearts refill over time. A practice session earns one back right away — and practice never costs hearts.${canBuy ? '' : ` A full refill costs ${HEARTS_PRICE} gems (you have ${app.state.gems}).`}</p></div>`, [
+    // Gems refill every heart and the lesson carries on where it stopped.
+    ...(canBuy ? [{ label: html`Refill hearts · ${icon('gem', 16)} ${HEARTS_PRICE}`, onClick: () => {
+      buyHearts(app.state, app.now());
+      app.save();
+      sfx('bonus');
+      updateProgress(root, s);
+      next(root, s);
+    } }] : []),
+    { label: 'Practice to earn hearts', kind: canBuy ? 'secondary' : 'primary', onClick: () => { app.inLesson = false; app.go('#/practice/go'); } },
     { label: 'End lesson', kind: 'danger-ghost', onClick: () => quit(s) },
   ], { dismissable: false });
 }

@@ -940,3 +940,8 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 @keyframes combo-flame { from { transform: scale(1) rotate(-4deg); } to { transform: scale(1.12) rotate(4deg); } }
 @keyframes combo-spark { from { transform: rotate(var(--a)) translateY(0); opacity: 1; } to { transform: rotate(var(--a)) translateY(-120px); opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .combo-card { animation: combo-fade 1.7s both; } .combo-flame, .combo-sparks i { animation: none; } @keyframes combo-fade { 0%, 100% { opacity: 0; } 10%, 80% { opacity: 1; } } }
+
+/* v0.47: hearts sheet. */
+.hearts-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
+.hearts-row span { color: var(--disabled); }
+.hearts-row span.on { color: var(--red); animation: pop .3s ease-out both; }

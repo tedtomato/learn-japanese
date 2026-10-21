@@ -11,6 +11,7 @@ import { initUpdates } from './update.js';
 import { splash } from './fx.js';
 import { mascot } from './mascot.js';
 import { showStreakCalendar } from './screens/streak.js';
+import { showHearts } from './screens/hearts.js';
 
 const TABS = [
   ['learn', 'Learn', 'learn'],
@@ -78,6 +79,7 @@ function route() {
 // The flame in the top bar opens the streak calendar on every screen.
 document.addEventListener('click', (e) => {
   if (e.target.closest('.stat-streak')) showStreakCalendar();
+  if (e.target.closest('.stat-hearts') && !document.body.classList.contains('in-lesson')) showHearts();
 });
 
 document.addEventListener('keydown', (e) => {

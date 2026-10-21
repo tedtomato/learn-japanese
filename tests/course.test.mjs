@@ -71,3 +71,17 @@ test('extras data is complete, with data corrections applied', () => {
   assert.equal(byId[49].romaji, 'Yakkyoku');
 });
 
+
+test('gems buy a full set of hearts, only when some are missing and gems suffice', async () => {
+  const { defaultState, buyHearts, loseHeart, currentHearts, HEARTS_PRICE, MAX_HEARTS } = await import('../app/js/progress.js');
+  const now = Date.now();
+  const s = defaultState(now);
+  s.gems = HEARTS_PRICE + 5;
+  assert.equal(buyHearts(s, now), false, 'full hearts: nothing to buy');
+  loseHeart(s, now); loseHeart(s, now);
+  assert.equal(buyHearts(s, now), true);
+  assert.equal(currentHearts(s, now), MAX_HEARTS);
+  assert.equal(s.gems, 5);
+  loseHeart(s, now);
+  assert.equal(buyHearts(s, now), false, 'not enough gems');
+});

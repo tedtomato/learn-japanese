@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.47', date: '21 Oct 2026', changes: [
+    'New: buy hearts with gems — tap ❤️ in the top bar, or use Refill on the Out of hearts screen to carry on the lesson (30 gems for a full set)',
+  ] },
   { version: '0.46', date: '21 Oct 2026', changes: [
     'Hiragana in smaller steps: two new characters at a time, practised together (hear it, pick it) before the next two',
     'New: Hiragana practice and Katakana practice on Practice → Kana — your weakest characters, 3 choices, hints, no countdown',

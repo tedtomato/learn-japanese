@@ -8,7 +8,7 @@ Releases are listed in the in-app change log (Profile → App version).
 |---|---|---|
 | No katakana for now | ✅ no katakana lessons; Katakana practice/chart only shown if some were already learned | 0.60 |
 | Less hiragana until the end | ✅ none in section 1, one 4-character lesson per unit after, the rest in the Kana corner at the end | 0.60 |
-| Priority: key words, phrases and travel kanji | 🚧 kanji from unit 1 (0.60); travel-sign kanji first — 入口/出口, toilets, station, directions, east/west/south/north exits | 0.61 |
+| Priority: key words, phrases and travel kanji | ✅ kanji from unit 1 (0.60); travel-sign kanji all in section 1 — 入口/出口, 男/女/お手洗い, 電車/駅, 右/左, 東西南北 exits, 円; radical-only lessons dropped (radicals still shown in each kanji's parts) | 0.61 |
 
 ## Batch 10 — 21 Oct 2026
 | Request | Status | Release |

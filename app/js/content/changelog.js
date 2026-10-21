@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.61', date: '22 Oct 2026', changes: [
+    'Travel kanji first: 入口 / 出口 (entrance / exit), 男 / 女 and お手洗い (toilets), 電車 and 駅 (trains), 右 / 左 (right / left), 東口 西口 南口 北口 (station exits), 円 (yen)',
+    'New kanji: 手 右 左 東 西 南 北 — all signs in section 1, everyday kanji after',
+  ] },
   { version: '0.60', date: '22 Oct 2026', changes: [
     'Beginner focus: section 1 is all about words and phrases — no kana lessons. Later units get one short hiragana lesson each, and the rest of hiragana is at the end (Kana corner)',
     'Katakana is no longer taught for now (words like タクシー keep their romaji)',

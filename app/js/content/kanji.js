@@ -72,6 +72,23 @@ export const KANJI = [
   { k: '子', meaning: 'child', on: 'shi', kun: 'ko', parts: [['子', 'child']], story: 'A baby wrapped up with its arms out.',
     words: [['男の子', 'おとこのこ', 'otoko no ko', 'boy (man + child)'], ['女の子', 'おんなのこ', 'onna no ko', 'girl (woman + child)']] },
 
+  { k: '手', meaning: 'hand', on: 'shu', kun: 'te', parts: [['手', 'hand']], story: 'A hand: fingers spread across the top, the wrist curling down.',
+    words: [['お手洗い', 'おてあらい', 'otearai', 'toilet (hand-washing place)'], ['手', 'て', 'te', 'hand']] },
+
+  { k: '右', meaning: 'right', on: 'u, yuu', kun: 'migi', parts: [['ナ', 'hand'], ['口', 'mouth']], story: 'A hand bringing food to the mouth — the right hand you eat with.',
+    words: [['右', 'みぎ', 'migi', 'right'], ['右側', 'みぎがわ', 'migigawa', 'right side']] },
+  { k: '左', meaning: 'left', on: 'sa', kun: 'hidari', parts: [['ナ', 'hand'], ['工', 'tool']], story: 'A hand holding a tool steady while the right hand works — the left hand.',
+    words: [['左', 'ひだり', 'hidari', 'left'], ['左側', 'ひだりがわ', 'hidarigawa', 'left side']] },
+
+  { k: '東', meaning: 'east', on: 'tou', kun: 'higashi', parts: [['木', 'tree'], ['日', 'sun']], story: 'The sun rising behind a tree — that way is east.',
+    words: [['東口', 'ひがしぐち', 'higashiguchi', 'east exit'], ['東京', 'とうきょう', 'toukyou', 'Tokyo (eastern capital)']] },
+  { k: '西', meaning: 'west', on: 'sei, sai', kun: 'nishi', parts: [['西', 'bird in its nest']], story: 'A bird settling into its nest as the sun sets in the west.',
+    words: [['西口', 'にしぐち', 'nishiguchi', 'west exit'], ['西', 'にし', 'nishi', 'west']] },
+  { k: '南', meaning: 'south', on: 'nan', kun: 'minami', parts: [['十', 'cross'], ['冂', 'hut'], ['¥', 'yen sign (looks like it)']], story: 'A hut with a ¥ sign inside — rich and sunny, down south.',
+    words: [['南口', 'みなみぐち', 'minamiguchi', 'south exit'], ['南', 'みなみ', 'minami', 'south']] },
+  { k: '北', meaning: 'north', on: 'hoku', kun: 'kita', parts: [['北', 'two people back to back']], story: 'Two people sitting back to back, turning away from the cold north wind.',
+    words: [['北口', 'きたぐち', 'kitaguchi', 'north exit'], ['北海道', 'ほっかいどう', 'hokkaidou', 'Hokkaido (northern island)']] },
+
   { k: '電', meaning: 'electricity', on: 'den', kun: '', parts: [['雨', 'rain'], ['田', 'field'], ['乚', 'tail']], story: 'Rain over a field — and a lightning bolt with a tail. Electricity!',
     words: [['電車', 'でんしゃ', 'densha', 'train (electric car)'], ['電話', 'でんわ', 'denwa', 'phone']] },
   { k: '車', meaning: 'car, vehicle', on: 'sha', kun: 'kuruma', parts: [['車', 'cart']], story: 'A cart seen from above: the body in the middle, an axle through it.',
@@ -87,19 +104,19 @@ export const KANJI = [
     words: [['何時', 'なんじ', 'nanji', 'what time'], ['時', 'とき', 'toki', 'time']] },
 ];
 
-// Lessons in teaching order: radical groups first, then kanji in threes.
+// Lessons in teaching order: the signs a traveller meets first (exits, toilets, stations,
+// directions, prices), then everyday kanji. Radicals are explained inside each kanji's parts.
 export const KANJI_LESSONS = [
-  { title: 'Radicals: person, mouth, tree', radicals: ['人', '口', '木'] },
   { title: 'Kanji: Japan', kanji: ['日', '本', '人'] },
-  { title: 'Kanji: in & out', kanji: ['口', '入', '出'] },
-  { title: 'Radicals: water, sun, field', radicals: ['氵', '日', '田'] },
-  { title: 'Kanji: trees', kanji: ['木', '林', '森'] },
-  { title: 'Kanji: water & sake', kanji: ['水', '酒', '海'] },
-  { title: 'Kanji: one, two, three', kanji: ['一', '二', '三'] },
-  { title: 'Radicals: power, woman, child', radicals: ['力', '女', '子'] },
-  { title: 'Kanji: big & small', kanji: ['大', '小', '中'] },
-  { title: 'Kanji: school', kanji: ['先', '生', '学'] },
-  { title: 'Kanji: boys & girls', kanji: ['男', '女', '子'] },
+  { title: 'Kanji: entrance & exit', kanji: ['口', '入', '出'] },
+  { title: 'Kanji: toilets', kanji: ['男', '女', '手'] },
   { title: 'Kanji: trains', kanji: ['電', '車', '駅'] },
-  { title: 'Kanji: time & money', kanji: ['円', '何', '時'] },
+  { title: 'Kanji: left & right', kanji: ['右', '左', '中'] },
+  { title: 'Kanji: station exits', kanji: ['東', '西', '南', '北'] },
+  { title: 'Kanji: money & time', kanji: ['円', '何', '時'] },
+  { title: 'Kanji: one, two, three', kanji: ['一', '二', '三'] },
+  { title: 'Kanji: water & sake', kanji: ['水', '酒', '海'] },
+  { title: 'Kanji: big & small', kanji: ['大', '小', '子'] },
+  { title: 'Kanji: school', kanji: ['先', '生', '学'] },
+  { title: 'Kanji: trees', kanji: ['木', '林', '森'] },
 ];

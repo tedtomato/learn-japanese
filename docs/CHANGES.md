@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 10 — 21 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| Notifications | ✅ option A: daily reminder via periodic background sync (Android Chrome, installed app; quiet before 9:00 and after 22:00; only if not studied today). Option B (GitHub-sent push at a fixed time) ⏳ not done | 0.51 |
 | Profile: Day streak opens the calendar | ✅ | 0.50 |
 | Explain the daily XP goal when tapping on it | ✅ explanation + goal picker | 0.49 |
 | Write "Section 1 – Unit 4" etc. | ✅ lesson header and path pop-up | 0.48 |

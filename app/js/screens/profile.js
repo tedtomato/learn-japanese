@@ -10,6 +10,7 @@ import { CHANGELOG, APP_RELEASE } from '../content/changelog.js';
 import { checkForUpdate, hardRefresh } from '../update.js';
 import { askOpenLab } from './lab.js';
 import { showStreakCalendar } from './streak.js';
+import { enableReminders, disableReminders } from '../reminders.js';
 import { shareButton, wireShare } from '../share.js';
 import {
   displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, defaultState, FREEZE_PRICE, MAX_FREEZES,
@@ -92,6 +93,8 @@ export function renderProfile(root) {
       <div class="setting"><span>Speed challenge</span>${seg('speed', s.speed !== false, [[true, 'On'], [false, 'Off']])}</div>
       <div class="setting"><span>Speaking tasks</span>${seg('speaking', s.speaking !== false, [[true, 'On'], [false, 'Off']])}</div>
       <div class="setting"><span>Sound effects</span>${seg('sfx', s.sfx, [[true, 'On'], [false, 'Off']])}</div>
+      <div class="setting"><span>Daily reminder<small class="muted setting-note">${s.reminders ? 'A nudge once a day if you have not studied' : 'Off'}</small></span>
+        <button class="btn btn-white btn-small reminder-btn">${s.reminders ? 'Turn off' : 'Turn on'}</button></div>
       <div class="setting"><span>Romaji help</span>${seg('romaji', s.romaji || 'auto', [['auto', 'Auto'], ['always', 'Always']])}</div>
       <div class="setting"><span>Voice speed</span>${seg('voiceRate', s.voiceRate, [[0.7, 'Slow'], [0.85, 'Normal'], [1, 'Fast']])}</div>
       <div class="setting column"><span>Japanese voice</span><small class="muted voice-status">${VOICE_TEXT[voiceStatus()]}</small>
@@ -134,6 +137,23 @@ export function renderProfile(root) {
     }),
   );
   $('.streak-tile', root).addEventListener('click', showStreakCalendar);
+  $('.reminder-btn', root).addEventListener('click', async () => {
+    if (state.settings.reminders) {
+      await disableReminders();
+      state.settings.reminders = false;
+      app.save();
+      return renderProfile(root);
+    }
+    const result = await enableReminders();
+    if (result === 'denied') return toast('Notifications are blocked — allow them for Hajime in your phone settings.');
+    if (result === 'unsupported') {
+      return modal(html`<div class="center"><h2>Daily reminder</h2><p class="muted">Reminders need the app on your home screen in Chrome on Android. Open the browser menu → <b>Add to Home screen</b> (or Install app), then open Hajime from its icon and turn this on again.</p></div>`, [{ label: 'OK', kind: 'secondary' }]);
+    }
+    state.settings.reminders = true;
+    app.save();
+    toast('Daily reminder on 🔔');
+    renderProfile(root);
+  });
   $('.test-voice', root).addEventListener('click', () => {
     speak('こんにちは');
     setTimeout(() => ($('.voice-status', root).textContent = VOICE_TEXT[voiceStatus()]), 600);

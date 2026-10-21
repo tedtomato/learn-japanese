@@ -48,3 +48,36 @@ self.addEventListener('fetch', (event) => {
   }
   event.respondWith(caches.match(request, { cacheName: CACHE, ignoreSearch: true }).then((res) => res || fetch(request)));
 });
+
+// ---- Daily reminder ----
+// The phone wakes the worker about once a day (periodic background sync, Android Chrome with the app on
+// the home screen). If reminders are on and the learner has not studied today, show a nudge — not at night.
+const dayKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+
+async function remind() {
+  const res = await caches.open('reminder-note').then((c) => c.match('./__reminder.json'));
+  if (!res) return;
+  const note = await res.json();
+  const now = new Date();
+  if (!note.on || note.lastDay === dayKey(now) || now.getHours() < 9 || now.getHours() >= 22) return;
+  const body = note.streak > 0
+    ? `Keep your ${note.streak}-day streak going 🔥${note.due ? ` — ${note.due} words to review` : ''}`
+    : note.due ? `${note.due} words are ready to review. Two minutes is enough!` : 'A quick lesson keeps your Japanese fresh.';
+  try {
+    await self.registration.showNotification('Time for Japanese! はじめ！', {
+      body, icon: './icons/icon-192.png', badge: './icons/icon-192.png', tag: 'daily-reminder', renotify: false,
+    });
+  } catch { /* notifications blocked since */ }
+}
+
+self.addEventListener('periodicsync', (event) => {
+  if (event.tag === 'daily-reminder') event.waitUntil(remind());
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  event.waitUntil(self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
+    const open = list.find((c) => 'focus' in c);
+    return open ? open.focus() : self.clients.openWindow('./');
+  }));
+});

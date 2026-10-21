@@ -3,6 +3,7 @@ import { loadState, saveState, currentHearts, displayStreak, studiedToday, STORA
 import { html, mount, $ } from './dom.js';
 import { icon } from './icons.js';
 import { setSfx, setVoiceRate } from './audio.js';
+import { writeReminderNote } from './reminders.js';
 
 const storage = (() => {
   try {
@@ -31,6 +32,7 @@ export const app = {
   save() {
     saveState(storage, app.state, keyFor(app.testMode));
     applySettings();
+    if (!app.testMode) writeReminderNote(app.state, app.now());
   },
   setTestMode(on) {
     app.save();

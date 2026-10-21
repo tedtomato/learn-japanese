@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.51', date: '21 Oct 2026', changes: [
+    'New: Daily reminder (Profile → settings). A notification once a day if you have not studied yet, with your streak and words to review. Android Chrome, app on the home screen',
+  ] },
   { version: '0.50', date: '21 Oct 2026', changes: [
     'Profile: tap Day streak to open your streak calendar',
   ] },

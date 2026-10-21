@@ -1,6 +1,6 @@
 // Garden scenery for the learning path: a stepping-stone trail between the lesson circles and
 // little bonsai trees, zen stones, bushes and lanterns beside it, with pebbles and moss along its edges,
-// and small streams crossed by red garden bridges.
+// and small streams crossed on stepping stones.
 import { raw } from './dom.js';
 
 const DECOR = {
@@ -49,8 +49,9 @@ export function drawTrails(root) {
     svg.setAttribute('height', box.height);
     const rows = [...track.querySelectorAll('.node-row')];
     const streams = rows.flatMap((row, i) => (row.classList.contains('stream-after') && pts[i + 1] ? [(pts[i].y + pts[i + 1].y) / 2] : []));
-    svg.innerHTML = streams.map((y) => streamPath(y, box.width)).join('')
-      + `<path d="${d}" class="trail-bed"/><path d="${d}" class="trail-stones"/>`;
+    // Water over the trail, so where they meet only the stepping stones show.
+    svg.innerHTML = `<path d="${d}" class="trail-bed"/><path d="${d}" class="trail-stones"/>`
+      + streams.map((y) => streamPath(y, box.width)).join('');
     const bed = svg.querySelector('.trail-bed');
     svg.insertAdjacentHTML('beforeend', edging(bed, box.width, pts, streams) + streams.map((y) => bridge(bed, y)).join(''));
     track.prepend(svg);
@@ -110,9 +111,7 @@ function streamPath(y, width) {
   return `<g class="stream"><path d="${d}" class="stream-bank"/><path d="${d}" class="stream-water"/><path d="${d}" class="stream-ripple"/></g>`;
 }
 
-// A red arched garden bridge (taiko-bashi) laid along the trail over the stream, seen from the same
-// slight front angle as the lesson circles: wooden deck on top, its red edge showing below, red rails
-// standing up on posts, gold caps, and a light band where the arch is highest.
+// Where the trail meets a stream, it crosses on flat stepping stones in the water.
 function bridge(path, y) {
   const len = path.getTotalLength();
   let lo = 0;
@@ -122,32 +121,16 @@ function bridge(path, y) {
     if (path.getPointAtLength(mid).y < y) lo = mid;
     else hi = mid;
   }
-  const a = path.getPointAtLength(Math.max(0, lo - 32));
-  const b = path.getPointAtLength(Math.min(len, lo + 32));
-  const L = Math.hypot(b.x - a.x, b.y - a.y) || 1;
-  const angle = (Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI;
-  // Local frame: u runs along the bridge (0 → L), v across it (deck from -14 to 14). The side that
-  // faces right on screen shows the red arch, as when the bridge is seen slightly from the side.
-  const flip = Math.cos((angle * Math.PI) / 180 + Math.PI / 2) < 0 ? -1 : 1;
-  const W = 14;
-  const S = W * flip; // the visible side
-  const planks = Array.from({ length: 7 }, (_, i) => {
-    const u = (L * (i + 1)) / 8;
-    return `<line x1="${u.toFixed(1)}" y1="${-W}" x2="${u.toFixed(1)}" y2="${W}" class="bridge-plank"/>`;
+  const sizes = [[11, 7], [13, 8], [12, 7.5]];
+  const stones = [-16, 0, 16].map((d, i) => {
+    const p = path.getPointAtLength(Math.min(len, Math.max(0, lo + d)));
+    const [rx, ry] = sizes[i];
+    const x = p.x + (i === 1 ? 3 : -2);
+    return `<ellipse cx="${x.toFixed(1)}" cy="${(p.y + 3).toFixed(1)}" rx="${rx + 3}" ry="${ry + 2}" class="stone-ripple"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${(p.y + 2).toFixed(1)}" rx="${rx}" ry="${ry}" class="stone-side"/>
+      <ellipse cx="${x.toFixed(1)}" cy="${p.y.toFixed(1)}" rx="${rx - 1}" ry="${ry - 1.5}" class="stone-top"/>`;
   }).join('');
-  const posts = (v) => Array.from({ length: 5 }, (_, i) => `<circle cx="${((L * i) / 4).toFixed(1)}" cy="${v}" r="2.6" class="bridge-post"/>`).join('');
-  return `<g class="bridge" transform="translate(${a.x.toFixed(1)} ${a.y.toFixed(1)}) rotate(${angle.toFixed(1)})">
-    <ellipse cx="${(L / 2).toFixed(1)}" cy="0" rx="${(L / 2 + 6).toFixed(1)}" ry="${W + 8}" class="bridge-shadow"/>
-    <path d="M0 ${S} Q${(L / 2).toFixed(1)} ${S + 24 * flip} ${L.toFixed(1)} ${S}" class="bridge-arch"/>
-    <rect x="0" y="${-W}" width="${L.toFixed(1)}" height="${W * 2}" rx="3" class="bridge-deck"/>
-    ${planks}
-    <rect x="${(L / 2 - 6).toFixed(1)}" y="${-W}" width="12" height="${W * 2}" class="bridge-crest"/>
-    <line x1="0" y1="${-W}" x2="${L.toFixed(1)}" y2="${-W}" class="bridge-rail"/>
-    <line x1="0" y1="${W}" x2="${L.toFixed(1)}" y2="${W}" class="bridge-rail"/>
-    ${posts(-W)}${posts(W)}
-    <circle cx="0" cy="${-W}" r="4.2" class="bridge-cap"/><circle cx="0" cy="${W}" r="4.2" class="bridge-cap"/>
-    <circle cx="${L.toFixed(1)}" cy="${-W}" r="4.2" class="bridge-cap"/><circle cx="${L.toFixed(1)}" cy="${W}" r="4.2" class="bridge-cap"/>
-  </g>`;
+  return `<g class="bridge">${stones}</g>`;
 }
 
 // End of the path: a roadblock with cones and a 工事中 ("under construction") sign.

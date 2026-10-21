@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.62', date: '22 Oct 2026', changes: [
+    'Fixed "Tap what you hear": no more trick tiles that sound the same as the answer (を + げんき sounds just like おげんき), and same-sounding answers are accepted',
+  ] },
   { version: '0.61', date: '22 Oct 2026', changes: [
     'Travel kanji first: 入口 / 出口 (entrance / exit), 男 / 女 and お手洗い (toilets), 電車 and 駅 (trains), 右 / 左 (right / left), 東口 西口 南口 北口 (station exits), 円 (yen)',
     'New kanji: 手 右 左 東 西 南 北 — all signs in section 1, everyday kanji after',

@@ -10,7 +10,7 @@ import { mascot } from '../mascot.js';
 import { person, nameOf } from '../characters.js';
 import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
-import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds } from './generate.js';
+import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds, romajiOfChunk } from './generate.js';
 import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey, buyHearts, HEARTS_PRICE } from '../progress.js';
 import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
 import { GRAMMAR } from '../content/grammar.js';
@@ -681,8 +681,10 @@ function renderBuild(root, s) {
     skip: ex.mode === 'audio' || ex.mode === 'fast' ? { label: "Can't listen now", onSkip: () => skipListening(root, s, 'listen') } : null,
     onCheck: () => {
       const given = placed.map((i) => ex.tiles[i]);
+      // When listening, tiles that sound the same as the answer count too.
+      const sound = (chunks) => chunks.map(romajiOfChunk).join('').replace(/ /g, '');
       const ok = jpTiles
-        ? given.join('') === ex.answer.join('')
+        ? given.join('') === ex.answer.join('') || ((ex.mode === 'audio' || ex.mode === 'fast') && given.every(romajiOfChunk) && sound(given) === sound(ex.answer))
         : (ex.accept || [ex.answer.join(' ')]).some((a) => norm(a) === norm(given.join(' ')));
       line.classList.add(ok ? 'right' : 'wrong');
       sayAs(root, s.speaker, speechOf(item));

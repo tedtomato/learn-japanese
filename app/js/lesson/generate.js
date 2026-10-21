@@ -131,11 +131,15 @@ function choiceOptions(item, answerKind, ctx) {
   return shuffle([...options, item.id], ctx.rng);
 }
 
-function tileDistractors(answer, candidates, count, ctx) {
+// With `bySound`, Japanese tiles that sound like part of an answer chunk are left out: を next to
+// げんき sounds exactly like おげんき, so a listener could not tell them apart.
+function tileDistractors(answer, candidates, count, ctx, bySound = false) {
   const lower = new Set(answer.map((w) => w.toLowerCase()));
+  const sounds = bySound ? answer.map(romajiOfChunk).filter(Boolean) : [];
+  const clash = (r) => r && sounds.some((a) => a.startsWith(r) || a.endsWith(r) || r.startsWith(a) || r.endsWith(a));
   const pool = candidates.filter((w) => {
     const key = w.toLowerCase();
-    if (lower.has(key)) return false;
+    if (lower.has(key) || clash(romajiOfChunk(w).replace(/ /g, ''))) return false;
     lower.add(key);
     return true;
   });
@@ -185,7 +189,7 @@ function buildExercise(item, type, ctx) {
     case 'fast': {
       const answer = item.jp;
       const others = sentencePool(ctx).flatMap((s) => s.jp);
-      const extra = tileDistractors(answer, [...others, ...JP_FILLERS], 3, ctx);
+      const extra = tileDistractors(answer, [...others, ...JP_FILLERS], 3, ctx, true);
       const mode = { 'build-audio': 'audio', fast: 'fast', 'build-en2jp': 'en2jp' }[type];
       const tiles = shuffle([...answer, ...extra], ctx.rng);
       const tileRomaji = base.hint ? tiles.map(romajiOfChunk) : null;

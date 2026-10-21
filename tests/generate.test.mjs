@@ -209,3 +209,15 @@ test('kana practice: weakest characters of one script, gentle questions', async 
   const { exercises } = generatePractice(state, { itemIds: ids, now: T0, gentle: true });
   for (const e of exercises.filter((x) => x.type === 'choice')) assert.ok(e.options.length <= 3 && e.untimed);
 });
+
+test('listening tiles never offer a sound-alike of the answer (を + げんき for おげんき)', () => {
+  const item = [...ITEMS.values()].find((i) => i.type === 'sentence' && i.jp.includes('おげんき'));
+  const node = NODES.find((n) => n.kind === 'lesson' && n.items.includes(item.id));
+  const state = defaultState(T0);
+  for (let seed = 0; seed < 30; seed++) {
+    const { exercises } = generateLesson(node, state, { rng: makeRng(seed), now: T0, level: 2, canListen: true });
+    for (const e of exercises.filter((x) => x.type === 'build' && x.itemId === item.id && ['audio', 'fast', 'en2jp'].includes(x.mode))) {
+      assert.ok(!e.tiles.includes('を') && !e.tiles.includes('げんき'), e.tiles.join(' '));
+    }
+  }
+});

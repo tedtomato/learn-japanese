@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.63', date: '24 Oct 2026', changes: [
+    'Start screen: "Tested by Geraldine" added to the credits',
+  ] },
   { version: '0.62', date: '22 Oct 2026', changes: [
     'Fixed "Tap what you hear": no more trick tiles that sound the same as the answer (を + げんき sounds just like おげんき), and same-sounding answers are accepted',
   ] },

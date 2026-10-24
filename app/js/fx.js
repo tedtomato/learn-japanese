@@ -48,7 +48,8 @@ export function splash() {
   mount(el, html`<div class="splash-inner">${mascot('cheer', 150)}<h1>Hajime <span class="jp">はじめ</span></h1><p>Learn Japanese, one day at a time</p>
       <button class="btn btn-white splash-go">Tap to start</button></div>
     <div class="splash-credits"><span class="beta">Beta version - Oct 26 · v${APP_RELEASE}</span>
-      <span class="made">Created by Seb and Claude AI ${raw(CLAUDE_SPARK)}</span></div>`);
+      <span class="made">Created by Seb and Claude AI ${raw(CLAUDE_SPARK)}</span>
+      <span class="tested">Tested by Geraldine</span></div>`);
   document.body.append(el);
   let closed = false;
   const close = () => {

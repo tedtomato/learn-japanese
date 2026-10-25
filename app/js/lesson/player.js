@@ -308,6 +308,9 @@ function result(root, s, ok, opts = {}) {
   const badges = [];
   if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} Speed bonus</span>`);
   if (hesitated) badges.push(html`<span class="pill pill-orange">${ex.hinted ? 'Used a hint' : 'A bit slow'} — we'll practise it again</span>`);
+  // How sure were you? A lucky guess comes back like a slow answer; a slow answer you knew does not.
+  const sureable = ok && ids.length && !ex.hinted && ex.type !== 'intro' && ex.type !== 'match';
+  if (sureable) badges.push(html`<button class="pill pill-sure" data-sure="${hesitated ? 'knew' : 'guessed'}">${hesitated ? '😎 I knew it' : '🤔 I guessed'}</button>`);
   mount(foot, html`<div class="foot-inner feedback">
     <div class="fb-text">
       <span class="fb-icon">${icon(ok ? 'check' : 'close', 26)}</span>
@@ -326,6 +329,22 @@ function result(root, s, ok, opts = {}) {
     else next(root, s);
   };
   $('.check', foot).addEventListener('click', go);
+  $('.pill-sure', foot)?.addEventListener('click', (e) => {
+    const knew = e.currentTarget.dataset.sure === 'knew';
+    for (const id of ids) {
+      const r = s.results.get(id);
+      if (!r) continue;
+      r.hesitated = Math.max(0, (r.hesitated || 0) + (knew ? -1 : 1));
+      // Still missed if it was wrong or slow elsewhere in this lesson.
+      if (knew && !r.wrong && !r.hesitated) s.missed.delete(id);
+      if (!knew) s.missed.add(id);
+    }
+    $$('.fb-badges .pill-orange', foot).forEach((p) => p.remove());
+    e.currentTarget.replaceWith(Object.assign(document.createElement('span'), {
+      className: 'pill pill-orange',
+      textContent: knew ? '👍 No extra practice' : '👍 It will come back soon',
+    }));
+  });
   $('.explain', foot)?.addEventListener('click', () => {
     showExplain(root, s, item, ok ? null : opts.chosenLabel, go);
   });

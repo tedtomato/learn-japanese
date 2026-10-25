@@ -3,6 +3,15 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 13 — 26 Oct 2026
+| Request | Status | Release |
+|---|---|---|
+| How sure are you? (confidence rating) | ✅ "🤔 I guessed" after a right answer (comes back like a slow one); "😎 I knew it" undoes "a bit slow" | 0.69 |
+| Guess first, then learn | ⏳ | |
+| Recall without options (type the answer) | ⏳ | |
+| Keyword mnemonics for words | ⏳ | |
+| Substitution drills (patterns: ___ をください…) | ⏳ | |
+
 ## Batch 12 — 25 Oct 2026
 | Request | Status | Release |
 |---|---|---|

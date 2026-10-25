@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.69', date: '26 Oct 2026', changes: [
+    'How sure were you? After a right answer, tap "🤔 I guessed" and it comes back for practice — or "😎 I knew it" when you were only slow, and it won\'t',
+  ] },
   { version: '0.68', date: '26 Oct 2026', changes: [
     'End-of-lesson review no longer says "the exercises you missed" when you only took a little longer — and its countdown is gone',
   ] },

@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 12 — 25 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| "Let's correct the exercises you missed" shown when nothing was missed (only slow) | ✅ wording depends on what happened (all right but slow / missed / both); countdown hidden on that screen | 0.68 |
 | Mistakes review | ✅ "Fix your mistakes" card on Practice (words got wrong and not answered right since, 8 per session); all fixed = +5 gems | 0.64 |
 | Listening mode for walks (hands-free audio) | ✅ Practice → Listening mode: English → pause to answer → Japanese ×2; weakest 20 words/phrases; screen kept awake; pause / next; 10 phrases = +5 XP (daily goal + streak) | 0.65 |
 | Sign spotter (real-looking signs: 出口, 男/女, 東口, 円…) | ✅ Practice → Sign spotter: 19 travel situations (yellow station signs, blue/street signs, wooden toilet plaques, order buttons, vertical menu, price tags); unlocked from 3 situations; answers count as kanji reviews; +1 gem each | 0.66 |

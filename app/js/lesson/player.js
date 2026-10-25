@@ -217,12 +217,18 @@ function next(root, s) {
 
 function retryIntro(root, s) {
   s.retryRound = true;
-  stopTimer(s);
+  startTimer(root, s, null); // no countdown on this screen
   const retry = generateRetry([...s.missed], app.state);
   s.queue.push(...retry);
   s.total += retry.length + 1;
+  // Slow answers and hints come back too, but they were not mistakes: say so.
+  const wrong = [...s.missed].filter((id) => s.results.get(id)?.wrong).length;
+  const slow = s.missed.size - wrong;
+  const text = !wrong ? 'You got everything right! Let\'s go over the ones that took you a little longer.'
+    : slow ? 'Let\'s go over the ones you missed, and the ones that took you a little longer.'
+      : 'Let\'s correct the exercises you missed!';
   mount($('.lesson-body', root), html`<div class="interlude">
-    <div class="bubble bubble-lg">Let's correct the exercises you missed!</div>
+    <div class="bubble bubble-lg">${text}</div>
     ${mascot('cheer', 150)}</div>`);
   footer(root, s, { canCheck: true, text: 'Continue', onCheck: () => { s.done += 1; next(root, s); } });
 }

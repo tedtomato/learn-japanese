@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.68', date: '26 Oct 2026', changes: [
+    'End-of-lesson review no longer says "the exercises you missed" when you only took a little longer — and its countdown is gone',
+  ] },
   { version: '0.67', date: '25 Oct 2026', changes: [
     'New: Missions (Practice) — real situations as a chat: meet your host Mika, ask the way in Shinjuku, order at a café, pay at a konbini. Pick what to say; wrong picks explain why. Up to 3 stars, +10 XP, gems for new stars',
   ] },

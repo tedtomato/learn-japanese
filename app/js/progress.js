@@ -239,6 +239,12 @@ export function completeListening(state, heard, now) {
   return xp;
 }
 
+// Sign spotter: each answer is a review of the sign's kanji; +1 gem per right answer.
+export function recordSigns(state, results, gems, now) {
+  for (const [id, r] of results) if (state.items[id]) state.items[id] = review(state.items[id], r, now);
+  state.gems += gems;
+}
+
 // ---- Saving on the device ----
 export function loadState(storage, now = Date.now(), key = STORAGE_KEY) {
   try {

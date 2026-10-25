@@ -99,3 +99,13 @@ test('every fun fact has a fair quiz question', async () => {
     assert.equal(new Set([e.a, ...e.wrong].map((x) => x.toLowerCase())).size, 4, `fact ${f.id}: four different answers`);
   }
 });
+
+test('sign spotter situations only need kanji the course teaches, and every answer sign uses them', async () => {
+  const { SIGN_SCENES } = await import('../app/js/content/signs.js');
+  for (const s of SIGN_SCENES) {
+    for (const k of s.need) assert.ok(ITEMS.has(`kj-${k}`), `${s.id}: ${k}`);
+    const kanji = [...s.answer.t].filter((c) => ITEMS.has(`kj-${c}`));
+    assert.ok(s.id === 'yen' || kanji.every((c) => s.need.includes(c)), `${s.id}: answer uses unlisted kanji`);
+    assert.ok(s.wrong.every((w) => w.t !== s.answer.t));
+  }
+});

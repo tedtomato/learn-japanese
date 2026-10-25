@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.66', date: '25 Oct 2026', changes: [
+    'New: Sign spotter (Practice) — real-looking Japanese signs: find the exit (出口), the women\'s toilet (女), the east exit (東口), a large beer (大), a table for two (二人)… Only uses kanji you have learned, +1 gem per right answer',
+  ] },
   { version: '0.65', date: '25 Oct 2026', changes: [
     'New: Listening mode (Practice → Listening mode) — hands-free for walks: hear the English, say it in Japanese, then Mika says it twice. Weakest phrases first; 10 phrases = +5 XP',
   ] },

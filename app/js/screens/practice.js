@@ -12,6 +12,7 @@ import { learnedItemIds, dueItemIds, mistakeIds } from '../progress.js';
 import { KINDS, emojiFor, phraseSpeech, tidbitCard } from '../tidbits.js';
 import { wireShare } from '../share.js';
 import { QUIZ_MIN_FACTS } from './factquiz.js';
+import { signScenes, SIGNS_MIN } from './signs.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 
 const level = (st) => (st === 0 ? 'none' : st < 0.34 ? 'weak' : st < 0.67 ? 'mid' : 'strong');
@@ -60,6 +61,15 @@ function explainMeter(item, state, now) {
     </ul>
     <p class="muted small">The bar shows how well you know it: mostly how often you answer it right, plus how well it has stuck between reviews (full once you remember it after a few days). Reviews then space out — 1 day, 3 days, a week, 2 weeks, 5 weeks — and the bar fades if one is overdue. <b>Green</b> strong · <b>yellow</b> okay · <b>orange</b> fading.</p>
   </div>`, [{ label: 'Got it', kind: 'secondary' }]);
+}
+
+// Travel situations answered with real-looking signs, from the first kanji learned.
+function signsCard(state) {
+  const n = signScenes(state).length;
+  if (!Object.keys(state.items).some((id) => id.startsWith('kj-'))) return '';
+  return html`<a class="card kanji-practice" href="${n >= SIGNS_MIN ? '#/signs' : '#/practice'}"><span class="kanji-chip">${art('🪧', 'art-row')}</span>
+    <div><b>Sign spotter</b><small>${n >= SIGNS_MIN ? 'Exits, toilets, station signs — tap the right one · +1 gem each' : 'Learn a few more travel kanji (exits, toilets…) to unlock'}</small></div>
+    <span class="btn btn-secondary" ${n >= SIGNS_MIN ? '' : 'aria-disabled="true"'}>${n >= SIGNS_MIN ? 'Play' : '🔒'}</span></a>`;
 }
 
 // Words got wrong lately, until answered right again; fixing them all earns 5 gems.
@@ -134,6 +144,7 @@ export function renderPractice(root, focus) {
     </section>
 
     ${mistakesCard(state)}
+    ${signsCard(state)}
     ${words.length >= 3 ? html`<a class="card kanji-practice listen-entry" href="#/listen"><span class="kanji-chip">${art('🎧', 'art-row')}</span>
       <div><b>Listening mode</b><small>Hands-free, for walks: hear the English, say it in Japanese, repeat</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
 

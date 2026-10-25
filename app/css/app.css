@@ -1003,3 +1003,24 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .listen-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .listen-controls .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .listen-done { align-items: center; text-align: center; padding-top: 60px; }
+
+/* Sign spotter: signs styled like the real thing in Japan. */
+.sign-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.sign-grid.n3 .sign:last-child:nth-child(odd) { grid-column: 1 / -1; justify-self: center; width: calc(50% - 6px); }
+.sign { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; min-height: 104px; padding: 12px 8px; border-radius: 10px; font: inherit; cursor: pointer; transition: transform .1s; box-shadow: 0 4px 0 rgba(0,0,0,.35); }
+.sign:active { transform: translateY(2px); }
+.sign-text { font-size: 38px; font-weight: 800; line-height: 1.1; }
+.sign-meaning { font-size: 13px; font-weight: 700; opacity: .85; }
+.sign-art { width: 40px; height: 40px; }
+.sign-yellow { background: #ffd400; color: #111; border: 3px solid #111; }
+.sign-blue { background: #1d4f91; color: #fff; border: 3px solid #fff; outline: 2px solid #1d4f91; }
+.sign-street { background: #0b5fa5; color: #fff; border: 3px solid #fff; outline: 2px solid #0b5fa5; border-radius: 6px; }
+.sign-wood { background: linear-gradient(90deg, #7a4a24, #9a6332 40%, #7a4a24); color: #fff6e6; border: 3px solid #4f2e14; }
+.sign-menu { background: #f6ecd6; color: #2a1a0c; border: 2px solid #c9b48a; min-height: 150px; }
+.sign-menu .sign-text { writing-mode: vertical-rl; font-family: serif; }
+.sign-button { background: #fff; color: #222; border: 3px solid #d0d4d8; border-radius: 16px; }
+.sign-tag { background: #fffbe6; color: #c1121f; border: 2px dashed #c1121f; }
+.sign-tag .sign-text { font-size: 28px; }
+.sign.right { outline: 4px solid var(--green); outline-offset: 3px; }
+.sign.wrong { outline: 4px solid var(--red); outline-offset: 3px; opacity: .8; }
+.sign:disabled { cursor: default; }

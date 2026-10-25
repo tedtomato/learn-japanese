@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.70', date: '26 Oct 2026', changes: [
+    'Guess first: up to two new words per lesson start with a quick guess of their meaning — not scored, no hearts, no countdown. Guessing first (even wrong) helps you remember',
+  ] },
   { version: '0.69', date: '26 Oct 2026', changes: [
     'How sure were you? After a right answer, tap "🤔 I guessed" and it comes back for practice — or "😎 I knew it" when you were only slow, and it won\'t',
   ] },

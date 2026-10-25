@@ -1060,3 +1060,8 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 
 /* "How sure were you?" after a right answer */
 .pill-sure { font: inherit; font-weight: 800; font-size: 13px; letter-spacing: .05em; text-transform: uppercase; background: transparent; color: var(--text-strong); border: 2px solid var(--border); cursor: pointer; }
+
+/* Guess first */
+.guess-help { margin: -4px 0 4px; }
+.lesson-foot.guess { background: var(--blue-soft); border-color: transparent; color: var(--blue-text); animation: rise .2s ease-out; }
+.option.guess-miss { border-color: var(--blue); opacity: .7; }

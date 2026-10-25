@@ -31,6 +31,8 @@ function checkExercise(ex, where) {
     }
   } else if (ex.type === 'match') {
     assert.ok(ex.pairs.length >= 3, where);
+  } else if (ex.type === 'guess') {
+    assert.ok(ex.options.includes(ITEMS.get(ex.itemId).en) && new Set(ex.options).size === ex.options.length, where);
   } else assert.fail(`${where}: unknown type ${ex.type}`);
 }
 
@@ -219,5 +221,18 @@ test('listening tiles never offer a sound-alike of the answer (を + げんき f
     for (const e of exercises.filter((x) => x.type === 'build' && x.itemId === item.id && ['audio', 'fast', 'en2jp'].includes(x.mode))) {
       assert.ok(!e.tiles.includes('を') && !e.tiles.includes('げんき'), e.tiles.join(' '));
     }
+  }
+});
+
+test('new words are guessed first (not scored), at most two per lesson, right before their card', () => {
+  const node = NODES.find((n) => n.kind === 'lesson');
+  const { exercises } = generateLesson(node, defaultState(T0), { rng: makeRng(2), now: T0, level: 0 });
+  const guesses = exercises.filter((e) => e.type === 'guess');
+  assert.ok(guesses.length >= 1 && guesses.length <= 2);
+  for (const g of guesses) {
+    const i = exercises.indexOf(g);
+    assert.deepEqual([exercises[i + 1].type, exercises[i + 1].itemId], ['intro', g.itemId]);
+    assert.ok(g.options.includes(ITEMS.get(g.itemId).en) && g.options.length === 3);
+    assert.deepEqual(g.itemIds, []);
   }
 });

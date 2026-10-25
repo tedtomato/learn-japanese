@@ -7,7 +7,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Request | Status | Release |
 |---|---|---|
 | How sure are you? (confidence rating) | ✅ "🤔 I guessed" after a right answer (comes back like a slow one); "😎 I knew it" undoes "a bit slow" | 0.69 |
-| Guess first, then learn | ⏳ | |
+| Guess first, then learn | ✅ up to 2 new words per lesson: hear/see it, guess the meaning from 3 (not scored), then its card | 0.70 |
 | Recall without options (type the answer) | ⏳ | |
 | Keyword mnemonics for words | ⏳ | |
 | Substitution drills (patterns: ___ をください…) | ⏳ | |

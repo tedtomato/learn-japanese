@@ -284,10 +284,20 @@ export function generateLesson(node, state, opts = {}) {
   const head = [];
   const rest = [];
   const pair = [];
+  let guesses = 0;
   for (const id of targets) {
     const item = ITEMS.get(id);
     const gentleKana = ctx.gentle && item.type === 'kana' && isNew(state, id);
     if (isNew(state, id)) {
+      // Guess first: a new word's meaning is guessed (not scored) before it is taught — trying, even
+      // wrongly, makes the answer stick better. Two per lesson at most.
+      if (item.type === 'word' && !isReview && guesses < 2) {
+        const others = [...new Set(targets.map((t) => ITEMS.get(t)).filter((w) => w.type === 'word' && w.en !== item.en).map((w) => w.en))];
+        if (others.length >= 2) {
+          guesses += 1;
+          head.push({ type: 'guess', itemId: id, itemIds: [], options: shuffle([item.en, ...shuffle(others, rng).slice(0, 2)], rng) });
+        }
+      }
       head.push({ type: 'intro', itemId: id, itemIds: [], hint: ctx.romajiHint(item) || item.type === 'kana' });
       if (hasStrokes(item) && item.type !== 'radical') head.push({ type: 'trace', itemId: id, itemIds: [id], kind: 'trace' });
       // Learn one, check one: a two-choice question on the new character before the next one.

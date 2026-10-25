@@ -597,6 +597,43 @@ function optionHtml(opt, ex) {
   return html`<span class="opt-label fit ${isKana ? 'jp-lg' : ''} ${isKanji ? 'opt-kanji' : ''}">${isKana || isKanji ? html`<span class="jp">${opt.jp}</span>` : jpItem(opt, ex.hint)}</span>`;
 }
 
+// Guess first: hear and see a new word, guess what it means. Not scored, no countdown, no hearts.
+function renderGuess(root, s) {
+  const ex = s.current;
+  const item = ITEMS.get(ex.itemId);
+  startTimer(root, s, null);
+  mount($('.lesson-body', root), html`<p class="instruction">New word — have a guess!</p>
+    ${speakerBubble(s, html`<button class="say-inline" aria-label="Play">${icon('speaker', 22)}</button><span class="jp-lg guess-word">${jpItem(item, true)}</span>`)}
+    <p class="muted small guess-help">No pressure: guessing first, even wrong, helps you remember it.</p>
+    <div class="options list">${ex.options.map((en, i) => html`<button class="option" data-i="${i}"><span class="key">${i + 1}</span><span class="opt-label">${en}</span></button>`)}</div>`);
+  const say = () => sayAs(root, s.speaker, speechOf(item));
+  $('.say-inline', root).addEventListener('click', say);
+  say();
+  const pickGuess = (btn) => {
+    if (s.checked) return;
+    s.checked = true;
+    const ok = ex.options[Number(btn.dataset.i)] === item.en;
+    $$('.option', root).forEach((b) => {
+      b.disabled = true;
+      if (ex.options[Number(b.dataset.i)] === item.en) b.classList.add('right');
+      else if (b === btn) b.classList.add('guess-miss');
+    });
+    sfx(ok ? 'correct' : 'tap');
+    const foot = $('.lesson-foot', root);
+    foot.className = `lesson-foot ${ok ? 'good' : 'guess'}`;
+    mount(foot, html`<div class="foot-inner feedback"><div class="fb-text"><span class="fb-icon">${ok ? icon('check', 26) : '💡'}</span>
+      <div><b>${ok ? 'Good guess!' : 'Nice try!'}</b><p class="fb-meaning">${item.jp} · ${item.romaji} = ${item.en}</p></div></div>
+      <div class="fb-actions"><button class="btn btn-primary check">Continue</button></div></div>`);
+    $('.check', foot).addEventListener('click', () => { s.done += 1; next(root, s); });
+  };
+  $$('.option', root).forEach((b) => b.addEventListener('click', () => pickGuess(b)));
+  s.keyHandler = (key) => {
+    const b = $$('.option', root)[Number(key) - 1];
+    if (b) pickGuess(b);
+  };
+  footer(root, s, { text: 'Pick a guess' });
+}
+
 function renderChoice(root, s) {
   const ex = s.current;
   const item = ITEMS.get(ex.itemId);
@@ -917,7 +954,7 @@ function renderTidbit(root, s) {
 }
 
 const RENDERERS = {
-  intro: renderIntro, trace: renderTrace, choice: renderChoice, build: renderBuild, match: renderMatch,
+  guess: renderGuess, intro: renderIntro, trace: renderTrace, choice: renderChoice, build: renderBuild, match: renderMatch,
   speak: renderSpeak, grammar: renderGrammar, dialogue: renderDialogue, tidbit: renderTidbit,
 };
 

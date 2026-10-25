@@ -10,7 +10,7 @@ import { mascot } from '../mascot.js';
 import { person, nameOf } from '../characters.js';
 import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
-import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds, romajiOfChunk } from './generate.js';
+import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds, romajiOfChunk, romajiMatch } from './generate.js';
 import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey, buyHearts, HEARTS_PRICE } from '../progress.js';
 import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
 import { GRAMMAR } from '../content/grammar.js';
@@ -597,6 +597,45 @@ function optionHtml(opt, ex) {
   return html`<span class="opt-label fit ${isKana ? 'jp-lg' : ''} ${isKanji ? 'opt-kanji' : ''}">${isKana || isKanji ? html`<span class="jp">${opt.jp}</span>` : jpItem(opt, ex.hint)}</span>`;
 }
 
+// Recall without options: the meaning is shown, the learner types the word in romaji. Typing is
+// harder than picking, so a miss costs no heart.
+function renderRecall(root, s) {
+  const ex = s.current;
+  const item = ITEMS.get(ex.itemId);
+  mount($('.lesson-body', root), html`<p class="instruction">How do you say this in Japanese?</p>
+    ${speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`)}
+    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type it in romaji, e.g. arigatou" aria-label="Your answer in romaji">
+    <p class="muted small recall-help">From memory — no choices this time! Spaces and long vowels (ou / o) don't matter.</p>`);
+  startTimer(root, s, null);
+  const input = $('.recall-input', root);
+  const check = () => {
+    if (s.checked || !input.value.trim()) return;
+    const match = romajiMatch(input.value, item.romaji);
+    input.disabled = true;
+    input.classList.add(match ? 'right' : 'wrong');
+    sayAs(root, s.speaker, speechOf(item));
+    result(root, s, !!match, { answerText: `${item.jp} · ${item.romaji}`, meaning: match === 'close' ? `Almost! It's spelled ${item.romaji} (${item.jp})` : match ? `${item.jp} · ${item.romaji} = ${item.en}` : `means "${item.en}"`, chosenLabel: input.value, noHeart: true, timing: null });
+  };
+  input.addEventListener('input', () => setCheckEnabled(root, !!input.value.trim()));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      check();
+    }
+  });
+  footer(root, s, {
+    onCheck: check,
+    skip: { label: "I don't know", onSkip: () => {
+      if (s.checked) return;
+      input.disabled = true;
+      sayAs(root, s.speaker, speechOf(item));
+      result(root, s, false, { answerText: `${item.jp} · ${item.romaji}`, meaning: `means "${item.en}"`, noHeart: true, timing: null });
+    } },
+  });
+  setTimeout(() => input.focus(), 250);
+}
+
 // Guess first: hear and see a new word, guess what it means. Not scored, no countdown, no hearts.
 function renderGuess(root, s) {
   const ex = s.current;
@@ -954,7 +993,7 @@ function renderTidbit(root, s) {
 }
 
 const RENDERERS = {
-  guess: renderGuess, intro: renderIntro, trace: renderTrace, choice: renderChoice, build: renderBuild, match: renderMatch,
+  recall: renderRecall, guess: renderGuess, intro: renderIntro, trace: renderTrace, choice: renderChoice, build: renderBuild, match: renderMatch,
   speak: renderSpeak, grammar: renderGrammar, dialogue: renderDialogue, tidbit: renderTidbit,
 };
 

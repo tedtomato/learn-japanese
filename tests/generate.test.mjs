@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { generateLesson, generatePractice, generateRetry, makeRng, knownChars, canRead, kanjiPracticeIds } from '../app/js/lesson/generate.js';
+import { generateLesson, generatePractice, generateRetry, makeRng, knownChars, canRead, kanjiPracticeIds, romajiMatch } from '../app/js/lesson/generate.js';
 import { NODES, ITEMS } from '../app/js/course.js';
 import { defaultState, completeSession } from '../app/js/progress.js';
 import { nextTidbit } from '../app/js/tidbits.js';
@@ -31,6 +31,8 @@ function checkExercise(ex, where) {
     }
   } else if (ex.type === 'match') {
     assert.ok(ex.pairs.length >= 3, where);
+  } else if (ex.type === 'recall') {
+    assert.equal(ITEMS.get(ex.itemId).type, 'word', where);
   } else if (ex.type === 'guess') {
     assert.ok(ex.options.includes(ITEMS.get(ex.itemId).en) && new Set(ex.options).size === ex.options.length, where);
   } else assert.fail(`${where}: unknown type ${ex.type}`);
@@ -235,4 +237,16 @@ test('new words are guessed first (not scored), at most two per lesson, right be
     assert.ok(g.options.includes(ITEMS.get(g.itemId).en) && g.options.length === 3);
     assert.deepEqual(g.itemIds, []);
   }
+});
+
+test('recall: from level 1 a known word is typed from memory, with lenient romaji', () => {
+  const node = NODES.find((n) => n.kind === 'lesson');
+  const state = defaultState(T0);
+  for (const id of node.items) state.items[id] = { box: 1, seen: 1, right: 1, wrong: 0, last: T0, due: T0 };
+  const { exercises } = generateLesson(node, state, { rng: makeRng(4), now: T0, level: 1 });
+  assert.equal(exercises.filter((e) => e.type === 'recall').length, 1);
+  assert.equal(romajiMatch('Arigatō', 'arigatou'), 'exact');
+  assert.equal(romajiMatch('kon nichi wa', 'konnichiwa'), 'exact');
+  assert.equal(romajiMatch('konichiwa', 'konnichiwa'), 'close');
+  assert.equal(romajiMatch('mizo', 'mizu'), false);
 });

@@ -265,6 +265,33 @@ function pickReview(state, exclude, count, rng, now, { peeks = false } = {}) {
 const hasStrokes = (item) => (item.type === 'kana' || item.type === 'kanji' || item.type === 'radical') && STROKES[item.jp];
 
 // opts: level, rng, now, canListen, canSpeak
+// Recall without options: the meaning is shown and the learner types the word in romaji — producing
+// a word makes it stick better than picking it. Only words already met, and short enough to type.
+function recallExercises(ids, state, count, rng) {
+  const words = [...new Set(ids)].map((id) => ITEMS.get(id))
+    .filter((it) => it?.type === 'word' && !isNew(state, it.id) && it.romaji.replace(/[^a-z]/g, '').length <= 14);
+  return shuffle(words, rng).slice(0, count).map((it) => ({ type: 'recall', itemId: it.id, itemIds: [it.id], kind: 'recall' }));
+}
+
+// Lenient romaji check: case, spaces, punctuation, apostrophes and long-vowel spellings (ou / oo / ō,
+// uu / ū…) don't matter. One slip in a longer word counts as "almost" (still right).
+const squash = (r) => r.toLowerCase().normalize('NFD').replace(/[\u0304\u0302]/g, '').replace(/[^a-z]/g, '')
+  .replace(/ou/g, 'o').replace(/([aeiou])\1+/g, '$1');
+function editDistance(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) {
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  }
+  return d[a.length][b.length];
+}
+export function romajiMatch(typed, answer) {
+  const [t, a] = [squash(typed), squash(answer)];
+  if (!t) return false;
+  if (t === a) return 'exact';
+  return a.length >= 5 && editDistance(t, a) === 1 ? 'close' : false;
+}
+
 export function generateLesson(node, state, opts = {}) {
   const { rng = makeRng(), now = Date.now() } = opts;
   let level = opts.level || 0;
@@ -341,6 +368,8 @@ export function generateLesson(node, state, opts = {}) {
     scored += 1;
     n += 1;
   }
+  // Recall without options, from the second level: type a word you have met (one, two in reviews).
+  if (level >= 1 && !readMode) rest.push(...recallExercises([...targets, ...reviewIds], state, isReview ? 2 : 1, rng));
   const body = spread(rest, rng);
   if (match) body.splice(Math.max(1, Math.floor(body.length * 0.6)), 0, match);
 
@@ -399,6 +428,7 @@ export function generatePractice(state, { rng = makeRng(), now = Date.now(), ite
     list.push(buildExercise(item, questionType(item, 'hard', ctx), ctx));
     n += 1;
   }
+  if (!gentle) list.push(...recallExercises(ids, state, 1, rng));
   const body = spread(list, rng);
   const match = matchExercise(ids, ctx);
   if (match) body.splice(Math.floor(body.length / 2), 0, match);

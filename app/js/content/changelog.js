@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.71', date: '26 Oct 2026', changes: [
+    'New exercise: say it from memory — see the meaning, type the word in romaji (no choices). From level 2 of a lesson and in practice. Spaces and long vowels don\'t matter, a small slip counts as "almost", and a miss costs no heart',
+  ] },
   { version: '0.70', date: '26 Oct 2026', changes: [
     'Guess first: up to two new words per lesson start with a quick guess of their meaning — not scored, no hearts, no countdown. Guessing first (even wrong) helps you remember',
   ] },

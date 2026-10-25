@@ -122,3 +122,8 @@ test('every mission belongs to a real unit, and every step has a right reply and
     }
   }
 });
+
+test('every word has a memory trick', () => {
+  const missing = [...ITEMS.values()].filter((i) => i.type === 'word' && !i.memory).map((i) => i.id);
+  assert.deepEqual(missing, []);
+});

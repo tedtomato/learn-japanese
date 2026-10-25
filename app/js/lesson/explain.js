@@ -41,6 +41,7 @@ export function explainCards(item, { chosenLabel } = {}) {
     const ex = examplesWith(item.jp, item.id);
     cards.push({ chip: item.jp, body: html`<p class="ex-lead">${jpItem(item, true)} means <b>“${item.en}”</b>.</p>
       ${item.note ? html`<p>${item.note}</p>` : ''}
+      ${item.memory ? html`<p class="intro-clue">🧠 <b>Memory trick:</b> ${item.memory}</p>` : ''}
       ${ex.length ? html`<p class="muted small">Used in:</p><ul>${ex.map((s) => html`<li><span class="jp">${s.text}</span> — ${s.en}</li>`)}</ul>` : ''}` });
   } else if (item.type === 'kana') {
     cards.push({ chip: item.jp, body: html`<p class="ex-lead"><span class="jp ex-key">${item.jp}</span> is read <b>“${item.romaji}”</b>.</p>

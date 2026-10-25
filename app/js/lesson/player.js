@@ -508,6 +508,13 @@ function wirePlay(root, s, extra = {}) {
 }
 
 // ---------- Exercise renderers ----------
+// The word's memory trick as a hint, when asked to come up with the Japanese (using it counts like a
+// slow answer, so the word comes back sooner).
+function memoryHint(item, show) {
+  if (!show || item.type !== 'word' || !item.memory) return '';
+  return html`<div class="kana-hint"><button class="link hint-btn">💡 Hint</button><div class="hint-body" hidden><p class="intro-clue">🧠 ${item.memory}</p></div></div>`;
+}
+
 function introHtml(item, hint) {
   switch (item.type) {
     case 'kana':
@@ -530,6 +537,7 @@ function introHtml(item, hint) {
         <div class="${size} fit">${jpItem(item, hint)}</div>
         ${!hint ? html`<div class="intro-romaji">${item.romaji}</div>` : ''}
         <div class="intro-en">${item.en}</div>
+        ${item.memory ? html`<p class="intro-clue">🧠 <b>Memory trick:</b> ${item.memory}</p>` : ''}
         ${item.note ? html`<p class="intro-hint">💡 ${item.note}</p>` : ''}`;
     }
   }
@@ -605,7 +613,13 @@ function renderRecall(root, s) {
   mount($('.lesson-body', root), html`<p class="instruction">How do you say this in Japanese?</p>
     ${speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`)}
     <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type it in romaji, e.g. arigatou" aria-label="Your answer in romaji">
-    <p class="muted small recall-help">From memory — no choices this time! Spaces and long vowels (ou / o) don't matter.</p>`);
+    <p class="muted small recall-help">From memory — no choices this time! Spaces and long vowels (ou / o) don't matter.</p>
+    ${memoryHint(item, true)}`);
+  $('.hint-btn', root)?.addEventListener('click', (e) => {
+    e.currentTarget.remove();
+    $('.hint-body', root).hidden = false;
+    ex.hinted = true;
+  });
   startTimer(root, s, null);
   const input = $('.recall-input', root);
   const check = () => {
@@ -680,6 +694,7 @@ function renderChoice(root, s) {
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
     ${promptFor(root, s, ex, item)}
     ${item.type === 'kana' && item.example ? html`<div class="kana-hint"><button class="link hint-btn">💡 Hint</button><div class="hint-body" hidden>${kanaExample(item, { asHint: true })}</div></div>` : ''}
+    ${memoryHint(item, ex.kind === 'en2jp' || ex.kind === 'jp2en')}
     <div class="options ${grid ? 'grid' : 'list'}">${ex.options.map((id, i) => html`<button class="option" data-id="${id}"><span class="key">${i + 1}</span>${optionHtml(ITEMS.get(id), ex)}</button>`)}</div>`);
   wirePlay(root, s);
   // The memory word as a hint; using it brings the character back sooner (like a hesitation).

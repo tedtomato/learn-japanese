@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.72', date: '26 Oct 2026', changes: [
+    'Memory tricks for every word: a sound-alike picture on new-word cards (こんにちは — "Connie, chee-wah!" you wave hello to Connie 👋), in Explain, and as a 💡 Hint on "how do you say…" questions',
+  ] },
   { version: '0.71', date: '26 Oct 2026', changes: [
     'New exercise: say it from memory — see the meaning, type the word in romaji (no choices). From level 2 of a lesson and in practice. Spaces and long vowels don\'t matter, a small slip counts as "almost", and a miss costs no heart',
   ] },

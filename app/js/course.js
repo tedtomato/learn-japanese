@@ -7,6 +7,7 @@ import { KANA, kanaId } from './content/kana.js';
 import { SECTIONS_DATA, DIALOGUES } from './content/units.js';
 import { KANJI, RADICALS, KANJI_LESSONS } from './content/kanji.js';
 import { KANJI as PEEK_KANJI } from './content/extras.js';
+import { MNEMONICS } from './content/mnemonics.js';
 
 export const ITEMS = new Map();
 export const MAX_LEVEL = 5;
@@ -36,7 +37,8 @@ function kanaItem(ch) {
 }
 
 function wordItem([jp, romaji, en, art, extra = {}], ctx) {
-  return addItem({ id: `w-${slug(romaji)}`, type: 'word', jp, romaji, en, art, note: extra.note, alt: extra.alt || [], unit: ctx.unit, section: ctx.section, chars: kanaChars(jp) });
+  const id = `w-${slug(romaji)}`;
+  return addItem({ id, type: 'word', jp, romaji, en, art, note: extra.note, memory: MNEMONICS[id], alt: extra.alt || [], unit: ctx.unit, section: ctx.section, chars: kanaChars(jp) });
 }
 
 function sentenceItem({ jp, romaji, en, alt = [] }, ctx) {

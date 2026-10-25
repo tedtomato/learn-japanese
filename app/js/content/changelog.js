@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.74', date: '26 Oct 2026', changes: [
+    'New word / kanji cards use the full screen width: the character stands above the card, and kanji parts (雨 + 田 + 乚 = 電) fit on one line',
+  ] },
   { version: '0.73', date: '26 Oct 2026', changes: [
     'New: Pattern drills (Practice) — one travel sentence, many words: ___ をください, ___ はどこですか, ___ でおねがいします, ___ はいくらですか, ___ がすきです. Fill the blank, then say the whole sentence from memory. Uses only words you know, +1 gem per right answer',
   ] },

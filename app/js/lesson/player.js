@@ -398,9 +398,10 @@ function skipListening(root, s, kind) {
 }
 
 // ---------- Characters & audio ----------
-function speakerBubble(s, content, { big = false } = {}) {
-  return html`<div class="prompt prompt-person">
-    <div class="person-wrap" data-who="${s.speaker}">${person(s.speaker, big ? 110 : 92)}<span class="person-name">${nameOf(s.speaker)}</span></div>
+// stacked: the character stands above the bubble (tall new-item cards get the full width).
+function speakerBubble(s, content, { big = false, stacked = false } = {}) {
+  return html`<div class="prompt prompt-person ${stacked ? 'stacked' : ''}">
+    <div class="person-wrap" data-who="${s.speaker}">${person(s.speaker, stacked ? 64 : big ? 110 : 92)}<span class="person-name">${nameOf(s.speaker)}</span></div>
     <div class="bubble bubble-lg">${content}</div></div>`;
 }
 
@@ -549,7 +550,7 @@ function renderIntro(root, s) {
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-gold">${icon('star', 14)} ${kindLabel}</span></p>
     ${speakerBubble(s, html`<div class="intro-card">${introHtml(item, s.current.hint)}
       <div class="intro-play"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 24)}</button>
-      <button class="speaker small-speaker slow" data-play="${speechOf(item)}" data-slow="1" aria-label="Play slowly">${icon('turtle', 22)}</button></div></div>`)}`);
+      <button class="speaker small-speaker slow" data-play="${speechOf(item)}" data-slow="1" aria-label="Play slowly">${icon('turtle', 22)}</button></div></div>`, { stacked: true })}`);
   wirePlay(root, s);
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   sayAs(root, s.speaker, speechOf(item));

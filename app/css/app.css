@@ -1081,3 +1081,16 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .drill-opt .opt-label { display: flex; flex-direction: column; align-items: flex-start; }
 .drill-opt .opt-label small { font-size: 13px; color: var(--muted); font-weight: 700; }
 .mission-card b.jp { font-size: 16px; }
+
+/* New-item cards: the character stands above, the card uses the full width. */
+.prompt-person.stacked { flex-direction: column; align-items: stretch; gap: 6px; }
+.prompt-person.stacked .person-wrap { flex-direction: row; align-self: flex-start; gap: 6px; align-items: flex-end; }
+.prompt-person.stacked .person-name { margin: 0 0 6px; }
+.prompt-person.stacked .bubble-lg { width: 100%; }
+.prompt-person.stacked .intro-card { padding: 16px 8px; }
+.prompt-person.stacked .bubble-lg { padding: 12px 12px; }
+.prompt-person.stacked .intro-card { padding: 8px 4px; }
+.prompt-person.stacked .parts { gap: 5px; flex-wrap: nowrap; }
+.prompt-person.stacked .part { padding: 4px 7px; min-width: 0; }
+.prompt-person.stacked .part small { font-size: 11px; white-space: nowrap; }
+.prompt-person.stacked .op { font-size: 16px; }

@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 13 — 26 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| Kanji card squeezed to the right, parts wrapping (電 screenshot) | ✅ character stacked above new-item cards; card full width; compact parts row | 0.74 |
 | How sure are you? (confidence rating) | ✅ "🤔 I guessed" after a right answer (comes back like a slow one); "😎 I knew it" undoes "a bit slow" | 0.69 |
 | Guess first, then learn | ✅ up to 2 new words per lesson: hear/see it, guess the meaning from 3 (not scored), then its card | 0.70 |
 | Recall without options (type the answer) | ✅ type the romaji for a known word (1 per lesson from level 2, 2 in reviews, 1 in practice); lenient (case, spaces, ou/o, ō); one-letter slip = "almost"; "I don't know"; no heart lost | 0.71 |

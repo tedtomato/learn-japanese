@@ -6,7 +6,6 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 11 — 22 Oct 2026
 | Request | Status | Release |
 |---|---|---|
-| Add "Tested by Geraldine" to the startup screen | ✅ under "Created by Seb and Claude AI" | 0.63 |
 | Tap what you hear: を + げんき marked wrong though it sounds like おげんき | ✅ sound-alike tiles never offered; same-sounding answers accepted | 0.62 |
 | No katakana for now | ✅ no katakana lessons; Katakana practice/chart only shown if some were already learned | 0.60 |
 | Less hiragana until the end | ✅ none in section 1, one 4-character lesson per unit after, the rest in the Kana corner at the end | 0.60 |

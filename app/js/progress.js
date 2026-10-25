@@ -227,6 +227,18 @@ export function completeSession(state, { node, mode, results, mistakes, now, bon
   return { xp, gems, perfect, levelUp, goalReached, mistakesCleared, streakExtended: streak.extended, streak: state.streak.count };
 }
 
+// Hands-free listening: XP (counts for the daily goal and streak) once enough phrases were heard.
+export const LISTEN_XP_MIN = 10;
+export function completeListening(state, heard, now) {
+  if (heard < LISTEN_XP_MIN) return 0;
+  const xp = 5;
+  state.xp += xp;
+  const today = dayKey(now);
+  state.daily[today] = (state.daily[today] || 0) + xp;
+  recordActivity(state, now);
+  return xp;
+}
+
 // ---- Saving on the device ----
 export function loadState(storage, now = Date.now(), key = STORAGE_KEY) {
   try {

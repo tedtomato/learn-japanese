@@ -991,3 +991,15 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .stone-ripple { fill: none; stroke: rgba(255, 255, 255, .4); stroke-width: 1.2; }
 .stone-side { fill: #7d8890; }
 .stone-top { fill: #b5bec4; }
+
+/* Listening mode */
+.listen { display: flex; flex-direction: column; gap: 14px; }
+.listen-card { display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 24px 18px; min-height: 300px; }
+.listen-art { min-height: 72px; }
+.listen-en { font-size: 24px; font-weight: 800; color: var(--text-strong); }
+.listen-step { color: var(--blue); font-weight: 800; }
+.listen-jp .jp { font-size: 30px; font-weight: 700; color: var(--text-strong); }
+.listen-jp small { color: var(--muted); font-size: 16px; font-weight: 700; }
+.listen-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.listen-controls .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.listen-done { align-items: center; text-align: center; padding-top: 60px; }

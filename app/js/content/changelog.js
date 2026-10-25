@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.65', date: '25 Oct 2026', changes: [
+    'New: Listening mode (Practice → Listening mode) — hands-free for walks: hear the English, say it in Japanese, then Mika says it twice. Weakest phrases first; 10 phrases = +5 XP',
+  ] },
   { version: '0.64', date: '25 Oct 2026', changes: [
     'New: Fix your mistakes — Practice shows the words you got wrong lately; answer them right to clear them, and fixing them all earns 5 gems',
   ] },

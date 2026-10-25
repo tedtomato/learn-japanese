@@ -84,6 +84,25 @@ export function speak(text, { speaker = 'narrator', slow = false, fast = false, 
   });
 }
 
+// English prompts for the hands-free listening mode, in the device's English voice.
+export function speakEnglish(text) {
+  return new Promise((resolve) => {
+    if (!synth || !text) return resolve();
+    synth.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    const en = synth.getVoices().find((v) => /^en([-_]|$)/i.test(v.lang));
+    if (en) u.voice = en;
+    u.rate = 0.95;
+    let done = false;
+    const finish = () => !done && (done = true, resolve());
+    u.onend = finish;
+    u.onerror = finish;
+    setTimeout(finish, 1500 + text.length * 150);
+    synth.speak(u);
+  });
+}
+
 export const stopSpeaking = () => synth?.cancel();
 
 // ---- Speech recognition ----

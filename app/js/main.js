@@ -13,6 +13,7 @@ import { mascot } from './mascot.js';
 import { showStreakCalendar } from './screens/streak.js';
 import { showHearts } from './screens/hearts.js';
 import { renderFactQuiz } from './screens/factquiz.js';
+import { renderListen } from './screens/listen.js';
 import { mistakeIds } from './progress.js';
 
 const TABS = [
@@ -72,10 +73,11 @@ function route() {
   else if (name === 'practice') renderPractice(root, arg);
   else if (name === 'collection') renderCollection(root, arg);
   else if (name === 'quiz') renderFactQuiz(root);
+  else if (name === 'listen') renderListen(root);
   else if (name === 'profile') renderProfile(root);
   else renderLearn(root);
   if (!inSession) {
-    renderNav(name === 'collection' || name === 'quiz' ? 'practice' : name === 'lab' ? 'profile' : TABS.some(([id]) => id === name) ? name : 'learn');
+    renderNav(name === 'collection' || name === 'quiz' || name === 'listen' ? 'practice' : name === 'lab' ? 'profile' : TABS.some(([id]) => id === name) ? name : 'learn');
     window.scrollTo(0, 0);
   }
 }

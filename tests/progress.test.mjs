@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   defaultState, currentHearts, loseHeart, recordActivity, displayStreak, completeSession, migrate, exportBackup, importBackup,
-  currentNodeIndex, mistakeIds, HEART_REFILL_MS, MAX_HEARTS,
+  currentNodeIndex, mistakeIds, completeListening, HEART_REFILL_MS, MAX_HEARTS,
 } from '../app/js/progress.js';
 import { review, INTERVALS, MAX_BOX } from '../app/js/srs.js';
 import { NODES } from '../app/js/course.js';
@@ -91,4 +91,12 @@ test('a mistake stays in the Mistakes review until answered right, and fixing th
   const r = completeSession(s, { mode: 'practice', results: new Map([[a, { right: 1, wrong: 0 }]]), mistakes: 0, now: T0 + 2 });
   assert.deepEqual(mistakeIds(s), []);
   assert.ok(r.mistakesCleared && s.gems > gems + 5);
+});
+
+test('listening mode gives XP towards the daily goal once 10 phrases are heard', () => {
+  const s = defaultState(T0);
+  assert.equal(completeListening(s, 9, T0), 0);
+  assert.equal(completeListening(s, 12, T0), 5);
+  assert.equal(s.xp, 5);
+  assert.equal(s.streak.count, 1);
 });

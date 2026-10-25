@@ -134,6 +134,8 @@ export function renderPractice(root, focus) {
     </section>
 
     ${mistakesCard(state)}
+    ${words.length >= 3 ? html`<a class="card kanji-practice listen-entry" href="#/listen"><span class="kanji-chip">${art('🎧', 'art-row')}</span>
+      <div><b>Listening mode</b><small>Hands-free, for walks: hear the English, say it in Japanese, repeat</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
 
     <h2 class="sub-title">Collections</h2>
     <div class="collections">

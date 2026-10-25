@@ -14,6 +14,7 @@ import { wireShare } from '../share.js';
 import { QUIZ_MIN_FACTS } from './factquiz.js';
 import { signScenes, SIGNS_MIN } from './signs.js';
 import { missionCards } from './mission.js';
+import { drillCards } from './drill.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 
 const level = (st) => (st === 0 ? 'none' : st < 0.34 ? 'weak' : st < 0.67 ? 'mid' : 'strong');
@@ -152,6 +153,10 @@ export function renderPractice(root, focus) {
     <h2 class="sub-title">Missions</h2>
     <p class="muted small list-help">Real situations in Japan — one after each unit of section 1.</p>
     ${missionCards(state)}
+
+    <h2 class="sub-title">Pattern drills</h2>
+    <p class="muted small list-help">One sentence, many words: swap words into a travel pattern until it's automatic.</p>
+    ${drillCards(state)}
 
     <h2 class="sub-title">Collections</h2>
     <div class="collections">

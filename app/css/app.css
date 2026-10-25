@@ -1072,3 +1072,12 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .recall-input.right { border-color: var(--green); color: var(--green-text); }
 .recall-input.wrong { border-color: var(--red); color: var(--red-text); }
 .recall-help { margin-top: 8px; }
+
+/* Pattern drills */
+.drill-pattern { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 4px 6px; font-size: 26px; font-weight: 700; color: var(--text-strong); margin: 6px 0 2px; }
+.drill-pattern small { flex-basis: 100%; text-align: center; font-size: 14px; color: var(--muted); }
+.drill-blank { min-width: 3em; text-align: center; border-bottom: 3px dashed var(--blue); color: var(--blue); }
+.drill-blank.filled { border-bottom-style: solid; color: var(--green-text); animation: pop .3s ease-out; }
+.drill-opt .opt-label { display: flex; flex-direction: column; align-items: flex-start; }
+.drill-opt .opt-label small { font-size: 13px; color: var(--muted); font-weight: 700; }
+.mission-card b.jp { font-size: 16px; }

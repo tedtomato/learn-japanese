@@ -127,3 +127,12 @@ test('every word has a memory trick', () => {
   const missing = [...ITEMS.values()].filter((i) => i.type === 'word' && !i.memory).map((i) => i.id);
   assert.deepEqual(missing, []);
 });
+
+test('pattern drills only use real words, and every sentence they build reads naturally', async () => {
+  const { PATTERNS } = await import('../app/js/content/patterns.js');
+  for (const p of PATTERNS) {
+    assert.ok(p.slots.length >= 3, p.id);
+    assert.ok(existsSync(new URL(`../app/art/${artCode(p.art)}.svg`, import.meta.url)), `${p.id}: no art for ${p.art}`);
+    for (const [id, en] of p.slots) assert.ok(ITEMS.get(id)?.type === 'word' && en, `${p.id}: ${id}`);
+  }
+});

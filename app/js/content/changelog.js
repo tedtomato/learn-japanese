@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.73', date: '26 Oct 2026', changes: [
+    'New: Pattern drills (Practice) — one travel sentence, many words: ___ をください, ___ はどこですか, ___ でおねがいします, ___ はいくらですか, ___ がすきです. Fill the blank, then say the whole sentence from memory. Uses only words you know, +1 gem per right answer',
+  ] },
   { version: '0.72', date: '26 Oct 2026', changes: [
     'Memory tricks for every word: a sound-alike picture on new-word cards (こんにちは — "Connie, chee-wah!" you wave hello to Connie 👋), in Explain, and as a 💡 Hint on "how do you say…" questions',
   ] },

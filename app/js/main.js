@@ -16,6 +16,7 @@ import { renderFactQuiz } from './screens/factquiz.js';
 import { renderListen } from './screens/listen.js';
 import { renderSigns } from './screens/signs.js';
 import { renderMission } from './screens/mission.js';
+import { renderDrill } from './screens/drill.js';
 import { mistakeIds } from './progress.js';
 
 const TABS = [
@@ -78,10 +79,11 @@ function route() {
   else if (name === 'listen') renderListen(root);
   else if (name === 'signs') renderSigns(root);
   else if (name === 'mission') renderMission(root, arg);
+  else if (name === 'drill') renderDrill(root, arg);
   else if (name === 'profile') renderProfile(root);
   else renderLearn(root);
   if (!inSession) {
-    renderNav(name === 'collection' || name === 'quiz' || name === 'listen' || name === 'signs' || name === 'mission' ? 'practice' : name === 'lab' ? 'profile' : TABS.some(([id]) => id === name) ? name : 'learn');
+    renderNav(name === 'collection' || name === 'quiz' || name === 'listen' || name === 'signs' || name === 'mission' || name === 'drill' ? 'practice' : name === 'lab' ? 'profile' : TABS.some(([id]) => id === name) ? name : 'learn');
     window.scrollTo(0, 0);
   }
 }

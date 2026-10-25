@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.64', date: '25 Oct 2026', changes: [
+    'New: Fix your mistakes — Practice shows the words you got wrong lately; answer them right to clear them, and fixing them all earns 5 gems',
+  ] },
   { version: '0.62', date: '22 Oct 2026', changes: [
     'Fixed "Tap what you hear": no more trick tiles that sound the same as the answer (を + げんき sounds just like おげんき), and same-sounding answers are accepted',
   ] },

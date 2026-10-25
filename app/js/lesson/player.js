@@ -921,6 +921,7 @@ function finish(root, s) {
   if (summary.streakExtended) extras.push(html`<p class="pill pill-orange">${icon('flame', 16)} ${summary.streak} day streak!</p>`);
   if (bonusXp) extras.push(html`<p class="pill pill-gold">${icon('bolt', 16)} Speed bonus +${bonusXp} XP</p>`);
   if (summary.goalReached) extras.push(html`<p class="pill pill-gold">${icon('star', 16)} Daily goal reached! +5 gems</p>`);
+  if (summary.mistakesCleared) extras.push(html`<p class="pill pill-green">${icon('check', 16)} All mistakes fixed! +5 gems</p>`);
   if (s.mode === 'practice') extras.push(html`<p class="pill pill-red">${icon('heart', 16)} +1 heart</p>`);
   if (summary.levelUp && s.node?.kind !== 'review') extras.push(html`<p class="pill pill-green">${icon('star', 16)} Level ${summary.levelUp} of ${MAX_LEVEL}</p>`);
 

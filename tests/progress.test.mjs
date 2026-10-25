@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   defaultState, currentHearts, loseHeart, recordActivity, displayStreak, completeSession, migrate, exportBackup, importBackup,
-  currentNodeIndex, HEART_REFILL_MS, MAX_HEARTS,
+  currentNodeIndex, mistakeIds, HEART_REFILL_MS, MAX_HEARTS,
 } from '../app/js/progress.js';
 import { review, INTERVALS, MAX_BOX } from '../app/js/srs.js';
 import { NODES } from '../app/js/course.js';
@@ -78,4 +78,17 @@ test('after a course rebuild, lessons whose words were learned stay done', () =>
   assert.ok(state.nodes[`${lesson.unit.id}-chest`]);
   assert.ok(!state.nodes[kanji.id], 'new kanji lesson still to do');
   assert.deepEqual(migrate(state).nodes, state.nodes);
+});
+
+test('a mistake stays in the Mistakes review until answered right, and fixing them all pays 5 gems', () => {
+  const s = defaultState(T0);
+  const [a, b] = NODES[0].items;
+  completeSession(s, { mode: 'lesson', node: NODES[0], results: new Map([[a, { right: 0, wrong: 1 }], [b, { right: 1, wrong: 0 }]]), mistakes: 1, now: T0 });
+  assert.deepEqual(mistakeIds(s), [a]);
+  completeSession(s, { mode: 'practice', results: new Map([[a, { right: 1, wrong: 0, hesitated: 1 }]]), mistakes: 0, now: T0 + 1 });
+  assert.deepEqual(mistakeIds(s), [a], 'a hesitant answer does not clear it');
+  const gems = s.gems;
+  const r = completeSession(s, { mode: 'practice', results: new Map([[a, { right: 1, wrong: 0 }]]), mistakes: 0, now: T0 + 2 });
+  assert.deepEqual(mistakeIds(s), []);
+  assert.ok(r.mistakesCleared && s.gems > gems + 5);
 });

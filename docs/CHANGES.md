@@ -3,6 +3,15 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 12 — 25 Oct 2026
+| Request | Status | Release |
+|---|---|---|
+| Mistakes review | ✅ "Fix your mistakes" card on Practice (words got wrong and not answered right since, 8 per session); all fixed = +5 gems | 0.64 |
+| Listening mode for walks (hands-free audio) | ⏳ | |
+| Sign spotter (real-looking signs: 出口, 男/女, 東口, 円…) | ⏳ | |
+| Real-world missions (role-play: order ramen, buy a ticket…) | ⏳ | |
+| Remove "Tested by Geraldine" | ✅ reverted | — |
+
 ## Batch 11 — 22 Oct 2026
 | Request | Status | Release |
 |---|---|---|

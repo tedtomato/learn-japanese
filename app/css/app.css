@@ -917,7 +917,7 @@ rt { font-size: max(11px, 0.45em); letter-spacing: 0; }
 /* v0.44: Kanji practice entry on the Kanji tab. */
 .kanji-practice { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; margin-bottom: 12px; }
 .kanji-practice b { display: block; color: var(--text-strong); }
-.kanji-practice small { color: var(--muted); font-size: 13px; }
+.kanji-practice small { display: block; color: var(--muted); font-size: 13px; }
 
 /* v0.45: "5 in a row" celebration. */
 .combo { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; pointer-events: none; }

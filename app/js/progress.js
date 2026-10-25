@@ -186,11 +186,19 @@ export function openChest(state, node) {
 // ---- Items ----
 export const learnedItemIds = (state) => Object.keys(state.items).filter((id) => ITEMS.has(id));
 export const dueItemIds = (state, now) => learnedItemIds(state).filter((id) => isDue(state.items[id], now));
+// Words got wrong recently and not answered right since, latest mistake first.
+const MISTAKE_TYPES = ['word', 'sentence', 'kanji', 'kword', 'radical', 'kana', 'fword'];
+export const mistakeIds = (state) => learnedItemIds(state)
+  .filter((id) => state.items[id].missed && MISTAKE_TYPES.includes(ITEMS.get(id).type))
+  .sort((a, b) => state.items[b].missed - state.items[a].missed);
 
 // ---- Finishing a session ----
 // results: Map itemId → { right, wrong }. mode: 'lesson' | 'practice'.
 export function completeSession(state, { node, mode, results, mistakes, now, bonusXp = 0 }) {
+  const missedBefore = mistakeIds(state).length;
   for (const [id, r] of results) state.items[id] = review(state.items[id], r, now);
+  const mistakesLeft = mistakeIds(state).length;
+  const mistakesCleared = missedBefore > 0 && mistakesLeft === 0;
 
   const perfect = mistakes === 0;
   const xp = XP_LESSON + (perfect ? XP_PERFECT_BONUS : 0) + bonusXp;
@@ -215,7 +223,8 @@ export function completeSession(state, { node, mode, results, mistakes, now, bon
   state.stats.lessons += 1;
   if (perfect) state.stats.perfect += 1;
   const streak = recordActivity(state, now);
-  return { xp, gems, perfect, levelUp, goalReached, streakExtended: streak.extended, streak: state.streak.count };
+  if (mistakesCleared) state.gems += 5;
+  return { xp, gems, perfect, levelUp, goalReached, mistakesCleared, streakExtended: streak.extended, streak: state.streak.count };
 }
 
 // ---- Saving on the device ----

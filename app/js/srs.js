@@ -6,6 +6,7 @@ export const INTERVALS = [0, 0.5 * DAY, 1 * DAY, 3 * DAY, 7 * DAY, 16 * DAY, 35 
 export const MAX_BOX = INTERVALS.length - 1;
 
 // A hesitation (correct but slow) keeps the item in its box and brings it back sooner.
+// `missed` marks a recent mistake until the item is answered right again (the Mistakes review).
 export function review(record, { right, wrong, hesitated = 0 }, now) {
   const prev = record || { box: 0, seen: 0, right: 0, wrong: 0, slow: 0 };
   let box;
@@ -13,6 +14,7 @@ export function review(record, { right, wrong, hesitated = 0 }, now) {
   else if (hesitated > 0) box = Math.max(prev.box, 1);
   else box = Math.min(MAX_BOX, prev.box + 1);
   const wait = hesitated > 0 && !wrong ? INTERVALS[box] / 2 : INTERVALS[box];
+  const missed = wrong > 0 ? now : right > 0 && !hesitated ? undefined : prev.missed;
   return {
     box,
     seen: prev.seen + 1,
@@ -21,6 +23,7 @@ export function review(record, { right, wrong, hesitated = 0 }, now) {
     slow: (prev.slow || 0) + hesitated,
     last: now,
     due: now + wait,
+    ...(missed ? { missed } : {}),
   };
 }
 

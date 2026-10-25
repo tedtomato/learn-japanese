@@ -8,7 +8,7 @@ import { mascot } from '../mascot.js';
 import { art } from '../art.js';
 import { speak } from '../audio.js';
 import { strength } from '../srs.js';
-import { learnedItemIds, dueItemIds } from '../progress.js';
+import { learnedItemIds, dueItemIds, mistakeIds } from '../progress.js';
 import { KINDS, emojiFor, phraseSpeech, tidbitCard } from '../tidbits.js';
 import { wireShare } from '../share.js';
 import { QUIZ_MIN_FACTS } from './factquiz.js';
@@ -60,6 +60,18 @@ function explainMeter(item, state, now) {
     </ul>
     <p class="muted small">The bar shows how well you know it: mostly how often you answer it right, plus how well it has stuck between reviews (full once you remember it after a few days). Reviews then space out — 1 day, 3 days, a week, 2 weeks, 5 weeks — and the bar fades if one is overdue. <b>Green</b> strong · <b>yellow</b> okay · <b>orange</b> fading.</p>
   </div>`, [{ label: 'Got it', kind: 'secondary' }]);
+}
+
+// Words got wrong lately, until answered right again; fixing them all earns 5 gems.
+function mistakesCard(state) {
+  const ids = mistakeIds(state);
+  if (!ids.length) return Object.values(state.items).some((r) => r.wrong)
+    ? html`<section class="card kanji-practice mistakes-card done"><span class="kanji-chip">${art('✨', 'art-row')}</span><div><b>No mistakes to fix</b><small>Everything you got wrong has been put right</small></div></section>`
+    : '';
+  const preview = ids.slice(0, 3).map((id) => ITEMS.get(id).en).join(' · ');
+  return html`<section class="card kanji-practice mistakes-card"><span class="kanji-chip">${art('🎯', 'art-row')}</span>
+    <div><b>Fix your mistakes (${ids.length})</b><small>${preview}${ids.length > 3 ? ' …' : ''}</small><small>Fix them all: +5 gems</small></div>
+    <button class="btn btn-secondary start-mistakes">Start</button></section>`;
 }
 
 export function renderPractice(root, focus) {
@@ -121,6 +133,8 @@ export function renderPractice(root, focus) {
       </div>
     </section>
 
+    ${mistakesCard(state)}
+
     <h2 class="sub-title">Collections</h2>
     <div class="collections">
       <a class="card collection" href="#/collection/phrase">${art('💬', 'art-col')}<b>Phrasebook</b><small>${KINDS.phrase.list.length} phrases</small></a>
@@ -135,6 +149,7 @@ export function renderPractice(root, focus) {
   </main>`);
 
   $('.start-practice', root).addEventListener('click', () => app.go('#/practice/go'));
+  $('.start-mistakes', root)?.addEventListener('click', () => app.go('#/practice/mistakes-go'));
   $('.start-kanji', root)?.addEventListener('click', () => app.go('#/practice/kanji-go'));
   $$('.start-kana', root).forEach((b) => b.addEventListener('click', () => app.go(`#/practice/${b.dataset.script}-go`)));
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));

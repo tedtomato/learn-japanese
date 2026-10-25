@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   defaultState, currentHearts, loseHeart, recordActivity, displayStreak, completeSession, migrate, exportBackup, importBackup,
-  currentNodeIndex, mistakeIds, completeListening, HEART_REFILL_MS, MAX_HEARTS,
+  currentNodeIndex, mistakeIds, completeListening, completeMission, HEART_REFILL_MS, MAX_HEARTS,
 } from '../app/js/progress.js';
 import { review, INTERVALS, MAX_BOX } from '../app/js/srs.js';
 import { NODES } from '../app/js/course.js';
@@ -99,4 +99,15 @@ test('listening mode gives XP towards the daily goal once 10 phrases are heard',
   assert.equal(completeListening(s, 12, T0), 5);
   assert.equal(s.xp, 5);
   assert.equal(s.streak.count, 1);
+});
+
+test('missions pay XP each time and 2 gems per star above the best', () => {
+  const s = defaultState(T0);
+  const g = s.gems;
+  assert.deepEqual(completeMission(s, 'cafe', 2, T0), { xp: 10, gems: 4, best: 2, improved: true });
+  assert.equal(completeMission(s, 'cafe', 1, T0).gems, 0);
+  assert.equal(completeMission(s, 'cafe', 3, T0).gems, 2);
+  assert.equal(s.gems, g + 6);
+  assert.equal(s.missions.cafe, 3);
+  assert.deepEqual(migrate({ nodes: {} }).missions, {});
 });

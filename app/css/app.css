@@ -1024,3 +1024,36 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .sign.right { outline: 4px solid var(--green); outline-offset: 3px; }
 .sign.wrong { outline: 4px solid var(--red); outline-offset: 3px; opacity: .8; }
 .sign:disabled { cursor: default; }
+
+/* Missions: role-play chats */
+.missions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; }
+.mission-card { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4px; padding: 14px 8px; }
+.mission-card b { color: var(--text-strong); font-size: 15px; line-height: 1.2; }
+.mission-card small { color: var(--muted); font-size: 12px; }
+.mission-card .new { color: var(--green-text); font-weight: 800; }
+.mission-card.locked { opacity: .55; }
+.stars { display: inline-flex; gap: 2px; font-size: 18px; color: var(--border); }
+.stars .on { color: #ffc800; }
+.mission-done .stars { font-size: 40px; }
+.mission { display: flex; flex-direction: column; gap: 12px; }
+.mission-scene { display: flex; gap: 12px; align-items: center; color: var(--muted); font-weight: 700; line-height: 1.4; }
+.chat { display: flex; flex-direction: column; gap: 10px; }
+.chat-line { display: flex; gap: 8px; align-items: flex-end; animation: pop .3s ease-out; }
+.chat-line.mine { justify-content: flex-end; }
+.chat-who { display: flex; flex-direction: column; align-items: center; flex: none; }
+.chat-who small { font-size: 11px; font-weight: 800; color: var(--muted); }
+.chat-bubble { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; font: inherit; background: var(--card); color: var(--text); border: 2px solid var(--border); border-radius: 18px 18px 18px 4px; padding: 10px 14px; max-width: 78%; cursor: pointer; }
+.chat-line.mine .chat-bubble { background: var(--blue-soft); color: var(--text-strong); border-color: var(--blue); border-radius: 18px 18px 4px 18px; align-items: flex-end; text-align: right; }
+.chat-bubble .jp { font-size: 20px; font-weight: 700; color: inherit; }
+.chat-romaji { font-size: 13px; font-weight: 700; opacity: .75; }
+.chat-en { font-size: 14px; font-weight: 700; }
+.chat-tap { font-size: 11px; color: var(--blue); font-weight: 800; }
+.mission-prompt { font-weight: 800; color: var(--text-strong); font-size: 17px; }
+.mission-act { display: flex; flex-direction: column; gap: 10px; }
+.reply .opt-label { display: flex; flex-direction: column; align-items: flex-start; }
+.reply .opt-label small { font-size: 13px; color: var(--muted); font-weight: 700; }
+.mission-note { border-radius: 14px; padding: 10px 14px; font-weight: 700; line-height: 1.4; }
+.mission-note.bad { background: var(--red-soft); color: var(--red-text); }
+.mission-note.good { background: var(--green-soft); color: var(--green-text); }
+.mission-done { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; padding-top: 50px; }
+.mission-done .extras { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }

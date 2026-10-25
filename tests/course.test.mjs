@@ -109,3 +109,16 @@ test('sign spotter situations only need kanji the course teaches, and every answ
     assert.ok(s.wrong.every((w) => w.t !== s.answer.t));
   }
 });
+
+test('every mission belongs to a real unit, and every step has a right reply and explained wrong ones', async () => {
+  const { MISSIONS } = await import('../app/js/content/missions.js');
+  const units = new Set(SECTIONS.flatMap((s) => s.units.map((u) => u.id)));
+  for (const m of MISSIONS) {
+    assert.ok(units.has(m.unit), m.id);
+    for (const s of m.steps) {
+      assert.ok(s.replies.some((r) => r.ok), `${m.id}: a step without a right reply`);
+      assert.ok(s.replies.filter((r) => !r.ok).every((r) => r.note), `${m.id}: unexplained wrong reply`);
+      assert.ok(s.who ? s.jp && s.romaji && s.en : s.prompt, `${m.id}: step needs a line or a prompt`);
+    }
+  }
+});

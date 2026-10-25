@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.67', date: '25 Oct 2026', changes: [
+    'New: Missions (Practice) — real situations as a chat: meet your host Mika, ask the way in Shinjuku, order at a café, pay at a konbini. Pick what to say; wrong picks explain why. Up to 3 stars, +10 XP, gems for new stars',
+  ] },
   { version: '0.66', date: '25 Oct 2026', changes: [
     'New: Sign spotter (Practice) — real-looking Japanese signs: find the exit (出口), the women\'s toilet (女), the east exit (東口), a large beer (大), a table for two (二人)… Only uses kanji you have learned, +1 gem per right answer',
   ] },

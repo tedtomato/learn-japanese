@@ -13,6 +13,7 @@ import { KINDS, emojiFor, phraseSpeech, tidbitCard } from '../tidbits.js';
 import { wireShare } from '../share.js';
 import { QUIZ_MIN_FACTS } from './factquiz.js';
 import { signScenes, SIGNS_MIN } from './signs.js';
+import { missionCards } from './mission.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 
 const level = (st) => (st === 0 ? 'none' : st < 0.34 ? 'weak' : st < 0.67 ? 'mid' : 'strong');
@@ -147,6 +148,10 @@ export function renderPractice(root, focus) {
     ${signsCard(state)}
     ${words.length >= 3 ? html`<a class="card kanji-practice listen-entry" href="#/listen"><span class="kanji-chip">${art('🎧', 'art-row')}</span>
       <div><b>Listening mode</b><small>Hands-free, for walks: hear the English, say it in Japanese, repeat</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
+
+    <h2 class="sub-title">Missions</h2>
+    <p class="muted small list-help">Real situations in Japan — one after each unit of section 1.</p>
+    ${missionCards(state)}
 
     <h2 class="sub-title">Collections</h2>
     <div class="collections">

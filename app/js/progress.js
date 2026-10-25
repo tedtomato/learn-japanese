@@ -31,6 +31,7 @@ export function defaultState(now = Date.now()) {
     items: {},
     stats: { lessons: 0, perfect: 0 },
     seen: { fact: [], phrase: [], kanji: [] },
+    missions: {}, // mission id → best stars (1–3)
     settings: { theme: 'system', sfx: true, voiceRate: 0.85, speed: true, speaking: true },
   };
 }
@@ -50,6 +51,7 @@ export function migrate(raw, now = Date.now()) {
     nodes: raw.nodes || {},
     items: raw.items || {},
     daily: raw.daily || {},
+    missions: raw.missions || {},
   };
   if (raw.course !== COURSE_VERSION) state.nodes = carryOverNodes(state, raw.nodes || {});
   state.course = COURSE_VERSION;
@@ -243,6 +245,21 @@ export function completeListening(state, heard, now) {
 export function recordSigns(state, results, gems, now) {
   for (const [id, r] of results) if (state.items[id]) state.items[id] = review(state.items[id], r, now);
   state.gems += gems;
+}
+
+// Missions: 10 XP each time (daily goal + streak); 2 gems per star above your best.
+export const unitLessonsDone = (state, unit) => unit.nodes.filter((n) => n.kind === 'lesson').every((n) => isNodeDone(state, n));
+export function completeMission(state, id, stars, now) {
+  const best = state.missions[id] || 0;
+  const gems = Math.max(0, stars - best) * 2;
+  state.missions[id] = Math.max(best, stars);
+  state.gems += gems;
+  const xp = 10;
+  state.xp += xp;
+  const today = dayKey(now);
+  state.daily[today] = (state.daily[today] || 0) + xp;
+  recordActivity(state, now);
+  return { xp, gems, best: Math.max(best, stars), improved: stars > best };
 }
 
 // ---- Saving on the device ----

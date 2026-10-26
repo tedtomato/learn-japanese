@@ -131,4 +131,21 @@ export const MISSIONS = [
         replies: [R('ホテルまでおねがいします', 'hoteru made onegaishimasu', 'to the hotel please', true), R('ホテルはどこですか', 'hoteru wa doko desu ka', 'where is the hotel?', false, 'The driver asks you! Say ホテルまで (to the hotel).'), R('えきまでおねがいします', 'eki made onegaishimasu', 'to the station please', false, 'You just came from the station!')] },
     ],
   },
+  {
+    id: 'pharmacy', unit: 'tokyo-help', art: '💊', title: 'Pharmacy visit',
+    setting: 'Too much sun in Kyoto: you have a headache. You find a pharmacy, and Yuki is at the counter.',
+    reward: 'Medicine in hand and you know how to take it — feel better soon!',
+    steps: [
+      { who: 'woman', jp: 'どうしましたか。', romaji: 'dou shimashita ka', en: 'What\'s the matter?', prompt: 'Point at your head and tell her it hurts here.',
+        replies: [R('ここがいたいです', 'koko ga itai desu', 'it hurts here', true), R('とてもおいしいです', 'totemo oishii desu', 'it\'s very good', false, 'That\'s for food! Say ここがいたいです.'), R('みちにまよいました', 'michi ni mayoimashita', 'I\'m lost', false, 'You found the pharmacy — you\'re not lost!')] },
+      { who: 'woman', jp: 'この くすりを どうぞ。', romaji: 'kono kusuri o douzo', en: 'Here, take this medicine.',
+        replies: [R('ありがとうございます', 'arigatou gozaimasu', 'thank you', true), R('いりません', 'irimasen', 'I don\'t need it', false, 'You do need it — your head hurts!'), R('かんぱい', 'kanpai', 'cheers!', false, 'Not with medicine!')] },
+      { who: 'woman', jp: '1にち 3かいです。', romaji: 'ichi-nichi san-kai desu', en: 'Three times a day.', prompt: 'How do you take it?',
+        replies: [E('💊 3 times a day', true), E('💊 Once every 3 days', false, '1にち = 1 day, 3かい = 3 times: three times a day.'), E('💊 3 pills at once', false, 'かい means times: three times a day.')] },
+      { prompt: 'Ask how much it is.',
+        replies: [R('いくらですか', 'ikura desu ka', 'how much is it?', true), R('なんじですか', 'nanji desu ka', 'what time is it?', false, 'That asks the time — ask いくら (how much).'), R('びょういんはどこですか', 'byouin wa doko desu ka', 'where is the hospital?', false, 'It\'s only a headache!')] },
+      { who: 'woman', jp: '800えんです。', romaji: 'happyaku en desu', en: 'It\'s 800 yen.', prompt: 'How much?',
+        replies: [E('800 yen', true), E('8,000 yen', false, 'はっぴゃく = 800 — ひゃく is hundred.'), E('80 yen', false, 'はっぴゃく = 800.')] },
+    ],
+  },
 ];

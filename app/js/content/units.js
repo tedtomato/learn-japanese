@@ -302,6 +302,41 @@ export const SECTIONS_DATA = [
           ] },
         ],
       },
+      {
+        id: 'help',
+        title: 'Help & health',
+        desc: 'Pharmacy, doctor, police and "I\'m lost"',
+        facts: [FACT.daily, FACT.wellness],
+        phrases: ['Important Locations & Emergency'],
+        lessons: [
+          { title: 'Feeling ill', words: [
+            ['いたい', 'itai', 'it hurts', '🤕', { alt: ['痛い'] }],
+            ['くすり', 'kusuri', 'medicine', '💊', { alt: ['薬'] }],
+            ['くすりや', 'kusuriya', 'pharmacy', '⚕️', { note: 'くすり (medicine) + や (shop). Big chains are called ドラッグストア (drugstore).', alt: ['薬屋'] }],
+            ['びょういん', 'byouin', 'hospital', '🏥', { alt: ['病院'] }],
+          ] },
+          { title: 'Getting help', words: [
+            ['いしゃ', 'isha', 'doctor', '🧑‍⚕️', { alt: ['医者'] }],
+            ['きゅうきゅうしゃ', 'kyuukyuusha', 'ambulance', '🚑', { note: 'Emergency number in Japan: 119 for ambulance and fire, 110 for police.', alt: ['救急車'] }],
+            ['けいさつ', 'keisatsu', 'police', '👮', { alt: ['警察'] }],
+            ['こうばん', 'kouban', 'police box', '🚓', { note: 'Small police posts on street corners — great for directions and lost things.', alt: ['交番'] }],
+          ] },
+          { title: 'Lost', words: [
+            ['みち', 'michi', 'road / way', '🛣️', { alt: ['道'] }],
+            ['ここ', 'koko', 'here', '📍'],
+          ] },
+          { title: 'Call for help', grammar: 'ga', sentences: [
+            { jp: ['ここ', 'が', 'いたい', 'です'], romaji: 'koko ga itai desu', en: 'It hurts here', alt: ['Here hurts', 'It hurts right here'] },
+            { jp: ['いしゃ', 'を', 'よんで', 'ください'], romaji: 'isha o yonde kudasai', en: 'Please call a doctor', alt: ['Call a doctor please'] },
+            { jp: ['きゅうきゅうしゃ', 'を', 'よんで', 'ください'], romaji: 'kyuukyuusha o yonde kudasai', en: 'Please call an ambulance', alt: ['Call an ambulance please'] },
+          ] },
+          { title: 'Finding help', sentences: [
+            { jp: ['みち', 'に', 'まよいました'], romaji: 'michi ni mayoimashita', en: 'I am lost', alt: ['I\'m lost', 'I got lost', 'I lost my way'] },
+            { jp: ['くすりや', 'は', 'どこ', 'です', 'か'], romaji: 'kusuriya wa doko desu ka', en: 'Where is the pharmacy', alt: ['Where is a pharmacy', 'Where\'s the pharmacy'] },
+            { jp: ['びょういん', 'は', 'どこ', 'です', 'か'], romaji: 'byouin wa doko desu ka', en: 'Where is the hospital', alt: ['Where is a hospital', 'Where\'s the hospital'] },
+          ] },
+        ],
+      },
     ],
   },
   {

@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.82', date: '27 Oct 2026', changes: [
+    'New unit — Section 1 · Unit 9: Help & health. "It hurts here", medicine, pharmacy, hospital, doctor, ambulance, police, police box (こうばん) and "I\'m lost"',
+    'New mission: Pharmacy visit — explain a headache, understand the dose, pay',
+  ] },
   { version: '0.81', date: '27 Oct 2026', changes: [
     'Numbers move to Section 1 (Unit 5) and grow into "Numbers, prices & time": hundred, thousand, ten thousand, yen, o\'clock, half past, "what time is it now?", "it\'s 500 yen"',
     'Kanji land where they help: 一 二 三 and 円 / 時 with numbers, 電車 駅 and the station exits with trains',

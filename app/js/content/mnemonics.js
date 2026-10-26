@@ -152,4 +152,14 @@ export const MNEMONICS = {
   'w-ji': '“Gee!” — “Gee, it’s already 3 o’clock!” 🕒',
   'w-han': '“Han” Solo is always half an hour late: half past 🕧',
   'w-ima': '“Ee, ma!” — “Ee, Ma, now? Right now?” ⌚',
+  // help & health
+  'w-itai': '“Eat eye?!” — ouch, that would hurt! 🤕',
+  'w-kusuri': '“Coo, Sue, Ree!” — Sue coos to Ree as she gives her the medicine 💊',
+  'w-kusuriya': '“Coo, Sue, Ree, yah!” — where Sue gets Ree’s medicine: the pharmacy ⚕️',
+  'w-byouin': '“Bee, oh, in!” — stung by a bee, oh, straight into hospital 🏥',
+  'w-kyuukyuusha': '“Cue, cue, sha!” — the siren goes kyuu-kyuu: the ambulance 🚑',
+  'w-keisatsu': '“Kay sat, Sue!” — Kay sat on Sue’s bike: call the police 👮',
+  'w-kouban': '“Cope, Ban!” — the little police box helps Ban cope with being lost 🚓',
+  'w-michi': '“Me, cheese!” — you follow the cheese trail along the road 🛣️',
+  'w-koko': '“Coco” — Coco the dog sits right here 📍',
 };

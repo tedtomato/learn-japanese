@@ -613,7 +613,7 @@ function renderRecall(root, s) {
   const item = ITEMS.get(ex.itemId);
   mount($('.lesson-body', root), html`<p class="instruction">How do you say this in Japanese?</p>
     ${speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`)}
-    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type it in romaji, e.g. arigatou" aria-label="Your answer in romaji">
+    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type it in romaji…" aria-label="Your answer in romaji">
     <p class="muted small recall-help">From memory — no choices this time! Spaces and long vowels (ou / o) don't matter.</p>
     ${memoryHint(item, true)}`);
   $('.hint-btn', root)?.addEventListener('click', (e) => {
@@ -875,7 +875,7 @@ function renderSpeak(root, s) {
   const item = ITEMS.get(ex.itemId);
   mount($('.lesson-body', root), html`<p class="instruction">Listen, then say it out loud</p>
     ${speakerBubble(s, html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 22)}</button>
-      <div><div class="jp-lg">${jpItem(item, true)}</div><div class="muted">${item.en}</div></div>`)}
+      <div class="speak-text"><div class="jp-lg fit">${jpItem(item, true)}</div><div class="muted">${item.en}</div></div>`)}
     <div class="mic-area"><button class="mic" aria-label="Start speaking">${icon('mic', 40)}</button><p class="mic-status">Tap the microphone and repeat.</p></div>`);
   wirePlay(root, s);
   sayAs(root, s.speaker, speechOf(item));

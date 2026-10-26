@@ -1094,3 +1094,41 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .prompt-person.stacked .part { padding: 4px 7px; min-width: 0; }
 .prompt-person.stacked .part small { font-size: 11px; white-space: nowrap; }
 .prompt-person.stacked .op { font-size: 16px; }
+
+/* ---------- v0.75: one readable type scale (checked at 393×851, the user's phone) ----------
+   Reading text never goes below 14px; short labels (names, tags, romaji over Japanese) below 13px
+   only where space is very tight. Japanese answers are a little bigger than English ones. */
+.person-name, .chat-who small, .dl-who { font-size: 13px; }
+.chat-tap { font-size: 13px; }
+.lesson-meta { font-size: 14px; }
+.collection small, .mission-card small, .goal-choice small, .guide-hint, .guide-ex { font-size: 14px; }
+.kanji-practice small, .word-main small, .reply .opt-label small, .drill-opt .opt-label small { font-size: 14px; }
+.setting-note, .streak-stats small, .cal-day small, .practice-tabs small, .app-ver { font-size: 13px; }
+.kana-cell small { font-size: 13px; }
+.part small { font-size: 13px; }
+.prompt-person.stacked .part small { font-size: 12px; }
+.rd-label, .pop-kicker, .g-block small, .day, .cal-weekdays span { font-size: 13px; }
+.fb-badges .pill { font-size: 12px; }
+.option .key { font-size: 13px; }
+#nav a { font-size: 13px; }
+.node-mascot .bubble { font-size: 13px; }
+/* Romaji over Japanese */
+.option rt, .match-btn rt { font-size: 13px; }
+.tile rt, .tile-romaji { font-size: 13px; }
+.g-block rt { font-size: 12px; }
+.fit-tight rt { font-size: 11px; }
+/* Japanese answers: as easy to read as the question */
+.option .opt-label.fit:not(.jp-lg):not(.opt-kanji) { font-size: 22px; }
+.chat-romaji { font-size: 14px; }
+.mission-scene, .muted.small, .list-help { font-size: 14px; }
+/* Headings: big but not shouting */
+.profile-head h1 { font-size: 26px; }
+.quiz-end h1 { font-size: 40px; }
+/* Speaking exercise: long phrases shrink to fit their bubble */
+.speak-text { flex: 1; min-width: 0; }
+.speak-text .jp-lg { max-width: 100%; }
+.phrase-main small { font-size: 14px; }
+.drill-opt .jp, .reply .jp { font-size: 22px; }
+.recall-input::placeholder { font-size: 18px; }
+/* Sentences wrap between words, never inside one (です stays together) */
+.chunk { display: inline-block; white-space: nowrap; }

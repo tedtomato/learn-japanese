@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 13 — 26 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| Text too small / too big too often (check at my phone size) | ✅ audit of 30 screens at 393×851: reading text ≥ 14px, labels ≥ 13px, romaji ≥ 13px (11 when tight), Japanese answers 22px, headings capped; words never split across lines; speak bubble fits; fit-to-width floor raised | 0.75 |
 | Kanji card squeezed to the right, parts wrapping (電 screenshot) | ✅ character stacked above new-item cards; card full width; compact parts row | 0.74 |
 | How sure are you? (confidence rating) | ✅ "🤔 I guessed" after a right answer (comes back like a slow one); "😎 I knew it" undoes "a bit slow" | 0.69 |
 | Guess first, then learn | ✅ up to 2 new words per lesson: hear/see it, guess the meaning from 3 (not scored), then its card | 0.70 |

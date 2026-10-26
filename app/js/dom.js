@@ -38,7 +38,7 @@ export function fitText(root) {
     shrink(20);
     if (over()) {
       el.classList.add('fit-tight');
-      shrink(15);
+      shrink(17);
     }
     if (over()) $$('.ruby-on', el).concat(el).forEach((x) => { x.style.whiteSpace = 'normal'; x.style.wordBreak = 'break-all'; });
   });

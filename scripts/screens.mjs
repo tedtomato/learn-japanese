@@ -97,7 +97,8 @@ try {
   });
 
   const SCREENS = [
-    ['#/learn', 'learn'], ['#/practice', 'practice'], ['#/practice/kanji', 'practice-kanji'], ['#/practice/kana', 'practice-kana'],
+    ['#/learn', 'learn'], ['#/practice/today', 'practice'], ['#/practice/games', 'practice-games'], ['#/practice/library', 'practice-library'],
+    ['#/practice/kanji', 'practice-kanji'], ['#/practice/kana', 'practice-kana'],
     ['#/profile', 'profile'], ['#/collection/phrase', 'phrasebook'], ['#/collection/fact', 'facts'], ['#/quiz', 'facts-quiz'],
     ['#/signs', 'signs'], ['#/mission/cafe', 'mission'], ['#/drill/kudasai', 'drill'], ['#/listen', 'listening'],
   ];
@@ -107,10 +108,10 @@ try {
     for (const [hash, name] of SCREENS) {
       await go(hash);
       await check(name, theme);
-      if (name === 'practice') {
+      if (name.startsWith('practice')) {
         await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
         await page.waitForTimeout(200);
-        await check('practice-bottom', theme);
+        await check(`${name}-bottom`, theme);
       }
     }
     for (const kind of LAB) {

@@ -1134,3 +1134,10 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .chunk { display: inline-block; white-space: nowrap; }
 .node-mascot .bubble small { font-size: 13px; }
 .prompt-person.stacked .part small { font-size: 13px; white-space: normal; line-height: 1.1; max-width: 6em; text-align: center; }
+
+/* Practice: Today / Games / Library */
+.practice-sections { display: flex; width: 100%; margin: 4px 0 12px; }
+.practice-sections button { flex: 1; }
+.practice-sections button { font-size: 15px; }
+.section-more { text-align: center; }
+.section-more .link { font: inherit; font-weight: 800; color: var(--blue); background: none; border: 0; cursor: pointer; }

@@ -11,7 +11,7 @@ import { strength } from '../srs.js';
 import { learnedItemIds, dueItemIds, mistakeIds } from '../progress.js';
 import { KINDS, emojiFor, phraseSpeech, tidbitCard } from '../tidbits.js';
 import { wireShare } from '../share.js';
-import { QUIZ_MIN_FACTS } from './factquiz.js';
+import { QUIZ_MIN_FACTS, seenFacts } from './factquiz.js';
 import { signScenes, SIGNS_MIN } from './signs.js';
 import { missionCards } from './mission.js';
 import { drillCards } from './drill.js';
@@ -42,6 +42,10 @@ function uniqueKanji(items, state, now) {
 }
 
 let lastTab = 'words';
+// Practice is split in three: Today (reviews), Games (missions, signs, drills, quiz) and Library
+// (collections and everything learned).
+let lastSection = 'today';
+const SECTIONS = [['today', 'Today', '🔁'], ['games', 'Games', '🎮'], ['library', 'Library', '📚']];
 
 const LEVEL_NAME = { strong: 'Strong', mid: 'Okay', weak: 'Fading', none: 'Not learned' };
 const DAY = 24 * 60 * 60 * 1000;
@@ -93,6 +97,8 @@ export function renderPractice(root, focus) {
   const due = dueItemIds(state, now);
   const tab = ['words', 'kanji', 'kana'].includes(focus) ? focus : lastTab;
   lastTab = tab;
+  const section = SECTIONS.some(([id]) => id === focus) ? focus : ['words', 'kanji', 'kana'].includes(focus) ? 'library' : lastSection;
+  lastSection = section;
   const words = learned.map((id) => ITEMS.get(id)).filter((i) => i.type === 'word' || i.type === 'sentence')
     .map((it) => ({ it, st: strength(state.items[it.id], now) })).sort((x, y) => x.st - y.st);
   const kanji = uniqueKanji(learned.map((id) => ITEMS.get(id)).filter((i) => ['kanji', 'radical', 'kword'].includes(i.type)), state, now);
@@ -134,7 +140,9 @@ export function renderPractice(root, focus) {
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page">
     <h1 class="page-title">Practice</h1>
-    <section class="card practice-hero">
+    <div class="seg practice-sections" role="tablist">${SECTIONS.map(([id, label, emo]) => html`<button role="tab" class="${id === section ? 'on' : ''}" data-section="${id}">${emo} ${label}</button>`)}</div>
+
+    ${section === 'today' ? html`<section class="card practice-hero">
       ${mascot(due.length ? 'happy' : 'cheer', 84)}
       <div>
         <h2>${learned.length ? (due.length ? `${due.length} to review` : 'All fresh!') : 'Nothing to review yet'}</h2>
@@ -144,22 +152,25 @@ export function renderPractice(root, focus) {
         <button class="btn btn-secondary start-practice" ${learned.length ? '' : 'disabled'}>${icon('refresh', 18)} Start practice</button>
       </div>
     </section>
-
     ${mistakesCard(state)}
-    ${signsCard(state)}
     ${words.length >= 3 ? html`<a class="card kanji-practice listen-entry" href="#/listen"><span class="kanji-chip">${art('🎧', 'art-row')}</span>
-      <div><b>Listening mode</b><small>Hands-free, for walks: hear the English, say it in Japanese, repeat</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
+      <div><b>Listening mode</b><small>Hands-free for walks: hear it, say it, repeat</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
+    ${kanji.length >= 3 ? html`<a class="card kanji-practice" href="#/practice/kanji-go"><span class="kanji-chip jp">漢</span>
+      <div><b>Kanji practice</b><small>Only kanji, weakest first — about 2 min</small></div><span class="btn btn-secondary">Start</span></a>` : ''}
+    <p class="muted small section-more">More to play in <button class="link" data-section="games">🎮 Games</button></p>` : ''}
 
-    <h2 class="sub-title">Missions</h2>
-    <p class="muted small list-help">Real situations in Japan — one after each unit of section 1.</p>
+    ${section === 'games' ? html`<h2 class="sub-title">Missions</h2>
+    <p class="muted small list-help">Real situations in Japan — one after each unit.</p>
     ${missionCards(state)}
-
+    <h2 class="sub-title">Quick games</h2>
+    ${signsCard(state)}
+    ${seenFacts(state).length >= QUIZ_MIN_FACTS ? html`<a class="card kanji-practice" href="#/quiz"><span class="kanji-chip">${art('❓', 'art-row')}</span>
+      <div><b>Fun facts quiz</b><small>5 questions about facts you've read · +1 gem each</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
     <h2 class="sub-title">Pattern drills</h2>
-    <p class="muted small list-help">One sentence, many words: swap words into a travel pattern until it's automatic.</p>
-    ${drillCards(state)}
+    <p class="muted small list-help">One sentence, many words: swap words in until it's automatic.</p>
+    ${drillCards(state)}` : ''}
 
-    <h2 class="sub-title">Collections</h2>
-    <div class="collections">
+    ${section === 'library' ? html`<div class="collections">
       <a class="card collection" href="#/collection/phrase">${art('💬', 'art-col')}<b>Phrasebook</b><small>${KINDS.phrase.list.length} phrases</small></a>
       <a class="card collection" href="#/collection/fact">${art('🗾', 'art-col')}<b>Fun facts</b><small>${state.seen.fact.length} / ${KINDS.fact.list.length}</small></a>
       <a class="card collection" href="#/collection/kanji"><span class="col-emoji jp">漢</span><b>Kanji spotted</b><small>${state.seen.kanji.length} / ${KINDS.kanji.list.length}</small></a>
@@ -168,10 +179,15 @@ export function renderPractice(root, focus) {
     <h2 class="sub-title" id="sec-learned">What you've learned</h2>
     <div class="seg practice-tabs" role="tablist">${TABS.map(([id, label, n]) => html`<button role="tab" class="${id === tab ? 'on' : ''}" data-tab="${id}">${label}${n != null ? html` <small>${n}</small>` : ''}</button>`)}</div>
     ${tab !== 'kana' ? html`<p class="muted small list-help">Weakest first. Tap a bar to see what it means.</p>` : ''}
-    <div class="practice-list">${lists[tab]()}</div>
+    <div class="practice-list">${lists[tab]()}</div>` : ''}
   </main>`);
 
-  $('.start-practice', root).addEventListener('click', () => app.go('#/practice/go'));
+  $('.start-practice', root)?.addEventListener('click', () => app.go('#/practice/go'));
+  $$('[data-section]', root).forEach((b) => b.addEventListener('click', () => {
+    lastSection = b.dataset.section;
+    renderPractice(root, b.dataset.section);
+    window.scrollTo(0, 0);
+  }));
   $('.start-mistakes', root)?.addEventListener('click', () => app.go('#/practice/mistakes-go'));
   $('.start-kanji', root)?.addEventListener('click', () => app.go('#/practice/kanji-go'));
   $$('.start-kana', root).forEach((b) => b.addEventListener('click', () => app.go(`#/practice/${b.dataset.script}-go`)));
@@ -185,7 +201,7 @@ export function renderPractice(root, focus) {
     renderPractice(root, b.dataset.tab);
     $('#sec-learned', root)?.scrollIntoView({ block: 'start' });
   }));
-  if (focus && focus !== 'go') requestAnimationFrame(() => $('#sec-learned', root)?.scrollIntoView({ block: 'start' }));
+  if (['words', 'kanji', 'kana'].includes(focus)) requestAnimationFrame(() => $('#sec-learned', root)?.scrollIntoView({ block: 'start' }));
 }
 
 // Phrasebook (always complete), discovered facts and spotted kanji.

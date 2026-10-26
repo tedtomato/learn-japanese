@@ -244,6 +244,36 @@ export const SECTIONS_DATA = [
           ] },
         ],
       },
+      {
+        id: 'trains',
+        title: 'Trains & taxis',
+        desc: 'Platforms, changing trains, the next stop and taxis',
+        facts: [FACT.transport],
+        phrases: ['Getting Around & Transit'],
+        lessons: [
+          { title: 'On the platform', words: [
+            ['ホーム', 'hoomu', 'platform', '🚉', { note: 'From the English "platform" — Japanese uses only the end.' }],
+            ['なんばんせん', 'nanbansen', 'which platform', '🔢', { note: 'Platforms are numbered: 3ばんせん = platform 3.', alt: ['何番線'] }],
+            ['つぎ', 'tsugi', 'next', '⏭️', { alt: ['次'] }],
+            ['のりかえ', 'norikae', 'transfer (change trains)', '🔄', { alt: ['乗り換え'] }],
+          ] },
+          { title: 'Going places', words: [
+            ['いきます', 'ikimasu', 'to go', '➡️', { alt: ['行きます'] }],
+            ['まで', 'made', 'to / until', '🏁', { note: 'After a place: ホテル まで = to the hotel.' }],
+            ['きょうと', 'kyouto', 'Kyoto', '⛩️', { alt: ['京都'] }],
+          ] },
+          { title: 'Which train?', grammar: 'ka', sentences: [
+            { jp: ['これ', 'は', 'きょうと', 'に', 'いきます', 'か'], romaji: 'kore wa kyouto ni ikimasu ka', en: 'Does this go to Kyoto', alt: ['Does this train go to Kyoto', 'Is this going to Kyoto'] },
+            { jp: ['なんばんせん', 'です', 'か'], romaji: 'nanbansen desu ka', en: 'Which platform is it', alt: ['Which platform', 'What platform is it'] },
+            { jp: ['つぎ', 'は', 'きょうと', 'です'], romaji: 'tsugi wa kyouto desu', en: 'The next stop is Kyoto', alt: ['Next is Kyoto', 'The next station is Kyoto'] },
+          ] },
+          { title: 'Transfers & taxis', sentences: [
+            { jp: ['のりかえ', 'は', 'どこ', 'です', 'か'], romaji: 'norikae wa doko desu ka', en: 'Where do I change trains', alt: ['Where is the transfer', 'Where do I transfer'] },
+            { jp: ['えき', 'まで', 'おねがいします'], romaji: 'eki made onegaishimasu', en: 'To the station please', alt: ['Take me to the station please'] },
+            { jp: ['ホテル', 'まで', 'おねがいします'], romaji: 'hoteru made onegaishimasu', en: 'To the hotel please', alt: ['Take me to the hotel please'] },
+          ] },
+        ],
+      },
     ],
   },
   {

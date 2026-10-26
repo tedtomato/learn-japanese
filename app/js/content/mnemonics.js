@@ -136,4 +136,12 @@ export const MNEMONICS = {
   'w-arerugii': '“Allergy” said the Japanese way: a-re-ru-gii 🤧',
   'w-bejitarian': '“Vegetarian” said the Japanese way: be-ji-ta-ri-an 🥗',
   'w-irimasen': '“Ear, he mass-sends” — he sends far too much: no thanks, I don’t need it 🙅',
+  // trains
+  'w-hoomu': '“Home” — the platform is the train’s home: hoo-mu 🚉',
+  'w-nanbansen': '“Nan bans ten!” — Nan bans platform ten: which platform, then? 🔢',
+  'w-tsugi': '“Sue, geez!” — “Sue, geez, it’s the NEXT stop!” ⏭️',
+  'w-norikae': '“No, Ricky, eh!” — no Ricky, we change trains here 🔄',
+  'w-ikimasu': '“Eek! Key! Must!” — eek, keys, must go! ➡️',
+  'w-made': '“Ma, day!” — Ma drives all day, all the way to the hotel 🏁',
+  'w-kyouto': '“Kyoto” — the old capital: kyo-u-to ⛩️',
 };

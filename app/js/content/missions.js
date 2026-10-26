@@ -114,4 +114,21 @@ export const MISSIONS = [
         replies: [R('もういっぱいください', 'mou ippai kudasai', 'one more please', true), R('おゆ', 'oyu', 'hot water', false, 'Hot water? Ask for もういっぱい (one more).'), R('かんぱい', 'kanpai', 'cheers!', false, 'Cheers — once the next one arrives!')] },
     ],
   },
+  {
+    id: 'kyoto', unit: 'tokyo-trains', art: '🚄', title: 'Day trip to Kyoto',
+    setting: 'Tokyo Station, 8 a.m. You want the train to Kyoto, then a taxi to your hotel. Mika works at the station.',
+    reward: 'Right platform, right stop, right hotel — you got to Kyoto on your own!',
+    steps: [
+      { prompt: 'Point at a train and ask if it goes to Kyoto.',
+        replies: [R('これはきょうとにいきますか', 'kore wa kyouto ni ikimasu ka', 'does this go to Kyoto?', true), R('きょうとはいくらですか', 'kyouto wa ikura desu ka', 'how much is Kyoto?', false, 'Kyoto isn\'t for sale! Ask if it goes there: いきますか.'), R('つぎはきょうとです', 'tsugi wa kyouto desu', 'next is Kyoto', false, 'That\'s what the announcement says — ask a question!')] },
+      { who: 'woman2', jp: 'いいえ。3ばんせんです。', romaji: 'iie. san-bansen desu', en: 'No. It\'s platform 3.', prompt: 'Where is your train?',
+        replies: [E('🚉 Platform 3', true), E('🚉 Platform 8', false, 'さん = 3: 3ばんせん is platform 3.'), E('🕒 In 3 hours', false, 'ばんせん means platform: platform 3.')] },
+      { prompt: 'Thank her.',
+        replies: [R('ありがとうございます', 'arigatou gozaimasu', 'thank you', true), R('のりかえはどこですか', 'norikae wa doko desu ka', 'where do I change?', false, 'No need to change trains — just say thank you.'), R('おやすみなさい', 'oyasuminasai', 'good night', false, 'It\'s 8 in the morning!')] },
+      { who: 'woman', jp: 'つぎは きょうと、きょうとです。', romaji: 'tsugi wa kyouto, kyouto desu', en: 'Next stop: Kyoto, Kyoto.', prompt: 'The train announcement! What do you do?',
+        replies: [E('🎒 Get ready — next stop is yours', true), E('😴 Sleep, it\'s far away', false, 'つぎ = next: Kyoto is the next stop!'), E('🔄 Change trains here', false, 'のりかえ would mean changing. つぎ means next.')] },
+      { who: 'woman2', jp: 'どちらまで？', romaji: 'dochira made?', en: 'Where to?', prompt: 'In the taxi. Ask to go to your hotel.',
+        replies: [R('ホテルまでおねがいします', 'hoteru made onegaishimasu', 'to the hotel please', true), R('ホテルはどこですか', 'hoteru wa doko desu ka', 'where is the hotel?', false, 'The driver asks you! Say ホテルまで (to the hotel).'), R('えきまでおねがいします', 'eki made onegaishimasu', 'to the station please', false, 'You just came from the station!')] },
+    ],
+  },
 ];

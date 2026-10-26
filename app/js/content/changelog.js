@@ -1,6 +1,11 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.80', date: '27 Oct 2026', changes: [
+    'New unit — Section 1 · Unit 7: Trains & taxis. Platform, "which platform?", "does this go to Kyoto?", next stop, changing trains, "to the hotel, please"',
+    'New mission: Day trip to Kyoto — find the platform, catch the announcement, take a taxi',
+    'New pattern drill: ___ までおねがいします (To ___, please)',
+  ] },
   { version: '0.79', date: '27 Oct 2026', changes: [
     'New unit — Section 1 · Unit 6: Eating out. Table for one or two, the menu, "what do you recommend?", vegetarian, allergies, "no meat please", one more drink',
     'New mission: Izakaya night — order as a vegetarian in a lively Japanese pub',

@@ -11,7 +11,7 @@ export const PATTERNS = [
   {
     id: 'doko', jp: 'はどこですか', romaji: 'wa doko desu ka', title: '___ はどこですか', meaning: 'Where is ___?', art: '🗺️',
     en: (w) => `Where is the ${w}?`,
-    slots: [['w-eki', 'station'], ['w-toire', 'toilet'], ['w-hoteru', 'hotel'], ['w-resutoran', 'restaurant'], ['w-otearai', 'restroom'], ['w-chikatetsu', 'subway']],
+    slots: [['w-eki', 'station'], ['w-toire', 'toilet'], ['w-hoteru', 'hotel'], ['w-resutoran', 'restaurant'], ['w-otearai', 'restroom'], ['w-chikatetsu', 'subway'], ['w-hoomu', 'platform'], ['w-norikae', 'transfer']],
   },
   {
     id: 'onegai', jp: 'でおねがいします', romaji: 'de onegaishimasu', title: '___ でおねがいします', meaning: 'By / in ___, please', art: '💳',
@@ -27,5 +27,10 @@ export const PATTERNS = [
     id: 'suki', jp: 'がすきです', romaji: 'ga suki desu', title: '___ がすきです', meaning: 'I like ___', art: '😋',
     en: (w) => `I like ${w}`,
     slots: [['w-sushi', 'sushi'], ['w-raamen', 'ramen'], ['w-neko', 'cats'], ['w-inu', 'dogs'], ['w-sakana', 'fish'], ['w-niku', 'meat'], ['w-yasai', 'vegetables'], ['w-ringo', 'apples'], ['w-biiru', 'beer'], ['w-ocha', 'green tea']],
+  },
+  {
+    id: 'made', jp: 'までおねがいします', romaji: 'made onegaishimasu', title: '___ までおねがいします', meaning: 'To ___, please', art: '🚕',
+    en: (w) => `To ${w}, please`,
+    slots: [['w-eki', 'the station'], ['w-hoteru', 'the hotel'], ['w-kyouto', 'Kyoto'], ['w-resutoran', 'the restaurant']],
   },
 ];

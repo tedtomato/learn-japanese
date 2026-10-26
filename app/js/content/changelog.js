@@ -1,6 +1,14 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.78', date: '27 Oct 2026', changes: [
+    'New unit — Section 1 · Unit 5: At the hotel. Reservation, check-in, room, key, Wi-Fi password, breakfast time, leaving your luggage',
+    'New mission: Hotel check-in with Yuki at the front desk',
+    'Your finished lessons are carried over to the updated path',
+  ] },
+  { version: '0.77', date: '27 Oct 2026', changes: [
+    'Practice is tidier: three tabs — Today (reviews, mistakes, listening, kanji practice), Games (missions, sign spotter, fun facts quiz, pattern drills) and Library (phrasebook, facts, everything you\'ve learned)',
+  ] },
   { version: '0.76', date: '27 Oct 2026', changes: [
     'Every update is now checked automatically on a phone-sized screen before it goes live: no text off the screen, cut off or too small, on every screen in light and dark mode',
     'Kanji part labels and the mascot\'s cheer on the path are a little bigger',

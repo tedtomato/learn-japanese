@@ -181,6 +181,38 @@ export const SECTIONS_DATA = [
           ] },
         ],
       },
+      {
+        id: 'hotel',
+        title: 'At the hotel',
+        desc: 'Check in, find your room, Wi-Fi and breakfast',
+        facts: [FACT.daily, FACT.wellness],
+        phrases: ['Practical Everyday Questions & Phrases'],
+        lessons: [
+          { title: 'Checking in', words: [
+            ['よやく', 'yoyaku', 'reservation', '📋', { alt: ['予約'] }],
+            ['チェックイン', 'chekkuin', 'check-in', '🛎️', { note: 'English said the Japanese way. Check-out is チェックアウト.' }],
+            ['へや', 'heya', 'room', '🚪', { alt: ['部屋'] }],
+            ['かぎ', 'kagi', 'key', '🔑', { alt: ['鍵'] }],
+          ] },
+          { title: 'Hotel life', words: [
+            ['あさごはん', 'asagohan', 'breakfast', '🍳', { note: 'あさ (morning) + ごはん (meal, rice).', alt: ['朝ご飯', '朝ごはん'] }],
+            ['なんじ', 'nanji', 'what time', '🕐', { alt: ['何時'] }],
+            ['ワイファイ', 'waifai', 'Wi-Fi', '📶'],
+            ['パスワード', 'pasuwaado', 'password', '🔐'],
+            ['にもつ', 'nimotsu', 'luggage', '🧳', { alt: ['荷物'] }],
+          ] },
+          { title: 'At the front desk', grammar: 'ga', sentences: [
+            { jp: ['よやく', 'が', 'あります'], romaji: 'yoyaku ga arimasu', en: 'I have a reservation', alt: ['I have a booking', 'I\'ve got a reservation'] },
+            { jp: ['チェックイン', 'を', 'おねがいします'], romaji: 'chekkuin o onegaishimasu', en: 'Check-in please', alt: ['I would like to check in', 'Check in please'] },
+            { jp: ['ワイファイ', 'の', 'パスワード', 'は'], romaji: 'waifai no pasuwaado wa', en: 'What is the Wi-Fi password', alt: ['The Wi-Fi password?', 'What\'s the Wi-Fi password'] },
+          ] },
+          { title: 'Breakfast & bags', sentences: [
+            { jp: ['あさごはん', 'は', 'なんじ', 'です', 'か'], romaji: 'asagohan wa nanji desu ka', en: 'What time is breakfast', alt: ['When is breakfast'] },
+            { jp: ['にもつ', 'を', 'あずかって', 'ください'], romaji: 'nimotsu o azukatte kudasai', en: 'Please keep my luggage', alt: ['Please look after my luggage', 'Please hold my bags'] },
+            { jp: ['へや', 'は', 'どこ', 'です', 'か'], romaji: 'heya wa doko desu ka', en: 'Where is the room', alt: ['Where is my room'] },
+          ] },
+        ],
+      },
     ],
   },
   {

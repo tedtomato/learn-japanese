@@ -118,4 +118,14 @@ export const MNEMONICS = {
   'w-ikemen': '“Icky men?” — nope, the opposite: super handsome guys 😎',
   'w-mukatsuku': '“Moo, cats, coo!” — a cow, cats and pigeons all yelling: so annoying 😤',
   'w-guguru': '“Google” said the Japanese way, as a verb: gu-gu-ru 🔎',
+  // hotel
+  'w-yoyaku': '“Yo, yak!” — a yak at the front desk checks your reservation 📋',
+  'w-chekkuin': '“Check-in” said the Japanese way: chek-ku-in 🛎️',
+  'w-heya': '“Hey, ya!” — you shout it and flop onto your room’s bed 🚪',
+  'w-kagi': '“Car-ghee” — someone dropped the key in a jar of ghee 🔑',
+  'w-asagohan': '“Asa, go, Han!” — in the morning (asa), Han goes to breakfast 🍳',
+  'w-nanji': '“Nan, G?” — Nan asks G what time it is 🕐',
+  'w-waifai': '“Wi-Fi” said the Japanese way: wai-fai 📶',
+  'w-pasuwaado': '“Password” said the Japanese way: pa-su-waa-do 🔐',
+  'w-nimotsu': '“Knee mots” — the luggage is so heavy it bumps your knee 🧳',
 };

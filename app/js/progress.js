@@ -14,7 +14,7 @@ export const FREEZE_PRICE = 50;
 export const HEARTS_PRICE = 30; // gems for a full set of hearts
 export const MAX_FREEZES = 2;
 
-export const COURSE_VERSION = 2; // bumped when the path is rebuilt, so finished lessons are carried over
+export const COURSE_VERSION = 3; // bumped when the path is rebuilt, so finished lessons are carried over
 
 export function defaultState(now = Date.now()) {
   return {

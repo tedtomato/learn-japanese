@@ -74,4 +74,23 @@ export const MISSIONS = [
         replies: [R('どうも', 'doumo', 'thanks', true), R('ありがとうございます', 'arigatou gozaimasu', 'thank you', true), R('はじめまして', 'hajimemashite', 'nice to meet you', false, 'You\'re leaving — just say thanks!')] },
     ],
   },
+  {
+    id: 'check-in', unit: 'tokyo-hotel', art: '🏨', title: 'Hotel check-in',
+    setting: 'After a long flight you reach your hotel in Shinjuku. Yuki is at the front desk.',
+    reward: 'Key in hand, Wi-Fi on, breakfast at 7 — time to rest!',
+    steps: [
+      { who: 'woman', jp: 'いらっしゃいませ！', romaji: 'irasshaimase!', en: 'Welcome!', prompt: 'Tell her you have a reservation.',
+        replies: [R('よやくがあります', 'yoyaku ga arimasu', 'I have a reservation', true), R('へやはどこですか', 'heya wa doko desu ka', 'where is the room?', false, 'Not yet — check in first!'), R('おかいけい', 'okaikei', 'the bill', false, 'That\'s for restaurants.')] },
+      { who: 'woman', jp: 'パスポートをおねがいします。', romaji: 'pasupooto o onegaishimasu', en: 'Your passport, please.', prompt: 'What does she want?',
+        replies: [E('🛂 Your passport', true), E('💳 Your card', false, 'パスポート = passport (English said the Japanese way).'), E('🔑 The key', false, 'She asks for your パスポート (passport).')] },
+      { who: 'woman', jp: 'こちらが かぎです。', romaji: 'kochira ga kagi desu', en: 'Here is your key.',
+        replies: [R('ありがとうございます', 'arigatou gozaimasu', 'thank you', true), R('いただきます', 'itadakimasu', 'said before eating', false, 'You can\'t eat a key! Say thank you.'), R('すみません', 'sumimasen', 'excuse me', false, 'Say thank you — ありがとうございます.')] },
+      { prompt: 'Ask for the Wi-Fi password.',
+        replies: [R('ワイファイのパスワードは？', 'waifai no pasuwaado wa?', 'the Wi-Fi password?', true), R('あさごはんはなんじですか', 'asagohan wa nanji desu ka', 'what time is breakfast?', false, 'That asks about breakfast — next question!'), R('にもつ', 'nimotsu', 'luggage', false, '"Luggage"? Ask for the パスワード.')] },
+      { prompt: 'Now ask what time breakfast is.',
+        replies: [R('あさごはんはなんじですか', 'asagohan wa nanji desu ka', 'what time is breakfast?', true), R('おやすみなさい', 'oyasuminasai', 'good night', false, 'A bit early for bed — ask about breakfast!'), R('かぎをください', 'kagi o kudasai', 'the key please', false, 'You already have the key!')] },
+      { who: 'woman', jp: '7じからです。', romaji: 'shichi-ji kara desu', en: 'From 7 o\'clock.', prompt: 'When is breakfast?',
+        replies: [E('🕖 From 7 o\'clock', true), E('🕘 From 9 o\'clock', false, 'しち (7) じ (o\'clock) から (from).'), E('🕚 Until 11 o\'clock', false, 'から means "from": from 7.')] },
+    ],
+  },
 ];

@@ -7,8 +7,9 @@ Releases are listed in the in-app change log (Profile → App version).
 | Request | Status | Release |
 |---|---|---|
 | Automated phone-screen tests on every update | ✅ scripts/screens.mjs (npm run screens): ~60 screens × light/dark at 393×851; fails on sideways scroll, text off-screen or cut, text < 13px (romaji < 10.5px), overflowing boxes, page errors; runs in the deploy pipeline before publishing | 0.76 |
-| Tidy up the Practice tab | ⏳ | |
-| More travel units (hotel, restaurant extras, numbers & time, emergencies, transport) | ⏳ | |
+| Tidy up the Practice tab | ✅ Today / Games / Library switcher | 0.77 |
+| More travel units (hotel, restaurant extras, numbers & time, emergencies, transport) | 🚧 Unit 5 At the hotel + Hotel check-in mission (0.78); restaurant, numbers & time, emergencies, transport next | 0.78 |
+| Deploy too slow with the phone check (~11 min) | ✅ uses the runner's Chrome (no download), dark theme only: check ~30 s | 0.78 |
 
 ## Batch 13 — 26 Oct 2026
 | Request | Status | Release |

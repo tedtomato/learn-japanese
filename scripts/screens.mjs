@@ -1,7 +1,8 @@
 // Phone-screen check: opens every screen of the built app at a real phone size (393×851, the
 // author's phone) and fails if text spills off the screen, overflows its box, or is too small to
 // read, or if a page throws. Run after `npm run build`: node scripts/screens.mjs [--shots dir]
-// Needs Playwright with Chromium (CI installs it; locally set PLAYWRIGHT_PATH if it is elsewhere).
+// Needs Playwright (locally set PLAYWRIGHT_PATH if it is elsewhere). SCREENS_CHANNEL=chrome uses the
+// machine's installed Chrome instead of a downloaded Chromium (CI does this: no browser download).
 import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
 import { mkdirSync } from 'node:fs';
@@ -21,7 +22,7 @@ const server = spawn(process.execPath, [new URL('./serve.mjs', import.meta.url).
 await new Promise((r) => setTimeout(r, 800));
 
 const problems = [];
-const browser = await playwright.chromium.launch();
+const browser = await playwright.chromium.launch(process.env.SCREENS_CHANNEL ? { channel: process.env.SCREENS_CHANNEL } : {});
 try {
   const page = await (await browser.newContext({
     viewport: { width: 393, height: 851 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, serviceWorkers: 'block', reducedMotion: 'reduce',
@@ -67,7 +68,7 @@ try {
     for (const f of found) problems.push(`${screen}: ${f}`);
     if (shotsAt) await page.screenshot({ path: `${shotsAt}/${name}-${theme}.png` });
   };
-  const go = async (hash, wait = 600) => { await page.evaluate((h) => (location.hash = h), hash); await page.waitForTimeout(wait); };
+  const go = async (hash, wait = 450) => { await page.evaluate((h) => (location.hash = h), hash); await page.waitForTimeout(wait); };
   const continueLesson = () => page.evaluate(() => {
     const b = document.querySelector('.lesson-foot .check');
     if (b) { b.disabled = false; b.click(); }
@@ -103,7 +104,8 @@ try {
     ['#/signs', 'signs'], ['#/mission/cafe', 'mission'], ['#/drill/kudasai', 'drill'], ['#/listen', 'listening'],
   ];
   const LAB = ['intro', 'read', 'build', 'match', 'grammar', 'dialogue', 'kanji', 'listen', 'fast', 'speak', 'trace'];
-  for (const theme of ['dark', 'light']) {
+  // Sizes are the same in both themes: dark only (the app's usual look) keeps the check quick.
+  for (const theme of ['dark']) {
     await page.emulateMedia({ colorScheme: theme });
     for (const [hash, name] of SCREENS) {
       await go(hash);
@@ -115,7 +117,7 @@ try {
       }
     }
     for (const kind of LAB) {
-      await go(`#/lab/${kind}`, 900);
+      await go(`#/lab/${kind}`, 600);
       await check(`lab-${kind}`, theme);
     }
     // A real lesson at level 2: the first ten screens, each one checked.

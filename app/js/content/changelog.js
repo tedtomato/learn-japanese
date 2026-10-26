@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.79', date: '27 Oct 2026', changes: [
+    'New unit — Section 1 · Unit 6: Eating out. Table for one or two, the menu, "what do you recommend?", vegetarian, allergies, "no meat please", one more drink',
+    'New mission: Izakaya night — order as a vegetarian in a lively Japanese pub',
+  ] },
   { version: '0.78', date: '27 Oct 2026', changes: [
     'New unit — Section 1 · Unit 5: At the hotel. Reservation, check-in, room, key, Wi-Fi password, breakfast time, leaving your luggage',
     'New mission: Hotel check-in with Yuki at the front desk',

@@ -128,4 +128,12 @@ export const MNEMONICS = {
   'w-waifai': '“Wi-Fi” said the Japanese way: wai-fai 📶',
   'w-pasuwaado': '“Password” said the Japanese way: pa-su-waa-do 🔐',
   'w-nimotsu': '“Knee mots” — the luggage is so heavy it bumps your knee 🧳',
+  // eating out
+  'w-hitori': '“He tore-y…” — he tore the second ticket: just one person 🧍',
+  'w-futari': '“Foot, Tari!” — two people, you and Tari, foot to foot under the table 👫',
+  'w-menyuu': '“Menu” said the Japanese way: me-nyuu 🗒️',
+  'w-osusume': '“Oh, Sue’s mum!” — Sue’s mum always knows what to recommend 👍',
+  'w-arerugii': '“Allergy” said the Japanese way: a-re-ru-gii 🤧',
+  'w-bejitarian': '“Vegetarian” said the Japanese way: be-ji-ta-ri-an 🥗',
+  'w-irimasen': '“Ear, he mass-sends” — he sends far too much: no thanks, I don’t need it 🙅',
 };

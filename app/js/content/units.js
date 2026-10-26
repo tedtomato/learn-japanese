@@ -213,6 +213,37 @@ export const SECTIONS_DATA = [
           ] },
         ],
       },
+      {
+        id: 'eating-out',
+        title: 'Eating out',
+        desc: 'A table for two, recommendations, allergies and one more drink',
+        facts: [FACT.food],
+        phrases: ['Dining & Food'],
+        lessons: [
+          { title: 'Table for…', words: [
+            ['ひとり', 'hitori', 'one person', '🧍', { note: 'Counting people: ひとり, ふたり, then さんにん (3)…', alt: ['一人'] }],
+            ['ふたり', 'futari', 'two people', '👫', { alt: ['二人'] }],
+            ['メニュー', 'menyuu', 'menu', '🗒️'],
+            ['おすすめ', 'osusume', 'recommendation', '👍', { note: 'Ask for it — staff love to help.', alt: ['お勧め', 'お薦め'] }],
+          ] },
+          { title: 'Special requests', words: [
+            ['アレルギー', 'arerugii', 'allergy', '🤧'],
+            ['ベジタリアン', 'bejitarian', 'vegetarian', '🥗'],
+            ['いりません', 'irimasen', 'I don\'t need it', '🙅', { note: 'A polite "no thanks" — for a bag, a straw, or meat in your dish.', alt: ['要りません'] }],
+          ] },
+          { title: 'Ordering', grammar: 'wa', sentences: [
+            { jp: ['ふたり', 'です'], romaji: 'futari desu', en: 'Two people', alt: ['A table for two', 'We are two', 'There are two of us'] },
+            { jp: ['メニュー', 'を', 'おねがいします'], romaji: 'menyuu o onegaishimasu', en: 'The menu please', alt: ['Menu please', 'Can I have the menu'] },
+            { jp: ['おすすめ', 'は', 'なん', 'です', 'か'], romaji: 'osusume wa nan desu ka', en: 'What do you recommend', alt: ['What is your recommendation', 'What is recommended'] },
+            { jp: ['もう', 'いっぱい', 'ください'], romaji: 'mou ippai kudasai', en: 'One more please', alt: ['Another one please', 'One more glass please'] },
+          ] },
+          { title: 'Allergies', sentences: [
+            { jp: ['わたし', 'は', 'ベジタリアン', 'です'], romaji: 'watashi wa bejitarian desu', en: 'I am vegetarian', alt: ['I\'m vegetarian', 'I am a vegetarian'] },
+            { jp: ['たまご', 'アレルギー', 'が', 'あります'], romaji: 'tamago arerugii ga arimasu', en: 'I have an egg allergy', alt: ['I am allergic to eggs', 'I\'m allergic to eggs'] },
+            { jp: ['にく', 'は', 'いりません'], romaji: 'niku wa irimasen', en: 'No meat please', alt: ['I don\'t need meat', 'No meat'] },
+          ] },
+        ],
+      },
     ],
   },
   {

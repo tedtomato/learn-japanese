@@ -101,7 +101,7 @@ try {
     ['#/learn', 'learn'], ['#/practice/today', 'practice'], ['#/practice/games', 'practice-games'], ['#/practice/library', 'practice-library'],
     ['#/practice/kanji', 'practice-kanji'], ['#/practice/kana', 'practice-kana'],
     ['#/profile', 'profile'], ['#/collection/phrase', 'phrasebook'], ['#/collection/fact', 'facts'], ['#/quiz', 'facts-quiz'],
-    ['#/signs', 'signs'], ['#/mission/cafe', 'mission'], ['#/drill/kudasai', 'drill'], ['#/listen', 'listening'],
+    ['#/signs', 'signs'], ['#/mission/cafe', 'mission'], ['#/mission/izakaya', 'mission-izakaya'], ['#/drill/kudasai', 'drill'], ['#/listen', 'listening'],
   ];
   const LAB = ['intro', 'read', 'build', 'match', 'grammar', 'dialogue', 'kanji', 'listen', 'fast', 'speak', 'trace'];
   // Sizes are the same in both themes: dark only (the app's usual look) keeps the check quick.

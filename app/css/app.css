@@ -1132,3 +1132,5 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .recall-input::placeholder { font-size: 18px; }
 /* Sentences wrap between words, never inside one (です stays together) */
 .chunk { display: inline-block; white-space: nowrap; }
+.node-mascot .bubble small { font-size: 13px; }
+.prompt-person.stacked .part small { font-size: 13px; white-space: normal; line-height: 1.1; max-width: 6em; text-align: center; }

@@ -25,6 +25,12 @@ jobs:
           node-version: 22
       - run: npm test
       - run: npm run build
+      # Every screen at a real phone size: no text off-screen, cut off or too small to read.
+      - name: Phone-screen check
+        run: |
+          npm i --no-save --no-package-lock playwright@1.56.1
+          npx playwright install --with-deps chromium
+          node scripts/screens.mjs
       - uses: actions/upload-pages-artifact@v3
         if: github.ref == 'refs/heads/main'
         with:

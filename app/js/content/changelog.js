@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.76', date: '27 Oct 2026', changes: [
+    'Every update is now checked automatically on a phone-sized screen before it goes live: no text off the screen, cut off or too small, on every screen in light and dark mode',
+    'Kanji part labels and the mascot\'s cheer on the path are a little bigger',
+  ] },
   { version: '0.75', date: '26 Oct 2026', changes: [
     'Text sizes checked on every screen at your phone\'s size: small labels made readable (names, card descriptions, romaji, lesson info), Japanese answers bigger, oversized headings toned down',
     'Sentences wrap between words, never inside one (です no longer splits), long phrases shrink less, and the speaking exercise no longer overflows',

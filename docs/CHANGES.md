@@ -3,6 +3,13 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 14 — 27 Oct 2026
+| Request | Status | Release |
+|---|---|---|
+| Automated phone-screen tests on every update | ✅ scripts/screens.mjs (npm run screens): ~60 screens × light/dark at 393×851; fails on sideways scroll, text off-screen or cut, text < 13px (romaji < 10.5px), overflowing boxes, page errors; runs in the deploy pipeline before publishing | 0.76 |
+| Tidy up the Practice tab | ⏳ | |
+| More travel units (hotel, restaurant extras, numbers & time, emergencies, transport) | ⏳ | |
+
 ## Batch 13 — 26 Oct 2026
 | Request | Status | Release |
 |---|---|---|

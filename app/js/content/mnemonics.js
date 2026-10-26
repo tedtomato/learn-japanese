@@ -144,4 +144,12 @@ export const MNEMONICS = {
   'w-ikimasu': '“Eek! Key! Must!” — eek, keys, must go! ➡️',
   'w-made': '“Ma, day!” — Ma drives all day, all the way to the hotel 🏁',
   'w-kyouto': '“Kyoto” — the old capital: kyo-u-to ⛩️',
+  // prices & time
+  'w-hyaku': '“Hya-COO!” — a hundred pigeons all coo at once 💯',
+  'w-sen': '“Cent” — a thousand cents, rattling in your pocket 🪙',
+  'w-man': '“Man!” — “Man, ten thousand yen!” you gasp at the bill 💰',
+  'w-en': '“Yen” without the y: just “en” 💴',
+  'w-ji': '“Gee!” — “Gee, it’s already 3 o’clock!” 🕒',
+  'w-han': '“Han” Solo is always half an hour late: half past 🕧',
+  'w-ima': '“Ee, ma!” — “Ee, Ma, now? Right now?” ⌚',
 };

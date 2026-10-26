@@ -182,6 +182,34 @@ export const SECTIONS_DATA = [
         ],
       },
       {
+        id: 'numbers',
+        title: 'Numbers, prices & time',
+        desc: 'Count, read prices in yen and tell the time',
+        facts: [FACT.society, FACT.festivals],
+        lessons: [
+          { title: '1 to 3', words: [['いち', 'ichi', 'one', '1️⃣'], ['に', 'ni', 'two', '2️⃣'], ['さん', 'san', 'three', '3️⃣']] },
+          { title: '4 to 6', words: [['よん', 'yon', 'four', '4️⃣', { note: 'Also し, but よん is safer — し sounds like "death".' }], ['ご', 'go', 'five', '5️⃣'], ['ろく', 'roku', 'six', '6️⃣']] },
+          { title: '7 to 10', words: [['なな', 'nana', 'seven', '7️⃣'], ['はち', 'hachi', 'eight', '8️⃣'], ['きゅう', 'kyuu', 'nine', '9️⃣'], ['じゅう', 'juu', 'ten', '🔟']] },
+          { title: 'Big numbers', words: [
+            ['ひゃく', 'hyaku', 'hundred', '💯', { note: '500 = ごひゃく (five hundred). 300 is さんびゃく — the sound softens.', alt: ['百'] }],
+            ['せん', 'sen', 'thousand', '🪙', { note: '2,000 = にせん. 3,000 is さんぜん.', alt: ['千'] }],
+            ['まん', 'man', 'ten thousand', '💰', { note: 'Japanese counts in ten-thousands: 10,000 yen = いちまんえん.', alt: ['万'] }],
+          ] },
+          { title: 'Yen & time', words: [
+            ['えん', 'en', 'yen', '💴', { note: 'After the price: ひゃくえん = 100 yen.', alt: ['円'] }],
+            ['じ', 'ji', 'o\'clock', '🕒', { note: 'After the hour: さんじ = 3 o\'clock. 4 is よじ, 7 is しちじ, 9 is くじ.', alt: ['時'] }],
+            ['はん', 'han', 'half past', '🕧', { note: 'After the hour: さんじはん = half past three.', alt: ['半'] }],
+            ['いま', 'ima', 'now', '⌚', { alt: ['今'] }],
+          ] },
+          { title: 'How much? What time?', grammar: 'desu', sentences: [
+            { jp: ['ごひゃく', 'えん', 'です'], romaji: 'gohyaku en desu', en: 'It is 500 yen', alt: ['It\'s 500 yen', '500 yen'] },
+            { jp: ['せん', 'えん', 'です'], romaji: 'sen en desu', en: 'It is 1,000 yen', alt: ['It\'s 1000 yen', 'It is 1000 yen', '1000 yen'] },
+            { jp: ['いま', 'なんじ', 'です', 'か'], romaji: 'ima nanji desu ka', en: 'What time is it now', alt: ['What time is it'] },
+            { jp: ['さんじ', 'はん', 'です'], romaji: 'sanji han desu', en: 'It is half past three', alt: ['It\'s half past three', 'It is 3:30', 'It\'s 3:30'] },
+          ] },
+        ],
+      },
+      {
         id: 'hotel',
         title: 'At the hotel',
         desc: 'Check in, find your room, Wi-Fi and breakfast',
@@ -280,17 +308,6 @@ export const SECTIONS_DATA = [
     id: 'everyday',
     title: 'Everyday Japanese',
     units: [
-      {
-        id: 'numbers',
-        title: 'Numbers 1–10',
-        desc: 'Count from one to ten',
-        facts: [FACT.society, FACT.festivals],
-        lessons: [
-          { title: '1 to 3', words: [['いち', 'ichi', 'one', '1️⃣'], ['に', 'ni', 'two', '2️⃣'], ['さん', 'san', 'three', '3️⃣']] },
-          { title: '4 to 6', words: [['よん', 'yon', 'four', '4️⃣', { note: 'Also し, but よん is safer — し sounds like "death".' }], ['ご', 'go', 'five', '5️⃣'], ['ろく', 'roku', 'six', '6️⃣']] },
-          { title: '7 to 10', words: [['なな', 'nana', 'seven', '7️⃣'], ['はち', 'hachi', 'eight', '8️⃣'], ['きゅう', 'kyuu', 'nine', '9️⃣'], ['じゅう', 'juu', 'ten', '🔟']] },
-        ],
-      },
       {
         id: 'people',
         title: 'People & jobs',

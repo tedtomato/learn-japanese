@@ -80,7 +80,8 @@ for (const d of Object.entries(DIALOGUES)) addItem({ id: `dl-${d[0]}`, type: 'di
 // ---- Build the path ----
 const taught = new Set();
 let carry = [];
-const kanjiQueue = [...KANJI_LESSONS];
+const kanjiQueue = KANJI_LESSONS.filter((l) => !l.unit);
+const kanjiPinned = KANJI_LESSONS.filter((l) => l.unit);
 
 // Marks words that every taught character can now spell, returning up to `max` of them.
 function newlyReadable(unitId, max = 6) {
@@ -133,8 +134,10 @@ function buildUnit(section, unit, u, unitIndex, totalUnits) {
     if (i % 2 === 1 && reads.length) seq.push(reads.shift());
   });
   seq.push(...reads);
-  // Kanji: spread the kanji lessons over every unit, the travel signs first.
-  const take = Math.ceil(kanjiQueue.length / (totalUnits - unitIndex));
+  // Kanji: lessons pinned to this unit, then the rest spread over every unit, travel signs first.
+  const pinned = kanjiPinned.filter((spec) => spec.unit === unit.id);
+  pinned.forEach((spec) => seq.push(kanjiLesson(spec)));
+  const take = pinned.length ? 0 : Math.ceil(kanjiQueue.length / (totalUnits - unitIndex));
   kanjiQueue.splice(0, take).forEach((spec) => seq.push(kanjiLesson(spec)));
   if (unit.dialogues?.length) seq.push({ kind: 'story', title: 'Story time', items: unit.dialogues.map((d) => `dl-${d}`), icon: 'story' });
 

@@ -106,17 +106,18 @@ export const KANJI = [
 
 // Lessons in teaching order: the signs a traveller meets first (exits, toilets, stations,
 // directions, prices), then everyday kanji. Radicals are explained inside each kanji's parts.
+// `unit` pins a lesson to the unit it belongs with (numbers, trains); the others are spread out.
 export const KANJI_LESSONS = [
   { title: 'Kanji: Japan', kanji: ['日', '本', '人'] },
   { title: 'Kanji: entrance & exit', kanji: ['口', '入', '出'] },
   { title: 'Kanji: toilets', kanji: ['男', '女', '手'] },
-  { title: 'Kanji: trains', kanji: ['電', '車', '駅'] },
+  { title: 'Kanji: trains', kanji: ['電', '車', '駅'], unit: 'trains' },
   { title: 'Kanji: left & right', kanji: ['右', '左', '中'] },
-  { title: 'Kanji: station exits', kanji: ['東', '西', '南', '北'] },
-  { title: 'Kanji: money & time', kanji: ['円', '何', '時'] },
-  { title: 'Kanji: one, two, three', kanji: ['一', '二', '三'] },
-  { title: 'Kanji: water & sake', kanji: ['水', '酒', '海'] },
+  { title: 'Kanji: station exits', kanji: ['東', '西', '南', '北'], unit: 'trains' },
+  { title: 'Kanji: money & time', kanji: ['円', '何', '時'], unit: 'numbers' },
+  { title: 'Kanji: one, two, three', kanji: ['一', '二', '三'], unit: 'numbers' },
   { title: 'Kanji: big & small', kanji: ['大', '小', '子'] },
+  { title: 'Kanji: water & sake', kanji: ['水', '酒', '海'] },
   { title: 'Kanji: school', kanji: ['先', '生', '学'] },
   { title: 'Kanji: trees', kanji: ['木', '林', '森'] },
 ];

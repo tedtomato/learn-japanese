@@ -8,7 +8,7 @@ Releases are listed in the in-app change log (Profile → App version).
 |---|---|---|
 | Automated phone-screen tests on every update | ✅ scripts/screens.mjs (npm run screens): ~60 screens × light/dark at 393×851; fails on sideways scroll, text off-screen or cut, text < 13px (romaji < 10.5px), overflowing boxes, page errors; runs in the deploy pipeline before publishing | 0.76 |
 | Tidy up the Practice tab | ✅ Today / Games / Library switcher | 0.77 |
-| More travel units (hotel, restaurant extras, numbers & time, emergencies, transport) | 🚧 Unit 5 At the hotel + Hotel check-in mission (0.78); Unit 6 Eating out + Izakaya night mission (0.79); Unit 7 Trains & taxis + Day trip to Kyoto mission + まで drill (0.80); numbers & time, emergencies next | 0.80 |
+| More travel units (hotel, restaurant extras, numbers & time, emergencies, transport) | 🚧 Unit 5 At the hotel + Hotel check-in mission (0.78); Unit 6 Eating out + Izakaya night mission (0.79); Unit 7 Trains & taxis + Day trip to Kyoto mission + まで drill (0.80); Numbers moved to section 1 as "Numbers, prices & time" (0.81); emergencies next | 0.81 |
 | Deploy too slow with the phone check (~11 min) | ✅ uses the runner's Chrome (no download), dark theme only: check ~30 s | 0.78 |
 
 ## Batch 13 — 26 Oct 2026

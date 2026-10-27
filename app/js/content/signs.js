@@ -1,7 +1,7 @@
 // Sign spotter: travel situations where you pick the right real-looking sign. `need` lists the
 // kanji that must be learned (kj-*) before the situation is asked. Signs: t text, r romaji,
-// say kana reading, en meaning, s style (yellow station sign, blue street sign, wood plaque,
-// vertical menu strip, order button, price tag).
+// say kana reading, en meaning. style: yellow station sign, blue / street sign, wood plaque, vertical
+// menu strip, order button, price tag, door plate, round no-smoking sign, red STOP triangle.
 const S = {
   exit: { t: '出口', r: 'deguchi', say: 'でぐち', en: 'exit' },
   entrance: { t: '入口', r: 'iriguchi', say: 'いりぐち', en: 'entrance' },
@@ -26,6 +26,19 @@ const S = {
   water: { t: '水', r: 'mizu', say: 'みず', en: 'water' },
   sake: { t: '酒', r: 'sake', say: 'さけ', en: 'alcohol' },
   japan: { t: '日本', r: 'nihon', say: 'にほん', en: 'Japan' },
+  push: { t: '押', r: 'osu', say: 'おす', en: 'push' },
+  pull: { t: '引', r: 'hiku', say: 'ひく', en: 'pull' },
+  shopOpen: { t: '開店', r: 'kaiten', say: 'かいてん', en: 'open (shop)' },
+  shopClosed: { t: '閉店', r: 'heiten', say: 'へいてん', en: 'closed (shop)' },
+  noSmoking: { t: '禁煙', r: 'kin-en', say: 'きんえん', en: 'no smoking' },
+  smoking: { t: '喫煙', r: 'kitsuen', say: 'きつえん', en: 'smoking area' },
+  noEntry: { t: '立入禁止', r: 'tachiiri kinshi', say: 'たちいりきんし', en: 'no entry' },
+  stop: { t: '止まれ', r: 'tomare', say: 'とまれ', en: 'stop' },
+  slow: { t: '徐行', r: 'jokou', say: 'じょこう', en: 'slow down' },
+  free: { t: '無料', r: 'muryou', say: 'むりょう', en: 'free (no charge)' },
+  fare: { t: '料金', r: 'ryoukin', say: 'りょうきん', en: 'fare / charge' },
+  cashOnly: { t: '現金のみ', r: 'genkin nomi', say: 'げんきんのみ', en: 'cash only' },
+  cardOk: { t: 'カードOK', r: 'kaado OK', say: 'カードオーケー', en: 'cards accepted' },
 };
 const tag = (art, price, en) => ({ t: `${price}円`, art, r: `${price} en`, say: `${price}えん`, en });
 
@@ -48,5 +61,16 @@ export const SIGN_SCENES = [
   { id: 'two', need: ['一', '二', '三', '人'], q: 'A table for two. Which do you point at?', style: 'button', answer: S.two, wrong: [S.one, S.three] },
   { id: 'alone', need: ['一', '二', '三', '人'], q: 'Travelling alone: a seat for one. Which do you point at?', style: 'button', answer: S.one, wrong: [S.two, S.three] },
   { id: 'water', need: ['水', '酒'], q: 'You want water, not alcohol. Which drink on the menu?', style: 'menu', answer: S.water, wrong: [S.sake] },
+  { id: 'push', need: ['押', '引'], q: 'The café door has a metal plate. You want to push it open. Which plate says push?', style: 'door', answer: S.push, wrong: [S.pull] },
+  { id: 'pull', need: ['押', '引'], q: 'Leaving the shop: this door opens towards you. Which plate says pull?', style: 'door', answer: S.pull, wrong: [S.push] },
+  { id: 'closed', need: ['開', '閉'], q: 'It\'s 10 p.m. Which sign on the shop door means it\'s closed?', style: 'wood', answer: S.shopClosed, wrong: [S.shopOpen] },
+  { id: 'open', need: ['開', '閉'], q: 'A new bakery! Which sign means it\'s opening (open)?', style: 'wood', answer: S.shopOpen, wrong: [S.shopClosed] },
+  { id: 'no-smoking', need: ['禁', '煙'], q: 'You want a table where nobody smokes. Which sign?', style: 'round', answer: S.noSmoking, wrong: [S.smoking] },
+  { id: 'no-entry', need: ['禁', '止', '入'], q: 'A rope across a temple path. Which sign tells you not to go in?', style: 'street', answer: S.noEntry, wrong: [S.entrance, S.exit] },
+  { id: 'stop', need: ['止'], q: 'Driving a rental car in Hokkaido. Which road sign means STOP?', style: 'stop', answer: S.stop, wrong: [S.slow] },
+  { id: 'free', need: ['無', '料'], q: 'Two museums. Which one is free to enter?', style: 'tag', answer: S.free, wrong: [tag('🎫', 1200, 'ticket, 1,200 yen')] },
+  { id: 'fare', need: ['料', '金'], q: 'At the bus stop: which board shows the fares?', style: 'blue', answer: S.fare, wrong: [S.exit, S.station] },
+  { id: 'cash-only', need: ['現', '金'], q: 'You only have yen coins and notes. Which tiny ramen shop is fine?', style: 'wood', answer: S.cashOnly, wrong: [S.cardOk] },
+  { id: 'card', need: ['現', '金'], q: 'You only have a credit card. Which shop is fine?', style: 'wood', answer: S.cardOk, wrong: [S.cashOnly] },
   { id: 'yen', need: ['円'], q: 'You have 500 yen left. What can you buy?', style: 'tag', answer: tag('🍙', 300, 'rice ball, 300 yen'), wrong: [tag('🍜', 900, 'ramen, 900 yen'), tag('🍣', 1500, 'sushi, 1,500 yen')] },
 ];

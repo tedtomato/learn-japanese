@@ -1,6 +1,11 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.84', date: '27 Oct 2026', changes: [
+    'Sign spotter, bigger: 11 new situations — push / pull door plates (押 / 引), shop open / closed (開店 / 閉店), no smoking (禁煙), no entry (立入禁止), the red STOP road sign (止まれ), free entry (無料), fares (料金) and "cash only" (現金のみ)',
+    'New "What does this sign mean?" questions mixed in, and 8 signs per round',
+    'New kanji lessons for these signs: push & pull (Unit 6), money signs (Unit 4), no smoking (Unit 9). Every kanji lesson now sits in the unit it belongs with',
+  ] },
   { version: '0.83', date: '27 Oct 2026', changes: [
     'School kanji (先生, 学生) moved to the People & jobs unit, and tree kanji (木 林 森) to Around you, where the matching words are',
   ] },

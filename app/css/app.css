@@ -1141,3 +1141,20 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .practice-sections button { font-size: 15px; }
 .section-more { text-align: center; }
 .section-more .link { font: inherit; font-weight: 800; color: var(--blue); background: none; border: 0; cursor: pointer; }
+
+/* Sign spotter: more sign styles */
+.sign-grid.n1 { grid-template-columns: 1fr; justify-items: center; margin-bottom: 4px; }
+.sign-grid.n1 .sign { width: 62%; min-height: 120px; }
+.sign-door { background: linear-gradient(135deg, #e9edf0, #b9c2c9 55%, #e4e8eb); color: #1d2329; border: 2px solid #8a949c; border-radius: 6px; box-shadow: inset 0 0 0 4px rgba(255,255,255,.5), 0 4px 0 rgba(0,0,0,.35); }
+.sign-round { background: #fff; color: #c1121f; border: 7px solid #d62828; border-radius: 50%; aspect-ratio: 1; min-height: 0; width: 82%; justify-self: center; }
+.sign-round .sign-text { font-size: 30px; }
+.sign-round .sign-meaning { color: #444; }
+.sign-stop { background: #d62828; color: #fff; border: 0; border-radius: 0; clip-path: polygon(0 0, 100% 0, 50% 100%); min-height: 130px; padding-bottom: 46px; box-shadow: none; }
+.sign-stop .sign-text { font-size: 28px; }
+.sign-stop .sign-meaning { display: none; }
+.sign-stop.right, .sign-stop.wrong { outline: none; filter: drop-shadow(0 0 0 transparent); }
+.sign-stop.right { background: #2b9348; }
+.sign-stop.wrong { opacity: .6; }
+.sign-text { white-space: nowrap; }
+.sign-text.long { font-size: 27px; }
+.sign-round .sign-text.long, .sign-stop .sign-text.long { font-size: 22px; }

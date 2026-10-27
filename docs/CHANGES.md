@@ -7,7 +7,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Request | Status | Release |
 |---|---|---|
 | Move school kanji to the People unit | ✅ also trees → Around you (nature); progress carried over | 0.83 |
-| Expand the sign spotter | ⏳ | |
+| Expand the sign spotter | ✅ 30 situations (+11: doors, open/closed, no smoking, no entry, STOP, free, fares, cash only/cards); "what does it mean?" rounds; 8 per game; new styles (door plate, round no-smoking, red STOP triangle); 11 new sign kanji in 3 lessons | 0.84 |
 | Automated phone-screen tests on every update | ✅ scripts/screens.mjs (npm run screens): ~60 screens × light/dark at 393×851; fails on sideways scroll, text off-screen or cut, text < 13px (romaji < 10.5px), overflowing boxes, page errors; runs in the deploy pipeline before publishing | 0.76 |
 | Tidy up the Practice tab | ✅ Today / Games / Library switcher | 0.77 |
 | More travel units (hotel, restaurant extras, numbers & time, emergencies, transport) | ✅ Unit 5 At the hotel + Hotel check-in mission (0.78); Unit 6 Eating out + Izakaya night mission (0.79); Unit 7 Trains & taxis + Day trip to Kyoto mission + まで drill (0.80); Numbers moved to section 1 as "Numbers, prices & time" (0.81); Unit 9 Help & health + Pharmacy visit mission (0.82) | 0.82 |

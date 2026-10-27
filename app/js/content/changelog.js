@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.83', date: '27 Oct 2026', changes: [
+    'School kanji (先生, 学生) moved to the People & jobs unit, and tree kanji (木 林 森) to Around you, where the matching words are',
+  ] },
   { version: '0.82', date: '27 Oct 2026', changes: [
     'New unit — Section 1 · Unit 9: Help & health. "It hurts here", medicine, pharmacy, hospital, doctor, ambulance, police, police box (こうばん) and "I\'m lost"',
     'New mission: Pharmacy visit — explain a headache, understand the dose, pay',

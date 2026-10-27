@@ -106,7 +106,7 @@ export const KANJI = [
 
 // Lessons in teaching order: the signs a traveller meets first (exits, toilets, stations,
 // directions, prices), then everyday kanji. Radicals are explained inside each kanji's parts.
-// `unit` pins a lesson to the unit it belongs with (numbers, trains); the others are spread out.
+// `unit` pins a lesson to the unit it belongs with (numbers, trains, people, nature); the others are spread out.
 export const KANJI_LESSONS = [
   { title: 'Kanji: Japan', kanji: ['日', '本', '人'] },
   { title: 'Kanji: entrance & exit', kanji: ['口', '入', '出'] },
@@ -118,6 +118,6 @@ export const KANJI_LESSONS = [
   { title: 'Kanji: one, two, three', kanji: ['一', '二', '三'], unit: 'numbers' },
   { title: 'Kanji: big & small', kanji: ['大', '小', '子'] },
   { title: 'Kanji: water & sake', kanji: ['水', '酒', '海'] },
-  { title: 'Kanji: school', kanji: ['先', '生', '学'] },
-  { title: 'Kanji: trees', kanji: ['木', '林', '森'] },
+  { title: 'Kanji: school', kanji: ['先', '生', '学'], unit: 'people' },
+  { title: 'Kanji: trees', kanji: ['木', '林', '森'], unit: 'world' },
 ];

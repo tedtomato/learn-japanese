@@ -13,7 +13,7 @@ import { showStreakCalendar } from './streak.js';
 import { enableReminders, disableReminders } from '../reminders.js';
 import { shareButton, wireShare } from '../share.js';
 import {
-  displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, defaultState, FREEZE_PRICE, MAX_FREEZES,
+  displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, backupStale, defaultState, FREEZE_PRICE, MAX_FREEZES,
 } from '../progress.js';
 
 function achievements(state, now) {
@@ -44,7 +44,40 @@ const VOICE_TEXT = {
 
 const fmtDate = (t) => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
-export function renderProfile(root) {
+// Backups go through the phone's share menu (→ Drive: Save) where it can share files, else to
+// Downloads. Shared as .txt: Android only shares a short list of file types, and JSON isn't one.
+const backupFile = (state) => new File([exportBackup(state)], `hajime-backup-${new Date().toISOString().slice(0, 10)}.txt`, { type: 'text/plain' });
+const canShareFiles = () => {
+  try {
+    return !!navigator.canShare?.({ files: [new File(['x'], 'x.txt', { type: 'text/plain' })] });
+  } catch {
+    return false;
+  }
+};
+async function saveBackup(state) {
+  const file = backupFile({ ...state, backupAt: Date.now() });
+  if (canShareFiles()) {
+    try {
+      await navigator.share({ files: [file], title: 'Hajime backup' });
+      return 'shared';
+    } catch (e) {
+      if (e.name === 'AbortError') return null; // closed the share menu
+    }
+  }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(file);
+  a.download = file.name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  return 'downloaded';
+}
+function backupAgeText(state, now) {
+  if (!state.backupAt) return 'No backup yet';
+  const days = Math.floor((now - state.backupAt) / 86400000);
+  return `Last backup: ${days === 0 ? 'today' : days === 1 ? 'yesterday' : `${days} days ago`}`;
+}
+
+export function renderProfile(root, focus) {
   const { state } = app;
   const now = app.now();
   const learned = learnedItemIds(state);
@@ -101,13 +134,17 @@ export function renderProfile(root) {
         <button class="btn btn-white test-voice">${icon('speaker', 18)} Test: こんにちは</button></div>
     </div>
 
-    <h2 class="sub-title">Backup</h2>
+    <h2 class="sub-title" id="sec-backup">Backup</h2>
     <div class="card settings">
-      <p class="muted small">Your progress is saved on this device only. Save a backup file now and then (to iCloud, Google Drive…) so you can restore it on a new phone.</p>
+      <p class="muted small">Your progress is saved on this phone only. Save a backup to Google Drive now and then, so you can restore it on a new phone.</p>
+      <p class="backup-age ${backupStale(state, now) ? 'stale' : ''}">${backupAgeText(state, now)}</p>
       <div class="row-btns">
-        <button class="btn btn-white export">${icon('download', 18)} Save backup</button>
-        <label class="btn btn-white import">${icon('upload', 18)} Restore<input type="file" accept="application/json,.json" hidden></label>
+        <button class="btn btn-white export">${icon('upload', 18)} ${canShareFiles() ? 'Save to Drive' : 'Save backup'}</button>
+        <label class="btn btn-white import">${icon('download', 18)} Restore<input type="file" accept="application/json,.json,text/plain,.txt" hidden></label>
       </div>
+      <p class="muted small">${canShareFiles()
+        ? html`<b>Save to Drive</b> opens your phone's share menu: pick <b>Drive</b> → Save. To restore, tap <b>Restore</b>, open the menu ☰ in the file picker, choose <b>Drive</b> and pick the newest <i>hajime-backup</i> file.`
+        : 'The backup file goes to your Downloads. Keep a copy in Google Drive or iCloud.'}</p>
     </div>
 
     <h2 class="sub-title">About</h2>
@@ -165,13 +202,13 @@ export function renderProfile(root) {
       renderProfile(root);
     }
   });
-  $('.export', root).addEventListener('click', () => {
-    const blob = new Blob([exportBackup(state)], { type: 'application/json' });
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = `hajime-backup-${new Date().toISOString().slice(0, 10)}.json`;
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  $('.export', root).addEventListener('click', async () => {
+    const saved = await saveBackup(state);
+    if (!saved) return;
+    state.backupAt = Date.now();
+    app.save();
+    toast(saved === 'shared' ? 'Backup sent ✅ — check it arrived in Drive' : 'Backup saved to Downloads ✅');
+    renderProfile(root, 'backup');
   });
   $('.import input', root).addEventListener('change', async (e) => {
     const file = e.target.files[0];
@@ -187,6 +224,7 @@ export function renderProfile(root) {
     }
   });
   wireShare(root);
+  if (focus === 'backup') requestAnimationFrame(() => $('#sec-backup', root)?.scrollIntoView({ block: 'start' }));
   // Hidden: a double tap on the avatar opens the test lab.
   let lastTap = 0;
   $('.avatar', root).addEventListener('click', () => {

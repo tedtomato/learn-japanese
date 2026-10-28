@@ -6,6 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 14 — 27 Oct 2026
 | Request | Status | Release |
 |---|---|---|
+| Save the backup on Google Drive | ✅ via the phone's share menu (Drive → Save), file shared as .txt (Android can't share .json); restore from Drive in the file picker; last-backup date + reminder after 14 days. Automatic Drive sync (Google sign-in) not done — needs a Google Cloud OAuth client | 0.85 |
 | Move school kanji to the People unit | ✅ also trees → Around you (nature); progress carried over | 0.83 |
 | Expand the sign spotter | ✅ 30 situations (+11: doors, open/closed, no smoking, no entry, STOP, free, fares, cash only/cards); "what does it mean?" rounds; 8 per game; new styles (door plate, round no-smoking, red STOP triangle); 11 new sign kanji in 3 lessons | 0.84 |
 | Automated phone-screen tests on every update | ✅ scripts/screens.mjs (npm run screens): ~60 screens × light/dark at 393×851; fails on sideways scroll, text off-screen or cut, text < 13px (romaji < 10.5px), overflowing boxes, page errors; runs in the deploy pipeline before publishing | 0.76 |

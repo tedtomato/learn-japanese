@@ -32,6 +32,7 @@ export function defaultState(now = Date.now()) {
     stats: { lessons: 0, perfect: 0 },
     seen: { fact: [], phrase: [], kanji: [] },
     missions: {}, // mission id → best stars (1–3)
+    backupAt: null, // when the last backup was saved
     settings: { theme: 'system', sfx: true, voiceRate: 0.85, speed: true, speaking: true },
   };
 }
@@ -280,6 +281,11 @@ export function saveState(storage, state, key = STORAGE_KEY) {
     return false;
   }
 }
+
+// A backup is due after two weeks (once there is something worth keeping: 10 things learned).
+export const BACKUP_DAYS = 14;
+export const backupStale = (state, now) => Object.keys(state.items).length >= 10
+  && (!state.backupAt || now - state.backupAt > BACKUP_DAYS * 86400000);
 
 export function exportBackup(state, now = Date.now()) {
   return JSON.stringify({ app: 'hajime', exportedAt: new Date(now).toISOString(), progress: state }, null, 1);

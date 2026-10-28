@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   defaultState, currentHearts, loseHeart, recordActivity, displayStreak, completeSession, migrate, exportBackup, importBackup,
-  currentNodeIndex, mistakeIds, completeListening, completeMission, HEART_REFILL_MS, MAX_HEARTS,
+  currentNodeIndex, mistakeIds, completeListening, completeMission, backupStale, HEART_REFILL_MS, MAX_HEARTS,
 } from '../app/js/progress.js';
 import { review, INTERVALS, MAX_BOX } from '../app/js/srs.js';
 import { NODES } from '../app/js/course.js';
@@ -110,4 +110,15 @@ test('missions pay XP each time and 2 gems per star above the best', () => {
   assert.equal(s.gems, g + 6);
   assert.equal(s.missions.cafe, 3);
   assert.deepEqual(migrate({ nodes: {} }).missions, {});
+});
+
+test('backups: due after two weeks once there is something to keep, and the date survives a restore', () => {
+  const s = defaultState(T0);
+  assert.equal(backupStale(s, T0), false, 'nothing learned yet');
+  [...new Set(NODES.flatMap((n) => n.items || []))].slice(0, 10).forEach((id) => (s.items[id] = { box: 1, seen: 1, right: 1, wrong: 0, last: T0, due: T0 }));
+  assert.equal(backupStale(s, T0), true, 'never backed up');
+  s.backupAt = T0;
+  assert.equal(backupStale(s, T0 + 13 * DAY), false);
+  assert.equal(backupStale(s, T0 + 15 * DAY), true);
+  assert.equal(importBackup(exportBackup(s)).backupAt, T0);
 });

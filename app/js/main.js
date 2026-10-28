@@ -80,7 +80,7 @@ function route() {
   else if (name === 'signs') renderSigns(root);
   else if (name === 'mission') renderMission(root, arg);
   else if (name === 'drill') renderDrill(root, arg);
-  else if (name === 'profile') renderProfile(root);
+  else if (name === 'profile') renderProfile(root, arg);
   else renderLearn(root);
   if (!inSession) {
     renderNav(name === 'collection' || name === 'quiz' || name === 'listen' || name === 'signs' || name === 'mission' || name === 'drill' ? 'practice' : name === 'lab' ? 'profile' : TABS.some(([id]) => id === name) ? name : 'learn');

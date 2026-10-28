@@ -1158,3 +1158,8 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .sign-text { white-space: nowrap; }
 .sign-text.long { font-size: 27px; }
 .sign-round .sign-text.long, .sign-stop .sign-text.long { font-size: 22px; }
+
+/* Backup */
+.backup-age { font-weight: 800; color: var(--text-strong); margin: 4px 0; }
+.backup-age.stale { color: var(--orange); }
+.backup-age.stale::before { content: '⚠️ '; }

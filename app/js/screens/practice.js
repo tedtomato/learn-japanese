@@ -8,7 +8,7 @@ import { mascot } from '../mascot.js';
 import { art } from '../art.js';
 import { speak } from '../audio.js';
 import { strength } from '../srs.js';
-import { learnedItemIds, dueItemIds, mistakeIds } from '../progress.js';
+import { learnedItemIds, dueItemIds, mistakeIds, backupStale } from '../progress.js';
 import { KINDS, emojiFor, phraseSpeech, tidbitCard } from '../tidbits.js';
 import { wireShare } from '../share.js';
 import { QUIZ_MIN_FACTS, seenFacts } from './factquiz.js';
@@ -153,6 +153,8 @@ export function renderPractice(root, focus) {
       </div>
     </section>
     ${mistakesCard(state)}
+    ${backupStale(state, now) ? html`<a class="card kanji-practice backup-nudge" href="#/profile/backup"><span class="kanji-chip">${art('💾', 'art-row')}</span>
+      <div><b>Back up your progress</b><small>${state.backupAt ? 'Your last backup is over 2 weeks old' : 'Keep it safe in Google Drive — takes 10 seconds'}</small></div><span class="btn btn-secondary">Back up</span></a>` : ''}
     ${words.length >= 3 ? html`<a class="card kanji-practice listen-entry" href="#/listen"><span class="kanji-chip">${art('🎧', 'art-row')}</span>
       <div><b>Listening mode</b><small>Hands-free for walks: hear it, say it, repeat</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
     ${kanji.length >= 3 ? html`<a class="card kanji-practice" href="#/practice/kanji-go"><span class="kanji-chip jp">漢</span>

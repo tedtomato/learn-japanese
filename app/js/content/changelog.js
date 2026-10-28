@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.85', date: '28 Oct 2026', changes: [
+    'Backup to Google Drive: Profile → Backup → Save to Drive opens your phone\'s share menu — pick Drive → Save. Restore picks the file back from Drive',
+    'Profile shows when you last backed up, and Practice → Today reminds you when it\'s been over 2 weeks',
+  ] },
   { version: '0.84', date: '27 Oct 2026', changes: [
     'Sign spotter, bigger: 11 new situations — push / pull door plates (押 / 引), shop open / closed (開店 / 閉店), no smoking (禁煙), no entry (立入禁止), the red STOP road sign (止まれ), free entry (無料), fares (料金) and "cash only" (現金のみ)',
     'New "What does this sign mean?" questions mixed in, and 8 signs per round',

@@ -1,6 +1,12 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.90', date: '2 Nov 2026', changes: [
+    'New: French 🇫🇷, Spanish 🇪🇸 and English 🇬🇧 courses! Each has 11 units in 3 sections (first trip, everyday, real talk), about 200 words and 80 sentences, 12 grammar cards, 11 dialogues, a phrasebook, 50+ fun facts with their quiz, 6 missions and 6 pattern drills',
+    'English is taught to French speakers: meanings, notes and grammar are in French',
+    'New language screen: it opens first, and from the flag at the top. Every language shows its own progress — lessons done, XP, streak, words learned and the unit you\'re on',
+    'Words in French, Spanish and English light up word by word as they are spoken; accents and capitals don\'t matter when you type or speak',
+  ] },
   { version: '0.89', date: '2 Nov 2026', changes: [
     'Chinese: memory tricks for all 159 words (你好 — “Knee, how?”), shown on new-word cards and as hints',
     'Chinese: 9 missions — meet your host family, find the metro in Shanghai, a Chengdu tea house, haggle at a market, buy fruit, hotel check-in, hot pot night, high-speed train to Xi\'an, a pharmacy visit',

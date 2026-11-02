@@ -13,7 +13,7 @@ function rubyWord(text, romaji) {
 
 // A word (or a single chunk) with romaji over it when `hint` is on.
 export function jpWord(text, romaji, hint) {
-  return hint ? html`<span class="jp ruby-on">${rubyWord(text, romaji)}</span>` : html`<span class="jp">${text}</span>`;
+  return hint && !L.latin ? html`<span class="jp ruby-on">${rubyWord(text, romaji)}</span>` : html`<span class="jp">${text}</span>`;
 }
 
 // An item (word / sentence / kana / kanji word) as Japanese text.
@@ -21,6 +21,7 @@ export function jpWord(text, romaji, hint) {
 const PARTICLE_SOUND = L.hasKana ? { は: 'わ', へ: 'え', を: 'お' } : {};
 
 export function jpItem(item, hint) {
+  if (L.latin) hint = false; // the word is its own reading
   if (item.type === 'sentence') {
     // Latin-alphabet sentences keep the spaces between their chunks.
     return html`<span class="jp ${hint ? 'ruby-on' : ''}">${item.jp.map((c, i) => html`${L.latin && i ? ' ' : ''}<span class="chunk" data-chunk="${PARTICLE_SOUND[c] || c}">${hint ? rubyWord(c, item.romajiChunks[i]) : c}</span>`)}</span>`;
@@ -31,7 +32,7 @@ export function jpItem(item, hint) {
 
 // A Japanese tile / chunk label, with romaji above when available.
 export function jpChunk(text, hint, romaji = romajiOfChunk(text)) {
-  return hint && romaji ? rubyWord(text, romaji) : raw(text.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]));
+  return hint && romaji && !L.latin ? rubyWord(text, romaji) : raw(text.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[c]));
 }
 
 // "As in すし (sushi)" for a kana: a word the learner already knows, with the kana highlighted.

@@ -1,6 +1,7 @@
-# Hajime はじめ — learn Japanese from zero
+# Hajime はじめ — learn Japanese, Chinese, French, Spanish or English from zero
 
-A playful, game-like Japanese course that runs in the browser and installs on your phone like an app.
+A playful, game-like language course (Japanese, Chinese, French and Spanish from English; English for
+French speakers) that runs in the browser and installs on your phone like an app.
 Short daily lessons, a winding learning path, streaks, XP, hearts — and spaced repetition that keeps
 bringing back what you are about to forget. Kuri the shiba cheers you on.
 
@@ -87,6 +88,10 @@ scripts/build.mjs                           build step used locally and by GitHu
 tests/                                      node:test unit tests
 docs/                                       roadmap and design system
 ```
+
+Each course is a content pack in `app/js/content/<code>/` (Japanese at the top level, then `zh`, `fr`,
+`es`, `en`), picked in `app/js/lang.js` and `app/js/content/pack.js`. French, Spanish and English are
+"Latin-alphabet" courses: words are written `[word, meaning, art]` and sentences need no romaji.
 
 Adding content is mostly editing `app/js/content/units.js` (words, sentences, dialogues),
 `kanji.js` and `grammar.js`. The course builder works out which characters each unit teaches; the

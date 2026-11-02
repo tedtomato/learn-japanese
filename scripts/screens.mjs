@@ -78,15 +78,27 @@ try {
   const COURSES = [
     { code: 'ja', stopAt: 'tokyo-shopping', lesson: 'tokyo-hello-l1', extra: [['#/practice/kana', 'practice-kana'], ['#/mission/cafe', 'mission'], ['#/mission/izakaya', 'mission-izakaya'], ['#/drill/kudasai', 'drill']] },
     { code: 'zh', stopAt: 'china-shopping', lesson: 'china-hello-l1', extra: [['#/practice/tones', 'practice-tones'], ['#/tones', 'tones'], ['#/mission/tea-house', 'mission'], ['#/mission/hot-pot', 'mission-hotpot'], ['#/drill/wo-yao', 'drill'], ['#/drill/zai-nali', 'drill-where']] },
+    { code: 'fr', stopAt: 'france-shopping', lesson: 'france-hello-l1', extra: [['#/mission/cafe-terrace', 'mission'], ['#/drill/ou-est', 'drill']] },
+    { code: 'es', stopAt: 'spain-shopping', lesson: 'spain-hello-l1', extra: [['#/mission/tapas-bar', 'mission'], ['#/drill/donde-esta', 'drill']] },
+    { code: 'en', stopAt: 'uk-shopping', lesson: 'uk-hello-l1', extra: [['#/mission/cafe-london', 'mission'], ['#/drill/where-is', 'drill']] },
   ];
   const SCREENS = [
     ['#/learn', 'learn'], ['#/practice/today', 'practice'], ['#/practice/games', 'practice-games'], ['#/practice/library', 'practice-library'],
     ['#/practice/kanji', 'practice-kanji'], ['#/profile', 'profile'], ['#/collection/phrase', 'phrasebook'], ['#/collection/fact', 'facts'],
-    ['#/quiz', 'facts-quiz'], ['#/signs', 'signs'], ['#/listen', 'listening'],
+    ['#/quiz', 'facts-quiz'], ['#/signs', 'signs'], ['#/listen', 'listening'], ['#/courses', 'languages'],
   ];
   const LAB = ['intro', 'read', 'build', 'match', 'grammar', 'dialogue', 'kanji', 'listen', 'fast', 'speak', 'trace'];
   // Sizes are the same in both themes: dark only (the app's usual look) keeps the check quick.
   await page.emulateMedia({ colorScheme: 'dark' });
+  // First launch: the language screen comes before anything else.
+  await page.goto(`http://localhost:${PORT}/`);
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  await page.waitForTimeout(500);
+  await page.tap('.splash');
+  await page.waitForTimeout(500);
+  if (!(await page.$('.course-card'))) problems.push('first launch: the language screen is not shown');
+  await check('first-launch', 'none');
   for (const course of COURSES) {
     await page.goto(`http://localhost:${PORT}/`);
     await page.evaluate((code) => { localStorage.clear(); localStorage.setItem('hajime.test-mode', '1'); localStorage.setItem('hajime.course', code); }, course.code);
@@ -140,4 +152,4 @@ if (problems.length) {
   console.error(`✗ ${problems.length} phone-screen problem(s):\n${[...new Set(problems)].map((p) => `  - ${p}`).join('\n')}`);
   process.exit(1);
 }
-console.log('✓ Every screen of both courses fits a 393×851 phone, text readable, no page errors');
+console.log('✓ Every screen of every course fits a 393×851 phone, text readable, no page errors');

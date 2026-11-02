@@ -4,7 +4,7 @@ import { ITEMS } from '../course.js';
 import { kanaId } from '../content/kana.js';
 import { HIRAGANA_ROWS, KATAKANA_ROWS, MISSIONS, PATTERNS } from '../content/pack.js';
 import { app, statsBar, modal } from '../app.js';
-import { html, mount, $, $$ } from '../dom.js';
+import { html, mount, raw, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { art } from '../art.js';
@@ -16,6 +16,7 @@ import { wireShare } from '../share.js';
 import { QUIZ_MIN_FACTS, seenFacts } from './factquiz.js';
 import { signScenes, SIGNS_MIN } from './signs.js';
 import { missionCards } from './mission.js';
+import { toneChart } from './tones.js';
 import { drillCards } from './drill.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 
@@ -97,9 +98,9 @@ export function renderPractice(root, focus) {
   const now = app.now();
   const learned = learnedItemIds(state);
   const due = dueItemIds(state, now);
-  const tab = ['words', 'kanji', 'kana'].includes(focus) ? focus : lastTab;
+  const tab = ['words', 'kanji', 'kana', 'tones'].includes(focus) ? focus : lastTab;
   lastTab = tab;
-  const section = SECTIONS.some(([id]) => id === focus) ? focus : ['words', 'kanji', 'kana'].includes(focus) ? 'library' : lastSection;
+  const section = SECTIONS.some(([id]) => id === focus) ? focus : ['words', 'kanji', 'kana', 'tones'].includes(focus) ? 'library' : lastSection;
   lastSection = section;
   const words = learned.map((id) => ITEMS.get(id)).filter((i) => i.type === 'word' || i.type === 'sentence')
     .map((it) => ({ it, st: strength(state.items[it.id], now) })).sort((x, y) => x.st - y.st);
@@ -124,6 +125,7 @@ export function renderPractice(root, focus) {
         <span class="word-main"><b>${k.en}</b><small>${reading(k)}</small></span>
         ${meter(st, k.id)}</button>`)}</div>`
       : html`<p class="muted">${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} lessons appear along the path from the first unit.</p>`),
+    tones: () => html`${toneCard()}${toneChart()}`,
     kana: () => html`${kanaCard('hiragana', 'あ', 'Hiragana practice')}${kanaCard('katakana', 'ア', 'Katakana practice')}<p class="muted legend"><i class="dot strong"></i>Strong <i class="dot mid"></i>Okay <i class="dot weak"></i>Fading <i class="dot none"></i>Not learned</p>
       <h3 class="sub-title small-title">Hiragana</h3>${chart(HIRAGANA_ROWS, state, now)}
       ${kanaCount('katakana') ? html`<h3 class="sub-title small-title">Katakana</h3>${chart(KATAKANA_ROWS, state, now)}` : ''}`,
@@ -137,7 +139,10 @@ export function renderPractice(root, focus) {
       <div><b>${title}</b><small>${n >= 3 ? 'Your weakest characters, with hints — no rush' : 'Learn 3 characters to unlock'}</small></div>
       <button class="btn btn-secondary start-kana" data-script="${script}" ${n >= 3 ? '' : 'disabled'}>Start</button></section>`;
   };
-  const TABS = [['words', 'Words', words.length], ['kanji', L.Chars, kanji.length], ...(L.hasKana ? [['kana', 'Kana', null]] : [])];
+  // Chinese: the tone trainer, from the first words learned.
+  const toneCard = () => html`<a class="card kanji-practice" href="#/tones"><span class="kanji-chip">${raw('<svg width="28" height="26" viewBox="0 0 52 48"><path d="M6 24 Q20 46 30 42 T46 14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>')}</span>
+    <div><b>Tone trainer</b><small>Hear a syllable, pick its tone · +1 gem each</small></div><span class="btn btn-secondary">Play</span></a>`;
+  const TABS = [['words', 'Words', words.length], ['kanji', L.Chars, kanji.length], ...(L.hasKana ? [['kana', 'Kana', null]] : [['tones', 'Tones', null]])];
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page">
@@ -159,6 +164,7 @@ export function renderPractice(root, focus) {
       <div><b>Back up your progress</b><small>${state.backupAt ? 'Your last backup is over 2 weeks old' : 'Keep it safe in Google Drive — takes 10 seconds'}</small></div><span class="btn btn-secondary">Back up</span></a>` : ''}
     ${words.length >= 3 ? html`<a class="card kanji-practice listen-entry" href="#/listen"><span class="kanji-chip">${art('🎧', 'art-row')}</span>
       <div><b>Listening mode</b><small>Hands-free for walks: hear it, say it, repeat</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
+    ${L.code === 'zh' ? toneCard() : ''}
     ${kanji.length >= 3 ? html`<a class="card kanji-practice" href="#/practice/kanji-go"><span class="kanji-chip jp">${L.glyph}</span>
       <div><b>${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} practice</b><small>Only ${L.chars}, weakest first — about 2 min</small></div><span class="btn btn-secondary">Start</span></a>` : ''}
     <p class="muted small section-more">More to play in <button class="link" data-section="games">🎮 Games</button></p>` : ''}
@@ -205,7 +211,7 @@ export function renderPractice(root, focus) {
     renderPractice(root, b.dataset.tab);
     $('#sec-learned', root)?.scrollIntoView({ block: 'start' });
   }));
-  if (['words', 'kanji', 'kana'].includes(focus)) requestAnimationFrame(() => $('#sec-learned', root)?.scrollIntoView({ block: 'start' }));
+  if (['words', 'kanji', 'kana', 'tones'].includes(focus)) requestAnimationFrame(() => $('#sec-learned', root)?.scrollIntoView({ block: 'start' }));
 }
 
 // Phrasebook (always complete), discovered facts and spotted kanji.

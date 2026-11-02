@@ -6,11 +6,11 @@ export { FACTS, PHRASES, KANJI as PEEK_KANJI } from './extras.js';
 export { FACT_QUIZ } from './fact-quiz.js';
 export { GRAMMAR, GLOSSARY } from './grammar.js';
 export { SIGN_SCENES } from './signs.js';
+export { STROKES } from './strokes.js';
 
 export const MNEMONICS = {};
 export const MISSIONS = [];
 export const PATTERNS = [];
-export const STROKES = {};
 export const KANA = new Map();
 export const HIRAGANA_ROWS = [];
 export const KATAKANA_ROWS = [];

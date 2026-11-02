@@ -77,7 +77,7 @@ try {
   // Each course: a learner part-way through section 1, so every screen has content.
   const COURSES = [
     { code: 'ja', stopAt: 'tokyo-shopping', lesson: 'tokyo-hello-l1', extra: [['#/practice/kana', 'practice-kana'], ['#/mission/cafe', 'mission'], ['#/mission/izakaya', 'mission-izakaya'], ['#/drill/kudasai', 'drill']] },
-    { code: 'zh', stopAt: 'china-shopping', lesson: 'china-hello-l1', extra: [] },
+    { code: 'zh', stopAt: 'china-shopping', lesson: 'china-hello-l1', extra: [['#/practice/tones', 'practice-tones'], ['#/tones', 'tones']] },
   ];
   const SCREENS = [
     ['#/learn', 'learn'], ['#/practice/today', 'practice'], ['#/practice/games', 'practice-games'], ['#/practice/library', 'practice-library'],

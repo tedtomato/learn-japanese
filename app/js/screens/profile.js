@@ -159,7 +159,7 @@ export function renderProfile(root, focus) {
       <button class="btn btn-danger-ghost reset">Reset all progress</button>
     </div>
     <p class="muted small center">Hajime — はじめ — means “beginning”${L.code === 'zh' ? ' (in Chinese: 开始, kāishǐ)' : ''}.</p>
-    <p class="muted small center credits">Stroke order data: <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> (CC BY-SA 3.0). Illustrations: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a> (CC BY 4.0).</p>
+    <p class="muted small center credits">Stroke order data: ${L.code === 'zh' ? html`<a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener">Make Me a Hanzi</a> (Arphic Public License)` : html`<a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> (CC BY-SA 3.0)`}. Illustrations: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a> (CC BY 4.0).</p>
   </main>`);
 
   $$('.seg', root).forEach((segEl) =>

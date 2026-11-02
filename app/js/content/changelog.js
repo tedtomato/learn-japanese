@@ -1,6 +1,10 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.88', date: '2 Nov 2026', changes: [
+    'Chinese: trace characters stroke by stroke, with the right stroke order (data: Make Me a Hanzi)',
+    'Chinese: new Tone trainer — the four tones with their shapes and sounds (Practice → Library → Tones), and a game: hear a syllable, pick its tone (+1 gem each)',
+  ] },
   { version: '0.87', date: '2 Nov 2026', changes: [
     'New: Chinese! Tap the flag → 🇨🇳 Chinese (中文). A beginner Mandarin course for a first trip to China: 13 units (hello, getting around, food, shopping with WeChat Pay, numbers & prices, hotel, eating out, high-speed trains & taxis, help & health, people, meals, the world around you, everyday slang)',
     'Pinyin with tone marks above every character, fading as you learn each word; Lìlì and Xiǎoměi speak with your phone\'s Chinese voice',

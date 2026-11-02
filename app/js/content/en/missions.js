@@ -1,1 +1,115 @@
-export const MISSIONS = []; // placeholder
+// Real-world missions for the English course: short role-plays at the end of units. Same shape as
+// ../missions.js. Each step is a line from the other person (who: cast key — woman = Emma,
+// woman2 = Olivia — jp = the English line, en = its French translation) and/or a prompt (in
+// French), then replies to pick from. A reply is { jp, romaji, en, ok, note } — note (in French)
+// explains a wrong (or funny) choice; replies with only `en` check understanding of what was said.
+// Unlocked once the unit's lessons are done.
+const R = (jp, en, ok = false, note = '') => ({ jp, romaji: jp, en, ok, note });
+const E = (en, ok = false, note = '') => ({ en, ok, note });
+
+export const MISSIONS = [
+  {
+    id: 'meet-emma', unit: 'uk-hello', art: '👋', title: 'Rencontrer ta correspondante',
+    setting: 'Tu arrives chez ta famille d\'accueil à York. Emma t\'ouvre la porte avec un grand sourire.',
+    reward: 'Emma t\'invite à entrer : excellente première impression !',
+    steps: [
+      { who: 'woman', jp: 'Hello! I\'m Emma.', en: 'Bonjour ! Je suis Emma.',
+        replies: [R('Hi, Emma! Nice to meet you', 'Salut, Emma ! Enchanté(e)', true), R('Goodbye', 'Au revoir', false, '« Au revoir » ? Tu viens à peine d\'arriver !'), R('Good night', 'Bonne nuit', false, '« Bonne nuit » — un peu tôt pour aller se coucher.')] },
+      { who: 'woman', jp: 'How are you?', en: 'Comment vas-tu ?',
+        replies: [R('I\'m fine, thanks. And you?', 'Je vais bien, merci. Et toi ?', true), R('No', 'Non', false, '« Non » ? Drôle de réponse à « comment vas-tu ? »'), R('Sorry', 'Désolé(e)', false, 'Rien à te faire pardonner : dis-lui que tu vas bien !')] },
+      { who: 'woman', jp: 'This is for you!', en: 'C\'est pour toi ! 🎁',
+        replies: [R('Thank you!', 'Merci !', true), R('No problem', 'Pas de problème', false, '« Pas de problème » répond à un merci ou à une excuse, pas à un cadeau !'), R('Pardon?', 'Pardon ?', false, 'Elle t\'offre un cadeau : un merci serait plus gentil !')] },
+      { who: 'woman', jp: 'You\'re welcome!', en: 'De rien !', prompt: 'Qu\'est-ce qu\'elle a dit ?',
+        replies: [E('De rien !', true), E('Désolée !', false, 'Désolé(e) se dit sorry.'), E('À plus tard !', false, 'À plus tard se dit see you later.')] },
+      { who: 'woman', jp: 'Good night! See you tomorrow!', en: 'Bonne nuit ! À demain !',
+        replies: [R('Good night!', 'Bonne nuit !', true), R('Good morning!', 'Bonjour ! (le matin)', false, 'Pas encore : garde-le pour demain matin !'), R('Hello!', 'Bonjour !', false, '« Bonjour » au moment d\'aller se coucher ? Dis bonne nuit !')] },
+    ],
+  },
+  {
+    id: 'find-platform', unit: 'uk-around', art: '🚉', title: 'Le train pour Édimbourg',
+    setting: 'Gare de King\'s Cross à Londres. Ton train part bientôt et tu cherches le quai. Tu arrêtes Olivia, une passante.',
+    reward: 'Tu as trouvé ton quai à temps — et même les toilettes en chemin !',
+    steps: [
+      { prompt: 'Attire poliment son attention.',
+        replies: [R('Excuse me', 'Excusez-moi', true), R('Cheers!', 'Santé !', false, '« Santé ! » — tu n\'as pas de verre à la main !'), R('Good night', 'Bonne nuit', false, '« Bonne nuit » à 10 h du matin ? Elle va être perplexe.')] },
+      { who: 'woman2', jp: 'Yes? Can I help you?', en: 'Oui ? Je peux vous aider ?',
+        replies: [R('Where is platform 9?', 'Où est le quai 9 ?', true), R('Where is the hotel?', 'Où est l\'hôtel ?', false, 'Ça, c\'est l\'hôtel — ton train part dans dix minutes !'), R('Where is the airport?', 'Où est l\'aéroport ?', false, 'Tu prends le train, pas l\'avion !')] },
+      { who: 'woman2', jp: 'Go straight on, then it\'s on the right.', en: 'Allez tout droit, puis c\'est à droite.', prompt: 'Par où vas-tu ?',
+        replies: [E('⬆️ Tout droit, puis ➡️ à droite', true), E('⬆️ Tout droit, puis ⬅️ à gauche', false, 'Left, c\'est à gauche — elle a dit right (à droite).'), E('⬅️ À gauche, puis ⬆️ tout droit', false, 'Straight on (tout droit) vient d\'abord, puis right (à droite).')] },
+      { prompt: 'Oh — tu as aussi besoin des toilettes. Demande-lui.',
+        replies: [R('Where are the toilets?', 'Où sont les toilettes ?', true), R('Where is the taxi?', 'Où est le taxi ?', false, 'Un taxi ? Ce n\'est pas le plus urgent !'), R('Where is the ticket?', 'Où est le billet ?', false, 'Ça demande où est le billet.')] },
+      { who: 'woman2', jp: 'The toilets are on the left, next to the café.', en: 'Les toilettes sont à gauche, à côté du café.', prompt: 'Où sont-elles ?',
+        replies: [E('⬅️ À gauche, à côté du café', true), E('➡️ À droite, à côté du quai', false, 'Elle a dit left (à gauche), next to the café.'), E('Dans le train', false, 'Elle a dit on the left, next to the café.')] },
+      { prompt: 'Remercie-la et dis au revoir.',
+        replies: [R('Thanks! Bye!', 'Merci ! Au revoir !', true), R('Sorry', 'Désolé(e)', false, 'Pas besoin de t\'excuser : remercie-la !'), R('You\'re welcome', 'De rien', false, '« De rien » — mais c\'est elle qui t\'a aidé(e) !')] },
+    ],
+  },
+  {
+    id: 'cafe-london', unit: 'uk-food', art: '☕', title: 'Au café du coin',
+    setting: 'Un petit café de Brighton. Emma, la serveuse, vient prendre ta commande.',
+    reward: 'Un bon thé, un bout de gâteau et un « cheers » : tu as commandé comme un local !',
+    steps: [
+      { who: 'woman', jp: 'Hi! What would you like?', en: 'Bonjour ! Qu\'est-ce que vous voulez ?',
+        replies: [R('I\'d like a tea, please', 'Je voudrais un thé, s\'il vous plaît', true), R('The bill, please', 'L\'addition, s\'il vous plaît', false, 'L\'addition déjà ? Tu n\'as encore rien pris !'), R('I\'m hungry', 'J\'ai faim', false, 'C\'est bien noté… mais que veux-tu commander ?')] },
+      { who: 'woman', jp: 'With milk?', en: 'Avec du lait ?',
+        replies: [R('Yes, please', 'Oui, s\'il vous plaît', true), R('No, thanks', 'Non, merci', true, 'Un thé noir nature — très bien aussi !'), R('You\'re welcome', 'De rien', false, '« De rien » — elle te demande si tu veux du lait !')] },
+      { who: 'woman', jp: 'Anything to eat? We have sandwiches and cake.', en: 'Quelque chose à manger ? On a des sandwichs et du gâteau.',
+        replies: [R('A piece of cake, please', 'Une part de gâteau, s\'il vous plaît', true), R('A pint, please', 'Une pinte, s\'il vous plaît', false, 'Une pinte dans un salon de thé ? Il faudra aller au pub !'), R('Good evening', 'Bonsoir', false, 'Elle te propose à manger : choisis quelque chose !')] },
+      { who: 'woman', jp: 'Is everything OK?', en: 'Tout va bien ?',
+        replies: [R('Yes, it\'s delicious!', 'Oui, c\'est délicieux !', true), R('I\'m vegetarian', 'Je suis végétarien(ne)', false, 'Bon à savoir… mais c\'était avant de commander qu\'il fallait le dire !'), R('Goodbye', 'Au revoir', false, 'Tu pars déjà ? Dis-lui plutôt que c\'est délicieux.')] },
+      { prompt: 'Tu as fini. Demande l\'addition.',
+        replies: [R('Can I have the bill, please?', 'Je peux avoir l\'addition, s\'il vous plaît ?', true), R('Can I have the menu, please?', 'Je peux avoir la carte, s\'il vous plaît ?', false, 'La carte ? Tu as déjà mangé !'), R('Where is the station?', 'Où est la gare ?', false, 'Plus tard, la gare : paie d\'abord !')] },
+      { who: 'woman', jp: 'That\'s six pounds fifty.', en: 'Ça fait six livres cinquante.', prompt: 'Combien dois-tu payer ?',
+        replies: [E('£6,50', true), E('£16,50', false, 'Six, pas sixteen (seize).'), E('£5,60', false, 'Six pounds fifty = 6 livres et 50 pence.')] },
+    ],
+  },
+  {
+    id: 'market-shopping', unit: 'uk-shopping', art: '🛍️', title: 'Au marché de Camden',
+    setting: 'Tu fais un tour au marché de Camden, à Londres. Un joli pull attire ton regard ; Olivia tient le stand.',
+    reward: 'Un pull tout chaud pour l\'hiver anglais — et tu as payé comme un pro !',
+    steps: [
+      { who: 'woman2', jp: 'Hi there! Are you OK?', en: 'Bonjour ! Je peux vous aider ?',
+        replies: [R('I\'m just looking, thanks', 'Je regarde seulement, merci', true), R('I\'m tired', 'Je suis fatigué(e)', false, 'Are you OK? veut dire ici « je peux vous aider ? » — pas besoin de raconter ta journée !'), R('Help!', 'Au secours !', false, 'Au secours ?! C\'est juste un marché !')] },
+      { prompt: 'Tu aimes bien ce pull. Demande le prix.',
+        replies: [R('How much is this?', 'Combien ça coûte ?', true), R('Where is this?', 'Où est-ce ?', false, 'Il est juste devant toi ! Demande plutôt le prix.'), R('What time is it?', 'Quelle heure est-il ?', false, 'Ça demande l\'heure, pas le prix.')] },
+      { who: 'woman2', jp: 'It\'s twenty-five pounds.', en: 'Il fait vingt-cinq livres.', prompt: 'Combien coûte le pull ?',
+        replies: [E('£25', true), E('£20', false, 'Twenty-five = 25, pas seulement twenty (20).'), E('£50', false, 'Twenty-five = vingt-cinq.')] },
+      { prompt: 'Tu veux payer par carte. Demande si c\'est possible.',
+        replies: [R('Can I pay by card?', 'Je peux payer par carte ?', true), R('Do you have a bag?', 'Vous avez un sac ?', false, 'Le sac, c\'est après — demande d\'abord pour la carte !'), R('It\'s too expensive', 'C\'est trop cher', false, 'Tu voulais l\'acheter, non ?')] },
+      { who: 'woman2', jp: 'Yes, of course. Do you need a bag?', en: 'Oui, bien sûr. Vous voulez un sac ?',
+        replies: [R('No, thanks', 'Non, merci', true, 'Bien vu : les sacs sont payants au Royaume-Uni !'), R('Yes, please', 'Oui, s\'il vous plaît', true), R('Good morning', 'Bonjour (le matin)', false, 'Vous vous êtes déjà dit bonjour !')] },
+      { prompt: 'Remercie-la avant de partir.',
+        replies: [R('Cheers! Bye!', 'Merci ! Au revoir !', true), R('Pardon?', 'Pardon ?', false, 'Elle n\'a rien dit de compliqué : remercie-la !'), R('It\'s closed', 'C\'est fermé', false, 'Le stand est ouvert, et tu viens d\'y acheter un pull !')] },
+    ],
+  },
+  {
+    id: 'new-friend', unit: 'everyday-people', art: '🤝', title: 'Une soirée chez des amis',
+    setting: 'Ton amie anglaise t\'emmène à une fête à Manchester. Olivia vient te parler.',
+    reward: 'Tu t\'es fait(e) une nouvelle amie — elle t\'invite déjà au pub samedi !',
+    steps: [
+      { who: 'woman2', jp: 'Hi! I\'m Olivia. What\'s your name?', en: 'Salut ! Je suis Olivia. Comment tu t\'appelles ?',
+        replies: [R('My name is Léa', 'Je m\'appelle Léa', true), R('I\'m hungry', 'J\'ai faim', false, 'Le buffet est par là… mais elle te demandait ton nom !'), R('This is my sister', 'Voici ma sœur', false, 'Ta sœur n\'est pas là ! Elle te demande ton nom.')] },
+      { who: 'woman2', jp: 'Where are you from?', en: 'Tu viens d\'où ?',
+        replies: [R('I\'m from France. I\'m French', 'Je viens de France. Je suis française', true), R('I\'m from the station', 'Je viens de la gare', false, 'Elle te demande ton pays, pas d\'où tu arrives ce soir !'), R('I\'m fine, thanks', 'Je vais bien, merci', false, 'Ça répond à How are you?, pas à Where are you from?')] },
+      { who: 'woman2', jp: 'Lovely! I\'m a teacher. And you?', en: 'Super ! Je suis professeure. Et toi ?',
+        replies: [R('I\'m a student', 'Je suis étudiante', true), R('I\'m student', 'Je suis étudiante', false, 'Il manque a : I\'m a student. Les métiers prennent toujours a en anglais.'), R('I\'m the student', 'Je suis l\'étudiante', false, 'Avec un métier, on dit a, pas the : I\'m a student.')] },
+      { who: 'woman2', jp: 'My brother lives in Paris! He\'s a chef.', en: 'Mon frère habite à Paris ! Il est cuisinier.', prompt: 'Que fait son frère ?',
+        replies: [E('Il est cuisinier, à Paris', true), E('Il est médecin, à Londres', false, 'Chef = cuisinier, et il habite à Paris.'), E('Il est étudiant, à Manchester', false, 'He\'s a chef = il est cuisinier.')] },
+    ],
+  },
+  {
+    id: 'chemist', unit: 'real-help', art: '💊', title: 'À la pharmacie',
+    setting: 'Tu te réveilles avec un gros mal de tête à Cardiff. Tu entres chez le chemist (la pharmacie) ; Emma est au comptoir.',
+    reward: 'Des comprimés, des conseils et un « get well soon » (bon rétablissement) — tu te sens déjà mieux !',
+    steps: [
+      { who: 'woman', jp: 'Hello! Can I help you?', en: 'Bonjour ! Je peux vous aider ?',
+        replies: [R('Yes, I have a headache', 'Oui, j\'ai mal à la tête', true), R('I\'m just looking', 'Je regarde seulement', false, 'Tu as mal à la tête : dis-le-lui !'), R('Cheers, mate!', 'Merci, mon pote !', false, 'Un peu trop familier… et tu n\'as encore rien reçu !')] },
+      { who: 'woman', jp: 'Take two tablets every four hours.', en: 'Prenez deux comprimés toutes les quatre heures.', prompt: 'Tu n\'as pas tout compris. Demande-lui de parler plus lentement.',
+        replies: [R('Can you speak slowly, please?', 'Vous pouvez parler lentement, s\'il vous plaît ?', true), R('Can you help me?', 'Vous pouvez m\'aider ?', false, 'Elle t\'aide déjà : demande-lui de parler lentement.'), R('I don\'t like rain', 'Je n\'aime pas la pluie', false, 'Vrai au pays de Galles… mais hors sujet !')] },
+      { who: 'woman', jp: 'Two tablets… every four hours.', en: 'Deux comprimés… toutes les quatre heures.', prompt: 'Que dois-tu faire ?',
+        replies: [E('Prendre 2 comprimés toutes les 4 heures', true), E('Prendre 4 comprimés toutes les 2 heures', false, 'Two tablets (2 comprimés), every four hours (toutes les 4 heures).'), E('Prendre 1 comprimé par jour', false, 'Elle a dit two tablets, every four hours.')] },
+      { prompt: 'Tu comprends maintenant. Remercie-la.',
+        replies: [R('Thank you very much!', 'Merci beaucoup !', true), R('I don\'t understand', 'Je ne comprends pas', false, 'Mais si, tu as compris cette fois !'), R('Call an ambulance!', 'Appelez une ambulance !', false, 'Pour un mal de tête ? Un merci suffira !')] },
+    ],
+  },
+];

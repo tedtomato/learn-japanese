@@ -1,1 +1,116 @@
-export const FACTS = []; export const PHRASES = []; // placeholder
+// Fun facts about Spain and travel phrases, shown between lessons. Same shapes as ../extras.js:
+// `jp` holds the Spanish text (spoken), `romaji` is empty (no romanisation), and `say` respells the
+// Castilian pronunciation for English speakers (stressed syllable in capitals, "th" for z / ce / ci).
+
+export const FACTS = [
+  { id: 1, category: 'Food & Drink', title: 'A Lid for Your Glass', text: 'Tapa means "lid". A popular story says the first tapas were slices of bread or ham laid over glasses of wine to keep the flies out.', icon: 'food' },
+  { id: 2, category: 'Food & Drink', title: 'Late Dinners', text: 'Spaniards eat late: lunch is usually around 2 to 3 pm and dinner often starts at 9 or 10 pm, so restaurants may look empty at 7.', icon: 'food' },
+  { id: 3, category: 'Food & Drink', title: 'Paella\'s Home', text: 'Paella comes from Valencia, where the traditional version has chicken, rabbit and green beans rather than seafood. It is named after its wide, shallow pan.', icon: 'food' },
+  { id: 4, category: 'Food & Drink', title: 'Acorn-Fed Ham', text: 'The finest jamón ibérico comes from black Iberian pigs that roam oak woodlands called dehesas and feast on acorns (bellotas) before slaughter.', icon: 'food' },
+  { id: 5, category: 'Food & Drink', title: 'Churros for Breakfast', text: 'Churros are fried dough sticks dunked in thick hot chocolate, eaten for breakfast, as an afternoon treat or after a long night out.', icon: 'sweets' },
+  { id: 6, category: 'Food & Drink', title: 'Liquid Gold', text: 'Spain is the world\'s largest producer of olive oil, and the province of Jaén in Andalusia is covered in millions of olive trees.', icon: 'food' },
+  { id: 7, category: 'Food & Drink', title: 'Pintxos', text: 'In the Basque Country, tapas are called pintxos: small bites often served on a slice of bread and held together with a toothpick.', icon: 'bread' },
+  { id: 8, category: 'Food & Drink', title: 'Manchego Cheese', text: 'Manchego cheese comes from the La Mancha region and is made from the milk of Manchega sheep — the same plains where Don Quixote fought windmills.', icon: 'cheese' },
+  { id: 9, category: 'Food & Drink', title: 'Cold Soup', text: 'Gazpacho is a cold soup of blended tomatoes, peppers, cucumber, garlic, olive oil and bread, from Andalusia — perfect for scorching summers.', icon: 'food' },
+  { id: 10, category: 'Food & Drink', title: 'A Sea of Vines', text: 'Spain has more land planted with vineyards than any other country in the world. Rioja and Ribera del Duero are its best-known red wine regions.', icon: 'wine' },
+
+  { id: 11, category: 'Cities & Architecture', title: 'The Unfinished Basilica', text: 'Antoni Gaudí\'s Sagrada Família in Barcelona was begun in 1882 and is still under construction today, funded by visitors\' tickets and donations.', icon: 'tower' },
+  { id: 12, category: 'Cities & Architecture', title: 'The Red Palace', text: 'Granada\'s Alhambra, built mainly in the 13th and 14th centuries by the Nasrid dynasty, is famous for its carved stucco, tiled walls and water gardens.', icon: 'castle' },
+  { id: 13, category: 'Cities & Architecture', title: 'A High Capital', text: 'Madrid sits on a high plateau at around 650 metres above sea level, making it one of the highest capital cities in Europe.', icon: 'city' },
+  { id: 14, category: 'Cities & Architecture', title: 'Mosque and Cathedral', text: 'The Mezquita of Córdoba is a great mosque with a forest of red-and-white striped arches; in the 16th century a cathedral was built right in its middle.', icon: 'castle' },
+  { id: 15, category: 'Cities & Architecture', title: 'No Mortar Needed', text: 'Segovia\'s Roman aqueduct, built about 2,000 years ago, is made of granite blocks held together without any mortar.', icon: 'bridge' },
+  { id: 16, category: 'Cities & Architecture', title: 'Titanium Museum', text: 'The Guggenheim Museum in Bilbao, designed by Frank Gehry and opened in 1997, is covered in shimmering titanium panels and helped transform the city.', icon: 'city' },
+  { id: 17, category: 'Cities & Architecture', title: 'City of Three Cultures', text: 'Toledo is known as the "city of three cultures" because Christians, Muslims and Jews lived there side by side in the Middle Ages.', icon: 'castle' },
+
+  { id: 18, category: 'History & Art', title: 'Al-Andalus', text: 'From 711, Muslim rulers controlled much of the Iberian Peninsula, which they called al-Andalus. The last Muslim kingdom, Granada, fell in 1492.', icon: 'castle' },
+  { id: 19, category: 'History & Art', title: '1492', text: 'In 1492 Christopher Columbus sailed west on a voyage paid for by Queen Isabella and King Ferdinand of Spain, and reached the Americas.', icon: 'sea' },
+  { id: 20, category: 'History & Art', title: 'The First Modern Novel', text: 'Don Quixote by Miguel de Cervantes, published in two parts in 1605 and 1615, is often called the first modern novel.', icon: 'book' },
+  { id: 21, category: 'History & Art', title: 'The Prado', text: 'Madrid\'s Prado Museum opened in 1819 and holds masterpieces by Velázquez, Goya and El Greco, including Velázquez\'s Las Meninas.', icon: 'star' },
+  { id: 22, category: 'History & Art', title: 'Picasso from Málaga', text: 'Pablo Picasso was born in Málaga in 1881. His huge anti-war painting Guernica hangs in the Reina Sofía museum in Madrid.', icon: 'star' },
+  { id: 23, category: 'History & Art', title: 'A Modern Monarchy', text: 'Spain is a parliamentary monarchy: its democratic constitution was approved in 1978, a few years after the death of the dictator Francisco Franco.', icon: 'flag' },
+
+  { id: 24, category: 'Festivals & Traditions', title: 'Twelve Grapes', text: 'On New Year\'s Eve, Spaniards eat twelve grapes, one at each stroke of midnight, for twelve months of luck. Crowds gather at Madrid\'s Puerta del Sol.', icon: 'fruit' },
+  { id: 25, category: 'Festivals & Traditions', title: 'La Tomatina', text: 'On the last Wednesday of August, the town of Buñol near Valencia hosts La Tomatina, a giant street fight with overripe tomatoes.', icon: 'fruit' },
+  { id: 26, category: 'Festivals & Traditions', title: 'Las Fallas', text: 'In March, Valencia fills its streets with giant satirical figures called fallas, then burns almost all of them on the night of 19 March.', icon: 'star' },
+  { id: 27, category: 'Festivals & Traditions', title: 'San Fermín', text: 'Pamplona\'s San Fermín festival runs from 6 to 14 July, with the famous running of the bulls through the old town each morning.', icon: 'calendar' },
+  { id: 28, category: 'Festivals & Traditions', title: 'The Three Kings', text: 'Spanish children traditionally get presents from the Three Kings on 6 January. On the evening of 5 January, towns hold parades called cabalgatas.', icon: 'star' },
+  { id: 29, category: 'Festivals & Traditions', title: 'Flamenco', text: 'Flamenco — song, guitar, dance and hand-clapping — grew up in Andalusia and was added to UNESCO\'s Intangible Cultural Heritage list in 2010.', icon: 'music' },
+  { id: 30, category: 'Festivals & Traditions', title: 'Human Towers', text: 'In Catalonia, teams called colles build castells: human towers up to ten levels high, topped by a small child. They are on UNESCO\'s heritage list too.', icon: 'person' },
+  { id: 31, category: 'Festivals & Traditions', title: 'Holy Week', text: 'During Semana Santa (Holy Week before Easter), brotherhoods carry huge religious floats through the streets, most famously in Seville.', icon: 'calendar' },
+
+  { id: 32, category: 'Daily Life & Customs', title: 'Two Kisses', text: 'Friends and new acquaintances in Spain often greet each other with dos besos: a light kiss on each cheek. Men usually shake hands with each other.', icon: 'heart' },
+  { id: 33, category: 'Daily Life & Customs', title: 'The Siesta', text: 'The siesta is a traditional rest after lunch. Few city workers nap today, but many small shops still close for a few hours in the afternoon.', icon: 'bed' },
+  { id: 34, category: 'Daily Life & Customs', title: 'Sobremesa', text: 'Sobremesa is the time spent chatting at the table after a meal is finished — it can last longer than the meal itself.', icon: 'coffee' },
+  { id: 35, category: 'Daily Life & Customs', title: 'The Wrong Time Zone?', text: 'Geographically, most of Spain lines up with the UK, but since 1940 it has used Central European Time — one reason Spanish days feel late.', icon: 'sun' },
+  { id: 36, category: 'Daily Life & Customs', title: 'Menú del Día', text: 'Many restaurants offer a weekday menú del día at lunch: a fixed price for a starter, a main course, dessert or coffee, bread and a drink.', icon: 'food' },
+  { id: 37, category: 'Daily Life & Customs', title: 'The Evening Stroll', text: 'The paseo is a relaxed evening walk through town, when families and friends stroll, chat and stop for a drink.', icon: 'city' },
+
+  { id: 38, category: 'Language & Regions', title: 'Four Languages', text: 'Castilian Spanish is the official language of the whole country, while Catalan, Galician and Basque are also co-official in their own regions.', icon: 'speech' },
+  { id: 39, category: 'Language & Regions', title: 'A Mystery Language', text: 'Basque (euskera) is a language isolate: it is not related to Spanish or to any other known language in the world.', icon: 'speech' },
+  { id: 40, category: 'Language & Regions', title: 'Upside-Down Marks', text: 'Spanish opens questions and exclamations with upside-down marks — ¿ and ¡ — so readers know the tone from the start of the sentence.', icon: 'book' },
+  { id: 41, category: 'Language & Regions', title: 'The Story of Ñ', text: 'The letter ñ began as a double n written with a small n on top, which shrank into the wavy line (tilde) over the letter.', icon: 'book' },
+  { id: 42, category: 'Language & Regions', title: 'Not a Lisp', text: 'In most of Spain, z and c before e or i sound like "th". This is a normal pronunciation, not a lisp — and the story of a king with a lisp is a myth.', icon: 'speech' },
+  { id: 43, category: 'Language & Regions', title: 'Vosotros', text: 'Spain uses vosotros for "you all" among friends. In Latin America, ustedes is used for every group, friendly or formal.', icon: 'speech' },
+  { id: 44, category: 'Language & Regions', title: 'A World Language', text: 'Spanish is an official language in about 20 countries and has more native speakers than any other language except Mandarin Chinese.', icon: 'globe' },
+  { id: 45, category: 'Language & Regions', title: 'The Language Academy', text: 'The Real Academia Española, founded in 1713 in Madrid, publishes the standard Spanish dictionary together with academies across the Spanish-speaking world.', icon: 'book' },
+
+  { id: 46, category: 'Nature & Landscapes', title: 'Spain\'s Highest Peak', text: 'Spain\'s highest mountain is not on the mainland: it is Mount Teide, a volcano on Tenerife in the Canary Islands, about 3,715 metres high.', icon: 'volcano' },
+  { id: 47, category: 'Nature & Landscapes', title: 'Islands in Two Seas', text: 'Spain has two island groups: the Balearic Islands in the Mediterranean and the Canary Islands in the Atlantic, off the coast of Africa.', icon: 'sea' },
+  { id: 48, category: 'Nature & Landscapes', title: 'The Iberian Lynx', text: 'The Iberian lynx, a spotted wild cat with ear tufts, lives only in Spain and Portugal. Once close to extinction, its numbers have recovered thanks to conservation.', icon: 'cat' },
+  { id: 49, category: 'Nature & Landscapes', title: 'Ski and Beach', text: 'In spring, you can ski in the Sierra Nevada near Granada in the morning and reach the Mediterranean beaches in the afternoon.', icon: 'snowflake' },
+  { id: 50, category: 'Nature & Landscapes', title: 'Doñana Wetlands', text: 'Doñana National Park in Andalusia is a huge wetland where hundreds of thousands of migrating birds stop between Europe and Africa.', icon: 'leaf' },
+
+  { id: 51, category: 'Sport & Leisure', title: 'El Clásico', text: 'Matches between Real Madrid and FC Barcelona are called El Clásico and are among the most watched club football games in the world.', icon: 'football' },
+  { id: 52, category: 'Sport & Leisure', title: 'World Champions', text: 'Spain\'s men won the football World Cup in 2010, and the women\'s team won the Women\'s World Cup in 2023.', icon: 'football' },
+  { id: 53, category: 'Sport & Leisure', title: 'King of Clay', text: 'Tennis player Rafael Nadal, from Mallorca, won the French Open on clay a record 14 times.', icon: 'star' },
+  { id: 54, category: 'Sport & Leisure', title: 'The Way of St James', text: 'Every year hundreds of thousands of people walk the Camino de Santiago, pilgrim routes that end at the cathedral of Santiago de Compostela in Galicia.', icon: 'mountain' },
+];
+
+export const PHRASES = [
+  { id: 1, category: 'Polite Basics', jp: '¡Hola!', romaji: '', say: 'OH-lah!', en: 'Hello!', icon: 'bowing' },
+  { id: 2, category: 'Polite Basics', jp: 'Buenos días', romaji: '', say: 'BWEH-nos DEE-ahs', en: 'Good morning', icon: 'sun' },
+  { id: 3, category: 'Polite Basics', jp: 'Gracias', romaji: '', say: 'GRAH-thyahs', en: 'Thank you', icon: 'bowing' },
+  { id: 4, category: 'Polite Basics', jp: 'De nada', romaji: '', say: 'deh NAH-dah', en: 'You\'re welcome', icon: 'heart' },
+  { id: 5, category: 'Polite Basics', jp: 'Por favor', romaji: '', say: 'por fah-VOR', en: 'Please', icon: 'bowing' },
+  { id: 6, category: 'Polite Basics', jp: 'Perdón', romaji: '', say: 'pehr-DOHN', en: 'Sorry / excuse me', icon: 'person' },
+  { id: 7, category: 'Polite Basics', jp: 'No hablo español', romaji: '', say: 'noh AH-bloh es-pah-NYOL', en: 'I don\'t speak Spanish', icon: 'speech' },
+  { id: 8, category: 'Polite Basics', jp: '¿Habla inglés?', romaji: '', say: 'AH-blah een-GLEHS?', en: 'Do you speak English?', icon: 'speech' },
+  { id: 9, category: 'Polite Basics', jp: 'Más despacio, por favor', romaji: '', say: 'mahs des-PAH-thyoh, por fah-VOR', en: 'More slowly, please', icon: 'speech' },
+
+  { id: 10, category: 'Getting Around', jp: '¿Dónde está el metro?', romaji: '', say: 'DOHN-deh es-TAH el MEH-troh?', en: 'Where is the metro?', icon: 'train' },
+  { id: 11, category: 'Getting Around', jp: 'Un billete para Sevilla, por favor', romaji: '', say: 'oon bee-YEH-teh PAH-rah seh-VEE-yah, por fah-VOR', en: 'A ticket to Seville, please', icon: 'ticket' },
+  { id: 12, category: 'Getting Around', jp: 'Ida y vuelta', romaji: '', say: 'EE-dah ee VWEL-tah', en: 'Return (round trip)', icon: 'ticket' },
+  { id: 13, category: 'Getting Around', jp: '¿A qué hora sale el tren?', romaji: '', say: 'ah keh OH-rah SAH-leh el tren?', en: 'What time does the train leave?', icon: 'train' },
+  { id: 14, category: 'Getting Around', jp: 'Al aeropuerto, por favor', romaji: '', say: 'al ah-eh-roh-PWEHR-toh, por fah-VOR', en: 'To the airport, please', icon: 'taxi' },
+  { id: 15, category: 'Getting Around', jp: 'Estoy perdido / perdida', romaji: '', say: 'es-TOY pehr-DEE-doh / pehr-DEE-dah', en: 'I\'m lost (man / woman)', icon: 'globe' },
+
+  { id: 16, category: 'Eating Out', jp: 'Una mesa para dos, por favor', romaji: '', say: 'OO-nah MEH-sah PAH-rah dohs, por fah-VOR', en: 'A table for two, please', icon: 'food' },
+  { id: 17, category: 'Eating Out', jp: '¿Me pones una caña?', romaji: '', say: 'meh POH-nes OO-nah KAH-nyah?', en: 'Can I have a small beer?', icon: 'beer' },
+  { id: 18, category: 'Eating Out', jp: 'La carta, por favor', romaji: '', say: 'lah KAR-tah, por fah-VOR', en: 'The menu, please', icon: 'book' },
+  { id: 19, category: 'Eating Out', jp: '¡Salud!', romaji: '', say: 'sah-LOOD!', en: 'Cheers!', icon: 'wine' },
+  { id: 20, category: 'Eating Out', jp: '¡Está muy rico!', romaji: '', say: 'es-TAH mwee REE-koh!', en: 'It\'s delicious!', icon: 'food' },
+  { id: 21, category: 'Eating Out', jp: 'Soy vegetariano / vegetariana', romaji: '', say: 'soy veh-heh-tah-RYAH-noh / -nah', en: 'I\'m vegetarian (man / woman)', icon: 'leaf' },
+  { id: 22, category: 'Eating Out', jp: 'La cuenta, por favor', romaji: '', say: 'lah KWEN-tah, por fah-VOR', en: 'The bill, please', icon: 'coin' },
+
+  { id: 23, category: 'Shopping & Paying', jp: '¿Cuánto cuesta?', romaji: '', say: 'KWAN-toh KWES-tah?', en: 'How much is it?', icon: 'coin' },
+  { id: 24, category: 'Shopping & Paying', jp: 'Solo estoy mirando', romaji: '', say: 'SOH-loh es-TOY mee-RAN-doh', en: 'I\'m just looking', icon: 'shop' },
+  { id: 25, category: 'Shopping & Paying', jp: '¿Puedo pagar con tarjeta?', romaji: '', say: 'PWEH-doh pah-GAR kon tar-HEH-tah?', en: 'Can I pay by card?', icon: 'bank' },
+  { id: 26, category: 'Shopping & Paying', jp: '¿Tiene otra talla?', romaji: '', say: 'TYEH-neh OH-trah TAH-yah?', en: 'Do you have another size?', icon: 'shop' },
+  { id: 27, category: 'Shopping & Paying', jp: 'Me lo llevo', romaji: '', say: 'meh loh YEH-voh', en: 'I\'ll take it', icon: 'shop' },
+  { id: 28, category: 'Shopping & Paying', jp: 'Sin bolsa, gracias', romaji: '', say: 'seen BOL-sah, GRAH-thyahs', en: 'No bag, thanks', icon: 'shop' },
+
+  { id: 29, category: 'Hotel & Practical', jp: 'Tengo una reserva', romaji: '', say: 'TEN-goh OO-nah reh-SEHR-vah', en: 'I have a reservation', icon: 'hotel' },
+  { id: 30, category: 'Hotel & Practical', jp: '¿Cuál es la contraseña del wifi?', romaji: '', say: 'kwal es lah kon-trah-SEH-nyah del WEE-fee?', en: 'What\'s the Wi-Fi password?', icon: 'globe' },
+  { id: 31, category: 'Hotel & Practical', jp: '¿A qué hora es el desayuno?', romaji: '', say: 'ah keh OH-rah es el deh-sah-YOO-noh?', en: 'What time is breakfast?', icon: 'coffee' },
+  { id: 32, category: 'Hotel & Practical', jp: '¿Dónde están los servicios?', romaji: '', say: 'DOHN-deh es-TAN lohs sehr-VEE-thyos?', en: 'Where are the toilets?', icon: 'toilet' },
+  { id: 33, category: 'Hotel & Practical', jp: '¿Qué hora es?', romaji: '', say: 'keh OH-rah es?', en: 'What time is it?', icon: 'calendar' },
+  { id: 34, category: 'Hotel & Practical', jp: '¿Me puede hacer una foto?', romaji: '', say: 'meh PWEH-deh ah-THEHR OO-nah FOH-toh?', en: 'Could you take a photo of me?', icon: 'camera' },
+
+  { id: 35, category: 'Help & Emergency', jp: '¡Socorro!', romaji: '', say: 'soh-KOH-rroh!', en: 'Help!', icon: 'siren' },
+  { id: 36, category: 'Help & Emergency', jp: 'Necesito un médico', romaji: '', say: 'neh-theh-SEE-toh oon MEH-dee-koh', en: 'I need a doctor', icon: 'medical' },
+  { id: 37, category: 'Help & Emergency', jp: 'Llame a una ambulancia', romaji: '', say: 'YAH-meh ah OO-nah am-boo-LAN-thyah', en: 'Call an ambulance', icon: 'siren' },
+  { id: 38, category: 'Help & Emergency', jp: '¿Dónde está la farmacia?', romaji: '', say: 'DOHN-deh es-TAH lah far-MAH-thyah?', en: 'Where is the pharmacy?', icon: 'medical' },
+  { id: 39, category: 'Help & Emergency', jp: 'Soy alérgico / alérgica a…', romaji: '', say: 'soy ah-LEHR-hee-koh / -kah ah…', en: 'I\'m allergic to… (man / woman)', icon: 'medical' },
+  { id: 40, category: 'Help & Emergency', jp: 'Me han robado', romaji: '', say: 'meh ahn roh-BAH-doh', en: 'I\'ve been robbed', icon: 'police' },
+  { id: 41, category: 'Help & Emergency', jp: 'He perdido mi pasaporte', romaji: '', say: 'eh pehr-DEE-doh mee pah-sah-POR-teh', en: 'I\'ve lost my passport', icon: 'siren' },
+];

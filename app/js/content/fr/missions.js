@@ -1,1 +1,119 @@
-export const MISSIONS = []; // placeholder
+// Real-world missions for the French course: short role-plays at the end of each section 1 unit.
+// Same shape as ../missions.js. Each step is a line from the other person (who: cast key,
+// jp = French, en) and/or a prompt, then replies to pick from. A reply is { jp, romaji, en, ok, note }
+// (romaji repeats the French: no separate reading) — note explains a wrong (or funny) choice;
+// replies with only `en` check understanding of what was said. Unlocked once the unit's lessons are done.
+// Cast: woman = Camille, woman2 = Léa.
+const R = (jp, en, ok = false, note = '') => ({ jp, romaji: jp, en, ok, note });
+const E = (en, ok = false, note = '') => ({ en, ok, note });
+
+export const MISSIONS = [
+  {
+    id: 'meet-camille', unit: 'france-hello', art: '🏠', title: 'Meet your host',
+    setting: 'You arrive at your Airbnb in Lyon. Camille, your host, opens the door with a smile.',
+    reward: 'Camille gives you the keys — great first impression!',
+    steps: [
+      { who: 'woman', jp: 'Bonjour! Je suis Camille.', en: 'Hello! I\'m Camille.',
+        replies: [R('Bonjour madame!', 'hello, madam!', true), R('Au revoir!', 'goodbye!', false, '"Goodbye" — you\'ve only just arrived!'), R('Bonne nuit!', 'good night!', false, 'That\'s "good night" — a bit early for bed.')] },
+      { who: 'woman', jp: 'Comment allez-vous?', en: 'How are you?',
+        replies: [R('Ça va bien, merci. Et vous?', 'I\'m fine, thanks. And you?', true), R('Non.', 'no.', false, '"No" isn\'t an answer to "how are you?"'), R('Désolé.', 'sorry.', false, 'Nothing to apologise for — tell her you\'re fine!')] },
+      { who: 'woman', jp: 'Très bien! Voici la clé.', en: 'Very well! Here is the key. 🔑',
+        replies: [R('Merci beaucoup!', 'thank you very much!', true), R('De rien.', 'you\'re welcome.', false, '"You\'re welcome" — but she\'s the one giving you something!'), R('Pardon!', 'sorry!', false, 'Pardon is for bumping into someone. Thank her instead!')] },
+      { who: 'woman', jp: 'De rien! Bonne soirée!', en: 'You\'re welcome! Have a nice evening!', prompt: 'What did she say?',
+        replies: [E('You\'re welcome! Have a nice evening!', true), E('Sorry! See you tomorrow!', false, 'Sorry is désolé, see you tomorrow is à demain.'), E('Good morning! Goodbye!', false, 'Good morning is bonjour — she said bonne soirée, "have a nice evening".')] },
+      { prompt: 'Say goodbye for now.',
+        replies: [R('Merci, à bientôt!', 'thanks, see you soon!', true), R('Salut, mec!', 'later, dude!', false, 'Way too casual for someone you\'ve just met!'), R('Oui.', 'yes.', false, 'Just "yes"? Say goodbye properly!')] },
+    ],
+  },
+  {
+    id: 'find-metro', unit: 'france-around', art: '🚇', title: 'Find the métro in Paris',
+    setting: 'You\'re on a busy Paris street and need the métro. You stop Léa, a passer-by.',
+    reward: 'You found the métro — and the toilets on the way!',
+    steps: [
+      { prompt: 'Get her attention politely.',
+        replies: [R('Excusez-moi, madame', 'excuse me, madam', true), R('Santé!', 'cheers!', false, '"Cheers!" — you\'re not holding a drink!'), R('Bonne nuit!', 'good night!', false, '"Good night" — at 10 a.m.? She\'ll be puzzled.')] },
+      { who: 'woman2', jp: 'Oui? Je peux vous aider?', en: 'Yes? Can I help you?',
+        replies: [R('Où est le métro?', 'where is the métro?', true), R('Où sont les toilettes?', 'where are the toilets?', false, 'That asks for the toilets — unless it\'s urgent!'), R('Où est l\'hôtel?', 'where is the hotel?', false, 'That asks for the hotel.')] },
+      { who: 'woman2', jp: 'Allez tout droit, puis à droite.', en: 'Go straight ahead, then right.', prompt: 'Which way do you go?',
+        replies: [E('⬆️ Straight, then ➡️ right', true), E('⬆️ Straight, then ⬅️ left', false, 'À gauche is left — she said à droite (right).'), E('➡️ Right, then ⬆️ straight', false, 'Tout droit (straight ahead) came first, then à droite.')] },
+      { prompt: 'Oh — you also need the toilets. Ask her.',
+        replies: [R('Où sont les toilettes?', 'where are the toilets?', true), R('Où est le taxi?', 'where is the taxi?', false, 'That asks for a taxi — not the most urgent thing right now!'), R('Où est la gare?', 'where is the train station?', false, 'That asks for the train station.')] },
+      { who: 'woman2', jp: 'Dans le café, à gauche.', en: 'In the café, on the left.', prompt: 'Where are they?',
+        replies: [E('⬅️ In the café on the left', true), E('➡️ In the café on the right', false, 'À droite is right — she said à gauche (left).'), E('In the museum', false, 'Museum is le musée — she said le café.')] },
+      { prompt: 'Thank her and say goodbye.',
+        replies: [R('Merci! Au revoir!', 'thanks! goodbye!', true), R('Désolé!', 'sorry!', false, 'No need to apologise — thank her!'), R('De rien!', 'you\'re welcome!', false, '"You\'re welcome" — but she\'s the one who helped you!')] },
+    ],
+  },
+  {
+    id: 'cafe-terrace', unit: 'france-food', art: '☕', title: 'On a café terrace',
+    setting: 'A sunny café terrace in Paris. Camille, the waitress, comes to your table.',
+    reward: 'Coffee, croissant and a friendly "bonne journée" — you ordered like a local!',
+    steps: [
+      { who: 'woman', jp: 'Bonjour! Qu\'est-ce que je vous sers?', en: 'Hello! What can I get you?',
+        replies: [R('Je voudrais un café, s\'il vous plaît', 'I\'d like a coffee, please', true), R('L\'addition!', 'the bill!', false, 'The bill already? You haven\'t had anything yet!'), R('Je veux café', 'want coffee', false, 'Understandable, but blunt. Je voudrais… s\'il vous plaît is much nicer.')] },
+      { who: 'woman', jp: 'Et avec ça?', en: 'Anything else?',
+        replies: [R('Un croissant, s\'il vous plaît', 'a croissant, please', true), R('C\'est tout, merci', 'that\'s all, thanks', true, 'Fine — just coffee then!'), R('Au secours!', 'help!', false, '"Help!" — it\'s only a question about croissants!')] },
+      { prompt: 'You\'re thirsty too. Ask for some free tap water.',
+        replies: [R('Une carafe d\'eau, s\'il vous plaît', 'a jug of water, please', true), R('Une bière, s\'il vous plaît', 'a beer, please', false, 'A beer is not free — and it\'s 9 a.m.!'), R('Du vin, s\'il vous plaît', 'some wine, please', false, 'Wine at breakfast? Ask for une carafe d\'eau.')] },
+      { who: 'woman', jp: 'C\'est bon?', en: 'Is it good?',
+        replies: [R('C\'est délicieux!', 'it\'s delicious!', true), R('C\'est froid!', 'it\'s cold!', false, 'Complaining? Your coffee is hot and your croissant is fresh!'), R('Pardon!', 'sorry!', false, '"Sorry"? Did you spill the coffee?')] },
+      { prompt: 'Time to go. Ask for the bill.',
+        replies: [R('L\'addition, s\'il vous plaît', 'the bill, please', true), R('La carte, s\'il vous plaît', 'the menu, please', false, 'That asks for the menu — you want l\'addition.'), R('Un café, s\'il vous plaît', 'a coffee, please', false, 'Another coffee? Ask for the bill instead.')] },
+      { who: 'woman', jp: 'Merci! Bonne journée!', en: 'Thanks! Have a nice day!',
+        replies: [R('Merci, vous aussi!', 'thanks, you too!', true), R('Bonne nuit!', 'good night!', false, 'It\'s the morning! Say vous aussi — you too.'), R('Non merci.', 'no thanks.', false, '"No thanks" to a nice day? Say vous aussi!')] },
+    ],
+  },
+  {
+    id: 'market-day', unit: 'france-shopping', art: '🍎', title: 'Market day',
+    setting: 'A Saturday morning market in Provence. Léa runs a cheese and fruit stall.',
+    reward: 'A bag full of cheese and apples — and you paid like a pro!',
+    steps: [
+      { prompt: 'You arrive at the stall. What do you say first?',
+        replies: [R('Bonjour!', 'hello!', true), R('C\'est combien?', 'how much is it?', false, 'Always start with bonjour — skipping it sounds rude in France!'), R('Merci!', 'thanks!', false, 'Thanks for what? Say bonjour first.')] },
+      { prompt: 'Point at the cheese and ask the price.',
+        replies: [R('C\'est combien, le fromage?', 'how much is the cheese?', true), R('Où est le fromage?', 'where is the cheese?', false, 'It\'s right in front of you!'), R('C\'est trop cher!', 'it\'s too expensive!', false, 'You don\'t even know the price yet!')] },
+      { who: 'woman2', jp: 'Six euros.', en: 'Six euros.', prompt: 'What\'s the price?',
+        replies: [E('6 euros', true), E('16 euros', false, '16 is seize — she said six.'), E('60 euros', false, '60 is soixante — she said six. What a relief!')] },
+      { prompt: 'Good price! Ask if you can pay by card.',
+        replies: [R('Je peux payer par carte?', 'can I pay by card?', true), R('Vous parlez anglais?', 'do you speak English?', false, 'That asks if she speaks English — you want to pay!'), R('Je ne sais pas', 'I don\'t know', false, 'You don\'t know what? Ask about paying by card.')] },
+      { who: 'woman2', jp: 'Oui, bien sûr. Vous avez un sac?', en: 'Yes, of course. Do you have a bag?', prompt: 'You brought your own bag. Answer her.',
+        replies: [R('Oui, merci!', 'yes, thanks!', true), R('Non, merci!', 'no, thanks!', false, 'You do have one! Plastic bags aren\'t free anymore — good thing you brought yours.'), R('Santé!', 'cheers!', false, '"Cheers!" — it\'s a bag, not a glass of wine.')] },
+      { who: 'woman2', jp: 'Merci, au revoir! Bon week-end!', en: 'Thanks, goodbye! Have a nice weekend!',
+        replies: [R('Merci, vous aussi! Au revoir!', 'thanks, you too! goodbye!', true), R('Bonjour!', 'hello!', false, 'You\'re leaving — say au revoir!'), R('Je regarde seulement', 'I\'m just looking', false, 'Too late — you already bought something!')] },
+    ],
+  },
+  {
+    id: 'train-ticket', unit: 'everyday-numbers', art: '🚄', title: 'A train to the coast',
+    setting: 'The ticket office at the Gare de Lyon in Paris. Camille is at the counter.',
+    reward: 'Two tickets, the right platform and the right time — bon voyage!',
+    steps: [
+      { who: 'woman', jp: 'Bonjour! Je peux vous aider?', en: 'Hello! Can I help you?',
+        replies: [R('Deux billets pour Marseille, s\'il vous plaît', 'two tickets to Marseille, please', true), R('Dix billets, s\'il vous plaît', 'ten tickets, please', false, 'Ten tickets? You\'re only two!'), R('Un café, s\'il vous plaît', 'a coffee, please', false, 'This is the ticket office, not a café!')] },
+      { who: 'woman', jp: 'Pour aujourd\'hui ou demain?', en: 'For today or tomorrow?',
+        replies: [R('Pour demain matin', 'for tomorrow morning', true), R('Pour aujourd\'hui', 'for today', true, 'Today it is — let\'s hope there are seats left!'), R('Bonne nuit', 'good night', false, 'Off to bed already? Answer today or tomorrow.')] },
+      { who: 'woman', jp: 'Il y a un train à huit heures.', en: 'There\'s a train at eight o\'clock.', prompt: 'What time is the train?',
+        replies: [E('8:00', true), E('3:00', false, 'Trois heures is 3:00 — she said huit heures.'), E('10:00', false, 'Dix heures is 10:00 — she said huit, eight.')] },
+      { who: 'woman', jp: 'Cent euros, s\'il vous plaît.', en: 'A hundred euros, please.', prompt: 'How much do you pay?',
+        replies: [E('100 euros', true), E('20 euros', false, 'Vingt is 20 — she said cent, 100.'), E('50 euros', false, 'Cinquante is 50 — she said cent, 100.')] },
+      { prompt: 'Pay and thank her.',
+        replies: [R('Voici. Merci beaucoup!', 'here you are. thank you very much!', true), R('C\'est trop cher!', 'it\'s too expensive!', false, 'Maybe… but there\'s no haggling at the ticket office!'), R('Je ne comprends pas', 'I don\'t understand', false, 'You understood perfectly: cent euros!')] },
+    ],
+  },
+  {
+    id: 'pharmacy', unit: 'real-help', art: '💊', title: 'At the pharmacy',
+    setting: 'You wake up with a headache in Nice. You walk into a pharmacy with a green cross. Léa is the pharmacist.',
+    reward: 'Medicine in hand and a friendly "bon rétablissement" (get well soon)!',
+    steps: [
+      { who: 'woman2', jp: 'Bonjour! Je vous écoute.', en: 'Hello! How can I help? (literally "I\'m listening")',
+        replies: [R('Bonjour, j\'ai mal à la tête', 'hello, I have a headache', true), R('Au secours!', 'help!', false, 'That\'s for real emergencies! Just explain the problem.'), R('J\'ai faim', 'I\'m hungry', false, 'Hungry? The boulangerie is next door. Tell her what hurts.')] },
+      { who: 'woman2', jp: 'Vous êtes allergique à un médicament?', en: 'Are you allergic to any medicine?',
+        replies: [R('Non, je ne suis pas allergique', 'no, I\'m not allergic', true), R('Oui, je suis allergique aux cacahuètes', 'yes, I\'m allergic to peanuts', true, 'Good to mention — but peanuts aren\'t a medicine, so that\'s fine.'), R('Il fait beau', 'the weather is nice', false, 'True, but she asked about allergies!')] },
+      { who: 'woman2', jp: 'Voici du paracétamol. Deux fois par jour.', en: 'Here is some paracetamol. Twice a day.', prompt: 'How often do you take it?',
+        replies: [E('Twice a day', true), E('Ten times a day', false, 'Dix is ten — she said deux, two. Careful!'), E('Once a week', false, 'She said deux fois par jour: twice a day.')] },
+      { prompt: 'You don\'t understand everything. Ask if she speaks English.',
+        replies: [R('Vous parlez anglais?', 'do you speak English?', true), R('Je parle anglais', 'I speak English', false, 'That says YOU speak English — ask about her!'), R('Je suis anglais', 'I\'m English', false, 'True maybe, but ask if she speaks English.')] },
+      { who: 'woman2', jp: 'Un peu! Two times a day. Bon rétablissement!', en: 'A little! Two times a day. Get well soon!',
+        replies: [R('Merci beaucoup! Au revoir!', 'thank you very much! goodbye!', true), R('C\'est pas grave', 'no worries', false, 'She helped you — thank her!'), R('Bof', 'meh', false, 'Meh?! She just helped you. Say merci!')] },
+    ],
+  },
+];

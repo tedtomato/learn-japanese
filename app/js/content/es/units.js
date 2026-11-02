@@ -1,1 +1,749 @@
-export const SECTIONS_DATA = []; export const DIALOGUES = {}; // placeholder, being written
+// The Spanish course: themed units of essential words and sentences, same format as the
+// Japanese course (../units.js) but without romanisation (Spanish is written in the Latin alphabet).
+// Castilian (Spain) usage; notes mention Latin American alternatives where they differ.
+//
+// Word: [spanish, english, art (emoji drawn in the cartoon art set), extras?]
+//   extras: { note: when / how it is used, alt: [other forms speech recognition may return] }
+//   Nouns carry their article (el / la / los / las) so the gender is learned with the word.
+// Sentence: { jp: [chunks], en, alt?: [other accepted translations] } — chunks are single words or
+//   short fixed groups ("por favor"), no final punctuation and no ¿ ¡ (they become tiles).
+// Lesson: { title, words?, sentences?, grammar?: id of a grammar card shown before the sentences }
+// Unit: { id, title, desc, facts: [fun-fact categories for breaks], phrases, lessons, dialogues?: [ids] }
+
+const FACT = {
+  food: 'Food & Drink',
+  city: 'Cities & Architecture',
+  history: 'History & Art',
+  festivals: 'Festivals & Traditions',
+  life: 'Daily Life & Customs',
+  language: 'Language & Regions',
+  nature: 'Nature & Landscapes',
+  sport: 'Sport & Leisure',
+};
+
+export const SECTIONS_DATA = [
+  {
+    id: 'spain',
+    title: 'First trip to Spain',
+    units: [
+      {
+        id: 'hello',
+        title: 'Hello & thank you',
+        desc: 'Greet people, thank them and say sorry',
+        facts: [FACT.language, FACT.life],
+        phrases: ['Polite Basics'],
+        dialogues: ['d-hola'],
+        lessons: [
+          { title: 'Hello', words: [
+            ['hola', 'hello', '👋', { note: 'Any time of day, to anyone. The h is always silent: "OH-lah".' }],
+            ['buenos días', 'good morning', '🌅', { note: 'Used until lunch — and lunch in Spain is around 2 pm!' }],
+            ['buenas tardes', 'good afternoon / evening', '🌄', { note: 'From lunch until it gets dark, which in a Spanish summer can be 9:30 pm.' }],
+            ['buenas noches', 'good evening / good night', '🌙', { note: 'Both hello and goodbye once it is dark.' }],
+          ] },
+          { title: 'Thank you', words: [
+            ['gracias', 'thank you', '🙏', { note: 'In most of Spain the c sounds like "th": GRAH-thyahs. In Latin America and the Canaries: GRAH-syahs.' }],
+            ['muchas gracias', 'thank you very much', '💐'],
+            ['de nada', 'you\'re welcome', '😊', { note: 'Literally "of nothing".' }],
+            ['por favor', 'please', '🤲', { note: 'Spaniards use it less than English speakers — a friendly tone does the job.' }],
+          ] },
+          { title: 'Sorry', words: [
+            ['perdón', 'sorry / excuse me', '🙋', { note: 'For bumping into someone or squeezing past.' }],
+            ['disculpe', 'excuse me (polite)', '🙇', { note: 'To get a stranger\'s attention before asking something.' }],
+            ['lo siento', 'I\'m sorry', '😔', { note: 'A real apology. Literally "I feel it".' }],
+            ['no pasa nada', 'no problem / it\'s fine', '👌', { note: 'The everyday reply to "sorry" in Spain. Literally "nothing is happening".' }],
+          ] },
+          { title: 'Yes & no', words: [
+            ['sí', 'yes', '✅', { note: 'With the accent it means yes; si without one means "if".', alt: ['si'] }],
+            ['no', 'no / not', '❌', { note: 'Also "not": goes right before the verb.' }],
+            ['vale', 'okay', '👍', { note: 'You will hear it all day in Spain. In Latin America: está bien, dale (Argentina) or órale (Mexico).' }],
+          ] },
+          { title: 'Goodbye', words: [
+            ['adiós', 'goodbye', '🏃', { note: 'Spaniards often say it in passing, even as a quick hello on the street.' }],
+            ['hasta luego', 'see you later', '👋', { note: 'Used as a general goodbye, even if you won\'t see them later.' }],
+            ['hasta mañana', 'see you tomorrow', '📅'],
+            ['nos vemos', 'see you', '✌', { note: 'Literally "we see each other".' }],
+          ] },
+          { title: 'Names', words: [
+            ['me llamo', 'my name is', '📛', { note: 'Literally "I call myself". Also: soy Lucía (I am Lucía).' }],
+            ['¿cómo te llamas?', 'what\'s your name?', '❓', { note: 'Polite form: ¿cómo se llama usted?' }],
+            ['encantado', 'nice to meet you', '🤝', { note: 'A woman says encantada. Mucho gusto also works, and is more common in Latin America.', alt: ['encantada'] }],
+          ] },
+          { title: 'How are you?', grammar: 'estar', sentences: [
+            { jp: ['hola', 'qué tal'], en: 'Hi how are you', alt: ['Hello how are you', 'Hi how is it going', 'Hello how is it going', 'Hi how\'s it going', 'Hello how\'s it going'] },
+            { jp: ['estoy', 'bien'], en: 'I am fine', alt: ['I\'m fine', 'I am well', 'I\'m well', 'I am good', 'I\'m good', 'I am okay', 'I\'m okay'] },
+            { jp: ['y', 'tú'], en: 'And you', alt: ['What about you', 'How about you'] },
+            { jp: ['no', 'gracias'], en: 'No thank you', alt: ['No thanks'] },
+          ] },
+          { title: 'Nice to meet you', grammar: 'ser', sentences: [
+            { jp: ['me llamo', 'Lucía'], en: 'My name is Lucía', alt: ['I am Lucía', 'I\'m Lucía', 'I am called Lucía', 'I\'m called Lucía'] },
+            { jp: ['cómo', 'te', 'llamas'], en: 'What is your name', alt: ['What\'s your name'] },
+            { jp: ['soy', 'de', 'Londres'], en: 'I am from London', alt: ['I\'m from London', 'I come from London'] },
+            { jp: ['mucho', 'gusto'], en: 'Nice to meet you', alt: ['Pleased to meet you', 'Good to meet you'] },
+          ] },
+        ],
+      },
+      {
+        id: 'around',
+        title: 'Getting around',
+        desc: 'Stations, the metro, taxis and finding the toilet',
+        facts: [FACT.city, FACT.history],
+        phrases: ['Getting Around'],
+        dialogues: ['d-metro'],
+        lessons: [
+          { title: 'Stations', words: [
+            ['la estación', 'station', '🚉', { note: 'Words ending in -ción are always feminine: la estación, la habitación.' }],
+            ['el metro', 'metro / subway', '🚇', { note: 'Madrid\'s metro is one of the biggest in Europe. In Buenos Aires it is el subte.' }],
+            ['el tren', 'train', '🚆', { note: 'The AVE is Spain\'s high-speed train.' }],
+            ['el autobús', 'bus', '🚌', { note: 'Called el camión in Mexico and la guagua in the Canary Islands and the Caribbean.' }],
+          ] },
+          { title: 'Toilet & taxi', words: [
+            ['el baño', 'toilet / bathroom', '🚻', { note: 'Signs in Spain often say servicios or aseos.' }],
+            ['el taxi', 'taxi', '🚕', { note: 'A green light on the roof means it is free.' }],
+            ['el billete', 'ticket', '🎫', { note: 'In Latin America: el boleto. (Un billete is also a banknote.)' }],
+          ] },
+          { title: 'Places', words: [
+            ['el hotel', 'hotel', '🏨', { note: 'The h is silent: oh-TEL.' }],
+            ['el aeropuerto', 'airport', '✈'],
+            ['la playa', 'beach', '🌊'],
+            ['la calle', 'street', '🛣', { note: 'The ll sounds like the y in "yes": KAH-yeh.' }],
+          ] },
+          { title: 'Which way?', words: [
+            ['¿dónde?', 'where?', '❓', { alt: ['dónde', 'donde'] }],
+            ['a la izquierda', 'on the left / to the left', '⬅'],
+            ['a la derecha', 'on the right / to the right', '➡'],
+            ['todo recto', 'straight ahead', '⬆', { note: 'In Latin America: derecho or todo derecho.' }],
+          ] },
+          { title: 'Near & far', words: [
+            ['cerca', 'near / close', '📍'],
+            ['lejos', 'far', '🗺'],
+            ['aquí', 'here', '👇'],
+            ['allí', 'there', '👉', { note: 'In Latin America you will also hear allá.' }],
+          ] },
+          { title: 'Where is…?', grammar: 'questions', sentences: [
+            { jp: ['dónde', 'está', 'el', 'baño'], en: 'Where is the toilet', alt: ['Where is the bathroom', 'Where\'s the toilet', 'Where\'s the bathroom', 'Where is the restroom', 'Where\'s the restroom'] },
+            { jp: ['dónde', 'está', 'la', 'estación'], en: 'Where is the station', alt: ['Where\'s the station'] },
+            { jp: ['el', 'hotel', 'está', 'cerca'], en: 'The hotel is near', alt: ['The hotel is close', 'The hotel is nearby', 'The hotel is close by'] },
+            { jp: ['está', 'a la derecha'], en: 'It is on the right', alt: ['It\'s on the right', 'On the right'] },
+          ] },
+          { title: 'Directions', grammar: 'gender', sentences: [
+            { jp: ['está', 'a la izquierda'], en: 'It is on the left', alt: ['It\'s on the left', 'On the left'] },
+            { jp: ['siga', 'todo recto'], en: 'Go straight ahead', alt: ['Go straight on', 'Keep going straight', 'Go straight', 'Carry on straight ahead'] },
+            { jp: ['el', 'metro', 'está', 'lejos'], en: 'The metro is far', alt: ['The metro is far away', 'The subway is far', 'The subway is far away'] },
+            { jp: ['un', 'billete', 'por favor'], en: 'A ticket please', alt: ['One ticket please'] },
+          ] },
+        ],
+      },
+      {
+        id: 'food',
+        title: 'Food & drinks',
+        desc: 'Order tapas, say cheers and ask for the bill',
+        facts: [FACT.food],
+        phrases: ['Eating Out'],
+        dialogues: ['d-tapas'],
+        lessons: [
+          { title: 'Ordering', words: [
+            ['quiero', 'I want', '🙋', { note: 'Fine for ordering, especially with por favor. In bars people also say ¿me pones…? (will you give me…?).' }],
+            ['quisiera', 'I would like', '🤲', { note: 'The extra-polite "I\'d like".' }],
+            ['esto', 'this', '👇', { note: 'Point and say "esto, por favor" — it works everywhere.' }],
+            ['la carta', 'menu', '📋', { note: 'In Spain el menú usually means the fixed-price set menu. In Latin America el menú is the normal word.' }],
+          ] },
+          { title: 'Drinks', words: [
+            ['el agua', 'water', '💧', { note: 'Feminine, but takes el because it starts with a stressed a: el agua fría.' }],
+            ['el café', 'coffee', '☕', { note: 'Café solo = espresso, cortado = with a dash of milk, café con leche = half milk.' }],
+            ['la cerveza', 'beer', '🍺', { note: 'Ask for una caña for a small draught beer.' }],
+            ['el vino', 'wine', '🍷', { note: 'Vino tinto = red wine, vino blanco = white wine.' }],
+          ] },
+          { title: 'Tapas', words: [
+            ['la tapa', 'tapa (small dish)', '🍽', { note: 'In some cities, like Granada, a free tapa comes with every drink.' }],
+            ['el pan', 'bread', '🍞'],
+            ['el queso', 'cheese', '🧀'],
+            ['el jamón', 'cured ham', '🥩', { note: 'The j is a throaty h: ha-MON.' }],
+          ] },
+          { title: 'More food', words: [
+            ['la tortilla', 'Spanish omelette', '🍳', { note: 'In Spain: a thick potato-and-egg omelette. In Mexico: a thin corn or wheat flatbread!' }],
+            ['la paella', 'paella', '🍚', { note: 'A rice dish from Valencia, named after its wide, shallow pan.' }],
+            ['el pescado', 'fish (to eat)', '🐟', { note: 'A live fish swimming in the sea is el pez.' }],
+            ['la ensalada', 'salad', '🥗'],
+          ] },
+          { title: 'Cheers!', words: [
+            ['salud', 'cheers!', '🍻', { note: 'Literally "health". Also said when someone sneezes.' }],
+            ['rico', 'tasty / delicious', '😋', { note: 'Feminine: rica. "Está muy rico" = it\'s really tasty.' }],
+            ['la cuenta', 'the bill', '🧾', { note: 'Waiters won\'t bring it until you ask — rushing you would be rude.' }],
+            ['¡que aproveche!', 'enjoy your meal!', '🥣', { note: 'Said to people eating, even strangers. In Latin America: ¡buen provecho!', alt: ['que aproveche'] }],
+          ] },
+          { title: 'Can I have…?', grammar: 'quisiera', sentences: [
+            { jp: ['un', 'café', 'por favor'], en: 'A coffee please', alt: ['One coffee please', 'Coffee please'] },
+            { jp: ['una', 'cerveza', 'por favor'], en: 'A beer please', alt: ['One beer please', 'Beer please'] },
+            { jp: ['quiero', 'esto'], en: 'I want this', alt: ['I want this one', 'I\'ll have this', 'I\'ll have this one'] },
+            { jp: ['quisiera', 'agua'], en: 'I would like water', alt: ['I\'d like water', 'I would like some water', 'I\'d like some water'] },
+          ] },
+          { title: 'At the bar', grammar: 'negation', sentences: [
+            { jp: ['no', 'quiero', 'vino'], en: 'I do not want wine', alt: ['I don\'t want wine', 'I don\'t want any wine', 'I do not want any wine'] },
+            { jp: ['el', 'jamón', 'está', 'muy', 'rico'], en: 'The ham is very tasty', alt: ['The ham is really tasty', 'The ham is very good', 'The ham is delicious', 'The ham is really good'] },
+            { jp: ['pan', 'y', 'queso'], en: 'Bread and cheese', alt: ['Some bread and cheese'] },
+            { jp: ['la', 'cuenta', 'por favor'], en: 'The bill please', alt: ['The check please', 'Bill please', 'Check please'] },
+          ] },
+        ],
+      },
+      {
+        id: 'shopping',
+        title: 'Shopping & money',
+        desc: 'Ask prices, pay by card and buy clothes',
+        facts: [FACT.life, FACT.city],
+        phrases: ['Shopping & Paying'],
+        dialogues: ['d-market'],
+        lessons: [
+          { title: 'Shops', words: [
+            ['la tienda', 'shop', '🏪'],
+            ['el mercado', 'market', '🍉', { note: 'Covered food markets like La Boqueria in Barcelona are great for tapas too.' }],
+            ['la panadería', 'bakery', '🍞'],
+          ] },
+          { title: 'Money', words: [
+            ['el dinero', 'money', '💰', { note: 'In Latin America you will often hear la plata (literally "silver").' }],
+            ['el euro', 'euro', '🪙'],
+            ['la tarjeta', 'card', '💳', { note: 'Cards are accepted almost everywhere in Spain, even for small amounts.' }],
+            ['en efectivo', 'in cash', '💵'],
+          ] },
+          { title: 'How much?', words: [
+            ['¿cuánto cuesta?', 'how much is it?', '🏷', { note: 'For several things: ¿cuánto cuestan?', alt: ['cuánto cuesta', 'cuanto cuesta'] }],
+            ['caro', 'expensive', '💎', { note: 'Feminine: cara. Plural: caros, caras.' }],
+            ['barato', 'cheap', '🤏'],
+            ['la bolsa', 'bag', '🛍', { note: 'Shops charge a few cents for a bag — bring your own.' }],
+          ] },
+          { title: 'Clothes', words: [
+            ['la camiseta', 'T-shirt', '👕', { note: 'In Mexico: la playera; in Argentina: la remera.' }],
+            ['los zapatos', 'shoes', '👢'],
+            ['la chaqueta', 'jacket', '🧥', { note: 'In much of Latin America: la chamarra (Mexico) or la campera (Argentina).' }],
+            ['la talla', 'size (clothes)', '👔'],
+          ] },
+          { title: 'Colours', words: [
+            ['rojo', 'red', '🍎', { note: 'Colours go after the noun and agree with it: la camiseta roja.' }],
+            ['azul', 'blue', '🌊'],
+            ['verde', 'green', '🌿'],
+            ['blanco', 'white', '❄'],
+          ] },
+          { title: 'How much is it?', sentences: [
+            { jp: ['cuánto', 'cuesta', 'esto'], en: 'How much is this', alt: ['How much does this cost', 'How much is it'] },
+            { jp: ['es', 'muy', 'caro'], en: 'It is very expensive', alt: ['It\'s very expensive', 'It\'s too expensive', 'That is very expensive', 'That\'s very expensive', 'It\'s really expensive'] },
+            { jp: ['con', 'tarjeta', 'por favor'], en: 'By card please', alt: ['With card please', 'Card please', 'With a card please'] },
+            { jp: ['pago', 'en efectivo'], en: 'I will pay in cash', alt: ['I\'ll pay in cash', 'I pay in cash', 'I\'m paying in cash', 'I\'ll pay cash'] },
+          ] },
+          { title: 'At the shop', grammar: 'plural', sentences: [
+            { jp: ['la', 'camiseta', 'roja'], en: 'The red T-shirt', alt: ['The red t-shirt', 'The red tshirt', 'The red shirt'] },
+            { jp: ['los', 'zapatos', 'son', 'caros'], en: 'The shoes are expensive', alt: ['The shoes are pricey'] },
+            { jp: ['quisiera', 'dos', 'camisetas'], en: 'I would like two T-shirts', alt: ['I\'d like two T-shirts', 'I would like two t-shirts', 'I\'d like two t-shirts', 'I would like two shirts', 'I\'d like two shirts'] },
+            { jp: ['una', 'bolsa', 'por favor'], en: 'A bag please', alt: ['One bag please'] },
+          ] },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'everyday',
+    title: 'Everyday Spanish',
+    units: [
+      {
+        id: 'numbers',
+        title: 'Numbers & time',
+        desc: 'Count, tell the time and name the days',
+        facts: [FACT.life, FACT.festivals],
+        phrases: ['Hotel & Practical'],
+        dialogues: ['d-time'],
+        lessons: [
+          { title: '1 to 4', words: [
+            ['uno', 'one', '1⃣', { note: 'Before a masculine noun it becomes un: un café. Feminine: una.' }],
+            ['dos', 'two', '2⃣'],
+            ['tres', 'three', '3⃣'],
+            ['cuatro', 'four', '4⃣'],
+          ] },
+          { title: '5 to 8', words: [
+            ['cinco', 'five', '5⃣'],
+            ['seis', 'six', '6⃣'],
+            ['siete', 'seven', '7⃣'],
+            ['ocho', 'eight', '8⃣'],
+          ] },
+          { title: '9, 10 & more', words: [
+            ['nueve', 'nine', '9⃣'],
+            ['diez', 'ten', '🔟', { note: 'In Spain the z sounds like "th": dyeth. In Latin America: dyes.' }],
+            ['veinte', 'twenty', '🔢'],
+            ['cien', 'a hundred', '💯'],
+          ] },
+          { title: 'Time', words: [
+            ['la hora', 'hour / time', '⌚', { note: '¿Qué hora es? = what time is it?' }],
+            ['el minuto', 'minute', '⏱'],
+            ['hoy', 'today', '📅'],
+            ['mañana', 'tomorrow', '⏭', { note: 'La mañana = the morning. Mañana por la mañana = tomorrow morning.' }],
+          ] },
+          { title: 'Days', words: [
+            ['el lunes', 'Monday', '🗒', { note: 'Days are not capitalised in Spanish. On Monday = el lunes.' }],
+            ['el viernes', 'Friday', '🍻'],
+            ['el sábado', 'Saturday', '🎭'],
+            ['el domingo', 'Sunday', '☀', { note: 'Many shops in Spain close on Sundays.' }],
+          ] },
+          { title: 'What time is it?', sentences: [
+            { jp: ['qué', 'hora', 'es'], en: 'What time is it', alt: ['What\'s the time', 'What is the time'] },
+            { jp: ['son', 'las', 'tres'], en: 'It is three o\'clock', alt: ['It\'s three o\'clock', 'It is three', 'It\'s three'] },
+            { jp: ['es', 'la', 'una'], en: 'It is one o\'clock', alt: ['It\'s one o\'clock', 'It is one', 'It\'s one'] },
+            { jp: ['hasta', 'el', 'lunes'], en: 'See you on Monday', alt: ['See you Monday', 'Until Monday'] },
+          ] },
+          { title: 'Counting', sentences: [
+            { jp: ['dos', 'cafés', 'por favor'], en: 'Two coffees please' },
+            { jp: ['cuatro', 'billetes', 'por favor'], en: 'Four tickets please' },
+            { jp: ['el', 'tren', 'sale', 'a las', 'ocho'], en: 'The train leaves at eight', alt: ['The train leaves at eight o\'clock', 'The train departs at eight'] },
+            { jp: ['hoy', 'es', 'sábado'], en: 'Today is Saturday', alt: ['It is Saturday today', 'It\'s Saturday today'] },
+          ] },
+        ],
+      },
+      {
+        id: 'people',
+        title: 'People & family',
+        desc: 'Talk about your family, friends and jobs',
+        facts: [FACT.life, FACT.history],
+        phrases: ['Polite Basics'],
+        dialogues: ['d-family'],
+        lessons: [
+          { title: 'Family', words: [
+            ['la familia', 'family', '🧑‍🤝‍🧑'],
+            ['la madre', 'mother', '🧑', { note: 'Casual: mamá. In Spain people also say "mi madre" a lot as a surprised "oh my god!"' }],
+            ['el padre', 'father', '🧍', { note: 'Casual: papá. Los padres = the parents.' }],
+            ['los abuelos', 'grandparents', '🧓', { note: 'El abuelo = grandfather, la abuela = grandmother.' }],
+          ] },
+          { title: 'Brothers & sisters', words: [
+            ['el hermano', 'brother', '🧍', { note: 'Los hermanos can mean brothers or brothers and sisters.' }],
+            ['la hermana', 'sister', '🙋'],
+            ['el hijo', 'son', '🧑', { note: 'Los hijos = sons, or children.' }],
+            ['la hija', 'daughter', '🙋'],
+          ] },
+          { title: 'Friends', words: [
+            ['el amigo', 'friend (male)', '🤝'],
+            ['la amiga', 'friend (female)', '🤗'],
+            ['el novio', 'boyfriend', '❤', { note: 'Also "fiancé" or "groom". In Spain la pareja (partner) is common too.' }],
+            ['la novia', 'girlfriend', '💝'],
+          ] },
+          { title: 'Jobs', words: [
+            ['el profesor', 'teacher', '🧑‍🏫', { note: 'A woman is la profesora.' }],
+            ['el médico', 'doctor', '🧑‍⚕️', { note: 'A woman is la médica, though la médico is also heard. Also: el doctor.' }],
+            ['el estudiante', 'student', '🧑‍🎓', { note: 'Same word for a woman: la estudiante.' }],
+            ['el cocinero', 'cook / chef', '🧑‍🍳'],
+          ] },
+          { title: 'Describing people', words: [
+            ['alto', 'tall', '⬆', { note: 'Feminine: alta. Short = bajo.' }],
+            ['simpático', 'nice / friendly', '😊', { note: 'Feminine: simpática. Not "sympathetic"!' }],
+            ['joven', 'young', '🧑'],
+            ['mayor', 'older / elderly', '🧓', { note: 'Polite for "old" about people. Mi hermano mayor = my older brother.' }],
+          ] },
+          { title: 'My family', grammar: 'possessives', sentences: [
+            { jp: ['mi', 'madre', 'es', 'profesora'], en: 'My mother is a teacher', alt: ['My mum is a teacher', 'My mom is a teacher'] },
+            { jp: ['mi', 'hermano', 'es', 'alto'], en: 'My brother is tall' },
+            { jp: ['tu', 'amiga', 'es', 'muy', 'simpática'], en: 'Your friend is very nice', alt: ['Your friend is really nice', 'Your friend is very friendly', 'Your friend is really friendly'] },
+            { jp: ['es', 'mi', 'novio'], en: 'He is my boyfriend', alt: ['He\'s my boyfriend', 'This is my boyfriend'] },
+          ] },
+          { title: 'How old are you?', grammar: 'tener', sentences: [
+            { jp: ['tengo', 'dos', 'hermanos'], en: 'I have two brothers', alt: ['I\'ve got two brothers', 'I have two siblings', 'I\'ve got two siblings', 'I have two brothers and sisters'] },
+            { jp: ['tengo', 'veinte', 'años'], en: 'I am twenty years old', alt: ['I\'m twenty years old', 'I am twenty', 'I\'m twenty'] },
+            { jp: ['cuántos', 'años', 'tienes'], en: 'How old are you' },
+            { jp: ['no', 'tengo', 'hijos'], en: 'I do not have children', alt: ['I don\'t have children', 'I don\'t have kids', 'I have no children', 'I have no kids'] },
+          ] },
+        ],
+      },
+      {
+        id: 'home',
+        title: 'Home & daily life',
+        desc: 'Your flat, your things and everyday verbs',
+        facts: [FACT.life, FACT.city],
+        phrases: ['Hotel & Practical'],
+        dialogues: ['d-flat'],
+        lessons: [
+          { title: 'Home', words: [
+            ['la casa', 'house / home', '🏠', { note: 'En casa = at home. Voy a casa = I\'m going home.' }],
+            ['el piso', 'flat / apartment', '🏙', { note: 'Also means "floor". In Latin America: el departamento or el apartamento.' }],
+            ['la habitación', 'room / bedroom', '🚪', { note: 'In Latin America also el cuarto or la recámara (Mexico).' }],
+            ['la cocina', 'kitchen', '🍳', { note: 'Also means "cooking" or "cuisine": la cocina española.' }],
+          ] },
+          { title: 'Furniture', words: [
+            ['la cama', 'bed', '🛏'],
+            ['el sofá', 'sofa', '🛋'],
+            ['la puerta', 'door', '🚪'],
+            ['la llave', 'key', '🔑'],
+          ] },
+          { title: 'Things', words: [
+            ['el móvil', 'mobile phone', '📱', { note: 'Spain only. In Latin America: el celular.' }],
+            ['el ordenador', 'computer', '🧑‍💻', { note: 'Spain only. In Latin America: la computadora.' }],
+            ['el libro', 'book', '📖'],
+            ['la tele', 'TV', '📺', { note: 'Short for la televisión.' }],
+          ] },
+          { title: 'Daily verbs', words: [
+            ['comer', 'to eat / to have lunch', '🍽', { note: 'In Spain la comida is lunch, the big meal of the day.' }],
+            ['beber', 'to drink', '🥤', { note: 'In Latin America tomar is more common.' }],
+            ['dormir', 'to sleep', '😴'],
+            ['trabajar', 'to work', '💼'],
+          ] },
+          { title: 'More verbs', words: [
+            ['hablar', 'to speak', '🗣'],
+            ['vivir', 'to live', '🏠'],
+            ['leer', 'to read', '📚'],
+            ['ir', 'to go', '🏃', { note: 'Very irregular: voy (I go), vas (you go), va (he/she goes).' }],
+          ] },
+          { title: 'Daily life', grammar: 'present', sentences: [
+            { jp: ['vivo', 'en', 'Madrid'], en: 'I live in Madrid' },
+            { jp: ['hablo', 'un poco', 'de', 'español'], en: 'I speak a little Spanish', alt: ['I speak a bit of Spanish', 'I speak a little bit of Spanish', 'I speak some Spanish'] },
+            { jp: ['como', 'en', 'casa'], en: 'I eat at home', alt: ['I have lunch at home', 'I\'m eating at home'] },
+            { jp: ['trabajo', 'en', 'un', 'hotel'], en: 'I work in a hotel', alt: ['I work at a hotel'] },
+          ] },
+          { title: 'There is…', grammar: 'hay', sentences: [
+            { jp: ['hay', 'una', 'cama'], en: 'There is a bed', alt: ['There\'s a bed'] },
+            { jp: ['no', 'hay', 'agua'], en: 'There is no water', alt: ['There\'s no water', 'There isn\'t any water', 'There is not any water'] },
+            { jp: ['hay', 'un', 'sofá', 'en', 'la', 'habitación'], en: 'There is a sofa in the room', alt: ['There\'s a sofa in the room', 'There is a sofa in the bedroom', 'There\'s a sofa in the bedroom'] },
+            { jp: ['dónde', 'está', 'la', 'llave'], en: 'Where is the key', alt: ['Where\'s the key'] },
+          ] },
+        ],
+      },
+      {
+        id: 'weather',
+        title: 'Weather & seasons',
+        desc: 'Sun, rain, the seasons and weekend plans',
+        facts: [FACT.nature],
+        phrases: ['Polite Basics'],
+        dialogues: ['d-weather'],
+        lessons: [
+          { title: 'Weather', words: [
+            ['el sol', 'sun', '☀'],
+            ['la lluvia', 'rain', '☂'],
+            ['la nieve', 'snow', '❄'],
+            ['el viento', 'wind', '🍃'],
+          ] },
+          { title: 'Hot & cold', words: [
+            ['hace calor', 'it\'s hot', '🔥', { note: 'Literally "it makes heat". Weather uses hacer: hace frío, hace sol, hace viento.' }],
+            ['hace frío', 'it\'s cold', '🧊'],
+            ['hace sol', 'it\'s sunny', '😎'],
+            ['llueve', 'it\'s raining', '☂', { note: 'Also: está lloviendo (it is raining right now).' }],
+          ] },
+          { title: 'Seasons', words: [
+            ['la primavera', 'spring', '🌸'],
+            ['el verano', 'summer', '🍉', { note: 'In August many Spaniards go on holiday and city shops close.' }],
+            ['el otoño', 'autumn / fall', '🍃'],
+            ['el invierno', 'winter', '🧥'],
+          ] },
+          { title: 'Nature', words: [
+            ['el mar', 'sea', '🌊'],
+            ['la montaña', 'mountain', '⛰', { note: 'Ir a la montaña = to go to the mountains.' }],
+            ['el río', 'river', '💧'],
+            ['el árbol', 'tree', '🌳'],
+          ] },
+          { title: 'What\'s the weather like?', sentences: [
+            { jp: ['qué', 'tiempo', 'hace'], en: 'What is the weather like', alt: ['What\'s the weather like', 'How is the weather', 'How\'s the weather'] },
+            { jp: ['hoy', 'hace', 'mucho', 'calor'], en: 'It is very hot today', alt: ['It\'s very hot today', 'Today it is very hot', 'Today it\'s very hot', 'It\'s really hot today'] },
+            { jp: ['en', 'invierno', 'hace', 'frío'], en: 'It is cold in winter', alt: ['It\'s cold in winter', 'In winter it is cold', 'In winter it\'s cold'] },
+            { jp: ['en', 'verano', 'hace', 'sol'], en: 'It is sunny in summer', alt: ['It\'s sunny in summer', 'In summer it is sunny', 'In summer it\'s sunny'] },
+          ] },
+          { title: 'Weekend plans', sentences: [
+            { jp: ['mañana', 'va a', 'llover'], en: 'It is going to rain tomorrow', alt: ['It\'s going to rain tomorrow', 'Tomorrow it is going to rain', 'Tomorrow it\'s going to rain', 'It will rain tomorrow'] },
+            { jp: ['voy a', 'la', 'playa'], en: 'I am going to the beach', alt: ['I\'m going to the beach', 'I go to the beach'] },
+            { jp: ['vamos a', 'la', 'montaña'], en: 'We are going to the mountains', alt: ['We\'re going to the mountains', 'Let\'s go to the mountains', 'We are going to the mountain', 'We\'re going to the mountain'] },
+          ] },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'real',
+    title: 'Real Spanish',
+    units: [
+      {
+        id: 'feelings',
+        title: 'Feelings & small talk',
+        desc: 'Say how you feel, what you like and keep a chat going',
+        facts: [FACT.festivals, FACT.sport],
+        phrases: ['Polite Basics'],
+        dialogues: ['d-party'],
+        lessons: [
+          { title: 'Feelings', words: [
+            ['contento', 'happy', '😄', { note: 'Feminine: contenta. Feelings use estar: estoy contento.' }],
+            ['triste', 'sad', '😔'],
+            ['cansado', 'tired', '😴', { note: 'Feminine: cansada.' }],
+            ['nervioso', 'nervous', '😱', { note: 'Feminine: nerviosa.' }],
+          ] },
+          { title: 'Hungry & thirsty', words: [
+            ['tengo hambre', 'I\'m hungry', '😋', { note: 'Literally "I have hunger".' }],
+            ['tengo sed', 'I\'m thirsty', '🥤'],
+            ['tengo sueño', 'I\'m sleepy', '🛏'],
+            ['tengo frío', 'I\'m cold', '🧊', { note: 'About you. About the weather: hace frío.' }],
+          ] },
+          { title: 'Likes', words: [
+            ['me gusta', 'I like', '😍', { note: 'Literally "it pleases me". For plural things: me gustan.' }],
+            ['me encanta', 'I love (it)', '❤', { note: 'For things and activities. For people, te quiero.' }],
+            ['no me gusta', 'I don\'t like', '🙅'],
+            ['odio', 'I hate', '😤'],
+          ] },
+          { title: 'Small talk', words: [
+            ['¿de dónde eres?', 'where are you from?', '🌏', { note: 'Polite form: ¿de dónde es usted?', alt: ['de dónde eres'] }],
+            ['¿qué haces?', 'what are you doing?', '💬', { note: 'Also "what do you do (for a living)?"', alt: ['qué haces'] }],
+            ['el fin de semana', 'the weekend', '🎒'],
+            ['claro', 'of course', '👌', { note: 'Also: ¡claro que sí! (of course!).' }],
+          ] },
+          { title: 'Reactions', words: [
+            ['¡qué bien!', 'how great!', '🤩', { alt: ['qué bien'] }],
+            ['¡qué pena!', 'what a shame!', '😔', { alt: ['qué pena'] }],
+            ['¿en serio?', 'really?', '😲', { alt: ['en serio'] }],
+            ['¡genial!', 'great!', '✨', { alt: ['genial'] }],
+          ] },
+          { title: 'I like it', grammar: 'gustar', sentences: [
+            { jp: ['me gusta', 'el', 'café'], en: 'I like coffee', alt: ['I like the coffee'] },
+            { jp: ['me encanta', 'España'], en: 'I love Spain' },
+            { jp: ['no me gusta', 'el', 'frío'], en: 'I do not like the cold', alt: ['I don\'t like the cold', 'I don\'t like cold weather', 'I do not like cold weather'] },
+            { jp: ['te gusta', 'el', 'fútbol'], en: 'Do you like football', alt: ['Do you like soccer'] },
+          ] },
+          { title: 'Chatting', sentences: [
+            { jp: ['estoy', 'muy', 'cansada'], en: 'I am very tired', alt: ['I\'m very tired', 'I\'m really tired', 'I am really tired'] },
+            { jp: ['de dónde', 'eres'], en: 'Where are you from', alt: ['Where do you come from'] },
+            { jp: ['soy', 'de', 'Inglaterra'], en: 'I am from England', alt: ['I\'m from England', 'I come from England'] },
+            { jp: ['tengo', 'mucha', 'sed'], en: 'I am very thirsty', alt: ['I\'m very thirsty', 'I\'m really thirsty', 'I am really thirsty'] },
+          ] },
+        ],
+      },
+      {
+        id: 'help',
+        title: 'Help & health',
+        desc: 'Get help, see a doctor and deal with lost things',
+        facts: [FACT.nature, FACT.language],
+        phrases: ['Help & Emergency'],
+        dialogues: ['d-pharmacy'],
+        lessons: [
+          { title: 'Help!', words: [
+            ['¡socorro!', 'help! (emergency)', '🆘', { note: 'In an emergency in Spain (and the rest of the EU) call 112.', alt: ['socorro'] }],
+            ['la ayuda', 'help', '🙋', { note: 'Necesito ayuda = I need help.' }],
+            ['la policía', 'police', '👮'],
+            ['la ambulancia', 'ambulance', '🚑'],
+          ] },
+          { title: 'Health', words: [
+            ['el hospital', 'hospital', '🏥', { note: 'The h is silent: os-pee-TAL.' }],
+            ['la farmacia', 'pharmacy', '💊', { note: 'Look for the green cross. One is always open at night: the farmacia de guardia.' }],
+            ['la medicina', 'medicine', '🧑‍⚕️', { note: 'Also el medicamento. Pills = las pastillas.' }],
+          ] },
+          { title: 'Body', words: [
+            ['la cabeza', 'head', '🤕'],
+            ['la garganta', 'throat', '🤧'],
+            ['el estómago', 'stomach', '🥣'],
+          ] },
+          { title: 'Hands & feet', words: [
+            ['la mano', 'hand', '🤲', { note: 'Feminine even though it ends in -o!' }],
+            ['el pie', 'foot', '👢'],
+            ['la espalda', 'back', '🧍'],
+            ['el diente', 'tooth', '😀'],
+          ] },
+          { title: 'Problems', words: [
+            ['me duele', 'it hurts (me)', '🤕', { note: 'Works like me gusta: me duele la cabeza = my head hurts.' }],
+            ['estoy enfermo', 'I\'m ill', '🤧', { note: 'A woman says estoy enferma.', alt: ['estoy enferma'] }],
+            ['la alergia', 'allergy', '🥜', { note: 'Soy alérgico a… = I\'m allergic to… (a woman: alérgica).' }],
+            ['necesito', 'I need', '🙏'],
+          ] },
+          { title: 'Lost things', words: [
+            ['el pasaporte', 'passport', '📕'],
+            ['la cartera', 'wallet', '💳', { note: 'In Latin America: la billetera. In Spain, la cartera can also be a briefcase.' }],
+            ['la maleta', 'suitcase', '🧳', { note: 'In Mexico also la petaca; in Argentina la valija.' }],
+            ['el bolso', 'handbag', '🎒'],
+          ] },
+          { title: 'At the doctor\'s', sentences: [
+            { jp: ['me duele', 'la', 'cabeza'], en: 'My head hurts', alt: ['I have a headache', 'I\'ve got a headache'] },
+            { jp: ['me duele', 'el', 'estómago'], en: 'My stomach hurts', alt: ['I have a stomach ache', 'I have a stomachache', 'I\'ve got a stomach ache', 'My stomach aches'] },
+            { jp: ['necesito', 'un', 'médico'], en: 'I need a doctor' },
+            { jp: ['dónde', 'está', 'la', 'farmacia'], en: 'Where is the pharmacy', alt: ['Where\'s the pharmacy', 'Where is the chemist', 'Where is the drugstore'] },
+          ] },
+          { title: 'Emergencies', sentences: [
+            { jp: ['llame', 'a', 'la', 'policía'], en: 'Call the police', alt: ['Call the police please', 'Please call the police'] },
+            { jp: ['he perdido', 'mi', 'pasaporte'], en: 'I have lost my passport', alt: ['I\'ve lost my passport', 'I lost my passport'] },
+            { jp: ['estoy', 'perdida'], en: 'I am lost', alt: ['I\'m lost'] },
+            { jp: ['necesito', 'ayuda'], en: 'I need help' },
+          ] },
+        ],
+      },
+      {
+        id: 'casual',
+        title: 'Casual & slang',
+        desc: 'Talk like a local with friends in Spain',
+        facts: [FACT.language, FACT.food],
+        phrases: ['Eating Out'],
+        dialogues: ['d-quedar'],
+        lessons: [
+          { title: 'Spain slang', words: [
+            ['guay', 'cool', '😎', { note: 'Very Spain. Mexico: padre or chido; Argentina: copado; Colombia and Venezuela: chévere.' }],
+            ['tío', 'dude / mate', '🙋', { note: 'Literally "uncle"; to a woman: tía. Mexico: güey; Argentina: che.' }],
+            ['venga', 'come on / okay then', '👉', { note: 'Used for everything — "¡venga, adiós!" ends many phone calls.' }],
+            ['¡qué fuerte!', 'no way! / wow!', '😱', { note: 'For shocking news or gossip.', alt: ['qué fuerte'] }],
+          ] },
+          { title: 'Going out', words: [
+            ['la fiesta', 'party', '🎵'],
+            ['el bar', 'bar', '🍻', { note: 'Spanish bars are for everyone: coffee in the morning, tapas at night, kids included.' }],
+            ['la caña', 'small draught beer', '🍺'],
+            ['quedar', 'to meet up', '🧑‍🤝‍🧑', { note: '¿Quedamos? = shall we meet up? Mostly Spain.' }],
+          ] },
+          { title: 'Casual feelings', words: [
+            ['mola', 'it\'s cool / I like it', '👍', { note: 'Spain only, informal: me mola = I like it, mola mucho = it\'s really cool.' }],
+            ['flipar', 'to be amazed', '🤯', { note: '¡Flipo! = I can\'t believe it!' }],
+            ['¡qué rollo!', 'what a drag!', '🙄', { alt: ['qué rollo'] }],
+            ['la pasta', 'money (slang)', '💰', { note: 'Also pasta to eat! In Latin America: la plata, or la lana in Mexico.' }],
+          ] },
+          { title: 'Filler words', words: [
+            ['bueno', 'well… / good', '🤷'],
+            ['pues', 'well / so', '💬', { note: 'Starts half the sentences in Spain: pues no sé = well, I don\'t know.' }],
+            ['o sea', 'I mean', '🗣'],
+            ['¿sabes?', 'you know?', '❔', { alt: ['sabes'] }],
+          ] },
+          { title: 'Texting', words: [
+            ['jaja', 'haha', '😂', { note: 'The j sounds like an h, so "jajaja" is laughing.' }],
+            ['besos', 'kisses / love', '💝', { note: 'A normal way to sign off messages to friends.' }],
+            ['un abrazo', 'a hug / best wishes', '🤗', { note: 'Also used to end emails and messages.' }],
+            ['porfa', 'please (casual)', '🙏', { note: 'Short for por favor.' }],
+          ] },
+          { title: 'Casual chat', sentences: [
+            { jp: ['qué', 'pasa', 'tío'], en: 'What\'s up dude', alt: ['What is up dude', 'What\'s up mate', 'What\'s up man', 'What\'s happening dude'] },
+            { jp: ['esto', 'mola', 'mucho'], en: 'This is really cool', alt: ['This is very cool', 'This is so cool', 'I really like this'] },
+            { jp: ['vamos', 'al', 'bar'], en: 'Let\'s go to the bar', alt: ['We are going to the bar', 'We\'re going to the bar', 'Shall we go to the bar'] },
+            { jp: ['quedamos', 'mañana'], en: 'Shall we meet tomorrow', alt: ['Let\'s meet tomorrow', 'Shall we meet up tomorrow', 'Should we meet tomorrow', 'Let\'s meet up tomorrow'] },
+          ] },
+          { title: 'Polite or casual?', sentences: [
+            { jp: ['cómo', 'está', 'usted'], en: 'How are you', alt: ['How are you sir', 'How are you madam', 'How do you do'] },
+            { jp: ['hablas', 'inglés'], en: 'Do you speak English', alt: ['Can you speak English'] },
+            { jp: ['puede', 'repetir', 'por favor'], en: 'Can you repeat please', alt: ['Could you repeat please', 'Can you repeat that please', 'Could you repeat that please'] },
+          ] },
+        ],
+      },
+    ],
+  },
+];
+
+// Short listening dialogues: two people talk, then a question checks what you understood.
+export const DIALOGUES = {
+  'd-hola': {
+    title: 'Meeting at the hotel',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '¡Hola! Me llamo Lucía. ¿Cómo te llamas?', en: 'Hi! My name is Lucía. What\'s your name?' },
+      { who: 1, jp: 'Hola, soy Sofía. Encantada.', en: 'Hi, I\'m Sofía. Nice to meet you.' },
+      { who: 0, jp: 'Encantada. ¿Qué tal?', en: 'Nice to meet you. How are you?' },
+      { who: 1, jp: 'Muy bien, gracias. ¿Y tú?', en: 'Very well, thanks. And you?' },
+    ],
+    question: 'What is the second woman\'s name?',
+    options: ['Sofía', 'Lucía', 'She doesn\'t say'],
+  },
+  'd-metro': {
+    title: 'Looking for the metro',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Disculpe, ¿dónde está el metro?', en: 'Excuse me, where is the metro?' },
+      { who: 1, jp: 'Siga todo recto y está a la izquierda.', en: 'Go straight ahead and it\'s on the left.' },
+      { who: 0, jp: '¿Está lejos?', en: 'Is it far?' },
+      { who: 1, jp: 'No, está muy cerca.', en: 'No, it\'s very close.' },
+    ],
+    question: 'Where is the metro?',
+    options: ['Straight ahead, on the left — very close', 'On the right, quite far', 'Behind the hotel'],
+  },
+  'd-tapas': {
+    title: 'At the tapas bar',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Hola, ¿qué te pongo?', en: 'Hi, what can I get you?' },
+      { who: 1, jp: 'Una caña y una tapa de tortilla, por favor.', en: 'A small beer and a portion of tortilla, please.' },
+      { who: 0, jp: '¿Algo más?', en: 'Anything else?' },
+      { who: 1, jp: 'No, gracias. Y la cuenta, por favor.', en: 'No, thanks. And the bill, please.' },
+    ],
+    question: 'What does she order?',
+    options: ['A small beer and some tortilla', 'A coffee and some ham', 'Water and a salad'],
+  },
+  'd-market': {
+    title: 'At the market',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Perdón, ¿cuánto cuesta esta camiseta?', en: 'Excuse me, how much is this T-shirt?' },
+      { who: 1, jp: 'Quince euros.', en: 'Fifteen euros.' },
+      { who: 0, jp: 'Vale. ¿Puedo pagar con tarjeta?', en: 'Okay. Can I pay by card?' },
+      { who: 1, jp: 'Sí, claro.', en: 'Yes, of course.' },
+    ],
+    question: 'How does she pay?',
+    options: ['By card', 'In cash', 'She doesn\'t buy it'],
+  },
+  'd-time': {
+    title: 'Catching the train',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '¿Qué hora es?', en: 'What time is it?' },
+      { who: 1, jp: 'Son las siete y media.', en: 'It\'s half past seven.' },
+      { who: 0, jp: '¡Uf! El tren sale a las ocho.', en: 'Phew! The train leaves at eight.' },
+      { who: 1, jp: 'Tranquila, tenemos treinta minutos.', en: 'Relax, we have thirty minutes.' },
+    ],
+    question: 'When does the train leave?',
+    options: ['At eight o\'clock', 'At half past seven', 'In ten minutes'],
+  },
+  'd-family': {
+    title: 'Family photos',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '¿Quién es?', en: 'Who is that?' },
+      { who: 1, jp: 'Es mi hermano, Pablo. Es médico.', en: 'It\'s my brother, Pablo. He\'s a doctor.' },
+      { who: 0, jp: '¿Y cuántos años tiene?', en: 'And how old is he?' },
+      { who: 1, jp: 'Tiene treinta años.', en: 'He\'s thirty.' },
+    ],
+    question: 'Who is Pablo?',
+    options: ['Her brother, a 30-year-old doctor', 'Her father, a teacher', 'Her boyfriend, a student'],
+  },
+  'd-flat': {
+    title: 'A new flat',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '¿Dónde vives ahora?', en: 'Where do you live now?' },
+      { who: 1, jp: 'Vivo en un piso pequeño en Valencia, cerca de la playa.', en: 'I live in a small flat in Valencia, near the beach.' },
+      { who: 0, jp: '¡Qué bien! ¿Trabajas allí?', en: 'How great! Do you work there?' },
+      { who: 1, jp: 'Sí, trabajo en un hotel.', en: 'Yes, I work in a hotel.' },
+    ],
+    question: 'Where does she live?',
+    options: ['In a small flat near the beach in Valencia', 'In a big house in Madrid', 'In a hotel in Seville'],
+  },
+  'd-weather': {
+    title: 'Weekend plans',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '¿Qué tiempo hace mañana?', en: 'What\'s the weather like tomorrow?' },
+      { who: 1, jp: 'Hace sol y mucho calor.', en: 'It\'s sunny and very hot.' },
+      { who: 0, jp: '¡Genial! Vamos a la playa.', en: 'Great! Let\'s go to the beach.' },
+      { who: 1, jp: 'Vale, ¡venga!', en: 'Okay, come on then!' },
+    ],
+    question: 'What will they do tomorrow?',
+    options: ['Go to the beach', 'Go to the mountains', 'Stay at home because of the rain'],
+  },
+  'd-party': {
+    title: 'At a party',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '¿De dónde eres?', en: 'Where are you from?' },
+      { who: 1, jp: 'Soy de México, pero vivo en Madrid.', en: 'I\'m from Mexico, but I live in Madrid.' },
+      { who: 0, jp: '¿Te gusta Madrid?', en: 'Do you like Madrid?' },
+      { who: 1, jp: '¡Me encanta! Pero no me gusta el frío en invierno.', en: 'I love it! But I don\'t like the cold in winter.' },
+    ],
+    question: 'What doesn\'t she like about Madrid?',
+    options: ['The cold in winter', 'The food', 'The people'],
+  },
+  'd-pharmacy': {
+    title: 'At the pharmacy',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Buenos días. ¿Qué le pasa?', en: 'Good morning. What\'s the matter?' },
+      { who: 1, jp: 'Me duele mucho la garganta.', en: 'My throat really hurts.' },
+      { who: 0, jp: '¿Tiene alergia a algún medicamento?', en: 'Are you allergic to any medicine?' },
+      { who: 1, jp: 'No, a ninguno.', en: 'No, none.' },
+    ],
+    question: 'What is the problem?',
+    options: ['A sore throat', 'A headache', 'A lost passport'],
+  },
+  'd-quedar': {
+    title: 'Making plans',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Tía, ¿quedamos el viernes?', en: 'Hey, shall we meet up on Friday?' },
+      { who: 1, jp: '¡Venga! ¿A qué hora?', en: 'Sure! What time?' },
+      { who: 0, jp: 'A las nueve en el bar de siempre.', en: 'At nine at the usual bar.' },
+      { who: 1, jp: '¡Guay! Nos vemos.', en: 'Cool! See you.' },
+    ],
+    question: 'When and where will they meet?',
+    options: ['Friday at nine, at their usual bar', 'Saturday at nine, at the beach', 'Friday at noon, at the station'],
+  },
+};

@@ -1,1 +1,110 @@
-export const FACTS = []; export const PHRASES = []; // placeholder
+// Fun facts about France and travel phrases, shown between lessons.
+// Same shapes as ../extras.js: `jp` holds the French phrase (spoken), `romaji` is empty and
+// `say` respells the pronunciation for English speakers (stressed syllable in capitals).
+
+export const FACTS = [
+  {"id": 1, "category": "Food & Wine", "title": "Heritage Bread", "text": "In 2022, UNESCO added the know-how and culture of the French baguette to its list of the Intangible Cultural Heritage of Humanity.", "icon": "bread"},
+  {"id": 2, "category": "Food & Wine", "title": "246 Cheeses", "text": "President Charles de Gaulle famously asked how anyone could govern a country that has 246 varieties of cheese.", "icon": "cheese"},
+  {"id": 3, "category": "Food & Wine", "title": "The French Meal", "text": "The French 'gastronomic meal', with its order of courses and its art of pairing food and wine, joined UNESCO's Intangible Cultural Heritage list in 2010.", "icon": "food"},
+  {"id": 4, "category": "Food & Wine", "title": "Real Champagne", "text": "Only sparkling wine made in the Champagne region, following strict rules, may be sold as Champagne. Others are often called crémant.", "icon": "wine"},
+  {"id": 5, "category": "Food & Wine", "title": "Counter or Terrace?", "text": "In many cafés a coffee costs less standing at the counter (au comptoir) than sitting at a table or out on the terrace.", "icon": "coffee"},
+  {"id": 6, "category": "Food & Wine", "title": "Free Tap Water", "text": "In French restaurants you can ask for 'une carafe d'eau', a jug of tap water, which is served free with a meal.", "icon": "drink"},
+  {"id": 7, "category": "Food & Wine", "title": "An Austrian Ancestor", "text": "The croissant's ancestor is the Austrian kipferl; Viennese bakers helped make crescent-shaped pastries fashionable in Paris in the 1800s.", "icon": "bread"},
+
+  {"id": 8, "category": "Paris & Cities", "title": "A Temporary Tower", "text": "The Eiffel Tower was built for the 1889 World's Fair and was only meant to stand for 20 years. It survived partly thanks to its use as a radio antenna.", "icon": "tower"},
+  {"id": 9, "category": "Paris & Cities", "title": "The Paris Snail", "text": "Paris is divided into 20 arrondissements (districts), numbered in a spiral that starts in the centre and winds outwards like a snail shell.", "icon": "city"},
+  {"id": 10, "category": "Paris & Cities", "title": "Oldest City", "text": "Marseille was founded by Greek sailors from Phocaea around 600 BC, which makes it France's oldest city.", "icon": "sea"},
+  {"id": 11, "category": "Paris & Cities", "title": "Capital of Gastronomy", "text": "Lyon is often called France's capital of gastronomy, famous for its bouchons: small, cosy restaurants serving hearty local dishes.", "icon": "food"},
+  {"id": 12, "category": "Paris & Cities", "title": "Beaches in Paris", "text": "Every summer, Paris Plages turns stretches of the Seine's banks into temporary beaches with sand, deckchairs and parasols.", "icon": "sun"},
+  {"id": 13, "category": "Paris & Cities", "title": "Europe's Parliament", "text": "Strasbourg, on the border with Germany, is the official seat of the European Parliament.", "icon": "flag"},
+
+  {"id": 14, "category": "History & Heritage", "title": "Bastille Day", "text": "France's national day, 14 July, remembers the storming of the Bastille prison in 1789, at the start of the French Revolution.", "icon": "flag"},
+  {"id": 15, "category": "History & Heritage", "title": "The Motto", "text": "France's national motto is 'Liberté, Égalité, Fraternité' — liberty, equality, brotherhood — and it is carved on many town halls and schools.", "icon": "flag"},
+  {"id": 16, "category": "History & Heritage", "title": "The Sun King's Palace", "text": "Louis XIV, the 'Sun King', moved his court to the Palace of Versailles in 1682. Its Hall of Mirrors has 357 mirrors.", "icon": "castle"},
+  {"id": 17, "category": "History & Heritage", "title": "Born in France: Metres", "text": "The metric system was created in France in the 1790s, after the Revolution, to replace hundreds of confusing local measures.", "icon": "globe"},
+  {"id": 18, "category": "History & Heritage", "title": "Cave Painters", "text": "The cave of Lascaux in the Dordogne is decorated with paintings of horses, bulls and deer made about 17,000 years ago.", "icon": "rocks"},
+  {"id": 19, "category": "History & Heritage", "title": "Marianne", "text": "Marianne, a woman in a red Phrygian cap, is the symbol of the French Republic. Her face appears on stamps and on French euro coins.", "icon": "coin"},
+
+  {"id": 20, "category": "Art & Culture", "title": "The Mona Lisa's Home", "text": "The Louvre in Paris is the most visited art museum in the world, and home to Leonardo da Vinci's Mona Lisa.", "icon": "vase"},
+  {"id": 21, "category": "Art & Culture", "title": "Birth of Cinema", "text": "The Lumière brothers held one of the first public film screenings for a paying audience in Paris in December 1895.", "icon": "camera"},
+  {"id": 22, "category": "Art & Culture", "title": "Impression, Sunrise", "text": "Impressionism got its name from Claude Monet's painting 'Impression, soleil levant' (Impression, Sunrise), shown in Paris in 1874.", "icon": "sun"},
+  {"id": 23, "category": "Art & Culture", "title": "Music Day", "text": "Every 21 June, the Fête de la Musique fills French streets with free concerts by amateurs and professionals. It began in 1982.", "icon": "music"},
+  {"id": 24, "category": "Art & Culture", "title": "Tour de France", "text": "The Tour de France cycling race was first held in 1903. The leader wears the famous yellow jersey, the maillot jaune.", "icon": "bike"},
+  {"id": 25, "category": "Art & Culture", "title": "The Ninth Art", "text": "In France, comics (bandes dessinées) are called the 'ninth art'. The town of Angoulême hosts a major international comics festival every January.", "icon": "book"},
+  {"id": 26, "category": "Art & Culture", "title": "Cannes", "text": "The Cannes Film Festival, held each May on the French Riviera, awards the Palme d'Or (Golden Palm) to its best film.", "icon": "star"},
+
+  {"id": 27, "category": "Everyday Life & Customs", "title": "La Bise", "text": "Friends greet each other with la bise, light kisses on the cheeks. How many kisses depends on the region — from one to four!", "icon": "heart"},
+  {"id": 28, "category": "Everyday Life & Customs", "title": "Bonjour First", "text": "Always say 'bonjour' when you walk into a shop, a bakery or a bus. Asking a question without it can come across as rude.", "icon": "speech"},
+  {"id": 29, "category": "Everyday Life & Customs", "title": "Quiet Sundays", "text": "Many shops close on Sundays, especially outside big cities, though bakeries and markets are often open on Sunday morning.", "icon": "shop"},
+  {"id": 30, "category": "Everyday Life & Customs", "title": "The Green Cross", "text": "French pharmacies are marked by a glowing green cross, and pharmacists can give advice on minor health problems.", "icon": "medical"},
+  {"id": 31, "category": "Everyday Life & Customs", "title": "Lily of the Valley", "text": "On 1 May, people in France give each other little bunches of lily of the valley (muguet) for good luck.", "icon": "flower"},
+  {"id": 32, "category": "Everyday Life & Customs", "title": "Emergency Numbers", "text": "In France, dial 15 for medical help (SAMU), 17 for the police and 18 for the fire brigade — or 112, the European emergency number.", "icon": "siren"},
+  {"id": 33, "category": "Everyday Life & Customs", "title": "Five Weeks Off", "text": "French employees are entitled to five weeks of paid holiday a year, and many take a long break in summer, especially in August.", "icon": "sun"},
+
+  {"id": 34, "category": "The French Language", "title": "The Immortals", "text": "The Académie française, founded in 1635 under Cardinal Richelieu, watches over the French language. Its 40 members are nicknamed 'les immortels'.", "icon": "book"},
+  {"id": 35, "category": "The French Language", "title": "Sixty-Ten", "text": "In France, 70 is 'soixante-dix' (sixty-ten) and 80 is 'quatre-vingts' (four twenties). Belgians and the Swiss say septante for 70.", "icon": "speech"},
+  {"id": 36, "category": "The French Language", "title": "French in English", "text": "After the Norman Conquest of 1066, French was the language of England's court for centuries — which is why English has words like 'beef' and 'pork'.", "icon": "speech"},
+  {"id": 37, "category": "The French Language", "title": "Backwards Slang", "text": "Verlan is slang that swaps syllables around: the word 'verlan' itself comes from 'l'envers' (backwards), and 'fou' (crazy) becomes 'ouf'.", "icon": "speech"},
+  {"id": 38, "category": "The French Language", "title": "A World Language", "text": "French is spoken on every continent and is one of the two working languages of the United Nations Secretariat, alongside English.", "icon": "globe"},
+  {"id": 39, "category": "The French Language", "title": "Silent Letters", "text": "French is full of silent final letters: in 'Paris', 'vingt' and 'beaucoup', the last letters are not pronounced at all.", "icon": "speech"},
+
+  {"id": 40, "category": "Regions & Nature", "title": "The Hexagon", "text": "Mainland France is nicknamed 'l'Hexagone' because its shape on the map looks roughly like a six-sided figure.", "icon": "globe"},
+  {"id": 41, "category": "Regions & Nature", "title": "Mont Blanc", "text": "Mont Blanc in the Alps, on the border with Italy, is the highest mountain in Western Europe, at over 4,800 metres.", "icon": "mountain"},
+  {"id": 42, "category": "Regions & Nature", "title": "France Overseas", "text": "France also includes overseas regions far from Europe, such as Guadeloupe and Martinique in the Caribbean and Réunion in the Indian Ocean.", "icon": "sea"},
+  {"id": 43, "category": "Regions & Nature", "title": "Purple Provence", "text": "In Provence, lavender fields bloom purple in early summer, roughly from late June to early August.", "icon": "flower"},
+  {"id": 44, "category": "Regions & Nature", "title": "The Island Abbey", "text": "Mont-Saint-Michel in Normandy is an abbey on a rocky tidal island. At high tide the sea can surround it completely.", "icon": "castle"},
+  {"id": 45, "category": "Regions & Nature", "title": "Giant Dune", "text": "The Dune du Pilat near Arcachon, on the Atlantic coast, is the tallest sand dune in Europe, at roughly 100 metres high.", "icon": "sea"},
+
+  {"id": 46, "category": "Transport & Travel", "title": "The TGV", "text": "France's high-speed TGV trains started running between Paris and Lyon in 1981. A test TGV set a rail speed record of 574.8 km/h in 2007.", "icon": "bullet"},
+  {"id": 47, "category": "Transport & Travel", "title": "Métro 1900", "text": "The first line of the Paris Métro opened in 1900, the same year Paris hosted a World's Fair and the Olympic Games.", "icon": "train"},
+  {"id": 48, "category": "Transport & Travel", "title": "Under the Sea", "text": "The Channel Tunnel, opened in 1994, links France and England with a rail tunnel about 50 km long, much of it under the sea.", "icon": "train"},
+  {"id": 49, "category": "Transport & Travel", "title": "Top Destination", "text": "France is regularly the most visited country in the world, welcoming tens of millions of international tourists each year.", "icon": "plane"},
+  {"id": 50, "category": "Transport & Travel", "title": "Vélib'", "text": "Paris launched its big bike-sharing system, Vélib', in 2007. The name mixes vélo (bike) and liberté (freedom).", "icon": "bike"},
+];
+
+export const PHRASES = [
+  {"id": 1, "category": "Key Polite Basics", "jp": "Bonjour", "romaji": "", "say": "bohn-ZHOOR", "en": "Hello / Good morning", "icon": "speech"},
+  {"id": 2, "category": "Key Polite Basics", "jp": "Bonsoir", "romaji": "", "say": "bohn-SWAHR", "en": "Good evening", "icon": "speech"},
+  {"id": 3, "category": "Key Polite Basics", "jp": "Merci beaucoup", "romaji": "", "say": "mair-SEE boh-KOO", "en": "Thank you very much", "icon": "heart"},
+  {"id": 4, "category": "Key Polite Basics", "jp": "S'il vous plaît", "romaji": "", "say": "seel voo PLEH", "en": "Please", "icon": "speech"},
+  {"id": 5, "category": "Key Polite Basics", "jp": "Excusez-moi", "romaji": "", "say": "ex-kew-zay-MWAH", "en": "Excuse me", "icon": "person"},
+  {"id": 6, "category": "Key Polite Basics", "jp": "Je ne comprends pas", "romaji": "", "say": "zhuh nuh kohm-PRAHN pah", "en": "I don't understand", "icon": "speech"},
+  {"id": 7, "category": "Key Polite Basics", "jp": "Vous parlez anglais?", "romaji": "", "say": "voo par-lay ahn-GLEH?", "en": "Do you speak English?", "icon": "speech"},
+  {"id": 8, "category": "Key Polite Basics", "jp": "Au revoir", "romaji": "", "say": "oh ruh-VWAHR", "en": "Goodbye", "icon": "person"},
+
+  {"id": 9, "category": "Getting Around", "jp": "Où est la gare?", "romaji": "", "say": "oo eh lah GAR?", "en": "Where is the train station?", "icon": "train"},
+  {"id": 10, "category": "Getting Around", "jp": "Un billet pour Paris, s'il vous plaît", "romaji": "", "say": "uhn bee-YEH poor pa-REE, seel voo PLEH", "en": "A ticket to Paris, please", "icon": "ticket"},
+  {"id": 11, "category": "Getting Around", "jp": "C'est loin?", "romaji": "", "say": "seh LWAN?", "en": "Is it far?", "icon": "globe"},
+  {"id": 12, "category": "Getting Around", "jp": "À quelle heure part le train?", "romaji": "", "say": "ah kel UHR par luh TRAN?", "en": "What time does the train leave?", "icon": "train"},
+  {"id": 13, "category": "Getting Around", "jp": "Où est l'arrêt de bus?", "romaji": "", "say": "oo eh lah-REH duh BOOSS?", "en": "Where is the bus stop?", "icon": "bus"},
+  {"id": 14, "category": "Getting Around", "jp": "À l'aéroport, s'il vous plaît", "romaji": "", "say": "ah lah-ay-roh-POR, seel voo PLEH", "en": "To the airport, please", "icon": "taxi"},
+
+  {"id": 15, "category": "Café & Restaurant", "jp": "Une table pour deux, s'il vous plaît", "romaji": "", "say": "ewn TAH-bluh poor DUH, seel voo PLEH", "en": "A table for two, please", "icon": "food"},
+  {"id": 16, "category": "Café & Restaurant", "jp": "La carte, s'il vous plaît", "romaji": "", "say": "lah KART, seel voo PLEH", "en": "The menu, please", "icon": "food"},
+  {"id": 17, "category": "Café & Restaurant", "jp": "Je voudrais un café", "romaji": "", "say": "zhuh voo-DREH uhn ka-FAY", "en": "I'd like a coffee", "icon": "coffee"},
+  {"id": 18, "category": "Café & Restaurant", "jp": "Une carafe d'eau, s'il vous plaît", "romaji": "", "say": "ewn ka-RAHF DOH, seel voo PLEH", "en": "A jug of tap water, please", "icon": "drink"},
+  {"id": 19, "category": "Café & Restaurant", "jp": "L'addition, s'il vous plaît", "romaji": "", "say": "lah-dee-SYOHN, seel voo PLEH", "en": "The bill, please", "icon": "coin"},
+  {"id": 20, "category": "Café & Restaurant", "jp": "C'était délicieux!", "romaji": "", "say": "say-TEH day-lee-SYUH!", "en": "That was delicious!", "icon": "food"},
+
+  {"id": 21, "category": "Shopping & Paying", "jp": "C'est combien?", "romaji": "", "say": "seh kohm-BYAN?", "en": "How much is it?", "icon": "coin"},
+  {"id": 22, "category": "Shopping & Paying", "jp": "Je regarde seulement", "romaji": "", "say": "zhuh ruh-GARD suhl-MAHN", "en": "I'm just looking", "icon": "shop"},
+  {"id": 23, "category": "Shopping & Paying", "jp": "Je peux payer par carte?", "romaji": "", "say": "zhuh PUH pay-YAY par KART?", "en": "Can I pay by card?", "icon": "bank"},
+  {"id": 24, "category": "Shopping & Paying", "jp": "Je le prends", "romaji": "", "say": "zhuh luh PRAHN", "en": "I'll take it", "icon": "shop"},
+  {"id": 25, "category": "Shopping & Paying", "jp": "C'est pour offrir", "romaji": "", "say": "seh poor oh-FREER", "en": "It's a gift", "icon": "shop"},
+
+  {"id": 26, "category": "Hotel & Practical", "jp": "J'ai une réservation", "romaji": "", "say": "zhay ewn ray-zair-va-SYOHN", "en": "I have a reservation", "icon": "hotel"},
+  {"id": 27, "category": "Hotel & Practical", "jp": "Quel est le code du wifi?", "romaji": "", "say": "kel eh luh KOD dew wee-FEE?", "en": "What's the Wi-Fi password?", "icon": "globe"},
+  {"id": 28, "category": "Hotel & Practical", "jp": "Le petit-déjeuner est à quelle heure?", "romaji": "", "say": "luh puh-TEE day-zhuh-NAY eh ah kel UHR?", "en": "What time is breakfast?", "icon": "hotel"},
+  {"id": 29, "category": "Hotel & Practical", "jp": "Je peux laisser mes bagages?", "romaji": "", "say": "zhuh puh leh-SAY may ba-GAHZH?", "en": "Can I leave my luggage?", "icon": "hotel"},
+  {"id": 30, "category": "Hotel & Practical", "jp": "Quelle heure est-il?", "romaji": "", "say": "kel UHR eh-TEEL?", "en": "What time is it?", "icon": "calendar"},
+  {"id": 31, "category": "Hotel & Practical", "jp": "Vous pouvez me prendre en photo?", "romaji": "", "say": "voo poo-VAY muh PRAHN-druh ahn foh-TOH?", "en": "Could you take a photo of me?", "icon": "camera"},
+
+  {"id": 32, "category": "Help & Emergency", "jp": "Au secours!", "romaji": "", "say": "oh suh-KOOR!", "en": "Help!", "icon": "siren"},
+  {"id": 33, "category": "Help & Emergency", "jp": "Appelez une ambulance!", "romaji": "", "say": "ap-LAY ewn ahm-bew-LAHNSS!", "en": "Call an ambulance!", "icon": "siren"},
+  {"id": 34, "category": "Help & Emergency", "jp": "Appelez la police!", "romaji": "", "say": "ap-LAY lah poh-LEESS!", "en": "Call the police!", "icon": "police"},
+  {"id": 35, "category": "Help & Emergency", "jp": "Je suis perdu", "romaji": "", "say": "zhuh swee pair-DEW", "en": "I'm lost", "icon": "globe"},
+  {"id": 36, "category": "Help & Emergency", "jp": "J'ai perdu mon passeport", "romaji": "", "say": "zhay pair-DEW mohn pass-POR", "en": "I've lost my passport", "icon": "siren"},
+  {"id": 37, "category": "Help & Emergency", "jp": "Je ne me sens pas bien", "romaji": "", "say": "zhuh nuh muh sahn pah BYAN", "en": "I don't feel well", "icon": "medical"},
+  {"id": 38, "category": "Help & Emergency", "jp": "Où est la pharmacie?", "romaji": "", "say": "oo eh lah far-ma-SEE?", "en": "Where is the pharmacy?", "icon": "medical"},
+  {"id": 39, "category": "Help & Emergency", "jp": "Je suis allergique aux cacahuètes", "romaji": "", "say": "zhuh swee za-lair-ZHEEK oh ka-ka-WET", "en": "I'm allergic to peanuts", "icon": "medical"},
+];

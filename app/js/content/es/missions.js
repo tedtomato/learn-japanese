@@ -1,1 +1,118 @@
-export const MISSIONS = []; // placeholder
+// Real-world missions for the Spanish course: short role-plays at the end of each section 1 unit
+// (plus a couple later on). Same shape as ../missions.js, without romanisation. Each step is a line
+// from the other person (who: cast key, jp = Spanish, en) and/or a prompt, then replies to pick from.
+// A reply is { jp, romaji, en, ok, note } — note explains a wrong (or funny) choice; replies with only
+// `en` check understanding of what was said. Unlocked once the unit's lessons are done.
+const R = (jp, en, ok = false, note = '') => ({ jp, romaji: jp, en, ok, note });
+const E = (en, ok = false, note = '') => ({ en, ok, note });
+
+export const MISSIONS = [
+  {
+    id: 'meet-lucia', unit: 'spain-hello', art: '🏨', title: 'Check in at a small hotel',
+    setting: 'You arrive at a little family hotel in Madrid. Lucía is at the front desk.',
+    reward: 'Lucía hands you your key with a big smile — great first impression!',
+    steps: [
+      { who: 'woman', jp: '¡Buenas tardes!', en: 'Good afternoon!',
+        replies: [R('¡Buenas tardes!', 'good afternoon!', true), R('Buenas noches', 'good night', false, 'It\'s only 5 pm — in Spain that\'s still afternoon!'), R('Adiós', 'goodbye', false, '"Goodbye" — you\'ve only just arrived!')] },
+      { who: 'woman', jp: 'Me llamo Lucía. ¿Cómo te llamas?', en: 'My name is Lucía. What\'s your name?',
+        replies: [R('Me llamo Sam. Encantado.', 'my name is Sam. Nice to meet you.', true), R('Lo siento', 'I\'m sorry', false, 'Nothing to apologise for — tell her your name!'), R('De nada', 'you\'re welcome', false, '"You\'re welcome" — she asked your name.')] },
+      { who: 'woman', jp: '¿Qué tal el viaje?', en: 'How was the trip?',
+        replies: [R('Muy bien, gracias. ¿Y tú?', 'very good, thanks. And you?', true), R('No pasa nada', 'no problem', false, '"No problem" is the answer to "sorry", not "how was it?"'), R('Hasta mañana', 'see you tomorrow', false, 'Leaving already? Tell her the trip was good!')] },
+      { who: 'woman', jp: 'Aquí tienes la llave. ¡Bienvenido!', en: 'Here\'s your key. Welcome!',
+        replies: [R('¡Muchas gracias!', 'thank you very much!', true), R('Perdón', 'excuse me', false, 'No need for "excuse me" — thank her!'), R('No', 'no', false, 'Refusing the key? You\'ll be sleeping in the lobby!')] },
+      { who: 'woman', jp: 'De nada. ¡Hasta luego!', en: 'You\'re welcome. See you later!', prompt: 'What did she say?',
+        replies: [E('You\'re welcome. See you later!', true), E('Sorry, see you tomorrow!', false, 'Sorry is lo siento, and see you tomorrow is hasta mañana.'), E('Good night, sleep well!', false, 'Good night is buenas noches.')] },
+    ],
+  },
+  {
+    id: 'find-metro', unit: 'spain-around', art: '🚇', title: 'Find the metro in Barcelona',
+    setting: 'You\'re on a busy street in Barcelona and need the metro. You stop Sofía, a passer-by.',
+    reward: 'You found the metro — and the toilets on the way!',
+    steps: [
+      { prompt: 'Get her attention politely.',
+        replies: [R('Disculpe', 'excuse me', true), R('¡Salud!', 'cheers!', false, '"Cheers!" — you\'re not holding a drink!'), R('Buenas noches', 'good night', false, '"Good night" at 10 a.m.? She\'ll be puzzled.')] },
+      { who: 'woman2', jp: 'Sí, dime.', en: 'Yes, tell me.',
+        replies: [R('¿Dónde está el metro?', 'where is the metro?', true), R('¿Dónde está la playa?', 'where is the beach?', false, 'That asks for the beach — tempting, but you need the metro.'), R('¿Dónde está el hotel?', 'where is the hotel?', false, 'That asks for the hotel.')] },
+      { who: 'woman2', jp: 'Siga todo recto y luego a la derecha.', en: 'Go straight ahead and then to the right.', prompt: 'Which way do you go?',
+        replies: [E('⬆️ Straight, then ➡️ right', true), E('⬆️ Straight, then ⬅️ left', false, 'Izquierda is left — she said derecha (right).'), E('⬅️ Left, then ⬆️ straight', false, 'Todo recto (straight ahead) came first, then a la derecha (right).')] },
+      { prompt: 'Oh — you also need the toilet. Ask her.',
+        replies: [R('¿Dónde está el baño?', 'where is the toilet?', true), R('¿Dónde está el taxi?', 'where is the taxi?', false, 'That asks for a taxi — not the most urgent thing right now!'), R('¿Dónde está el billete?', 'where is the ticket?', false, 'That asks where the ticket is.')] },
+      { who: 'woman2', jp: 'Hay un baño allí, a la izquierda.', en: 'There\'s a toilet over there, on the left.', prompt: 'Where is it?',
+        replies: [E('⬅️ Over there, on the left', true), E('➡️ Over there, on the right', false, 'Derecha is right — she said izquierda (left).'), E('Very far away', false, 'Lejos means far — she said allí, over there.')] },
+      { prompt: 'Thank her and say goodbye.',
+        replies: [R('¡Muchas gracias! ¡Adiós!', 'thanks a lot! goodbye!', true), R('Lo siento', 'I\'m sorry', false, 'No need to apologise — thank her!'), R('De nada', 'you\'re welcome', false, '"You\'re welcome" — but she\'s the one who helped you!')] },
+    ],
+  },
+  {
+    id: 'tapas-bar', unit: 'spain-food', art: '🍻', title: 'Tapas in Seville',
+    setting: 'A noisy, cheerful tapas bar in Seville. Sofía is behind the counter.',
+    reward: 'Cold beer, great tortilla and a friendly "¡salud!" — you ordered like a local!',
+    steps: [
+      { who: 'woman2', jp: 'Hola, ¿qué te pongo?', en: 'Hi, what can I get you?',
+        replies: [R('Una caña, por favor', 'a small beer, please', true), R('La cuenta, por favor', 'the bill, please', false, 'The bill already? You haven\'t had anything yet!'), R('No, gracias', 'no, thanks', false, 'You came into a bar to order nothing?')] },
+      { who: 'woman2', jp: '¿Y para comer?', en: 'And to eat?', prompt: 'Point at the tortilla on the counter.',
+        replies: [R('Quiero esto, por favor', 'I want this, please', true), R('Quisiera la tortilla', 'I would like the tortilla', true, 'Perfect and polite!'), R('Hasta luego', 'see you later', false, 'Leaving before the food? Point and say "esto"!')] },
+      { who: 'woman2', jp: '¿Quieres jamón también?', en: 'Do you want ham too?',
+        replies: [R('Sí, ¡vale!', 'yes, okay!', true), R('No, gracias', 'no, thanks', true, 'Fair enough — the tortilla is plenty.'), R('Encantado', 'nice to meet you', false, '"Nice to meet you" — to the ham?')] },
+      { who: 'woman2', jp: '¿Está rico?', en: 'Is it tasty?',
+        replies: [R('¡Sí, muy rico!', 'yes, very tasty!', true), R('Lo siento', 'I\'m sorry', false, '"Sorry"? Did you spill your beer?'), R('Buenos días', 'good morning', false, 'It\'s 10 pm — tell her it\'s delicious!')] },
+      { prompt: 'Raise your glass with the people next to you.',
+        replies: [R('¡Salud!', 'cheers!', true), R('¡Socorro!', 'help!', false, 'That\'s "help!" — everyone turns round in panic.'), R('Por favor', 'please', false, '"Please"? Try "cheers!"')] },
+      { prompt: 'Time to go. Ask for the bill.',
+        replies: [R('La cuenta, por favor', 'the bill, please', true), R('Una cerveza, por favor', 'a beer, please', false, 'That gets you another beer — nice, but you wanted the bill.'), R('¿Dónde está el baño?', 'where is the toilet?', false, 'Useful, but you wanted the bill.')] },
+    ],
+  },
+  {
+    id: 'market-shopping', unit: 'spain-shopping', art: '🛍️', title: 'Shopping at the market',
+    setting: 'A street market in Valencia. You spot a nice blue T-shirt. Lucía runs the stall.',
+    reward: 'A new T-shirt at a good price — and no plastic bag!',
+    steps: [
+      { prompt: 'Point at the T-shirt and ask the price.',
+        replies: [R('¿Cuánto cuesta?', 'how much is it?', true), R('¡Socorro!', 'help!', false, 'Help?! It\'s just a T-shirt — no emergency!'), R('Es muy caro', 'it\'s very expensive', false, 'You don\'t even know the price yet!')] },
+      { who: 'woman', jp: 'Doce euros.', en: '12 euros.', prompt: 'How much is it?',
+        replies: [E('12 euros', true), E('2 euros', false, 'Dos is 2 — she said doce, 12.'), E('20 euros', false, 'Veinte is 20 — she said doce, 12.')] },
+      { prompt: 'Ask for it in another size.',
+        replies: [R('¿Tiene otra talla?', 'do you have another size?', true), R('¿Tiene otro color?', 'do you have another colour?', false, 'That asks for another colour — but you like the blue!'), R('No me gusta', 'I don\'t like it', false, 'You do like it — you just need another size.')] },
+      { who: 'woman', jp: 'Sí, aquí tienes. ¿Efectivo o tarjeta?', en: 'Yes, here you go. Cash or card?',
+        replies: [R('Con tarjeta, por favor', 'by card, please', true), R('En efectivo', 'in cash', true, 'Cash works fine at markets!'), R('Buenas noches', 'good night', false, 'She asked how you want to pay!')] },
+      { who: 'woman', jp: '¿Quieres una bolsa?', en: 'Do you want a bag?',
+        replies: [R('No, gracias', 'no, thanks', true), R('Sí, por favor', 'yes, please', true, 'Fine — it might cost a few cents.'), R('Me llamo Sam', 'my name is Sam', false, 'She asked about a bag, not your name!')] },
+      { who: 'woman', jp: '¡Gracias! ¡Hasta luego!', en: 'Thanks! See you later!',
+        replies: [R('¡Adiós, gracias!', 'bye, thanks!', true), R('¿Cuánto cuesta?', 'how much is it?', false, 'You\'ve already paid!'), R('Perdón', 'sorry', false, 'Nothing to be sorry for — say goodbye!')] },
+    ],
+  },
+  {
+    id: 'meet-family', unit: 'everyday-people', art: '🧑‍🤝‍🧑', title: 'Sunday lunch with the family',
+    setting: 'Your friend Sofía invites you to a long Sunday lunch with her family in Málaga.',
+    reward: 'Everyone loves you — and you\'re invited back next Sunday!',
+    steps: [
+      { who: 'woman2', jp: 'Mira, es mi madre.', en: 'Look, this is my mother.',
+        replies: [R('Encantado, señora', 'nice to meet you, madam', true), R('¡Salud!', 'cheers!', false, 'Wait for the drinks first!'), R('Lo siento', 'I\'m sorry', false, '"I\'m sorry" — why? Say nice to meet you!')] },
+      { who: 'woman2', jp: 'Y él es mi hermano, Pablo. Tiene veinte años.', en: 'And he\'s my brother, Pablo. He\'s twenty.', prompt: 'Who is Pablo?',
+        replies: [E('Her brother, 20 years old', true), E('Her father, 20 years old', false, 'Padre is father — she said hermano, brother.'), E('Her boyfriend', false, 'Novio is boyfriend — she said hermano.')] },
+      { who: 'woman2', jp: '¿Tienes hermanos?', en: 'Do you have brothers and sisters?',
+        replies: [R('Sí, tengo una hermana', 'yes, I have a sister', true), R('No, no tengo hermanos', 'no, I don\'t have any', true, 'An only child — fine!'), R('Tengo hambre', 'I\'m hungry', false, 'True maybe, but she asked about siblings!')] },
+      { who: 'woman2', jp: '¿Te gusta la paella de mi madre?', en: 'Do you like my mother\'s paella?',
+        replies: [R('¡Me encanta! Está muy rica', 'I love it! It\'s delicious', true), R('No me gusta', 'I don\'t like it', false, 'Ouch! Never say that to a Spanish mother.'), R('¿Dónde está el baño?', 'where is the toilet?', false, 'Answer her first!')] },
+      { prompt: 'Lunch is over and everyone keeps chatting at the table. What is this called?',
+        replies: [E('La sobremesa', true), E('La siesta', false, 'The siesta is the nap — this is the chat at the table: la sobremesa.'), E('El desayuno', false, 'El desayuno is breakfast.')] },
+    ],
+  },
+  {
+    id: 'pharmacy', unit: 'real-help', art: '💊', title: 'At the pharmacy',
+    setting: 'You wake up with a sore throat in Granada. Lucía, the pharmacist, is behind the counter.',
+    reward: 'You got the right medicine — get well soon!',
+    steps: [
+      { who: 'woman', jp: 'Buenos días, ¿qué le pasa?', en: 'Good morning, what\'s the matter?',
+        replies: [R('Me duele la garganta', 'my throat hurts', true), R('Me gusta la garganta', 'I like the throat', false, 'Me gusta = I like. You want me duele — it hurts.'), R('Tengo veinte años', 'I\'m twenty', false, 'She asked what\'s wrong, not your age.')] },
+      { who: 'woman', jp: '¿Tiene fiebre?', en: 'Do you have a fever?',
+        replies: [R('No, pero estoy muy cansado', 'no, but I\'m very tired', true), R('Sí, un poco', 'yes, a little', true, 'Okay — she\'ll keep that in mind.'), R('¡Salud!', 'cheers!', false, 'Not the time for a toast!')] },
+      { who: 'woman', jp: '¿Es alérgico a algún medicamento?', en: 'Are you allergic to any medicine?',
+        replies: [R('No, a ninguno', 'no, none', true), R('Sí, a la penicilina', 'yes, to penicillin', true, 'Good thing you told her!'), R('Hasta luego', 'see you later', false, 'Don\'t leave — this is important!')] },
+      { who: 'woman', jp: 'Tome una pastilla tres veces al día.', en: 'Take one pill three times a day.', prompt: 'How often do you take it?',
+        replies: [E('Three times a day', true), E('Once a day', false, 'Una is the pill — tres veces is three times.'), E('Every three days', false, 'Al día means per day: three times a day.')] },
+      { prompt: 'Thank her.',
+        replies: [R('Muchas gracias', 'thank you very much', true), R('No pasa nada', 'no problem', false, 'That answers "sorry" — say thank you!'), R('¡Socorro!', 'help!', false, 'You\'re fine now — just say thanks!')] },
+    ],
+  },
+];

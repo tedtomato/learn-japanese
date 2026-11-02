@@ -26,7 +26,7 @@ function addItem(item) {
 
 // Ids from the romanisation; pinyin tones become numbers (买 mǎi → mai3, 卖 mài → mai4).
 // Latin-alphabet courses drop accents instead (le café → le-cafe, ¿dónde? → donde).
-const plainLatin = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+const plainLatin = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/œ/g, 'oe').replace(/æ/g, 'ae');
 export const slug = (s) => (L.latin ? plainLatin(s) : toneNumbers(s)).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const kanaChars = (text) => [...text].filter((c) => KANA.has(c));
 

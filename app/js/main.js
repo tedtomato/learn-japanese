@@ -13,7 +13,7 @@ import { mascot } from './mascot.js';
 import { showStreakCalendar } from './screens/streak.js';
 import { showHearts } from './screens/hearts.js';
 import { renderCourses } from './screens/courses.js';
-import { courseChosen } from './lang.js';
+import { courseChosen, languagePicked } from './lang.js';
 import { renderFactQuiz } from './screens/factquiz.js';
 import { renderListen } from './screens/listen.js';
 import { renderSigns } from './screens/signs.js';
@@ -110,6 +110,8 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', a
 applySettings();
 if (isPhone()) {
   window.addEventListener('hashchange', route);
+  // Each start of the app opens on the language menu (links into a lesson or screen go straight there).
+  if (!languagePicked() && /^#?(\/learn)?$/.test(location.hash)) history.replaceState(null, '', '#/courses');
   splash();
   route();
 } else phoneOnly();

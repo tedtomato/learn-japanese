@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.91', date: '2 Nov 2026', changes: [
+    'The language menu now opens every time you start the app: pick today\'s language and see your progress in each one. Close it with ✕ to carry on where you were',
+  ] },
   { version: '0.90', date: '2 Nov 2026', changes: [
     'New: French 🇫🇷, Spanish 🇪🇸 and English 🇬🇧 courses! Each has 11 units in 3 sections (first trip, everyday, real talk), about 200 words and 80 sentences, 12 grammar cards, 11 dialogues, a phrasebook, 50+ fun facts with their quiz, 6 missions and 6 pattern drills',
     'English is taught to French speakers: meanings, notes and grammar are in French',

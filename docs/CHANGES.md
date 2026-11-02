@@ -7,6 +7,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Request | Status | Release |
 |---|---|---|
 | French, English and Spanish versions | ✅ three new courses (French and Spanish from English; English for French speakers, meanings in French): 11 units each, grammar cards, dialogues, phrasebook, fun facts + quiz, missions, pattern drills; Latin-alphabet mode (no romanisation, kana or kanji; word-by-word highlighting; accent-insensitive typing and speech) | 0.90 |
+| Language menu every time the app starts | ✅ opens after the splash on each start (not again after switching language in the same session) | 0.91 |
 | A screen to select the language first, with progress for each language | ✅ language screen on first launch and from the flag: lessons done (bar + %), XP, streak, words, next unit, per language | 0.90 |
 
 ## Batch 15 — 2 Nov 2026

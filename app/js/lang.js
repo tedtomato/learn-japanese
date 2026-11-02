@@ -74,8 +74,27 @@ export const L = COURSES[LANG];
 // The text shown under words (romanisation) — none in Latin-alphabet courses, where it is the word itself.
 export const withRoman = (jp, romaji) => (L.latin || !romaji || romaji === jp ? jp : `${jp} · ${romaji}`);
 
+// The language menu opens every time the app starts; once a language is picked (or the menu is
+// closed) it stays away until the next start, including the reload that switching language needs.
+const PICKED_KEY = 'hajime.language-picked';
+export function languagePicked() {
+  try {
+    return globalThis.sessionStorage?.getItem(PICKED_KEY) === '1';
+  } catch {
+    return true;
+  }
+}
+export function markLanguagePicked() {
+  try {
+    globalThis.sessionStorage?.setItem(PICKED_KEY, '1');
+  } catch {
+    /* ignore */
+  }
+}
+
 export function switchCourse(code) {
   if (!COURSES[code]) return;
+  markLanguagePicked();
   try {
     localStorage.setItem(COURSE_KEY, code);
   } catch {

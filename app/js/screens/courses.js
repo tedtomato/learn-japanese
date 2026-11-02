@@ -1,7 +1,7 @@
 // The language screen: shown first (before anything else) until a language is picked, and opened
 // from the flag in the top bar. Every course keeps its own progress, shown here so the learner sees
 // what they come back to: lessons done, XP, streak, words, and the unit they are on.
-import { COURSES, LANG, courseChosen, switchCourse } from '../lang.js';
+import { COURSES, LANG, courseChosen, switchCourse, markLanguagePicked } from '../lang.js';
 import { AVAILABLE } from '../content/pack.js';
 import { app, flagSvg, saveSummary } from '../app.js';
 import { html, mount, raw, $$ } from '../dom.js';
@@ -57,11 +57,13 @@ export function renderCourses(root) {
   mount(root, html`${chosen ? html`<header class="topbar topbar-back"><a class="icon-btn" href="#/learn" aria-label="Back">${icon('close', 24)}</a><h1>Languages</h1></header>` : ''}
   <main class="page courses-page">
     <section class="courses-hero">${mascot(chosen ? 'happy' : 'cheer', 96)}
-      <div><h1>${chosen ? 'Your languages' : 'What do you want to learn?'}</h1>
+      <div><h1>${chosen ? 'Which language today?' : 'What do you want to learn?'}</h1>
       <p class="muted">${started.length ? `You are learning ${started.length} language${started.length > 1 ? 's' : ''}. Each one keeps its own progress, streak and gems.` : 'Pick a language to start. You can switch any time from the flag at the top — each language keeps its own progress.'}</p></div>
     </section>
     <div class="course-cards">${list.map(courseCard)}</div>
   </main>`);
+  window.scrollTo(0, 0);
+  $$('.topbar-back .icon-btn', root).forEach((a) => a.addEventListener('click', markLanguagePicked));
   $$('[data-course]', root).forEach((b) => b.addEventListener('click', () => {
     if (app.testMode && b.dataset.course !== LANG) app.setTestMode(false);
     switchCourse(b.dataset.course);

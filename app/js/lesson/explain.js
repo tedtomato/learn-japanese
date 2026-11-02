@@ -1,7 +1,7 @@
 // "Explain my answer": a breakdown of the item — each chunk with its meaning, usage notes,
 // particles, kanji parts and stories — shown after checking an answer.
 import { ITEMS } from '../course.js';
-import { GLOSSARY } from '../content/grammar.js';
+import { GLOSSARY } from '../content/pack.js';
 import { html } from '../dom.js';
 import { jpItem, jpChunk, kanaExample } from './text.js';
 import { readings } from '../tidbits.js';

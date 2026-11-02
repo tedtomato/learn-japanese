@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.86', date: '2 Nov 2026', changes: [
+    'Tap the flag in the top bar to choose your language. Chinese (中文) is on its way — each language will keep its own progress, streak and gems',
+  ] },
   { version: '0.85', date: '28 Oct 2026', changes: [
     'Backup to Google Drive: Profile → Backup → Save to Drive opens your phone\'s share menu — pick Drive → Save. Restore picks the file back from Drive',
     'Profile shows when you last backed up, and Practice → Today reminds you when it\'s been over 2 weeks',

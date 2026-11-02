@@ -8,7 +8,7 @@ import { icon } from '../icons.js';
 import { art } from '../art.js';
 import { person, nameOf } from '../characters.js';
 import { speak, sfx, buzz } from '../audio.js';
-import { MISSIONS } from '../content/missions.js';
+import { MISSIONS } from '../content/pack.js';
 import { completeMission, unitLessonsDone } from '../progress.js';
 
 const shuffle = (list) => list.map((x) => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(([, x]) => x);

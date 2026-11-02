@@ -3,6 +3,11 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 15 — 2 Nov 2026
+| Request | Status | Release |
+|---|---|---|
+| Chinese version for beginners, chosen with the flag | 🚧 course picker on the flag + per-course progress (0.86); Chinese content (units, characters, signs, facts, phrasebook) being written; then missions, drills, memory tricks, strokes, tone trainer | 0.86 |
+
 ## Batch 14 — 27 Oct 2026
 | Request | Status | Release |
 |---|---|---|

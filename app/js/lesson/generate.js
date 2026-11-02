@@ -1,8 +1,7 @@
 // Turns a path node (or a practice request) into a list of exercises.
 import { FAMILIAR_IDS, ITEMS } from '../course.js';
 import { byUrgency } from '../srs.js';
-import { GRAMMAR } from '../content/grammar.js';
-import { STROKES } from '../content/strokes.js';
+import { GRAMMAR, STROKES, FILLERS as JP_FILLERS, FILLER_ROMAJI } from '../content/pack.js';
 
 export function makeRng(seed = Date.now()) {
   let a = seed >>> 0;
@@ -36,8 +35,6 @@ const QUESTION_TYPES = {
   fword: { easy: ['read'], hard: ['read'] },
 };
 
-const JP_FILLERS = ['は', 'が', 'を', 'の', 'です', 'か', 'と'];
-const FILLER_ROMAJI = { は: 'wa', が: 'ga', を: 'o', の: 'no', です: 'desu', か: 'ka', と: 'to', で: 'de' };
 const EN_FILLERS = ['the', 'is', 'a', 'you', 'I', 'my', 'please', 'what', 'this', 'like', 'are', 'and'];
 
 // Romaji for any sentence chunk, used to label Japanese tiles while hints are on.

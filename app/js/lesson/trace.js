@@ -1,7 +1,7 @@
 // Trace a character stroke by stroke. Round 1 is guided (outline, start dot and dashed arrow);
 // round 2 (kana) is from memory with only a faint outline. A stroke counts when it starts near
 // the stroke's start, ends near its end and follows its shape — so order and direction matter.
-import { STROKES } from '../content/strokes.js';
+import { STROKES } from '../content/pack.js';
 import { sfx, buzz } from '../audio.js';
 
 const NS = 'http://www.w3.org/2000/svg';

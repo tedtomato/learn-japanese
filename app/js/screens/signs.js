@@ -7,7 +7,7 @@ import { icon } from '../icons.js';
 import { art } from '../art.js';
 import { sfx, speak } from '../audio.js';
 import { mascot } from '../mascot.js';
-import { SIGN_SCENES } from '../content/signs.js';
+import { SIGN_SCENES } from '../content/pack.js';
 import { recordSigns } from '../progress.js';
 
 export const SIGNS_MIN = 3;

@@ -12,6 +12,7 @@ import { splash } from './fx.js';
 import { mascot } from './mascot.js';
 import { showStreakCalendar } from './screens/streak.js';
 import { showHearts } from './screens/hearts.js';
+import { showCoursePicker } from './screens/courses.js';
 import { renderFactQuiz } from './screens/factquiz.js';
 import { renderListen } from './screens/listen.js';
 import { renderSigns } from './screens/signs.js';
@@ -91,6 +92,7 @@ function route() {
 // The flame in the top bar opens the streak calendar on every screen.
 document.addEventListener('click', (e) => {
   if (e.target.closest('.stat-streak')) showStreakCalendar();
+  if (e.target.closest('.stat-flag') && !document.body.classList.contains('in-lesson')) showCoursePicker();
   if (e.target.closest('.stat-hearts') && !document.body.classList.contains('in-lesson')) showHearts();
 });
 

@@ -2,12 +2,8 @@
 // Beginners focus on spoken words, phrases and travel kanji: section 1 teaches no kana, later
 // units get one short hiragana "Read it" lesson each, and the rest of hiragana comes in the
 // "Kana corner" at the end. Katakana is not taught for now.
-import { KANA_WORDS } from './content/kana-words.js';
-import { KANA, kanaId } from './content/kana.js';
-import { SECTIONS_DATA, DIALOGUES } from './content/units.js';
-import { KANJI, RADICALS, KANJI_LESSONS } from './content/kanji.js';
-import { KANJI as PEEK_KANJI } from './content/extras.js';
-import { MNEMONICS } from './content/mnemonics.js';
+import { kanaId } from './content/kana.js';
+import { KANA, KANA_WORDS, SECTIONS_DATA, DIALOGUES, KANJI, RADICALS, KANJI_LESSONS, PEEK_KANJI, MNEMONICS } from './content/pack.js';
 
 export const ITEMS = new Map();
 export const MAX_LEVEL = 5;

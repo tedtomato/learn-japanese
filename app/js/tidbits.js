@@ -1,5 +1,5 @@
 // Fun facts, travel phrases and kanji shown now and then. Seen ones are collected in the Practice tab.
-import { FACTS, PHRASES, KANJI } from './content/extras.js';
+import { FACTS, PHRASES, PEEK_KANJI as KANJI } from './content/pack.js';
 import { html } from './dom.js';
 import { icon } from './icons.js';
 import { art } from './art.js';

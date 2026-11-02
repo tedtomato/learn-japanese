@@ -1,6 +1,7 @@
 // Shared app context: progress state, saving, navigation, toasts and modals.
 import { loadState, saveState, currentHearts, displayStreak, studiedToday, STORAGE_KEY, TEST_STORAGE_KEY } from './progress.js';
-import { html, mount, $ } from './dom.js';
+import { html, mount, raw, $ } from './dom.js';
+import { L } from './lang.js';
 import { icon } from './icons.js';
 import { setSfx, setVoiceRate } from './audio.js';
 import { writeReminderNote } from './reminders.js';
@@ -69,13 +70,24 @@ export function applySettings() {
   setVoiceRate(voiceRate);
 }
 
+// Course flags, drawn small and rounded like the other top-bar items.
+const STAR = 'M0,-1L0.224,-0.309L0.951,-0.309L0.363,0.118L0.588,0.809L0,0.382L-0.588,0.809L-0.363,0.118L-0.951,-0.309L-0.224,-0.309Z';
+export function flagSvg(code, w = 34) {
+  const h = Math.round((w * 24) / 34);
+  const inner = code === 'cn'
+    ? `<rect x="1" y="1" width="32" height="22" rx="5" fill="#de2910"/><path d="${STAR}" fill="#ffde00" transform="translate(8 8) scale(3.6)"/>`
+      + [[14, 4, 20], [16.5, 7, 45], [16.5, 11, 0], [14, 14, 20]].map(([x, y, r]) => `<path d="${STAR}" fill="#ffde00" transform="translate(${x} ${y}) rotate(${r}) scale(1.2)"/>`).join('')
+    : '<rect x="1" y="1" width="32" height="22" rx="5" fill="#fff"/><circle cx="17" cy="12" r="6" fill="#bc002d"/>';
+  return `<svg width="${w}" height="${h}" viewBox="0 0 34 24" aria-hidden="true">${inner}<rect x="1" y="1" width="32" height="22" rx="5" fill="none" stroke="var(--border)" stroke-width="2"/></svg>`;
+}
+
 export function statsBar() {
   const { state } = app;
   const now = app.now();
   const streak = displayStreak(state, now);
   const hearts = currentHearts(state, now);
   return html`<div class="stats">
-    <span class="stat stat-flag" title="Japanese"><svg width="34" height="24" viewBox="0 0 34 24" aria-hidden="true"><rect x="1" y="1" width="32" height="22" rx="5" fill="#fff" stroke="var(--border)" stroke-width="2"/><circle cx="17" cy="12" r="6" fill="#bc002d"/></svg></span>
+    <button class="stat stat-flag" aria-label="Course: ${L.name}. Change course">${raw(flagSvg(L.flag))}</button>
     <button class="stat stat-streak ${studiedToday(state, now) ? 'on' : ''}" aria-label="Day streak: ${streak}. Open calendar">${icon('flame', 22)}<b>${streak}</b></button>
     <span class="stat stat-gems" title="Gems">${icon('gem', 22)}<b>${state.gems}</b></span>
     <button class="stat stat-hearts" aria-label="Hearts: ${hearts}. Refill">${icon('heart', 22)}<b>${hearts}</b></button>

@@ -13,7 +13,7 @@ import { speak, stopSpeaking, sfx, buzz, canSpeakAloud, canRecognise, listen, sp
 import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds, romajiOfChunk, romajiMatch } from './generate.js';
 import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey, buyHearts, HEARTS_PRICE } from '../progress.js';
 import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
-import { GRAMMAR } from '../content/grammar.js';
+import { GRAMMAR } from '../content/pack.js';
 import { jpItem, jpChunk, speechOf, kanaExample } from './text.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';

@@ -1,6 +1,7 @@
 // Practice hub: personalised review session, collections, kana charts, kanji and words learned.
 import { ITEMS } from '../course.js';
-import { HIRAGANA_ROWS, KATAKANA_ROWS, kanaId } from '../content/kana.js';
+import { kanaId } from '../content/kana.js';
+import { HIRAGANA_ROWS, KATAKANA_ROWS } from '../content/pack.js';
 import { app, statsBar, modal } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';

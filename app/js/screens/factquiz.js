@@ -8,7 +8,7 @@ import { art } from '../art.js';
 import { sfx } from '../audio.js';
 import { KINDS, emojiFor } from '../tidbits.js';
 import { mascot } from '../mascot.js';
-import { FACT_QUIZ } from '../content/fact-quiz.js';
+import { FACT_QUIZ } from '../content/pack.js';
 
 export const QUIZ_MIN_FACTS = 4;
 const QUESTIONS = 5;

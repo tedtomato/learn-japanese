@@ -8,7 +8,7 @@ import { icon } from '../icons.js';
 import { art } from '../art.js';
 import { sfx, speak } from '../audio.js';
 import { mascot } from '../mascot.js';
-import { PATTERNS } from '../content/patterns.js';
+import { PATTERNS } from '../content/pack.js';
 import { recordSigns } from '../progress.js';
 import { romajiMatch } from '../lesson/generate.js';
 

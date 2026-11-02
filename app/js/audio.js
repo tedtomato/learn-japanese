@@ -1,21 +1,26 @@
-// Japanese speech with the device's voices, voice casting for the lesson characters, speech
-// recognition for speaking exercises, and small generated sound effects.
+// Speech in the course's language (Japanese or Chinese) with the device's voices, voice casting for
+// the lesson characters, speech recognition for speaking exercises, and small generated sound effects.
+import { L } from './lang.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
 let jaVoices = [];
 let voiceCount = 0;
 let baseRate = 0.85;
 
-// Voice names by platform: Apple (Kyoko, O-ren / Otoya, Hattori), Microsoft (Haruka, Ayumi, Nanami /
-// Ichiro, Keita), Google on Android (ja-jp-x-htm / jab are women, jac / jad are men).
-const FEMALE = /kyoko|o-?ren|haruka|ayumi|nanami|sayaka|mizuki|aoi|shiori|mei|female|女性|google 日本語|-htm-|-jab-/i;
-const MALE = /otoya|hattori|ichiro|keita|daichi|naoki|takumi|kenji|\bmale\b|男性|-jac-|-jad-/i;
+// Voice names by platform. Japanese: Apple (Kyoko, O-ren / Otoya, Hattori), Microsoft (Haruka, Ayumi,
+// Nanami / Ichiro, Keita), Google on Android (ja-jp-x-htm / jab are women, jac / jad are men).
+// Chinese: Apple (Tingting, Lili / Li-mu), Microsoft (Xiaoxiao, Huihui, Yaoyao / Kangkang, Yunxi,
+// Yunyang), Google 普通话. Mainland voices (zh-CN) come first, then any other Chinese voice.
+const FEMALE = /kyoko|o-?ren|haruka|ayumi|nanami|sayaka|mizuki|aoi|shiori|mei|ting-?ting|lili|xiaoxiao|huihui|yaoyao|xiaoyi|female|女性|女|google 日本語|google 普通话|-htm-|-jab-/i;
+const MALE = /otoya|hattori|ichiro|keita|daichi|naoki|takumi|kenji|li-?mu|kangkang|yunxi|yunyang|yunjian|\bmale\b|男性|男|-jac-|-jad-/i;
+const LANG_PREFIX = new RegExp(`^${L.speech.slice(0, 2)}([-_]|$)`, 'i');
+const exactLang = (v) => v.lang.replace('_', '-').toLowerCase() === L.speech.toLowerCase();
 
 function loadVoices() {
   if (!synth) return;
   const voices = synth.getVoices();
   voiceCount = voices.length;
-  jaVoices = voices.filter((v) => /^ja([-_]|$)/i.test(v.lang)).map((v) => ({
+  jaVoices = voices.filter((v) => LANG_PREFIX.test(v.lang)).sort((a, b) => exactLang(b) - exactLang(a)).map((v) => ({
     voice: v,
     gender: MALE.test(v.name) ? 'male' : FEMALE.test(v.name) ? 'female' : 'unknown',
   }));
@@ -62,7 +67,7 @@ export function speak(text, { speaker = 'narrator', slow = false, fast = false, 
     synth.cancel();
     const u = new SpeechSynthesisUtterance(text);
     const { voice, pitch, rate } = voiceFor(speaker);
-    u.lang = 'ja-JP';
+    u.lang = L.speech;
     if (voice) u.voice = voice;
     u.pitch = Math.min(2, pitch);
     u.rate = slow ? 0.5 : fast ? Math.min(1.6, baseRate * 1.45) : baseRate * rate;
@@ -117,7 +122,7 @@ export function listen({ timeoutMs = 7000 } = {}) {
       return;
     }
     const rec = new Recognition();
-    rec.lang = 'ja-JP';
+    rec.lang = L.speech;
     rec.interimResults = false;
     rec.maxAlternatives = 5;
     let heard = [];
@@ -140,7 +145,7 @@ export function listen({ timeoutMs = 7000 } = {}) {
 }
 
 const toHira = (s) => s.replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
-const normJa = (s) => toHira(s).replace(/[\s、。！？!?.,・～〜ー]/g, '');
+const normJa = (s) => toHira(s).replace(/[\s、。！？!?.,・～〜ー，：；“”]/g, '');
 
 function similarity(a, b) {
   if (!a || !b) return 0;

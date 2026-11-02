@@ -74,40 +74,43 @@ try {
     if (b) { b.disabled = false; b.click(); }
   });
 
-  await page.goto(`http://localhost:${PORT}/`);
-  await page.evaluate(() => { localStorage.clear(); localStorage.setItem('hajime.test-mode', '1'); });
-  await page.reload();
-  await page.waitForTimeout(500);
-  await page.tap('.splash');
-  await page.waitForTimeout(500);
-  // A learner part-way through section 1, so every screen has content.
-  await page.evaluate(async () => {
-    const src = [...document.scripts].find((s) => s.type === 'module').src;
-    const q = src.includes('?') ? src.slice(src.indexOf('?')) : '';
-    const base = src.replace(/main\.js.*/, '');
-    const { app } = await import(`${base}app.js${q}`);
-    const { NODES } = await import(`${base}course.js${q}`);
-    const now = Date.now();
-    for (const n of NODES) {
-      if (n.unit.id === 'tokyo-shopping') break;
-      app.state.nodes[n.id] = { level: 1 };
-      for (const id of n.items || []) app.state.items[id] = { box: 1, seen: 2, right: 2, wrong: id.length % 3 ? 0 : 1, last: now, due: now + 1e8, ...(id.length % 5 ? {} : { missed: now }) };
-    }
-    app.state.seen.fact = ['f1', 'f2', 'f3', 'f4', 'f5'];
-    app.save();
-  });
-
+  // Each course: a learner part-way through section 1, so every screen has content.
+  const COURSES = [
+    { code: 'ja', stopAt: 'tokyo-shopping', lesson: 'tokyo-hello-l1', extra: [['#/practice/kana', 'practice-kana'], ['#/mission/cafe', 'mission'], ['#/mission/izakaya', 'mission-izakaya'], ['#/drill/kudasai', 'drill']] },
+    { code: 'zh', stopAt: 'china-shopping', lesson: 'china-hello-l1', extra: [] },
+  ];
   const SCREENS = [
     ['#/learn', 'learn'], ['#/practice/today', 'practice'], ['#/practice/games', 'practice-games'], ['#/practice/library', 'practice-library'],
-    ['#/practice/kanji', 'practice-kanji'], ['#/practice/kana', 'practice-kana'],
-    ['#/profile', 'profile'], ['#/collection/phrase', 'phrasebook'], ['#/collection/fact', 'facts'], ['#/quiz', 'facts-quiz'],
-    ['#/signs', 'signs'], ['#/mission/cafe', 'mission'], ['#/mission/izakaya', 'mission-izakaya'], ['#/drill/kudasai', 'drill'], ['#/listen', 'listening'],
+    ['#/practice/kanji', 'practice-kanji'], ['#/profile', 'profile'], ['#/collection/phrase', 'phrasebook'], ['#/collection/fact', 'facts'],
+    ['#/quiz', 'facts-quiz'], ['#/signs', 'signs'], ['#/listen', 'listening'],
   ];
   const LAB = ['intro', 'read', 'build', 'match', 'grammar', 'dialogue', 'kanji', 'listen', 'fast', 'speak', 'trace'];
   // Sizes are the same in both themes: dark only (the app's usual look) keeps the check quick.
-  for (const theme of ['dark']) {
-    await page.emulateMedia({ colorScheme: theme });
-    for (const [hash, name] of SCREENS) {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  for (const course of COURSES) {
+    await page.goto(`http://localhost:${PORT}/`);
+    await page.evaluate((code) => { localStorage.clear(); localStorage.setItem('hajime.test-mode', '1'); localStorage.setItem('hajime.course', code); }, course.code);
+    await page.reload();
+    await page.waitForTimeout(500);
+    await page.tap('.splash');
+    await page.waitForTimeout(500);
+    await page.evaluate(async (stopAt) => {
+      const src = [...document.scripts].find((s) => s.type === 'module').src;
+      const q = src.includes('?') ? src.slice(src.indexOf('?')) : '';
+      const base = src.replace(/main\.js.*/, '');
+      const { app } = await import(`${base}app.js${q}`);
+      const { NODES } = await import(`${base}course.js${q}`);
+      const now = Date.now();
+      for (const n of NODES) {
+        if (n.unit.id === stopAt) break;
+        app.state.nodes[n.id] = { level: 1 };
+        for (const id of n.items || []) app.state.items[id] = { box: 1, seen: 2, right: 2, wrong: id.length % 3 ? 0 : 1, last: now, due: now + 1e8, ...(id.length % 5 ? {} : { missed: now }) };
+      }
+      app.state.seen.fact = ['f1', 'f2', 'f3', 'f4', 'f5', '1', '2', '3', '4', '5'];
+      app.save();
+    }, course.stopAt);
+    const theme = course.code;
+    for (const [hash, name] of [...SCREENS, ...course.extra]) {
       await go(hash);
       await check(name, theme);
       if (name.startsWith('practice')) {
@@ -121,7 +124,7 @@ try {
       await check(`lab-${kind}`, theme);
     }
     // A real lesson at level 2: the first ten screens, each one checked.
-    await go('#/lesson/tokyo-hello-l1', 900);
+    await go(`#/lesson/${course.lesson}`, 900);
     for (let k = 1; k <= 10; k++) {
       await check(`lesson-${k}`, theme);
       await continueLesson();
@@ -137,4 +140,4 @@ if (problems.length) {
   console.error(`✗ ${problems.length} phone-screen problem(s):\n${[...new Set(problems)].map((p) => `  - ${p}`).join('\n')}`);
   process.exit(1);
 }
-console.log('✓ Every screen fits a 393×851 phone, text readable, no page errors');
+console.log('✓ Every screen of both courses fits a 393×851 phone, text readable, no page errors');

@@ -1,5 +1,6 @@
 // "Explain my answer": a breakdown of the item — each chunk with its meaning, usage notes,
 // particles, kanji parts and stories — shown after checking an answer.
+import { LANG } from '../lang.js';
 import { ITEMS } from '../course.js';
 import { GLOSSARY } from '../content/pack.js';
 import { html } from '../dom.js';
@@ -54,7 +55,7 @@ export function explainCards(item, { chosenLabel } = {}) {
   } else if (item.type === 'kword') {
     cards.push({ chip: item.jp, body: html`<p class="ex-lead">${jpItem(item, true)} (${item.romaji}) means <b>“${item.en}”</b>.</p>
       <p class="parts">${item.kanji.map((k, i) => html`${i ? ' + ' : ''}<span class="part"><b class="jp">${k}</b> ${ITEMS.get(`kj-${k}`)?.en || ''}</span>`)}</p>
-      <p class="muted small">Kanji compounds (jukugo) combine the readings of their kanji.</p>` });
+      <p class="muted small">${LANG === 'zh' ? 'Most Chinese words are two characters: each one keeps its own sound and meaning.' : 'Kanji compounds (jukugo) combine the readings of their kanji.'}</p>` });
   }
   if (chosenLabel) cards[0].body = html`<p class="ex-wrong">You picked <b>${chosenLabel}</b>.</p>${cards[0].body}`;
   return cards;

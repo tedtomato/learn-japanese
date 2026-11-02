@@ -1,5 +1,7 @@
 // Sharing to WhatsApp with the Hajime logo picture. Phones that can share files open the share sheet
 // with the picture attached; otherwise WhatsApp opens with the message, and the link shows the logo preview.
+import { L } from './lang.js';
+const FLAG = L.flag === 'cn' ? '🇨🇳' : '🇯🇵';
 import { html } from './dom.js';
 import { icon } from './icons.js';
 
@@ -30,9 +32,9 @@ function openWhatsApp(message) {
 }
 
 export function tidbitShareText(kind, item) {
-  if (kind === 'fact') return `🇯🇵 Did you know? ${item.title}: ${item.text}\n— I'm learning Japanese with Hajime`;
+  if (kind === 'fact') return `${FLAG} Did you know? ${item.title}: ${item.text}\n— I'm learning ${L.name} with Hajime`;
   if (kind === 'phrase') return `🇯🇵 Useful Japanese: ${item.jp} (${item.romaji}) = "${item.en}"\n— I'm learning Japanese with Hajime`;
-  return `🇯🇵 Kanji of the day: ${item.k} = ${item.en}. ${item.tip || ''}\n— I'm learning Japanese with Hajime`;
+  return `${FLAG} ${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} of the day: ${item.k} = ${item.en}. ${item.tip || ''}\n— I'm learning ${L.name} with Hajime`;
 }
 
 // A small WhatsApp-green share button; data-share holds the message.

@@ -1,4 +1,5 @@
 // Fun facts, travel phrases and kanji shown now and then. Seen ones are collected in the Practice tab.
+import { LANG } from './lang.js';
 import { FACTS, PHRASES, PEEK_KANJI as KANJI } from './content/pack.js';
 import { html } from './dom.js';
 import { icon } from './icons.js';
@@ -69,10 +70,12 @@ export function tidbitBody(kind, item) {
     ${item.tip ? html`<div class="small muted">💡 ${item.tip}</div>` : ''}</div></div>`;
 }
 
-// A kanji's two kinds of reading, in plain words: its native word when it stands alone (kun)
+// A kanji's two kinds of reading (Japanese), in plain words: its native word when it stands alone (kun)
 // and the sound it borrows from Chinese inside longer words (on).
 export function readings(on, kun) {
   if (!on && !kun) return '';
+  // A Chinese character has one reading (its pinyin).
+  if (LANG === 'zh') return html`<div class="readings"><div><span class="rd-label">Say</span> ${on || kun}</div></div>`;
   return html`<div class="readings">${kun ? html`<div><span class="rd-label">Alone, say</span> ${kun}</div>` : ''}${on ? html`<div><span class="rd-label">In longer words</span> ${on}</div>` : ''}</div>`;
 }
 

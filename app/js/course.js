@@ -3,6 +3,7 @@
 // units get one short hiragana "Read it" lesson each, and the rest of hiragana comes in the
 // "Kana corner" at the end. Katakana is not taught for now.
 import { kanaId } from './content/kana.js';
+import { toneNumbers } from './pinyin.js';
 import { KANA, KANA_WORDS, SECTIONS_DATA, DIALOGUES, KANJI, RADICALS, KANJI_LESSONS, PEEK_KANJI, MNEMONICS } from './content/pack.js';
 
 export const ITEMS = new Map();
@@ -22,7 +23,8 @@ function addItem(item) {
   return item.id;
 }
 
-const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+// Ids from the romanisation; pinyin tones become numbers (买 mǎi → mai3, 卖 mài → mai4).
+const slug = (s) => toneNumbers(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const kanaChars = (text) => [...text].filter((c) => KANA.has(c));
 
 function kanaItem(ch) {

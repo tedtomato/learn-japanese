@@ -1,5 +1,6 @@
 // Celebration effects: the startup splash, and reward pop-ups (chests, bonuses) with an animated
 // chest that bursts open and gems flying out.
+import { L } from './lang.js';
 import { html, mount, raw, $ } from './dom.js';
 import { mascot } from './mascot.js';
 import { sfx, speak } from './audio.js';
@@ -45,7 +46,7 @@ const CLAUDE_SPARK = `<svg class="claude-spark" viewBox="0 0 40 40" aria-label="
 export function splash() {
   const el = document.createElement('div');
   el.className = 'splash';
-  mount(el, html`<div class="splash-inner">${mascot('cheer', 150)}<h1>Hajime <span class="jp">はじめ</span></h1><p>Learn Japanese, one day at a time</p>
+  mount(el, html`<div class="splash-inner">${mascot('cheer', 150)}<h1>Hajime <span class="jp">${L.titleNative}</span></h1><p>Learn ${L.name}, one day at a time</p>
       <button class="btn btn-white splash-go">Tap to start</button></div>
     <div class="splash-credits"><span class="beta">Beta version - Oct 26 · v${APP_RELEASE}</span>
       <span class="made">Created by Seb and Claude AI ${raw(CLAUDE_SPARK)}</span></div>`);
@@ -54,7 +55,7 @@ export function splash() {
   const close = () => {
     if (closed) return;
     closed = true;
-    speak('はじめ！', { speaker: 'woman' });
+    speak(L.titleSay, { speaker: 'woman' });
     sfx('bonus');
     el.classList.add('out');
     setTimeout(() => el.remove(), 450);

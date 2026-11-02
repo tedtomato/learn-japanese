@@ -6,7 +6,7 @@ Releases are listed in the in-app change log (Profile → App version).
 ## Batch 15 — 2 Nov 2026
 | Request | Status | Release |
 |---|---|---|
-| Chinese version for beginners, chosen with the flag | 🚧 course picker on the flag + per-course progress (0.86); Chinese content (units, characters, signs, facts, phrasebook) being written; then missions, drills, memory tricks, strokes, tone trainer | 0.86 |
+| Chinese version for beginners, chosen with the flag | 🚧 course picker on the flag + per-course progress (0.86); Chinese course live: 13 units, pinyin over characters, zh voices/speech, 58 characters, signs, grammar, dialogues, facts + quiz, phrasebook (0.87); next: memory tricks, missions, pattern drills, stroke tracing, tone trainer | 0.87 |
 
 ## Batch 14 — 27 Oct 2026
 | Request | Status | Release |

@@ -1,6 +1,7 @@
 // The lesson cast: Yuki and Mika (women) speak in lessons for now, as phones only have a female
 // Japanese voice; Ken (man), Sora (boy) and Hana (girl) wait for later. Flat cartoon SVGs that
 // blink while idle and move their mouth while their voice is speaking (.talking on the wrapper).
+import { L } from './lang.js';
 import { raw } from './dom.js';
 
 const PEOPLE = {
@@ -23,7 +24,7 @@ const PEOPLE = {
 };
 
 export const CAST_NAMES = Object.keys(PEOPLE);
-export const nameOf = (who) => PEOPLE[who]?.name || '';
+export const nameOf = (who) => L.cast[who] || PEOPLE[who]?.name || '';
 
 export function personSvg(who, size = 110) {
   const p = PEOPLE[who] || PEOPLE.woman;

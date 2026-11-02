@@ -1,6 +1,7 @@
 // Fun-fact quiz: five multiple-choice questions about facts the learner has already discovered.
 // Each fact has a written question with one right and three plausible wrong answers; the fact
 // itself (and its picture) only appears after answering. +1 gem per right answer.
+import { L } from '../lang.js';
 import { app, statsBar } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
@@ -70,7 +71,7 @@ export function renderFactQuiz(root) {
     <main class="page quiz quiz-end">
       ${mascot(score >= questions.length - 1 ? 'cheer' : 'happy', 110)}
       <h1>${score} / ${questions.length}</h1>
-      <p class="muted">${score === questions.length ? 'Perfect — you really know Japan!' : score >= 3 ? 'Nice! A few more to remember.' : 'Every fact you read counts. Try again!'}</p>
+      <p class="muted">${score === questions.length ? `Perfect — you really know ${L.country}!` : score >= 3 ? 'Nice! A few more to remember.' : 'Every fact you read counts. Try again!'}</p>
       ${score ? html`<p class="pill pill-gold">${icon('gem', 16)} +${score} gems</p>` : ''}
       <button class="btn btn-primary btn-block quiz-again">Another quiz</button>
       <a class="btn btn-white btn-block" href="#/collection/fact">Back to fun facts</a>

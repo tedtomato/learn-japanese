@@ -1,6 +1,12 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.87', date: '2 Nov 2026', changes: [
+    'New: Chinese! Tap the flag → 🇨🇳 Chinese (中文). A beginner Mandarin course for a first trip to China: 13 units (hello, getting around, food, shopping with WeChat Pay, numbers & prices, hotel, eating out, high-speed trains & taxis, help & health, people, meals, the world around you, everyday slang)',
+    'Pinyin with tone marks above every character, fading as you learn each word; Lìlì and Xiǎoměi speak with your phone\'s Chinese voice',
+    '58 characters with memory stories (车站, 出口, 东西南北, 推/拉…), 31 sign spotter situations, 14 grammar cards, 9 dialogues, a 60-phrase phrasebook and 103 fun facts about China with their quiz',
+    'Each language keeps its own progress, streak and gems — switch any time from the flag',
+  ] },
   { version: '0.86', date: '2 Nov 2026', changes: [
     'Tap the flag in the top bar to choose your language. Chinese (中文) is on its way — each language will keep its own progress, streak and gems',
   ] },

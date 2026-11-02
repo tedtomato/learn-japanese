@@ -1,6 +1,7 @@
 // Sign spotter: eight travel situations. Most ask you to tap the right real-looking sign; some show a
 // sign and ask what it means. Only situations whose kanji are learned are asked. Answers count as
 // kanji reviews; +1 gem per right one.
+import { L } from '../lang.js';
 import { app, statsBar } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
@@ -18,7 +19,7 @@ const kanjiIds = (text) => [...text].map((c) => `kj-${c}`);
 export const signScenes = (state) => SIGN_SCENES.filter((s) => s.need.every((k) => state.items[`kj-${k}`]?.seen));
 
 const sign = (s, style, k) => html`<button class="sign sign-${style}" data-k="${k}">
-  ${s.art ? art(s.art, 'sign-art') : ''}<span class="sign-text jp ${[...s.t].length >= 4 ? 'long' : ''}">${s.t}</span><small class="sign-meaning" hidden>${s.r} · ${s.en}</small></button>`;
+  ${s.art ? art(s.art, 'sign-art') : ''}<span class="sign-text jp ${[...s.t].length >= 4 ? 'long' : ''}">${style === 'menu' ? [...s.t].map((c) => html`<span>${c}</span>`) : s.t}</span><small class="sign-meaning" hidden>${s.r} · ${s.en}</small></button>`;
 
 export function renderSigns(root) {
   const scenes = signScenes(app.state);
@@ -92,7 +93,7 @@ export function renderSigns(root) {
     <main class="page quiz quiz-end">
       ${mascot(score >= questions.length - 1 ? 'cheer' : 'happy', 110)}
       <h1>${score} / ${questions.length}</h1>
-      <p class="muted">${score === questions.length ? 'Perfect — you can find your way around Japan!' : score >= 4 ? 'Nice! Nearly a local.' : 'Signs take practice. Try again!'}</p>
+      <p class="muted">${score === questions.length ? `Perfect — you can find your way around ${L.country}!` : score >= 4 ? 'Nice! Nearly a local.' : 'Signs take practice. Try again!'}</p>
       ${score ? html`<p class="pill pill-gold">${icon('gem', 16)} +${score} gems</p>` : ''}
       <button class="btn btn-primary btn-block quiz-again">More signs</button>
       <a class="btn btn-white btn-block" href="#/practice">Back to practice</a>

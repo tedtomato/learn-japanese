@@ -1,7 +1,8 @@
 // Practice hub: personalised review session, collections, kana charts, kanji and words learned.
+import { L } from '../lang.js';
 import { ITEMS } from '../course.js';
 import { kanaId } from '../content/kana.js';
-import { HIRAGANA_ROWS, KATAKANA_ROWS } from '../content/pack.js';
+import { HIRAGANA_ROWS, KATAKANA_ROWS, MISSIONS, PATTERNS } from '../content/pack.js';
 import { app, statsBar, modal } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
@@ -75,7 +76,7 @@ function signsCard(state) {
   const n = signScenes(state).length;
   if (!Object.keys(state.items).some((id) => id.startsWith('kj-'))) return '';
   return html`<a class="card kanji-practice" href="${n >= SIGNS_MIN ? '#/signs' : '#/practice'}"><span class="kanji-chip">${art('🪧', 'art-row')}</span>
-    <div><b>Sign spotter</b><small>${n >= SIGNS_MIN ? 'Exits, toilets, station signs — tap the right one · +1 gem each' : 'Learn a few more travel kanji (exits, toilets…) to unlock'}</small></div>
+    <div><b>Sign spotter</b><small>${n >= SIGNS_MIN ? 'Exits, toilets, station signs — tap the right one · +1 gem each' : `Learn a few more travel ${L.chars} (exits, toilets…) to unlock`}</small></div>
     <span class="btn btn-secondary" ${n >= SIGNS_MIN ? '' : 'aria-disabled="true"'}>${n >= SIGNS_MIN ? 'Play' : '🔒'}</span></a>`;
 }
 
@@ -114,7 +115,7 @@ export function renderPractice(root, focus) {
         ${meter(st, w.id)}</button>`)}</div>`
       : html`<p class="muted">Words you learn will be listed here, weakest first.</p>`),
     kanji: () => (kanji.length ? html`<section class="card kanji-practice">
-        <span class="kanji-chip jp">漢</span>
+        <span class="kanji-chip jp">${L.glyph}</span>
         <div><b>Kanji practice</b><small>${kanji.length >= 3 ? 'Only kanji, weakest first — about 2 min' : 'Learn 3 kanji to unlock'}</small></div>
         <button class="btn btn-secondary start-kanji" ${kanji.length >= 3 ? '' : 'disabled'}>Start</button>
       </section>
@@ -122,7 +123,7 @@ export function renderPractice(root, focus) {
         <span class="kanji-chip jp ${[...k.jp].length > 1 ? 'wide' : ''} ${[...k.jp].length > 2 ? 'xwide' : ''}">${k.jp}</span>
         <span class="word-main"><b>${k.en}</b><small>${reading(k)}</small></span>
         ${meter(st, k.id)}</button>`)}</div>`
-      : html`<p class="muted">Kanji lessons appear along the path from the first unit.</p>`),
+      : html`<p class="muted">${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} lessons appear along the path from the first unit.</p>`),
     kana: () => html`${kanaCard('hiragana', 'あ', 'Hiragana practice')}${kanaCard('katakana', 'ア', 'Katakana practice')}<p class="muted legend"><i class="dot strong"></i>Strong <i class="dot mid"></i>Okay <i class="dot weak"></i>Fading <i class="dot none"></i>Not learned</p>
       <h3 class="sub-title small-title">Hiragana</h3>${chart(HIRAGANA_ROWS, state, now)}
       ${kanaCount('katakana') ? html`<h3 class="sub-title small-title">Katakana</h3>${chart(KATAKANA_ROWS, state, now)}` : ''}`,
@@ -136,7 +137,7 @@ export function renderPractice(root, focus) {
       <div><b>${title}</b><small>${n >= 3 ? 'Your weakest characters, with hints — no rush' : 'Learn 3 characters to unlock'}</small></div>
       <button class="btn btn-secondary start-kana" data-script="${script}" ${n >= 3 ? '' : 'disabled'}>Start</button></section>`;
   };
-  const TABS = [['words', 'Words', words.length], ['kanji', 'Kanji', kanji.length], ['kana', 'Kana', null]];
+  const TABS = [['words', 'Words', words.length], ['kanji', L.Chars, kanji.length], ...(L.hasKana ? [['kana', 'Kana', null]] : [])];
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page">
@@ -158,25 +159,25 @@ export function renderPractice(root, focus) {
       <div><b>Back up your progress</b><small>${state.backupAt ? 'Your last backup is over 2 weeks old' : 'Keep it safe in Google Drive — takes 10 seconds'}</small></div><span class="btn btn-secondary">Back up</span></a>` : ''}
     ${words.length >= 3 ? html`<a class="card kanji-practice listen-entry" href="#/listen"><span class="kanji-chip">${art('🎧', 'art-row')}</span>
       <div><b>Listening mode</b><small>Hands-free for walks: hear it, say it, repeat</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
-    ${kanji.length >= 3 ? html`<a class="card kanji-practice" href="#/practice/kanji-go"><span class="kanji-chip jp">漢</span>
-      <div><b>Kanji practice</b><small>Only kanji, weakest first — about 2 min</small></div><span class="btn btn-secondary">Start</span></a>` : ''}
+    ${kanji.length >= 3 ? html`<a class="card kanji-practice" href="#/practice/kanji-go"><span class="kanji-chip jp">${L.glyph}</span>
+      <div><b>${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} practice</b><small>Only ${L.chars}, weakest first — about 2 min</small></div><span class="btn btn-secondary">Start</span></a>` : ''}
     <p class="muted small section-more">More to play in <button class="link" data-section="games">🎮 Games</button></p>` : ''}
 
-    ${section === 'games' ? html`<h2 class="sub-title">Missions</h2>
-    <p class="muted small list-help">Real situations in Japan — one after each unit.</p>
-    ${missionCards(state)}
+    ${section === 'games' ? html`${MISSIONS.length ? html`<h2 class="sub-title">Missions</h2>
+    <p class="muted small list-help">Real situations in ${L.country} — one after each unit.</p>
+    ${missionCards(state)}` : ''}
     <h2 class="sub-title">Quick games</h2>
     ${signsCard(state)}
     ${seenFacts(state).length >= QUIZ_MIN_FACTS ? html`<a class="card kanji-practice" href="#/quiz"><span class="kanji-chip">${art('❓', 'art-row')}</span>
       <div><b>Fun facts quiz</b><small>5 questions about facts you've read · +1 gem each</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
-    <h2 class="sub-title">Pattern drills</h2>
+    ${PATTERNS.length ? html`<h2 class="sub-title">Pattern drills</h2>
     <p class="muted small list-help">One sentence, many words: swap words in until it's automatic.</p>
-    ${drillCards(state)}` : ''}
+    ${drillCards(state)}` : ''}` : ''}
 
     ${section === 'library' ? html`<div class="collections">
       <a class="card collection" href="#/collection/phrase">${art('💬', 'art-col')}<b>Phrasebook</b><small>${KINDS.phrase.list.length} phrases</small></a>
       <a class="card collection" href="#/collection/fact">${art('🗾', 'art-col')}<b>Fun facts</b><small>${state.seen.fact.length} / ${KINDS.fact.list.length}</small></a>
-      <a class="card collection" href="#/collection/kanji"><span class="col-emoji jp">漢</span><b>Kanji spotted</b><small>${state.seen.kanji.length} / ${KINDS.kanji.list.length}</small></a>
+      <a class="card collection" href="#/collection/kanji"><span class="col-emoji jp">${L.glyph}</span><b>${L.Chars} spotted</b><small>${state.seen.kanji.length} / ${KINDS.kanji.list.length}</small></a>
     </div>
 
     <h2 class="sub-title" id="sec-learned">What you've learned</h2>

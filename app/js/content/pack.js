@@ -2,8 +2,9 @@
 // same code runs the Japanese and the Chinese course.
 import { LANG } from '../lang.js';
 import * as ja from './ja.js';
+import * as zh from './zh/index.js';
 
-const PACKS = { ja };
+const PACKS = { ja, zh };
 // Courses that can be picked from the flag.
 export const AVAILABLE = Object.keys(PACKS);
 const P = PACKS[LANG] || ja;

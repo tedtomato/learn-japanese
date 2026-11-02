@@ -1,6 +1,7 @@
 // Pattern drill: eight quick rounds on one sentence pattern with learned words swapped in. Most rounds
 // fill the blank (pick the word); some ask for the whole sentence typed in romaji. Answers count as
 // reviews of the slot word; +1 gem per right answer.
+import { L } from '../lang.js';
 import { ITEMS } from '../course.js';
 import { app, statsBar } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
@@ -46,8 +47,8 @@ export function renderDrill(root, id) {
         ? html`<p class="drill-pattern"><span class="drill-blank jp">＿＿</span><span class="jp">${p.jp}</span><small>___ ${p.romaji}</small></p>
           <div class="options list">${shuffle([slot, ...shuffle(slots.filter((x) => x.id !== slot.id)).slice(0, 2)]).map((o) => html`<button class="option drill-opt" data-id="${o.id}">
             <span class="opt-label"><span class="jp">${o.word.jp}</span><small>${o.word.romaji}</small></span></button>`)}</div>`
-        : html`<p class="muted small">Now the whole sentence, from memory — type it in romaji.</p>
-          <input class="recall-input drill-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type the sentence in romaji">
+        : html`<p class="muted small">Now the whole sentence, from memory — type it in ${L.roman}.</p>
+          <input class="recall-input drill-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type the sentence in ${L.roman}">
           <button class="btn btn-primary btn-block drill-check" disabled>Check</button>`}
       <div class="quiz-after" hidden></div>
     </main>`);

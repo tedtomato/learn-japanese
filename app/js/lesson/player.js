@@ -2,6 +2,7 @@
 // Each task has a countdown (speed bonus when answered in time). Correct answers move on
 // automatically after a second; wrong or hesitant answers are noted and come back at the end in a
 // "Let's correct the exercises you missed" round.
+import { L } from '../lang.js';
 import { ITEMS, NODE_BY_ID, MAX_LEVEL } from '../course.js';
 import { app, modal } from '../app.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
@@ -595,7 +596,7 @@ function promptFor(root, s, ex, item) {
   const isReading = ex.kind === 'read' || (item.type === 'kana' && ex.answerKind === 'romaji');
   return speakerBubble(s, html`${isReading ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 22)}</button>`}
     <div class="jp-prompt-wrap"><div class="${big ? 'jp-huge' : 'jp-lg fit'} ${canPeek ? 'rt-hidden' : ''}">${big ? html`<span class="jp">${item.jp}</span>` : jpItem(item, ex.hint || canPeek)}</div>
-    ${canPeek ? html`<button class="show-romaji">Show romaji</button>` : ''}</div>`);
+    ${canPeek ? html`<button class="show-romaji">Show ${L.roman}</button>` : ''}</div>`);
 }
 
 function optionHtml(opt, ex) {
@@ -611,10 +612,10 @@ function optionHtml(opt, ex) {
 function renderRecall(root, s) {
   const ex = s.current;
   const item = ITEMS.get(ex.itemId);
-  mount($('.lesson-body', root), html`<p class="instruction">How do you say this in Japanese?</p>
+  mount($('.lesson-body', root), html`<p class="instruction">How do you say this in ${L.name}?</p>
     ${speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`)}
-    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type it in romaji…" aria-label="Your answer in romaji">
-    <p class="muted small recall-help">From memory — no choices this time! Spaces and long vowels (ou / o) don't matter.</p>
+    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type it in ${L.roman}…" aria-label="Your answer in romaji">
+    <p class="muted small recall-help">From memory — no choices this time! ${L.code === 'zh' ? 'Tone marks and spaces don\'t matter.' : 'Spaces and long vowels (ou / o) don\'t matter.'}</p>
     ${memoryHint(item, true)}`);
   $('.hint-btn', root)?.addEventListener('click', (e) => {
     e.currentTarget.remove();

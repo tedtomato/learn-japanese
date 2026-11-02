@@ -2,6 +2,8 @@
 // syllable (きゅう → きゅ kyu · う u). Small ゃゅょ join the syllable before them; small っ joins the
 // next one and doubles its consonant; ー stretches the vowel.
 import { HIRAGANA_ROWS } from './content/kana.js';
+import { LANG } from './lang.js';
+import { pinyinParts } from './pinyin.js';
 
 const BASE = new Map();
 for (const row of HIRAGANA_ROWS) for (const [k, r] of row.kana) BASE.set(k, r);
@@ -66,10 +68,11 @@ export function syllables(text) {
 
 const squash = (s) => s.toLowerCase().replace(/[^a-z]/g, '').replace(/tch/g, 'cch').replace(/ou/g, 'oo').replace(/(.)\1/g, '$1');
 
-// Syllables for a word whose official romaji is known. Particles and words like こんにちは read は as
+// Syllables for a word whose official romaji (or, in Chinese, pinyin) is known. Particles and words like こんにちは read は as
 // "wa"; when the syllables still don't match the official romaji, returns null (show the plain
 // romaji line instead).
 export function syllablesFor(text, romaji) {
+  if (LANG === 'zh') return pinyinParts(text, romaji); // one pinyin syllable per character
   const list = syllables(text);
   const words = romaji.toLowerCase().split(/\s+/);
   if (text === 'は' && romaji === 'wa') return [{ text, romaji: 'wa' }];

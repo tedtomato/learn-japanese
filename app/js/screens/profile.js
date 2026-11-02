@@ -1,4 +1,5 @@
 // Profile: stats, achievements, settings, backup and app version.
+import { L } from '../lang.js';
 import { ITEMS, NODES } from '../course.js';
 import { app, statsBar, toast, modal } from '../app.js';
 import { html, mount, raw, $, $$ } from '../dom.js';
@@ -24,10 +25,12 @@ function achievements(state, now) {
   const best = Math.max(state.streak.best, displayStreak(state, now));
   return [
     { icon: '🌱', title: 'First steps', desc: 'Finish your first lesson', value: state.stats.lessons, goal: 1 },
-    { icon: 'あ', title: 'Kana collector', desc: 'Learn 25 hiragana', value: kana, goal: 25 },
-    { icon: '🏆', title: 'Hiragana master', desc: 'Learn all 71 hiragana', value: kana, goal: 71 },
+    ...(L.hasKana ? [
+      { icon: 'あ', title: 'Kana collector', desc: 'Learn 25 hiragana', value: kana, goal: 25 },
+      { icon: '🏆', title: 'Hiragana master', desc: 'Learn all 71 hiragana', value: kana, goal: 71 },
+    ] : []),
     { icon: '💬', title: 'Wordsmith', desc: 'Learn 50 words and phrases', value: words, goal: 50 },
-    { icon: '漢', title: 'Kanji explorer', desc: 'Learn 10 kanji', value: learned.filter((i) => i.type === 'kanji' && !i.peek).length, goal: 10 },
+    { icon: L.glyph, title: `${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} explorer`, desc: `Learn 10 ${L.chars}`, value: learned.filter((i) => i.type === 'kanji' && !i.peek).length, goal: 10 },
     { icon: '🔥', title: 'On fire', desc: 'Reach a 7 day streak', value: best, goal: 7 },
     { icon: '🎯', title: 'Sharpshooter', desc: '10 perfect lessons', value: state.stats.perfect, goal: 10 },
     { icon: '⚡', title: 'XP hunter', desc: 'Earn 500 XP', value: state.xp, goal: 500 },
@@ -37,9 +40,9 @@ function achievements(state, now) {
 }
 
 const VOICE_TEXT = {
-  yes: 'Japanese voice ready.',
+  yes: `${L.name} voice ready.`,
   unknown: 'Your device has not listed its voices yet. Tap test to check.',
-  no: 'No Japanese voice found. Install one in your phone settings (Accessibility → Spoken content / Text-to-speech) to hear audio.',
+  no: `No ${L.name} voice found. Install one in your phone settings (Accessibility → Spoken content / Text-to-speech) to hear audio.`,
 };
 
 const fmtDate = (t) => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -97,9 +100,9 @@ export function renderProfile(root, focus) {
     <div class="stat-grid">
       <button class="card stat-card link-card streak-tile"><span class="c-orange">${icon('flame', 26)}</span><b>${displayStreak(state, now)}</b><small>Day streak ›</small></button>
       <div class="card stat-card"><span class="c-gold">${icon('bolt', 26)}</span><b>${state.xp}</b><small>Total XP</small></div>
-      <a class="card stat-card link-card" href="#/practice/kana"><span class="c-blue">${icon('kana', 26)}</span><b>${count('kana')}</b><small>Kana learned ›</small></a>
+      ${L.hasKana ? html`<a class="card stat-card link-card" href="#/practice/kana"><span class="c-blue">${icon('kana', 26)}</span><b>${count('kana')}</b><small>Kana learned ›</small></a>` : ''}
       <a class="card stat-card link-card" href="#/practice/words"><span class="c-green">${icon('word', 26)}</span><b>${count('word', 'sentence')}</b><small>Words & phrases ›</small></a>
-      <a class="card stat-card link-card" href="#/practice/kanji"><span class="c-purple">${raw('<b class="jp" style="font-size:22px">漢</b>')}</span><b>${count('kanji', 'kword', 'radical')}</b><small>Kanji & radicals ›</small></a>
+      <a class="card stat-card link-card" href="#/practice/kanji"><span class="c-purple">${raw(`<b class="jp" style="font-size:22px">${L.glyph}</b>`)}</span><b>${count('kanji', 'kword', 'radical')}</b><small>${L.code === 'zh' ? 'Characters' : 'Kanji & radicals'} ›</small></a>
       <a class="card stat-card link-card" href="#/collection/fact"><span class="c-orange">${icon('book', 26)}</span><b>${state.seen.fact.length}</b><small>Fun facts ›</small></a>
     </div>
 
@@ -109,7 +112,7 @@ export function renderProfile(root, focus) {
       return html`<div class="ach ${done ? 'done' : ''}"><span class="ach-icon jp">${a.icon}</span>
         <div class="ach-body"><b>${a.title}</b><small>${a.desc}</small>
         <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (a.value / a.goal) * 100)}%"></div></div></div>
-        ${done ? shareButton(`🏆 I unlocked "${a.title}" (${a.desc}) learning Japanese with Hajime!`, '') : html`<span class="ach-count">${Math.min(a.value, a.goal)}/${a.goal}</span>`}</div>`;
+        ${done ? shareButton(`🏆 I unlocked "${a.title}" (${a.desc}) learning ${L.name} with Hajime!`, '') : html`<span class="ach-count">${Math.min(a.value, a.goal)}/${a.goal}</span>`}</div>`;
     })}</div>
 
     <h2 class="sub-title">Shop</h2>
@@ -130,8 +133,8 @@ export function renderProfile(root, focus) {
         <button class="btn btn-white btn-small reminder-btn">${s.reminders ? 'Turn off' : 'Turn on'}</button></div>
       <div class="setting"><span>Romaji help</span>${seg('romaji', s.romaji || 'auto', [['auto', 'Auto'], ['always', 'Always']])}</div>
       <div class="setting"><span>Voice speed</span>${seg('voiceRate', s.voiceRate, [[0.7, 'Slow'], [0.85, 'Normal'], [1, 'Fast']])}</div>
-      <div class="setting column"><span>Japanese voice</span><small class="muted voice-status">${VOICE_TEXT[voiceStatus()]}</small>
-        <button class="btn btn-white test-voice">${icon('speaker', 18)} Test: こんにちは</button></div>
+      <div class="setting column"><span>${L.name} voice</span><small class="muted voice-status">${VOICE_TEXT[voiceStatus()]}</small>
+        <button class="btn btn-white test-voice">${icon('speaker', 18)} Test: ${L.voiceTest}</button></div>
     </div>
 
     <h2 class="sub-title" id="sec-backup">Backup</h2>
@@ -155,7 +158,7 @@ export function renderProfile(root, focus) {
       <p class="muted small">Not seeing an update? “Reload latest version” clears the app's cached files and loads it fresh from GitHub. Your progress is kept.</p>
       <button class="btn btn-danger-ghost reset">Reset all progress</button>
     </div>
-    <p class="muted small center">Hajime — はじめ — means “beginning”.</p>
+    <p class="muted small center">Hajime — はじめ — means “beginning”${L.code === 'zh' ? ' (in Chinese: 开始, kāishǐ)' : ''}.</p>
     <p class="muted small center credits">Stroke order data: <a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> (CC BY-SA 3.0). Illustrations: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a> (CC BY 4.0).</p>
   </main>`);
 
@@ -170,7 +173,7 @@ export function renderProfile(root, focus) {
       else state.settings[name] = v;
       app.save();
       renderProfile(root);
-      if (name === 'voiceRate') speak('こんにちは');
+      if (name === 'voiceRate') speak(L.voiceTest);
     }),
   );
   $('.streak-tile', root).addEventListener('click', showStreakCalendar);
@@ -192,7 +195,7 @@ export function renderProfile(root, focus) {
     renderProfile(root);
   });
   $('.test-voice', root).addEventListener('click', () => {
-    speak('こんにちは');
+    speak(L.voiceTest);
     setTimeout(() => ($('.voice-status', root).textContent = VOICE_TEXT[voiceStatus()]), 600);
   });
   $('.buy-freeze', root).addEventListener('click', () => {

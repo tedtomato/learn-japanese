@@ -1,4 +1,5 @@
 // The learning path: sections → unit banners → winding track of lesson nodes.
+import { L } from '../lang.js';
 import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID } from '../course.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 import { rewardPopup } from '../fx.js';
@@ -14,7 +15,7 @@ import {
 } from '../progress.js';
 
 const OFFSETS = [0, 44, 70, 44, 0, -44, -70, -44];
-const CHEERS = [['がんばって！', 'You can do it!'], ['いいね！', 'Nice!'], ['すごい！', 'Amazing!'], ['ファイト！', 'Keep going!']];
+const CHEERS = L.cheers;
 
 // Words learned before that are due again today (spaced repetition), with a one-tap review.
 function reviewCard(state, now) {
@@ -191,7 +192,7 @@ export function renderLearn(root) {
           </div>
           <div class="track">${unit.nodes.map((node) => renderNode(node, n++, current, now))}</div>
         </section>`)}`)}
-    <div class="path-end">${raw(ROADBLOCK)}<p><b>${current >= n ? 'You finished every lesson!' : 'Road under construction'}</b><br>${current >= n ? 'More units are coming — keep practising.' : 'More units are on the way: phrases, kanji and conversations.'}</p></div>
+    <div class="path-end">${raw(ROADBLOCK)}<p><b>${current >= n ? 'You finished every lesson!' : 'Road under construction'}</b><br>${current >= n ? 'More units are coming — keep practising.' : 'More units are on the way: phrases, ${L.chars} and conversations.'}</p></div>
   </main>`);
 
   $$('.node', root).forEach((el) =>

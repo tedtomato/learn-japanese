@@ -3,6 +3,7 @@ import { html, raw } from '../dom.js';
 import { art } from '../art.js';
 import { syllablesFor } from '../romaji.js';
 import { romajiOfChunk } from './generate.js';
+import { LANG } from '../lang.js';
 
 function rubyWord(text, romaji) {
   const parts = romaji ? syllablesFor(text, romaji) : null;
@@ -49,4 +50,6 @@ export function kanaExample(item, { asHint = false } = {}) {
 }
 
 // What to say out loud for an item.
-export const speechOf = (item) => item.say || item.text || item.kana || item.jp;
+// What the voice reads. Chinese voices read characters, never pinyin (which sits in the reading fields).
+const chineseText = (item) => item.text || (Array.isArray(item.jp) ? item.jp.join('') : item.jp);
+export const speechOf = (item) => (LANG === 'zh' ? item.say && /\p{Script=Han}/u.test(item.say) ? item.say : chineseText(item) : item.say || item.text || item.kana || item.jp);

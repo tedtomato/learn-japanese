@@ -1,6 +1,7 @@
 // Turns a path node (or a practice request) into a list of exercises.
 import { FAMILIAR_IDS, ITEMS } from '../course.js';
 import { byUrgency } from '../srs.js';
+import { L, LANG } from '../lang.js';
 import { GRAMMAR, STROKES, FILLERS as JP_FILLERS, FILLER_ROMAJI } from '../content/pack.js';
 
 export function makeRng(seed = Date.now()) {
@@ -75,8 +76,10 @@ export const canRead = (item, chars) => item.chars?.length > 0 && item.chars.eve
 function allowed(type, item, ctx) {
   if (type.startsWith('audio') || type === 'build-audio' || type === 'fast') return ctx.canListen && (type !== 'fast' || ctx.advanced);
   if (type === 'speak') return ctx.canSpeak && ctx.level >= 1;
-  if (type === 'spell') return canRead(item, ctx.chars) && [...item.jp].length <= 5;
-  if (type === 'read') return canRead(item, ctx.chars);
+  // Chinese has no kana to spell with; reading a word's pinyin from its characters comes once the
+  // word is well known (its pinyin hint is gone by then).
+  if (type === 'spell') return LANG !== 'zh' && canRead(item, ctx.chars) && [...item.jp].length <= 5;
+  if (type === 'read') return LANG === 'zh' ? item.type === 'word' && ctx.solid(item) : canRead(item, ctx.chars);
   if (type === 'meaning2radical' || type === 'meaning2kanji') return distractorPool(item, ctx).length >= 2;
   return true;
 }
@@ -190,7 +193,7 @@ function buildExercise(item, type, ctx) {
       const mode = { 'build-audio': 'audio', fast: 'fast', 'build-en2jp': 'en2jp' }[type];
       const tiles = shuffle([...answer, ...extra], ctx.rng);
       const tileRomaji = base.hint ? tiles.map(romajiOfChunk) : null;
-      const instruction = { audio: 'Tap what you hear', fast: 'Fast talk! Tap the words you hear', en2jp: 'Translate into Japanese' }[mode];
+      const instruction = { audio: 'Tap what you hear', fast: 'Fast talk! Tap the words you hear', en2jp: `Translate into ${L.name}` }[mode];
       return { ...base, type: 'build', mode, answer, tiles, tileRomaji, instruction };
     }
     default:
@@ -242,9 +245,13 @@ export function context({ state, sessionIds, level, rng, canListen = true, canSp
     rng, level, canListen, canSpeak, advanced, sessionIds, knownIds, chars,
     // Romaji over Japanese: until the learner reads every character of the word well; sentences
     // keep it until the sentence itself is well known; "Always" in settings keeps it on.
+    solid: (item) => state.items[item.id]?.box >= SOLID_BOX,
     romajiHint: (item) => {
       if (!['word', 'sentence'].includes(item.type)) return false;
-      if (always || !canRead(item, chars)) return true;
+      if (always) return true;
+      // Chinese: pinyin stays over a word or sentence until that word or sentence is well known.
+      if (LANG === 'zh') return !(state.items[item.id]?.box >= SOLID_BOX);
+      if (!canRead(item, chars)) return true;
       if (item.type === 'sentence' && !readMode && !(state.items[item.id]?.box >= SOLID_BOX)) return true;
       return !readMode && level < 1 && isNew(state, item.id);
     },
@@ -272,7 +279,7 @@ function recallExercises(ids, state, count, rng) {
 
 // Lenient romaji check: case, spaces, punctuation, apostrophes and long-vowel spellings (ou / oo / ō,
 // uu / ū…) don't matter. One slip in a longer word counts as "almost" (still right).
-const squash = (r) => r.toLowerCase().normalize('NFD').replace(/[\u0304\u0302]/g, '').replace(/[^a-z]/g, '')
+const squash = (r) => r.toLowerCase().replace(/[üǖǘǚǜ]/g, 'u').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/v/g, 'u').replace(/[^a-z]/g, '')
   .replace(/ou/g, 'o').replace(/([aeiou])\1+/g, '$1');
 function editDistance(a, b) {
   const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);

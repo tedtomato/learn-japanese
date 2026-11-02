@@ -21,9 +21,44 @@ export const COURSES = {
     cheers: [['加油！', 'Keep going!'], ['很好！', 'Very good!'], ['太棒了！', 'Awesome!'], ['你可以的！', 'You can do it!']],
     storageKey: 'hajime.zh.progress.v1', testKey: 'hajime.zh.test-progress.v1',
   },
+  // Latin-alphabet courses: no characters to learn, so no kana, kanji, strokes or romanisation
+  // (`romaji` holds the word itself). `gloss` is the language of the meanings (the `en` fields).
+  fr: {
+    code: 'fr', name: 'French', native: 'Français', country: 'France', flag: 'fr', flagEmoji: '🇫🇷', latin: true, gloss: 'English',
+    speech: 'fr-FR', roman: 'French', chars: 'words', Chars: 'Words', charOne: 'word', glyph: 'Fr',
+    titleNative: 'C\'est parti !', titleSay: 'C\'est parti !', voiceTest: 'Bonjour !', hasKana: false,
+    cast: { woman: 'Camille', woman2: 'Léa' },
+    cheers: [['Allez !', 'Come on!'], ['Bravo !', 'Well done!'], ['Super !', 'Great!'], ['Tu peux le faire !', 'You can do it!']],
+    storageKey: 'hajime.fr.progress.v1', testKey: 'hajime.fr.test-progress.v1',
+  },
+  es: {
+    code: 'es', name: 'Spanish', native: 'Español', country: 'Spain', flag: 'es', flagEmoji: '🇪🇸', latin: true, gloss: 'English',
+    speech: 'es-ES', roman: 'Spanish', chars: 'words', Chars: 'Words', charOne: 'word', glyph: 'Es',
+    titleNative: '¡Vamos!', titleSay: '¡Vamos!', voiceTest: '¡Hola!', hasKana: false,
+    cast: { woman: 'Lucía', woman2: 'Sofía' },
+    cheers: [['¡Ánimo!', 'Keep going!'], ['¡Muy bien!', 'Very good!'], ['¡Genial!', 'Great!'], ['¡Tú puedes!', 'You can do it!']],
+    storageKey: 'hajime.es.progress.v1', testKey: 'hajime.es.test-progress.v1',
+  },
+  en: {
+    code: 'en', name: 'English', native: 'English', country: 'the UK', flag: 'gb', flagEmoji: '🇬🇧', latin: true, gloss: 'French',
+    speech: 'en-GB', roman: 'English', chars: 'words', Chars: 'Words', charOne: 'word', glyph: 'En',
+    titleNative: 'Let\'s go!', titleSay: 'Let\'s go!', voiceTest: 'Hello!', hasKana: false,
+    cast: { woman: 'Emma', woman2: 'Olivia' },
+    cheers: [['Keep going!', 'Continue !'], ['Well done!', 'Bravo !'], ['Brilliant!', 'Génial !'], ['You can do it!', 'Tu peux le faire !']],
+    storageKey: 'hajime.en.progress.v1', testKey: 'hajime.en.test-progress.v1',
+  },
 };
 
 const COURSE_KEY = 'hajime.course';
+// Whether the learner has picked a language yet: the first launch opens the language screen.
+export function courseChosen() {
+  if (globalThis.__HAJIME_COURSE__) return true;
+  try {
+    return !!globalThis.localStorage?.getItem(COURSE_KEY);
+  } catch {
+    return true;
+  }
+}
 function readCourse() {
   if (globalThis.__HAJIME_COURSE__) return globalThis.__HAJIME_COURSE__; // tests
   try {
@@ -36,13 +71,17 @@ function readCourse() {
 export const LANG = COURSES[readCourse()] ? readCourse() : 'ja';
 export const L = COURSES[LANG];
 
+// The text shown under words (romanisation) — none in Latin-alphabet courses, where it is the word itself.
+export const withRoman = (jp, romaji) => (L.latin || !romaji || romaji === jp ? jp : `${jp} · ${romaji}`);
+
 export function switchCourse(code) {
-  if (!COURSES[code] || code === LANG) return;
+  if (!COURSES[code]) return;
   try {
     localStorage.setItem(COURSE_KEY, code);
   } catch {
     return;
   }
   location.hash = '#/learn';
-  location.reload();
+  if (code === LANG) window.dispatchEvent(new HashChangeEvent('hashchange'));
+  else location.reload();
 }

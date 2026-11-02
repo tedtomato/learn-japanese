@@ -98,7 +98,7 @@ export function renderPractice(root, focus) {
   const now = app.now();
   const learned = learnedItemIds(state);
   const due = dueItemIds(state, now);
-  const tab = ['words', 'kanji', 'kana', 'tones'].includes(focus) ? focus : lastTab;
+  let tab = ['words', 'kanji', 'kana', 'tones'].includes(focus) ? focus : lastTab;
   lastTab = tab;
   const section = SECTIONS.some(([id]) => id === focus) ? focus : ['words', 'kanji', 'kana', 'tones'].includes(focus) ? 'library' : lastSection;
   lastSection = section;
@@ -112,7 +112,7 @@ export function renderPractice(root, focus) {
   const lists = {
     words: () => (words.length ? html`<div class="word-list">${words.map(({ it: w, st }) => html`<button class="word-row" data-say="${speechOf(w)}">
         ${w.art ? art(w.art, 'art-row') : html`<span class="art-row"></span>`}
-        <span class="word-main"><span class="word-jp">${jpItem(w, false)}</span><small>${w.romaji} · ${w.en}</small></span>
+        <span class="word-main"><span class="word-jp">${jpItem(w, false)}</span><small>${L.latin ? w.en : `${w.romaji} · ${w.en}`}</small></span>
         ${meter(st, w.id)}</button>`)}</div>`
       : html`<p class="muted">Words you learn will be listed here, weakest first.</p>`),
     kanji: () => (kanji.length ? html`<section class="card kanji-practice">
@@ -142,7 +142,10 @@ export function renderPractice(root, focus) {
   // Chinese: the tone trainer, from the first words learned.
   const toneCard = () => html`<a class="card kanji-practice" href="#/tones"><span class="kanji-chip">${raw('<svg width="28" height="26" viewBox="0 0 52 48"><path d="M6 24 Q20 46 30 42 T46 14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>')}</span>
     <div><b>Tone trainer</b><small>Hear a syllable, pick its tone · +1 gem each</small></div><span class="btn btn-secondary">Play</span></a>`;
-  const TABS = [['words', 'Words', words.length], ['kanji', L.Chars, kanji.length], ...(L.hasKana ? [['kana', 'Kana', null]] : [['tones', 'Tones', null]])];
+  // Latin-alphabet courses only have words to list.
+  const TABS = L.latin ? [['words', 'Words', words.length]]
+    : [['words', 'Words', words.length], ['kanji', L.Chars, kanji.length], ...(L.hasKana ? [['kana', 'Kana', null]] : [['tones', 'Tones', null]])];
+  if (!TABS.some(([id]) => id === tab)) tab = 'words';
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page">
@@ -182,8 +185,8 @@ export function renderPractice(root, focus) {
 
     ${section === 'library' ? html`<div class="collections">
       <a class="card collection" href="#/collection/phrase">${art('💬', 'art-col')}<b>Phrasebook</b><small>${KINDS.phrase.list.length} phrases</small></a>
-      <a class="card collection" href="#/collection/fact">${art('🗾', 'art-col')}<b>Fun facts</b><small>${state.seen.fact.length} / ${KINDS.fact.list.length}</small></a>
-      <a class="card collection" href="#/collection/kanji"><span class="col-emoji jp">${L.glyph}</span><b>${L.Chars} spotted</b><small>${state.seen.kanji.length} / ${KINDS.kanji.list.length}</small></a>
+      <a class="card collection" href="#/collection/fact">${art(L.flagEmoji || '🗾', 'art-col')}<b>Fun facts</b><small>${state.seen.fact.length} / ${KINDS.fact.list.length}</small></a>
+      ${KINDS.kanji.list.length ? html`<a class="card collection" href="#/collection/kanji"><span class="col-emoji jp">${L.glyph}</span><b>${L.Chars} spotted</b><small>${state.seen.kanji.length} / ${KINDS.kanji.list.length}</small></a>` : ''}
     </div>
 
     <h2 class="sub-title" id="sec-learned">What you've learned</h2>
@@ -238,7 +241,7 @@ export function renderCollection(root, kind) {
       ${kind === 'phrase'
         ? html`<div class="word-list">${list.map((p) => html`<button class="word-row phrase-row" data-say="${phraseSpeech(p)}">
             ${art(emojiFor(p.icon), 'art-row')}
-            <span class="phrase-main"><span class="jp word-jp">${p.jp}</span><small>${p.romaji} · ${p.en}</small></span></button>`)}</div>`
+            <span class="phrase-main"><span class="jp word-jp">${p.jp}</span><small>${p.romaji ? `${p.romaji} · ${p.en}` : `${p.say} · ${p.en}`}</small></span></button>`)}</div>`
         : html`<div class="tidbit-list">${list.map((x) => tidbitCard(kind, x))}</div>`}`)}
   </main>`);
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));

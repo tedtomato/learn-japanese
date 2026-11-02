@@ -30,11 +30,12 @@ function achievements(state, now) {
       { icon: '🏆', title: 'Hiragana master', desc: 'Learn all 71 hiragana', value: kana, goal: 71 },
     ] : []),
     { icon: '💬', title: 'Wordsmith', desc: 'Learn 50 words and phrases', value: words, goal: 50 },
-    { icon: L.glyph, title: `${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} explorer`, desc: `Learn 10 ${L.chars}`, value: learned.filter((i) => i.type === 'kanji' && !i.peek).length, goal: 10 },
+    ...(L.latin ? [{ icon: '📖', title: 'Bookworm', desc: 'Learn 150 words and phrases', value: words, goal: 150 }]
+      : [{ icon: L.glyph, title: `${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} explorer`, desc: `Learn 10 ${L.chars}`, value: learned.filter((i) => i.type === 'kanji' && !i.peek).length, goal: 10 }]),
     { icon: '🔥', title: 'On fire', desc: 'Reach a 7 day streak', value: best, goal: 7 },
     { icon: '🎯', title: 'Sharpshooter', desc: '10 perfect lessons', value: state.stats.perfect, goal: 10 },
     { icon: '⚡', title: 'XP hunter', desc: 'Earn 500 XP', value: state.xp, goal: 500 },
-    { icon: '🗾', title: 'Explorer', desc: 'Complete 5 units', value: unitsDone, goal: 5 },
+    { icon: L.flagEmoji || '🗾', title: 'Explorer', desc: 'Complete 5 units', value: unitsDone, goal: 5 },
     { icon: '📚', title: 'Curious mind', desc: 'Discover 50 fun facts', value: state.seen.fact.length, goal: 50 },
   ];
 }
@@ -102,7 +103,7 @@ export function renderProfile(root, focus) {
       <div class="card stat-card"><span class="c-gold">${icon('bolt', 26)}</span><b>${state.xp}</b><small>Total XP</small></div>
       ${L.hasKana ? html`<a class="card stat-card link-card" href="#/practice/kana"><span class="c-blue">${icon('kana', 26)}</span><b>${count('kana')}</b><small>Kana learned ›</small></a>` : ''}
       <a class="card stat-card link-card" href="#/practice/words"><span class="c-green">${icon('word', 26)}</span><b>${count('word', 'sentence')}</b><small>Words & phrases ›</small></a>
-      <a class="card stat-card link-card" href="#/practice/kanji"><span class="c-purple">${raw(`<b class="jp" style="font-size:22px">${L.glyph}</b>`)}</span><b>${count('kanji', 'kword', 'radical')}</b><small>${L.code === 'zh' ? 'Characters' : 'Kanji & radicals'} ›</small></a>
+      ${L.latin ? '' : html`<a class="card stat-card link-card" href="#/practice/kanji"><span class="c-purple">${raw(`<b class="jp" style="font-size:22px">${L.glyph}</b>`)}</span><b>${count('kanji', 'kword', 'radical')}</b><small>${L.code === 'zh' ? 'Characters' : 'Kanji & radicals'} ›</small></a>`}
       <a class="card stat-card link-card" href="#/collection/fact"><span class="c-orange">${icon('book', 26)}</span><b>${state.seen.fact.length}</b><small>Fun facts ›</small></a>
     </div>
 
@@ -131,7 +132,7 @@ export function renderProfile(root, focus) {
       <div class="setting"><span>Sound effects</span>${seg('sfx', s.sfx, [[true, 'On'], [false, 'Off']])}</div>
       <div class="setting"><span>Daily reminder<small class="muted setting-note">${s.reminders ? 'A nudge once a day if you have not studied' : 'Off'}</small></span>
         <button class="btn btn-white btn-small reminder-btn">${s.reminders ? 'Turn off' : 'Turn on'}</button></div>
-      <div class="setting"><span>Romaji help</span>${seg('romaji', s.romaji || 'auto', [['auto', 'Auto'], ['always', 'Always']])}</div>
+      ${L.latin ? '' : html`<div class="setting"><span>Romaji help</span>${seg('romaji', s.romaji || 'auto', [['auto', 'Auto'], ['always', 'Always']])}</div>`}
       <div class="setting"><span>Voice speed</span>${seg('voiceRate', s.voiceRate, [[0.7, 'Slow'], [0.85, 'Normal'], [1, 'Fast']])}</div>
       <div class="setting column"><span>${L.name} voice</span><small class="muted voice-status">${VOICE_TEXT[voiceStatus()]}</small>
         <button class="btn btn-white test-voice">${icon('speaker', 18)} Test: ${L.voiceTest}</button></div>
@@ -159,7 +160,7 @@ export function renderProfile(root, focus) {
       <button class="btn btn-danger-ghost reset">Reset all progress</button>
     </div>
     <p class="muted small center">Hajime — はじめ — means “beginning”${L.code === 'zh' ? ' (in Chinese: 开始, kāishǐ)' : ''}.</p>
-    <p class="muted small center credits">Stroke order data: ${L.code === 'zh' ? html`<a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener">Make Me a Hanzi</a> (Arphic Public License)` : html`<a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> (CC BY-SA 3.0)`}. Illustrations: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a> (CC BY 4.0).</p>
+    <p class="muted small center credits">${L.latin ? '' : 'Stroke order data: '}${L.latin ? '' : L.code === 'zh' ? html`<a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener">Make Me a Hanzi</a> (Arphic Public License)` : html`<a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> (CC BY-SA 3.0)`}${L.latin ? '' : '. '}Illustrations: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a> (CC BY 4.0).</p>
   </main>`);
 
   $$('.seg', root).forEach((segEl) =>

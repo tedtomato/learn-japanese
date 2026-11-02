@@ -36,7 +36,9 @@ export function renderDrill(root, id) {
 
   // The blank comes first in Japanese (___ をください) and often last in Chinese (我要 ___: slotLast).
   const sentence = (slot, sep = ' ') => (p.slotLast ? `${p.jp}${sep}${slot.word.jp}` : `${slot.word.jp}${sep}${p.jp}`);
-  const romaji = (slot) => (p.slotLast ? `${p.romaji} ${slot.word.romaji}` : `${slot.word.romaji} ${p.romaji}`);
+  const romaji = (slot) => (p.slotLast ? `${p.romaji ?? p.jp} ${slot.word.romaji}` : `${slot.word.romaji} ${p.romaji ?? p.jp}`);
+  // Latin-alphabet courses: no reading line under the words (it would repeat them).
+  const sub = (text) => (L.latin ? '' : html`<small>${text}</small>`);
 
   const show = () => {
     const { kind, slot } = rounds[i];
@@ -46,10 +48,10 @@ export function renderDrill(root, id) {
       <section class="card quiz-card">${slot.word.art ? art(slot.word.art, 'art-lg') : ''}<p class="quiz-text"><b>${p.en(slot.en)}</b></p></section>
       ${kind === 'fill'
         ? html`<p class="drill-pattern">${p.slotLast
-          ? html`<span class="jp">${p.jp}</span><span class="drill-blank jp">＿＿</span><small>${p.romaji} ___</small>`
-          : html`<span class="drill-blank jp">＿＿</span><span class="jp">${p.jp}</span><small>___ ${p.romaji}</small>`}</p>
+          ? html`<span class="jp">${p.jp}</span><span class="drill-blank jp">＿＿</span>${sub(`${p.romaji} ___`)}`
+          : html`<span class="drill-blank jp">＿＿</span><span class="jp">${p.jp}</span>${sub(`___ ${p.romaji}`)}`}</p>
           <div class="options list">${shuffle([slot, ...shuffle(slots.filter((x) => x.id !== slot.id)).slice(0, 2)]).map((o) => html`<button class="option drill-opt" data-id="${o.id}">
-            <span class="opt-label"><span class="jp">${o.word.jp}</span><small>${o.word.romaji}</small></span></button>`)}</div>`
+            <span class="opt-label"><span class="jp">${o.word.jp}</span>${sub(o.word.romaji)}</span></button>`)}</div>`
         : html`<p class="muted small">Now the whole sentence, from memory — type it in ${L.roman}.</p>
           <input class="recall-input drill-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type the sentence in ${L.roman}">
           <button class="btn btn-primary btn-block drill-check" disabled>Check</button>`}
@@ -91,11 +93,11 @@ export function renderDrill(root, id) {
       blank.textContent = slot.word.jp;
       blank.classList.add('filled');
     }
-    speak(sentence(slot, ''), { speaker: 'woman2' });
+    speak(sentence(slot, L.latin ? ' ' : ''), { speaker: 'woman2' });
     const after = $('.quiz-after', root);
     after.hidden = false;
     mount(after, html`<p class="quiz-reveal"><span><b>${ok ? (almost ? 'Almost — watch the spelling!' : 'Right!') : 'Not quite.'}</b>
-      <span class="jp">${sentence(slot)}</span> · ${romaji(slot)}</span></p>
+      <span class="jp">${sentence(slot)}</span>${L.latin ? '' : ` · ${romaji(slot)}`}</span></p>
       <button class="btn btn-primary btn-block quiz-next">${i + 1 < rounds.length ? 'Next' : 'See my score'}</button>`);
     $('.quiz-next', root).addEventListener('click', () => {
       i += 1;

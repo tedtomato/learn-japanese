@@ -15,13 +15,13 @@ if (process.argv[2] === '--course-emojis') {
   console.log(JSON.stringify([...list, ...EMOJI_USED, ...MISSIONS.map((m) => m.art), ...PATTERNS.map((p) => p.art)].filter(Boolean)));
   process.exit(0);
 }
-const COURSES = ['ja', 'zh'];
+const COURSES = ['ja', 'zh', 'fr', 'es', 'en'];
 const courseEmojis = (code) => JSON.parse(execFileSync(process.execPath, [new URL(import.meta.url).pathname, '--course-emojis', code]).toString());
 
 const src = process.argv[2];
 const out = new URL('../app/art/', import.meta.url).pathname;
 const wanted = new Set(COURSES.flatMap(courseEmojis));
-['🔥', '💎', '❤️', '⭐', '🏆', '🎁', '🧊', '🌱', '🎯', '⚡', '🗾', '📚', '💬', '🈁', '🎌', '⏱️', '🌸', '🔤', '❓', '🎧', '🪧', '🍜', '🎫', '🚉', '🏨', '🛍️', '☕', '🍣', '🚕', '🗺️', '🧳', '🙋', '🏮', '🍱', '💾'].forEach((e) => wanted.add(e));
+['🇫🇷', '🇪🇸', '🇬🇧', '🔥', '💎', '❤️', '⭐', '🏆', '🎁', '🧊', '🌱', '🎯', '⚡', '🗾', '📚', '💬', '🈁', '🎌', '⏱️', '🌸', '🔤', '❓', '🎧', '🪧', '🍜', '🎫', '🚉', '🏨', '🛍️', '☕', '🍣', '🚕', '🗺️', '🧳', '🙋', '🏮', '🍱', '💾'].forEach((e) => wanted.add(e));
 
 if (process.argv.includes('--list')) {
   console.log([...wanted].map((e) => `/assets/svg/${artCode(e)}.svg`).join('\n'));

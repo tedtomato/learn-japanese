@@ -66,8 +66,8 @@ export function renderListen(root) {
     if (id !== run || paused) return;
     step(`🗣️ Say it in ${L.name}!`);
     if (!(await wait(THINK_MS, id))) return;
-    $('.listen-jp .jp', root).textContent = Array.isArray(it.jp) ? it.jp.join('') : it.jp;
-    $('.listen-jp small', root).textContent = it.romaji;
+    $('.listen-jp .jp', root).textContent = Array.isArray(it.jp) ? it.jp.join(L.latin ? ' ' : '') : it.jp;
+    $('.listen-jp small', root).textContent = L.latin ? it.en : it.romaji;
     $('.listen-jp', root).hidden = false;
     step(`👂 ${L.cast.woman2} says…`);
     await speak(speechOf(it), { speaker: 'woman2' });

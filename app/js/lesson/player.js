@@ -2,7 +2,7 @@
 // Each task has a countdown (speed bonus when answered in time). Correct answers move on
 // automatically after a second; wrong or hesitant answers are noted and come back at the end in a
 // "Let's correct the exercises you missed" round.
-import { L } from '../lang.js';
+import { L, withRoman } from '../lang.js';
 import { ITEMS, NODE_BY_ID, MAX_LEVEL } from '../course.js';
 import { app, modal } from '../app.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
@@ -21,7 +21,7 @@ import { mountTrace } from './trace.js';
 import { rewardPopup, comboBurst } from '../fx.js';
 import { shareButton, wireShare } from '../share.js';
 
-const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', 'すごい！', 'You got it!', 'Perfect!', 'いいね！'];
+const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', L.cheers[2][0], 'You got it!', 'Perfect!', L.cheers[1][0]];
 const HOUR = 60 * 60 * 1000;
 const norm = (s) => s.toLowerCase().replace(/[’']/g, '').replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
 const pickOne = (list) => list[Math.floor(Math.random() * list.length)];
@@ -448,7 +448,8 @@ function karaoke(root, text, el) {
       while (walker.nextNode()) if (walker.currentNode.textContent.trim()) nodes.push(walker.currentNode);
       nodes.forEach((n) => {
         const frag = document.createDocumentFragment();
-        [...n.textContent].forEach((c) => {
+        // Latin alphabet: light up whole words (with the space after them), not letters.
+        (L.latin ? n.textContent.match(/\S+\s*|\s+/g) || [] : [...n.textContent]).forEach((c) => {
           const span = document.createElement('span');
           span.className = 'k-char';
           span.textContent = c;
@@ -463,7 +464,7 @@ function karaoke(root, text, el) {
   const starts = [];
   let pos = 0;
   units.forEach((u) => {
-    const t = u.tagName === 'RUBY' ? rubyText(u) : u.textContent;
+    const t = (u.tagName === 'RUBY' ? rubyText(u) : u.textContent).trim();
     const at = text.indexOf(t, pos);
     starts.push(at === -1 ? pos : at);
     pos = (at === -1 ? pos : at) + t.length;
@@ -486,7 +487,7 @@ function karaoke(root, text, el) {
       stop();
       show(0);
       // About 6 syllables a second at normal speed.
-      timer = setInterval(() => (current < units.length - 1 ? show(current + 1) : clearInterval(timer)), 170 / rate);
+      timer = setInterval(() => (current < units.length - 1 ? show(current + 1) : clearInterval(timer)), (L.latin ? 330 : 170) / rate);
     },
     at(charIndex) {
       let i = 0;
@@ -537,7 +538,7 @@ function introHtml(item, hint) {
       const size = len <= 4 ? 'jp-xl' : len <= 7 ? 'jp-l2' : 'jp-l3';
       return html`${item.art ? art(item.art, 'art-xl') : ''}
         <div class="${size} fit">${jpItem(item, hint)}</div>
-        ${!hint ? html`<div class="intro-romaji">${item.romaji}</div>` : ''}
+        ${!hint && !L.latin ? html`<div class="intro-romaji">${item.romaji}</div>` : ''}
         <div class="intro-en">${item.en}</div>
         ${item.memory ? html`<p class="intro-clue">🧠 <b>Memory trick:</b> ${item.memory}</p>` : ''}
         ${item.note ? html`<p class="intro-hint">💡 ${item.note}</p>` : ''}`;
@@ -591,7 +592,7 @@ function promptFor(root, s, ex, item) {
   const big = item.type === 'kana';
   // No play button when the task is to read it — hearing it would give the answer away.
   // Romaji hidden: offer it on demand (not when the task is to read it), kept in place so nothing jumps.
-  const canPeek = !big && !ex.hint && ex.kind !== 'read' && ['word', 'sentence'].includes(item.type);
+  const canPeek = !L.latin && !big && !ex.hint && ex.kind !== 'read' && ['word', 'sentence'].includes(item.type);
   // Reading tests (a word, or a kana asked for its sound) have no play button: hearing it is the answer.
   const isReading = ex.kind === 'read' || (item.type === 'kana' && ex.answerKind === 'romaji');
   return speakerBubble(s, html`${isReading ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 22)}</button>`}
@@ -614,8 +615,8 @@ function renderRecall(root, s) {
   const item = ITEMS.get(ex.itemId);
   mount($('.lesson-body', root), html`<p class="instruction">How do you say this in ${L.name}?</p>
     ${speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`)}
-    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type it in ${L.roman}…" aria-label="Your answer in romaji">
-    <p class="muted small recall-help">From memory — no choices this time! ${L.code === 'zh' ? 'Tone marks and spaces don\'t matter.' : 'Spaces and long vowels (ou / o) don\'t matter.'}</p>
+    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type it in ${L.roman}…" aria-label="Your answer in ${L.roman}">
+    <p class="muted small recall-help">From memory — no choices this time! ${L.latin ? 'Accents and capitals don\'t matter.' : L.code === 'zh' ? 'Tone marks and spaces don\'t matter.' : 'Spaces and long vowels (ou / o) don\'t matter.'}</p>
     ${memoryHint(item, true)}`);
   $('.hint-btn', root)?.addEventListener('click', (e) => {
     e.currentTarget.remove();
@@ -630,7 +631,7 @@ function renderRecall(root, s) {
     input.disabled = true;
     input.classList.add(match ? 'right' : 'wrong');
     sayAs(root, s.speaker, speechOf(item));
-    result(root, s, !!match, { answerText: `${item.jp} · ${item.romaji}`, meaning: match === 'close' ? `Almost! It's spelled ${item.romaji} (${item.jp})` : match ? `${item.jp} · ${item.romaji} = ${item.en}` : `means "${item.en}"`, chosenLabel: input.value, noHeart: true, timing: null });
+    result(root, s, !!match, { answerText: withRoman(item.jp, item.romaji), meaning: match === 'close' ? `Almost! It's spelled ${L.latin ? item.jp : `${item.romaji} (${item.jp})`}` : match ? `${withRoman(item.jp, item.romaji)} = ${item.en}` : `means "${item.en}"`, chosenLabel: input.value, noHeart: true, timing: null });
   };
   input.addEventListener('input', () => setCheckEnabled(root, !!input.value.trim()));
   input.addEventListener('keydown', (e) => {
@@ -646,7 +647,7 @@ function renderRecall(root, s) {
       if (s.checked) return;
       input.disabled = true;
       sayAs(root, s.speaker, speechOf(item));
-      result(root, s, false, { answerText: `${item.jp} · ${item.romaji}`, meaning: `means "${item.en}"`, noHeart: true, timing: null });
+      result(root, s, false, { answerText: withRoman(item.jp, item.romaji), meaning: `means "${item.en}"`, noHeart: true, timing: null });
     } },
   });
   setTimeout(() => input.focus(), 250);
@@ -677,7 +678,7 @@ function renderGuess(root, s) {
     const foot = $('.lesson-foot', root);
     foot.className = `lesson-foot ${ok ? 'good' : 'guess'}`;
     mount(foot, html`<div class="foot-inner feedback"><div class="fb-text"><span class="fb-icon">${ok ? icon('check', 26) : '💡'}</span>
-      <div><b>${ok ? 'Good guess!' : 'Nice try!'}</b><p class="fb-meaning">${item.jp} · ${item.romaji} = ${item.en}</p></div></div>
+      <div><b>${ok ? 'Good guess!' : 'Nice try!'}</b><p class="fb-meaning">${withRoman(item.jp, item.romaji)} = ${item.en}</p></div></div>
       <div class="fb-actions"><button class="btn btn-primary check">Continue</button></div></div>`);
     $('.check', foot).addEventListener('click', () => { s.done += 1; next(root, s); });
   };
@@ -723,7 +724,7 @@ function renderChoice(root, s) {
       else if (b.dataset.id === chosen) b.classList.add('wrong');
     });
     if (['word', 'sentence', 'kana', 'kword'].includes(item.type)) sayAs(root, s.speaker, speechOf(item));
-    const meaning = item.en && ex.answerKind !== 'en' ? `${item.jp} = ${item.en}` : item.type === 'kana' ? `${item.jp} = ${item.romaji}${item.example ? ` — as in ${item.example.jp} (${item.example.romaji})` : ''}` : item.romaji ? `${item.jp} · ${item.romaji}` : null;
+    const meaning = item.en && ex.answerKind !== 'en' ? `${item.jp} = ${item.en}` : item.type === 'kana' ? `${item.jp} = ${item.romaji}${item.example ? ` — as in ${item.example.jp} (${item.example.romaji})` : ''}` : item.romaji && !L.latin ? `${item.jp} · ${item.romaji}` : null;
     result(root, s, ok, { answerText: label(item, ex.answerKind === 'kana' ? 'jp' : ex.answerKind), meaning, chosenLabel: ok ? null : label(ITEMS.get(chosen), ex.answerKind === 'kana' ? 'jp' : ex.answerKind) });
   };
   const choose = (btn) => {
@@ -808,8 +809,8 @@ function renderBuild(root, s) {
       sayAs(root, s.speaker, speechOf(item));
       result(root, s, ok, {
         answerText: jpTiles ? ex.answer.join(jpTiles && ex.mode !== 'spell' ? ' ' : '') : ex.answer.join(' '),
-        meaning: `${item.romaji}${ex.mode === 'jp2en' ? '' : ` — ${item.en}`}`,
-        chosenLabel: ok ? null : given.join(jpTiles ? '' : ' '),
+        meaning: L.latin ? (ex.mode === 'jp2en' ? item.text : item.en) : `${item.romaji}${ex.mode === 'jp2en' ? '' : ` — ${item.en}`}`,
+        chosenLabel: ok ? null : given.join(jpTiles && !L.latin ? '' : ' '),
       });
     },
   });
@@ -899,7 +900,7 @@ function renderSpeak(root, s) {
       sfx('wrong');
       status.textContent = heard.length ? `I heard “${heard[0]}”. Try again!` : "I didn't catch that. Try again!";
     } else {
-      result(root, s, false, { answerText: item.text || item.jp, meaning: item.romaji, noHeart: true });
+      result(root, s, false, { answerText: item.text || item.jp, meaning: L.latin ? item.en : item.romaji, noHeart: true });
     }
   });
   footer(root, s, { canCheck: false, text: 'Check', skip: { label: "Can't speak now", onSkip: () => skipListening(root, s, 'speak') } });
@@ -910,7 +911,7 @@ function renderGrammar(root, s) {
   const blocks = html`<div class="g-blocks">${g.blocks.map((b) => html`<div class="g-block g-${b.role}"><span class="jp">${jpChunk(b.jp, true)}</span><small>${b.en}</small></div>`)}</div>`;
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">Grammar in 15 seconds</span></p>
     <div class="card grammar-card"><h2>${g.title}</h2>${blocks}<p class="g-en">= ${g.en}</p><p>${g.rule}</p><p class="muted small">💡 ${g.tip}</p></div>`);
-  speak(g.blocks.map((b) => b.jp).join(''), { speaker: s.speaker });
+  speak(g.blocks.map((b) => b.jp).join(L.latin ? ' ' : ''), { speaker: s.speaker });
   footer(root, s, { canCheck: true, text: 'Test me (15 s)', onCheck: () => grammarCheck(root, s, g) });
 }
 
@@ -997,11 +998,11 @@ function renderDialogue(root, s) {
 
 function renderTidbit(root, s) {
   const unit = s.node?.unit;
-  // Mostly a fact about Japan; about one break in four shows a kanji to spot (it then comes back in Practice).
+  // Mostly a fun fact about the country; about one break in four shows a kanji to spot (it then comes back in Practice).
   const t = nextTidbit(app.state, Math.random, ['fact', 'kanji'], { facts: unit?.facts });
   app.save();
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">Quick break</span></p>
-    ${speakerBubble(s, t.kind === 'kanji' ? "Here's a kanji you'll see in Japan…" : 'Did you know? A fun fact about Japan…')}
+    ${speakerBubble(s, t.kind === 'kanji' ? `Here's a ${L.charOne} you'll see in ${L.country}…` : `Did you know? A fun fact about ${L.country}…`)}
     ${tidbitCard(t.kind, t.item)}`);
   $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   wireShare($('.lesson-body', root));

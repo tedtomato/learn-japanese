@@ -2,6 +2,7 @@
 // tap), you pick what to say; wrong picks explain themselves and can be tried again. Stars: 3 with
 // no mistakes, 2 with one or two, else 1.
 import { SECTIONS } from '../course.js';
+import { L } from '../lang.js';
 import { app } from '../app.js';
 import { html, mount, $, $$ } from '../dom.js';
 import { icon } from '../icons.js';
@@ -37,7 +38,7 @@ export function renderMission(root, id) {
     const el = document.createElement('div');
     el.className = `chat-line ${mine ? 'mine' : ''}`;
     mount(el, html`${mine ? '' : html`<div class="chat-who">${person(who, 56)}<small>${nameOf(who)}</small></div>`}
-      <button class="chat-bubble">${line.jp ? html`<span class="jp">${line.jp}</span><small class="chat-romaji">${line.romaji}</small>` : ''}
+      <button class="chat-bubble">${line.jp ? html`<span class="jp">${line.jp}</span>${L.latin ? '' : html`<small class="chat-romaji">${line.romaji}</small>`}` : ''}
         <small class="chat-en" ${mine || !line.jp ? '' : 'hidden'}>${line.en}</small>${line.jp && !mine ? html`<small class="chat-tap">Tap for English</small>` : ''}</button>`);
     chat.append(el);
     $('.chat-bubble', el).addEventListener('click', () => {
@@ -57,7 +58,7 @@ export function renderMission(root, id) {
     const replies = shuffle(s.replies);
     mount(act, html`<p class="mission-prompt">${s.prompt || 'What do you say?'}</p>
       <div class="options list">${replies.map((r, k) => html`<button class="option reply" data-k="${k}">
-        ${r.jp ? html`<span class="opt-label"><span class="jp">${r.jp}</span><small>${r.romaji}</small></span>` : html`<span class="opt-label">${r.en}</span>`}</button>`)}</div>
+        ${r.jp ? html`<span class="opt-label"><span class="jp">${r.jp}</span>${L.latin ? '' : html`<small>${r.romaji}</small>`}</span>` : html`<span class="opt-label">${r.en}</span>`}</button>`)}</div>
       <p class="mission-note" hidden></p>`);
     $$('.reply', act).forEach((b) => b.addEventListener('click', () => pick(b, replies[Number(b.dataset.k)])));
     scroll();

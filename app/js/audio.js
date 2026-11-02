@@ -145,7 +145,9 @@ export function listen({ timeoutMs = 7000 } = {}) {
 }
 
 const toHira = (s) => s.replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
-const normJa = (s) => toHira(s).replace(/[\s、。！？!?.,・～〜ー，：；“”]/g, '');
+// Latin-alphabet courses: capitals, accents and apostrophes don't matter either.
+const normLatin = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
+const normJa = (s) => (L.latin ? normLatin(s) : toHira(s).replace(/[\s、。！？!?.,・～〜ー，：；“”]/g, ''));
 
 function similarity(a, b) {
   if (!a || !b) return 0;

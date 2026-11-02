@@ -306,3 +306,21 @@ export function buyHearts(state, now) {
   state.hearts = { count: MAX_HEARTS, updatedAt: now };
   return true;
 }
+
+// A short summary of this course's progress, kept beside it so the language screen can show every
+// course's progress without building the other courses.
+export const SUMMARY_KEY = `hajime.summary.${L.code}`;
+export function courseSummary(state, now) {
+  const at = currentNodeIndex(state);
+  const unit = NODES[Math.min(at, NODES.length - 1)]?.unit;
+  return {
+    xp: state.xp,
+    streak: displayStreak(state, now),
+    done: NODES.filter((n) => isNodeDone(state, n)).length,
+    total: NODES.length,
+    words: learnedItemIds(state).filter((id) => ['word', 'sentence'].includes(ITEMS.get(id).type)).length,
+    unit: at >= NODES.length ? 'Course complete' : unit?.title || '',
+    started: state.stats.lessons > 0 || Object.keys(state.nodes).length > 0,
+    at: now,
+  };
+}

@@ -1194,3 +1194,31 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .tone-options { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .tone-opt { align-items: center !important; padding: 14px 10px !important; gap: 6px; text-align: center !important; }
 .tone-opt span { font-size: 16px; }
+/* Latin-alphabet courses (French, Spanish, English): words in the main rounded font */
+.latin .jp { font-family: var(--font); font-weight: 800; letter-spacing: 0; }
+.latin .jp-giant, .latin .jp-huge { font-size: 56px; }
+/* Language screen */
+.courses-page { padding-bottom: 32px; }
+.courses-hero { display: flex; align-items: center; gap: 14px; margin: 8px 0 18px; }
+.courses-hero h1 { font-size: 24px; margin: 0 0 4px; color: var(--text-strong); }
+.courses-hero p { margin: 0; font-size: 15px; }
+.course-cards { display: flex; flex-direction: column; gap: 12px; }
+.course-card { display: flex; flex-direction: column; gap: 10px; width: 100%; text-align: left; font: inherit; color: var(--text); background: var(--card); border: 2px solid var(--border); border-bottom-width: 5px; border-radius: 20px; padding: 14px 16px; cursor: pointer; transition: transform .08s; }
+.course-card:active { transform: translateY(2px); }
+.course-card.on { border-color: var(--blue); background: var(--blue-soft); }
+.course-top { display: flex; align-items: center; gap: 14px; }
+.course-top svg { flex: none; }
+.course-name { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.course-name b { font-size: 20px; font-weight: 800; color: var(--text-strong); }
+.course-name small { color: var(--muted); font-size: 14px; font-weight: 700; }
+.course-name .native { color: var(--text); }
+.course-go { color: var(--faint); display: flex; }
+.course-progress { display: flex; align-items: center; gap: 10px; }
+.course-bar { flex: 1; height: 14px; border-radius: 99px; background: var(--border); overflow: hidden; }
+.course-bar i { display: block; height: 100%; border-radius: 99px; background: var(--green); }
+.course-pct { font-weight: 800; color: var(--green-text, var(--green)); min-width: 3ch; text-align: right; }
+.course-stats { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 14px; font-weight: 800; }
+.course-stats > span { display: inline-flex; align-items: center; gap: 4px; }
+.course-unit { font-size: 14px; color: var(--muted); font-weight: 700; }
+.course-unit b { color: var(--text); }
+.course-new { font-size: 14px; color: var(--muted); font-weight: 700; }

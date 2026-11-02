@@ -2,7 +2,7 @@
 import { FAMILIAR_IDS, ITEMS } from '../course.js';
 import { byUrgency } from '../srs.js';
 import { L, LANG } from '../lang.js';
-import { GRAMMAR, STROKES, FILLERS as JP_FILLERS, FILLER_ROMAJI } from '../content/pack.js';
+import { GRAMMAR, STROKES, FILLERS as JP_FILLERS, FILLER_ROMAJI, GLOSS_FILLERS } from '../content/pack.js';
 
 export function makeRng(seed = Date.now()) {
   let a = seed >>> 0;
@@ -36,7 +36,8 @@ const QUESTION_TYPES = {
   fword: { easy: ['read'], hard: ['read'] },
 };
 
-const EN_FILLERS = ['the', 'is', 'a', 'you', 'I', 'my', 'please', 'what', 'this', 'like', 'are', 'and'];
+// Extra tiles for translating into the language of the meanings (French in the English course).
+const EN_FILLERS = GLOSS_FILLERS || ['the', 'is', 'a', 'you', 'I', 'my', 'please', 'what', 'this', 'like', 'are', 'and'];
 
 // Romaji for any sentence chunk, used to label Japanese tiles while hints are on.
 let chunkRomaji;
@@ -248,6 +249,8 @@ export function context({ state, sessionIds, level, rng, canListen = true, canSp
     solid: (item) => state.items[item.id]?.box >= SOLID_BOX,
     romajiHint: (item) => {
       if (!['word', 'sentence'].includes(item.type)) return false;
+      // Latin-alphabet courses have no separate reading to show.
+      if (L.latin) return false;
       if (always) return true;
       // Chinese: pinyin stays over a word or sentence until that word or sentence is well known.
       if (LANG === 'zh') return !(state.items[item.id]?.box >= SOLID_BOX);

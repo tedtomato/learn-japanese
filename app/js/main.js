@@ -12,7 +12,8 @@ import { splash } from './fx.js';
 import { mascot } from './mascot.js';
 import { showStreakCalendar } from './screens/streak.js';
 import { showHearts } from './screens/hearts.js';
-import { showCoursePicker } from './screens/courses.js';
+import { renderCourses } from './screens/courses.js';
+import { courseChosen } from './lang.js';
 import { renderFactQuiz } from './screens/factquiz.js';
 import { renderListen } from './screens/listen.js';
 import { renderSigns } from './screens/signs.js';
@@ -58,7 +59,8 @@ function phoneOnly() {
 }
 
 function route() {
-  const [, name = 'learn', arg] = location.hash.split('/');
+  // Until a language is picked, the language screen comes first, whatever the address.
+  const [, name = 'learn', arg] = courseChosen() ? location.hash.split('/') : ['', 'courses'];
   const view = $('#view');
   const root = document.createElement('div');
   root.className = 'screen';
@@ -66,9 +68,10 @@ function route() {
   $('#modal').classList.remove('open');
   app.inLesson = false;
 
-  const inSession = name === 'lesson' || (name === 'practice' && (arg === 'go' || arg === 'kanji-go' || arg === 'mistakes-go' || arg === 'hiragana-go' || arg === 'katakana-go')) || (name === 'lab' && !!arg);
+  const inSession = name === 'courses' || name === 'lesson' || (name === 'practice' && (arg === 'go' || arg === 'kanji-go' || arg === 'mistakes-go' || arg === 'hiragana-go' || arg === 'katakana-go')) || (name === 'lab' && !!arg);
   document.body.classList.toggle('in-lesson', inSession);
-  if (name === 'lesson') startSession(root, { nodeId: arg });
+  if (name === 'courses') renderCourses(root);
+  else if (name === 'lesson') startSession(root, { nodeId: arg });
   else if (name === 'practice' && arg === 'go') startSession(root, {});
   else if (name === 'practice' && arg === 'kanji-go') startSession(root, { kanjiOnly: true });
   else if (name === 'practice' && arg === 'mistakes-go') startSession(root, { itemIds: mistakeIds(app.state).slice(0, 8) });
@@ -94,7 +97,7 @@ function route() {
 // The flame in the top bar opens the streak calendar on every screen.
 document.addEventListener('click', (e) => {
   if (e.target.closest('.stat-streak')) showStreakCalendar();
-  if (e.target.closest('.stat-flag') && !document.body.classList.contains('in-lesson')) showCoursePicker();
+  if (e.target.closest('.stat-flag') && !document.body.classList.contains('in-lesson')) app.go('#/courses');
   if (e.target.closest('.stat-hearts') && !document.body.classList.contains('in-lesson')) showHearts();
 });
 

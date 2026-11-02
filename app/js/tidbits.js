@@ -1,5 +1,5 @@
 // Fun facts, travel phrases and kanji shown now and then. Seen ones are collected in the Practice tab.
-import { LANG } from './lang.js';
+import { L, LANG } from './lang.js';
 import { FACTS, PHRASES, PEEK_KANJI as KANJI } from './content/pack.js';
 import { html } from './dom.js';
 import { icon } from './icons.js';
@@ -22,19 +22,24 @@ const EMOJI = {
   game: '🎮', bear: '🐻', robot: '🤖', quake: '🌏', person: '🧓', briefcase: '💼', bowing: '🙇', speech: '💬',
   school: '🏫', pearl: '🦪', rocks: '🪨', taxi: '🚕', ticket: '🎫', coin: '💴', mountain: '🗻', bow: '🏹',
   globe: '🌐', bus: '🚌', plane: '✈️', siren: '🚨', medical: '🏥', hotel: '🏨', bank: '🏦',
+  wine: '🍷', cheese: '🧀', bread: '🍞', football: '⚽', beer: '🍺', coffee: '☕', star: '⭐', sea: '🌊', flower: '💐',
+  flag: L.flagEmoji || '🎌',
 };
-export const emojiFor = (name) => EMOJI[name] || '🎌';
-export const EMOJI_USED = [...Object.values(EMOJI), '🎌'];
+export const EMOJI_NAMES = Object.keys(EMOJI);
+export const emojiFor = (name) => EMOJI[name] || L.flagEmoji || '🎌';
+export const EMOJI_USED = [...Object.values(EMOJI), '🎌', '🇫🇷', '🇪🇸', '🇬🇧'];
 
 // Text to speak for a phrase (drops the "～" placeholder).
 export const phraseSpeech = (p) => p.jp.replace(/[～~]/g, '');
 
 const KIND_WEIGHTS = [['fact', 0.5], ['phrase', 0.35], ['kanji', 0.15]];
+// Kinds with nothing to show (no kanji peeks in Latin-alphabet courses) are never picked.
+export const tidbitKinds = (kinds) => kinds.filter((k) => KINDS[k].list.length);
 
 // Picks something the learner has not seen yet (or anything, once all are seen) and marks it seen.
 // theme: { facts: [categories], phrases: [categories] } keeps breaks on the current unit's topic.
 export function nextTidbit(state, rng = Math.random, kinds = ['fact', 'phrase', 'kanji'], theme = {}) {
-  const weights = KIND_WEIGHTS.filter(([k]) => kinds.includes(k));
+  const weights = KIND_WEIGHTS.filter(([k]) => tidbitKinds(kinds).includes(k));
   const total = weights.reduce((a, [, w]) => a + w, 0);
   let r = rng() * total;
   const kind = (weights.find(([, w]) => (r -= w) < 0) || weights[0])[0];
@@ -60,7 +65,7 @@ export function tidbitBody(kind, item) {
   if (kind === 'phrase') {
     return html`<div class="tidbit-phrase">
       <button class="say-inline" data-say="${phraseSpeech(item)}" aria-label="Play">${icon('speaker', 22)}</button>
-      <div><div class="jp jp-lg">${item.jp}</div><div class="tidbit-romaji">${item.romaji} <span class="muted">(${item.say})</span></div>
+      <div><div class="jp jp-lg">${item.jp}</div><div class="tidbit-romaji">${item.romaji ? html`${item.romaji} <span class="muted">(${item.say})</span>` : html`<span class="muted">Sounds like: ${item.say}</span>`}</div>
       <div class="tidbit-en">${art(emojiFor(item.icon), 'art-inline')} ${item.en}</div></div></div>`;
   }
   return html`<div class="tidbit-kanji">

@@ -4,6 +4,7 @@
 // "Kana corner" at the end. Katakana is not taught for now.
 import { kanaId } from './content/kana.js';
 import { toneNumbers } from './pinyin.js';
+import { L } from './lang.js';
 import { KANA, KANA_WORDS, SECTIONS_DATA, DIALOGUES, KANJI, RADICALS, KANJI_LESSONS, PEEK_KANJI, MNEMONICS } from './content/pack.js';
 
 export const ITEMS = new Map();
@@ -24,7 +25,9 @@ function addItem(item) {
 }
 
 // Ids from the romanisation; pinyin tones become numbers (买 mǎi → mai3, 卖 mài → mai4).
-const slug = (s) => toneNumbers(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+// Latin-alphabet courses drop accents instead (le café → le-cafe, ¿dónde? → donde).
+const plainLatin = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+export const slug = (s) => (L.latin ? plainLatin(s) : toneNumbers(s)).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 const kanaChars = (text) => [...text].filter((c) => KANA.has(c));
 
 function kanaItem(ch) {
@@ -34,15 +37,17 @@ function kanaItem(ch) {
     example: word && { jp: word, romaji: wordRomaji, art, en } });
 }
 
-function wordItem([jp, romaji, en, art, extra = {}], ctx) {
+// Latin-alphabet courses write words without romanisation: [word, meaning, art, extras?].
+function wordItem(w, ctx) {
+  const [jp, romaji, en, art, extra = {}] = L.latin ? [w[0], w[0], ...w.slice(1)] : w;
   const id = `w-${slug(romaji)}`;
   return addItem({ id, type: 'word', jp, romaji, en, art, note: extra.note, memory: MNEMONICS[id], alt: extra.alt || [], unit: ctx.unit, section: ctx.section, chars: kanaChars(jp) });
 }
 
-function sentenceItem({ jp, romaji, en, alt = [] }, ctx) {
-  const romajiChunks = romaji.split(' ');
+function sentenceItem({ jp, romaji = jp.join(' '), en, alt = [] }, ctx) {
+  const romajiChunks = L.latin ? jp : romaji.split(' ');
   if (romajiChunks.length !== jp.length) throw new Error(`Romaji "${romaji}" must have one word per chunk`);
-  const text = jp.join('');
+  const text = jp.join(L.latin ? ' ' : '');
   return addItem({ id: `s-${slug(romaji)}`, type: 'sentence', jp, text, romaji, romajiChunks, en, accept: [en, ...alt], unit: ctx.unit, section: ctx.section, chars: kanaChars(text) });
 }
 

@@ -17,7 +17,7 @@ export const MISSIONS = [
       { who: 'woman', jp: 'Me llamo Lucía. ¿Cómo te llamas?', en: 'My name is Lucía. What\'s your name?',
         replies: [R('Me llamo Sam. Encantado.', 'my name is Sam. Nice to meet you.', true), R('Lo siento', 'I\'m sorry', false, 'Nothing to apologise for — tell her your name!'), R('De nada', 'you\'re welcome', false, '"You\'re welcome" — she asked your name.')] },
       { who: 'woman', jp: '¿Qué tal el viaje?', en: 'How was the trip?',
-        replies: [R('Muy bien, gracias. ¿Y tú?', 'very good, thanks. And you?', true), R('No pasa nada', 'no problem', false, '"No problem" is the answer to "sorry", not "how was it?"'), R('Hasta mañana', 'see you tomorrow', false, 'Leaving already? Tell her the trip was good!')] },
+        replies: [R('Muy bien, gracias', 'very good, thanks', true), R('No pasa nada', 'no problem', false, '"No problem" is the answer to "sorry", not "how was it?"'), R('Hasta mañana', 'see you tomorrow', false, 'Leaving already? Tell her the trip was good!')] },
       { who: 'woman', jp: 'Aquí tienes la llave. ¡Bienvenido!', en: 'Here\'s your key. Welcome!',
         replies: [R('¡Muchas gracias!', 'thank you very much!', true), R('Perdón', 'excuse me', false, 'No need for "excuse me" — thank her!'), R('No', 'no', false, 'Refusing the key? You\'ll be sleeping in the lobby!')] },
       { who: 'woman', jp: 'De nada. ¡Hasta luego!', en: 'You\'re welcome. See you later!', prompt: 'What did she say?',

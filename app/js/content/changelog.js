@@ -1,6 +1,11 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.89', date: '2 Nov 2026', changes: [
+    'Chinese: memory tricks for all 159 words (你好 — “Knee, how?”), shown on new-word cards and as hints',
+    'Chinese: 9 missions — meet your host family, find the metro in Shanghai, a Chengdu tea house, haggle at a market, buy fruit, hotel check-in, hot pot night, high-speed train to Xi\'an, a pharmacy visit',
+    'Chinese: 6 pattern drills — 我要 ___, ___ 在哪里, ___ 多少钱, 请给我 ___, 我喜欢 ___, 去 ___',
+  ] },
   { version: '0.88', date: '2 Nov 2026', changes: [
     'Chinese: trace characters stroke by stroke, with the right stroke order (data: Make Me a Hanzi)',
     'Chinese: new Tone trainer — the four tones with their shapes and sounds (Practice → Library → Tones), and a game: hear a syllable, pick its tone (+1 gem each)',

@@ -34,8 +34,9 @@ export function renderDrill(root, id) {
   let i = 0;
   let score = 0;
 
-  const sentence = (slot, sep = ' ') => `${slot.word.jp}${sep}${p.jp}`;
-  const romaji = (slot) => `${slot.word.romaji} ${p.romaji}`;
+  // The blank comes first in Japanese (___ をください) and often last in Chinese (我要 ___: slotLast).
+  const sentence = (slot, sep = ' ') => (p.slotLast ? `${p.jp}${sep}${slot.word.jp}` : `${slot.word.jp}${sep}${p.jp}`);
+  const romaji = (slot) => (p.slotLast ? `${p.romaji} ${slot.word.romaji}` : `${slot.word.romaji} ${p.romaji}`);
 
   const show = () => {
     const { kind, slot } = rounds[i];
@@ -44,7 +45,9 @@ export function renderDrill(root, id) {
       <p class="muted quiz-count">${i + 1} of ${rounds.length} · ${p.meaning}</p>
       <section class="card quiz-card">${slot.word.art ? art(slot.word.art, 'art-lg') : ''}<p class="quiz-text"><b>${p.en(slot.en)}</b></p></section>
       ${kind === 'fill'
-        ? html`<p class="drill-pattern"><span class="drill-blank jp">＿＿</span><span class="jp">${p.jp}</span><small>___ ${p.romaji}</small></p>
+        ? html`<p class="drill-pattern">${p.slotLast
+          ? html`<span class="jp">${p.jp}</span><span class="drill-blank jp">＿＿</span><small>${p.romaji} ___</small>`
+          : html`<span class="drill-blank jp">＿＿</span><span class="jp">${p.jp}</span><small>___ ${p.romaji}</small>`}</p>
           <div class="options list">${shuffle([slot, ...shuffle(slots.filter((x) => x.id !== slot.id)).slice(0, 2)]).map((o) => html`<button class="option drill-opt" data-id="${o.id}">
             <span class="opt-label"><span class="jp">${o.word.jp}</span><small>${o.word.romaji}</small></span></button>`)}</div>`
         : html`<p class="muted small">Now the whole sentence, from memory — type it in ${L.roman}.</p>

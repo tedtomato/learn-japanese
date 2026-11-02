@@ -40,3 +40,11 @@ test('every Chinese node makes valid exercises at every level', () => {
   }
   assert.ok(generatePractice(state, { now: T0 }).exercises.length > 0);
 });
+
+test('Chinese extras: every word has a memory trick, missions and drills point at real units and words', async () => {
+  const { MISSIONS, PATTERNS } = await import('../app/js/content/pack.js');
+  const units = new Set(SECTIONS.flatMap((s) => s.units.map((u) => u.id)));
+  assert.deepEqual([...ITEMS.values()].filter((i) => i.type === 'word' && !i.memory).map((i) => i.id), []);
+  assert.ok(MISSIONS.length >= 9 && MISSIONS.every((m) => units.has(m.unit) && m.steps.every((s) => s.replies.some((r) => r.ok))));
+  for (const p of PATTERNS) for (const [id] of p.slots) assert.equal(ITEMS.get(id)?.type, 'word', `${p.id}: ${id}`);
+});

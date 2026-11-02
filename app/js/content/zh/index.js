@@ -7,10 +7,10 @@ export { FACT_QUIZ } from './fact-quiz.js';
 export { GRAMMAR, GLOSSARY } from './grammar.js';
 export { SIGN_SCENES } from './signs.js';
 export { STROKES } from './strokes.js';
+export { MNEMONICS } from './mnemonics.js';
+export { MISSIONS } from './missions.js';
+export { PATTERNS } from './patterns.js';
 
-export const MNEMONICS = {};
-export const MISSIONS = [];
-export const PATTERNS = [];
 export const KANA = new Map();
 export const HIRAGANA_ROWS = [];
 export const KATAKANA_ROWS = [];

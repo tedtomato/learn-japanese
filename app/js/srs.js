@@ -7,13 +7,21 @@ export const MAX_BOX = INTERVALS.length - 1;
 
 // A hesitation (correct but slow) keeps the item in its box and brings it back sooner.
 // `missed` marks a recent mistake until the item is answered right again (the Mistakes review).
-export function review(record, { right, wrong, hesitated = 0 }, now) {
+// Reviews drift ±10% so a day's lessons do not all fall due on the same day again. The drift comes from
+// the item id and how often it was seen, so the same history always gives the same date.
+function drift(id, seen) {
+  let h = 2166136261;
+  for (const c of `${id}:${seen}`) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  return 0.9 + 0.2 * ((h >>> 0) / 4294967296);
+}
+
+export function review(record, { right, wrong, hesitated = 0 }, now, id = null) {
   const prev = record || { box: 0, seen: 0, right: 0, wrong: 0, slow: 0 };
   let box;
   if (wrong > 0) box = Math.max(0, prev.box - 2);
   else if (hesitated > 0) box = Math.max(prev.box, 1);
   else box = Math.min(MAX_BOX, prev.box + 1);
-  const wait = hesitated > 0 && !wrong ? INTERVALS[box] / 2 : INTERVALS[box];
+  const wait = (hesitated > 0 && !wrong ? INTERVALS[box] / 2 : INTERVALS[box]) * (id ? drift(id, prev.seen) : 1);
   const missed = wrong > 0 ? now : right > 0 && !hesitated ? undefined : prev.missed;
   return {
     box,

@@ -2,7 +2,8 @@
 import { FAMILIAR_IDS, ITEMS } from '../course.js';
 import { byUrgency } from '../srs.js';
 import { L, LANG } from '../lang.js';
-import { romajiMatch } from '../normalise.js';
+import { romajiMatch, latinKey } from '../normalise.js';
+import { t, langName } from '../strings.js';
 import { GRAMMAR, STROKES, FILLERS as JP_FILLERS, FILLER_ROMAJI, GLOSS_FILLERS } from '../content/pack.js';
 
 export function makeRng(seed = Date.now()) {
@@ -29,8 +30,9 @@ const pick = (list, rng) => list[Math.floor(rng() * list.length)];
 
 const QUESTION_TYPES = {
   kana: { easy: ['kana2romaji', 'audio2kana'], hard: ['romaji2kana', 'audio2kana', 'kana2romaji'] },
-  word: { easy: ['jp2en', 'audio2jp'], hard: ['en2jp', 'spell', 'audio2jp', 'read', 'speak'] },
-  sentence: { easy: ['build-jp2en'], hard: ['build-en2jp', 'build-audio', 'fast', 'speak'] },
+  // Latin-alphabet courses have no spelling or reading tasks, so they get typing, gap and article tasks instead.
+  word: { easy: ['jp2en', 'audio2jp'], hard: ['en2jp', 'spell', 'audio2jp', 'read', 'speak', ...(L.latin ? ['dictation', 'article'] : [])] },
+  sentence: { easy: ['build-jp2en'], hard: ['build-en2jp', 'build-audio', 'fast', 'speak', ...(L.latin ? ['dictation', 'cloze', 'type-translate'] : [])] },
   kanji: { easy: ['kanji2meaning'], hard: ['meaning2kanji', 'kanji2meaning'] },
   kword: { easy: ['kword2meaning'], hard: ['kword2reading', 'kword2meaning'] },
   radical: { easy: ['radical2meaning'], hard: ['meaning2radical'] },
@@ -75,8 +77,25 @@ export function knownChars(state, extraIds = []) {
 }
 export const canRead = (item, chars) => item.chars?.length > 0 && item.chars.every((c) => chars.has(c));
 
+// Latin words that start with an article (le café, el metro): the noun without it, the article, and the
+// other article of the same kind (le ↔ la). Nothing for l' (no choice), plural articles, Spanish
+// nouns that take el although feminine (el agua) and nouns that go with either gender (le professeur).
+const ARTICLES = { fr: [['le', 'la'], ['un', 'une']], es: [['el', 'la'], ['un', 'una']], en: [['a', 'an']] };
+const EITHER_GENDER = new Set(['professeur', 'médecin', 'livre', 'élève', 'estudiante', 'policía']);
+export function articleParts(item) {
+  const groups = ARTICLES[L.code];
+  const m = L.latin && groups && item.type === 'word' && /^(\S+) (.+)$/.exec(item.jp);
+  const group = m && groups.find((g) => g.includes(m[1].toLowerCase()));
+  if (!group || EITHER_GENDER.has(m[2].toLowerCase()) || (L.code === 'es' && /^h?[aá]/i.test(m[2]))) return null;
+  const article = m[1].toLowerCase();
+  return { article, noun: m[2], group, wrong: group.find((a) => a !== article) };
+}
+
 function allowed(type, item, ctx) {
-  if (type.startsWith('audio') || type === 'build-audio' || type === 'fast') return ctx.canListen && (type !== 'fast' || ctx.advanced);
+  if (type.startsWith('audio') || type === 'build-audio' || type === 'fast' || type === 'dictation') return ctx.canListen && (type !== 'fast' || ctx.advanced);
+  if (type === 'article') return !!articleParts(item);
+  if (type === 'cloze') return item.type === 'sentence' && item.jp.length >= 2;
+  if (type === 'type-translate') return item.type === 'sentence';
   if (type === 'speak') return ctx.canSpeak && ctx.level >= 1;
   // Chinese has no kana to spell with; reading a word's pinyin from its characters comes once the
   // word is well known (its pinyin hint is gone by then).
@@ -114,6 +133,36 @@ const LABEL = { romaji: (i) => i.romaji, kana: (i) => i.jp, jp: (i) => i.jp, en:
 // Characters beginners mix up; while learning, they are not offered as each other's wrong answers.
 const LOOK_ALIKES = ['さちき', 'ねれわ', 'ぬめ', 'はほけ', 'るろ', 'いりこ', 'うらつ', 'あお', 'まも', 'たな', 'シツ', 'ソン', 'クケタ', 'ウワ', 'コロ', 'チテ'];
 const lookAlike = (a, b) => LOOK_ALIKES.some((g) => g.includes(a) && g.includes(b));
+
+// Now and then (1 in 3) one wrong answer is the same noun under the wrong article (la café for le café).
+// It is not a real item, so the exercise carries it in `fakes`.
+function withGenderFake(item, options, ctx) {
+  const p = articleParts(item);
+  if (!p || ctx.rng() >= 1 / 3 || options.length < 3) return { options };
+  const text = `${p.wrong} ${p.noun}`;
+  if ([...ITEMS.values()].some((i) => i.type === 'word' && i.jp.toLowerCase() === text.toLowerCase())) return { options };
+  const fake = { id: `gender:${text}`, type: 'word', jp: text, romaji: text, en: '' };
+  const victim = pick(options.filter((id) => id !== item.id), ctx.rng);
+  return { options: options.map((id) => (id === victim ? fake.id : id)), fakes: { [fake.id]: fake } };
+}
+
+// Sentence chunks from the whole course, for the wrong answers of a gap exercise.
+let courseChunks;
+// Two chunks from other sentences (those the learner has met first); never one that is in this sentence,
+// even in another case or without accents.
+function clozeDistractors(item, ctx) {
+  courseChunks ||= [...ITEMS.values()].filter((i) => i.type === 'sentence').flatMap((i) => i.jp);
+  const taken = new Set(item.jp.map(latinKey));
+  const out = [];
+  for (const c of [...shuffle(sentencePool(ctx).flatMap((x) => x.jp), ctx.rng), ...shuffle(courseChunks, ctx.rng)]) {
+    const key = latinKey(c);
+    if (!key || taken.has(key)) continue;
+    taken.add(key);
+    out.push(c);
+    if (out.length === 2) break;
+  }
+  return out;
+}
 
 // ctx.wrongCount: how many wrong answers to offer (3 normally; fewer in gentle kana lessons).
 function choiceOptions(item, answerKind, ctx) {
@@ -153,27 +202,31 @@ const sentencePool = (ctx) => [...new Set([...ctx.sessionIds, ...ctx.knownIds])]
 function buildExercise(item, type, ctx) {
   const base = { itemIds: [item.id], itemId: item.id, hint: ctx.romajiHint(item), kind: type };
   // Gentle kana questions (first time through a "Read it" lesson) have no countdown.
-  const choice = (prompt, answerKind, instruction) => ({ ...base, type: 'choice', prompt, answerKind, options: choiceOptions(item, answerKind, ctx), instruction,
-    untimed: !!(ctx.gentle && ['kana', 'fword'].includes(item.type)) });
+  const choice = (prompt, answerKind, instruction) => {
+    const chosen = choiceOptions(item, answerKind, ctx);
+    const { options, fakes } = answerKind === 'jp' && L.latin ? withGenderFake(item, chosen, ctx) : { options: chosen };
+    return { ...base, type: 'choice', prompt, answerKind, options, ...(fakes ? { fakes } : {}), instruction,
+      untimed: !!(ctx.gentle && ['kana', 'fword'].includes(item.type)) };
+  };
   switch (type) {
-    case 'kana2romaji': return choice('jp', 'romaji', 'What sound is this?');
+    case 'kana2romaji': return choice('jp', 'romaji', t('What sound is this?'));
     case 'romaji2kana': return choice('romaji', 'kana', `Which one is “${item.romaji}”?`);
-    case 'audio2kana': return choice('audio', 'kana', 'What do you hear?');
-    case 'jp2en': return choice('jp', 'en', 'What does this mean?');
-    case 'en2jp': return choice('en', 'jp', `How do you say “${item.en}”?`);
-    case 'audio2jp': return choice('audio', 'jp', 'What do you hear?');
-    case 'read': return { ...choice('jp', 'romaji', 'How do you read this?'), hint: false };
+    case 'audio2kana': return choice('audio', 'kana', t('What do you hear?'));
+    case 'jp2en': return choice('jp', 'en', t('What does this mean?'));
+    case 'en2jp': return choice('en', 'jp', t('How do you say “{en}”?', { en: item.en, lang: langName() }));
+    case 'audio2jp': return choice('audio', 'jp', t('What do you hear?'));
+    case 'read': return { ...choice('jp', 'romaji', t('How do you read this?')), hint: false };
     case 'kanji2meaning':
     case 'kword2meaning':
     case 'radical2meaning':
-      return { ...choice('kanji', 'en', 'What does this mean?'), hint: false, clue: item.story || null };
+      return { ...choice('kanji', 'en', t('What does this mean?')), hint: false, clue: item.story || null };
     case 'meaning2kanji':
     case 'meaning2radical':
-      return { ...choice('en', 'jp', `Which one means “${item.en}”?`), hint: false, clue: item.story || null };
+      return { ...choice('en', 'jp', t('Which one means “{en}”?', { en: item.en })), hint: false, clue: item.story || null };
     case 'kword2reading':
-      return { ...choice('kanji', 'romaji', 'How do you read this?'), hint: false, clue: item.kanji.map((k) => `${k} = ${ITEMS.get(`kj-${k}`)?.en || ''}`).join(' · ') };
+      return { ...choice('kanji', 'romaji', t('How do you read this?')), hint: false, clue: item.kanji.map((k) => `${k} = ${ITEMS.get(`kj-${k}`)?.en || ''}`).join(' · ') };
     case 'speak':
-      return { ...base, type: 'speak', instruction: 'Say it out loud' };
+      return { ...base, type: 'speak', instruction: t('Say it out loud') };
     case 'spell': {
       const answer = [...item.jp];
       const known = [...ctx.chars];
@@ -184,7 +237,7 @@ function buildExercise(item, type, ctx) {
       const answer = enWords(item.en);
       const others = sentencePool(ctx).flatMap((s) => enWords(s.en));
       const extra = tileDistractors(answer, [...others, ...GLOSS_TILES], 3, ctx);
-      return { ...base, type: 'build', mode: 'jp2en', answer, accept: item.accept, tiles: shuffle([...answer, ...extra], ctx.rng), instruction: 'Translate this sentence' };
+      return { ...base, type: 'build', mode: 'jp2en', answer, accept: item.accept, tiles: shuffle([...answer, ...extra], ctx.rng), instruction: t('Translate this sentence') };
     }
     case 'build-en2jp':
     case 'build-audio':
@@ -195,8 +248,25 @@ function buildExercise(item, type, ctx) {
       const mode = { 'build-audio': 'audio', fast: 'fast', 'build-en2jp': 'en2jp' }[type];
       const tiles = shuffle([...answer, ...extra], ctx.rng);
       const tileRomaji = base.hint ? tiles.map(romajiOfChunk) : null;
-      const instruction = { audio: 'Tap what you hear', fast: 'Fast talk! Tap the words you hear', en2jp: `Translate into ${L.name}` }[mode];
+      const instruction = { audio: t('Tap what you hear'), fast: t('Fast talk! Tap the words you hear'), en2jp: t('Translate into {lang}', { lang: langName() }) }[mode];
       return { ...base, type: 'build', mode, answer, tiles, tileRomaji, instruction };
+    }
+    // Typed from sound or from the meaning: the player's recall task with another prompt.
+    case 'dictation': return { ...base, type: 'recall', mode: 'dictation', instruction: t('Type what you hear') };
+    case 'type-translate': return { ...base, type: 'recall', mode: 'translate', instruction: t('Type the meaning') };
+    // A sentence with one chunk hidden: pick it from three.
+    case 'cloze': {
+      const pickable = item.jp.map((c, i) => i).filter((i) => latinKey(item.jp[i]).length >= 2);
+      const gap = pick(pickable.length ? pickable : item.jp.map((c, i) => i), ctx.rng);
+      const answer = item.jp[gap];
+      return { ...base, type: 'cloze', prompt: item.jp.map((c, i) => (i === gap ? null : c)), answer, en: item.en,
+        options: shuffle([answer, ...clozeDistractors(item, ctx)], ctx.rng), instruction: t('Fill the gap — {en}', { en: item.en }) };
+    }
+    // Which article goes with this noun?
+    case 'article': {
+      const p = articleParts(item);
+      return { ...base, type: 'cloze', prompt: [null, p.noun], answer: p.article, en: item.en, art: item.art,
+        options: shuffle(p.group, ctx.rng), instruction: t('Which article goes with “{en}”?', { en: item.en }) };
     }
     default:
       throw new Error(`Unknown question type ${type}`);
@@ -218,7 +288,7 @@ function matchExercise(ids, ctx) {
     return true;
   }).slice(0, 5);
   if (pairs.length < 3) return null;
-  return { type: 'match', untimed: !!ctx.gentle, itemIds: pairs, pairs, right, hint: type === 'word' && pairs.some((id) => ctx.romajiHint(ITEMS.get(id))), instruction: 'Tap the matching pairs' };
+  return { type: 'match', untimed: !!ctx.gentle, itemIds: pairs, pairs, right, hint: type === 'word' && pairs.some((id) => ctx.romajiHint(ITEMS.get(id))), instruction: t('Tap the matching pairs') };
 }
 
 function dialogueExercise(id, ctx) {
@@ -439,6 +509,7 @@ export const DEMO_KINDS = {
   trace: 'Trace characters', read: 'Read words', speak: 'Speak & repeat', fast: 'Fast listening',
   grammar: 'Grammar cards', dialogue: 'Dialogues', kanji: 'Kanji & clues', match: 'Match pairs',
   build: 'Build sentences', listen: 'Listening', intro: 'New word cards',
+  ...(L.latin ? { dictation: 'Dictation', cloze: 'Fill the gap', translate: 'Type the meaning', article: 'Articles' } : {}),
 };
 
 export function demoExercises(kind, state, { rng = makeRng() } = {}) {
@@ -463,6 +534,10 @@ export function demoExercises(kind, state, { rng = makeRng() } = {}) {
     case 'match': return [matchExercise(ids(of('kanji', 5)), ctx), matchExercise(ids(of('word', 5)), ctx), matchExercise(ids(of('kana', 5)), ctx)].filter(Boolean);
     case 'build': return [...make(of('sentence', 2), 'build-jp2en'), ...make(of('sentence', 2), 'build-en2jp')];
     case 'listen': return [...make(of('word', 3), 'audio2jp'), ...make(of('sentence', 2), 'build-audio')];
+    case 'dictation': return [...make(of('word', 2), 'dictation'), ...make(of('sentence', 2), 'dictation')];
+    case 'cloze': return make(of('sentence', 4), 'cloze');
+    case 'translate': return make(of('sentence', 4), 'type-translate');
+    case 'article': return make(shuffle(all.filter((i) => articleParts(i)), rng).slice(0, 4), 'article');
     case 'intro': return of('word', 4).map((w) => ({ type: 'intro', itemId: w.id, itemIds: [], hint: true }));
     default: return [];
   }

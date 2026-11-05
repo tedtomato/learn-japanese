@@ -45,6 +45,19 @@ test('spaced repetition moves items up on success and down on mistakes', () => {
   assert.equal(r.box, MAX_BOX - 2);
 });
 
+test('review dates drift by at most 10% and the same item always drifts the same way', () => {
+  const dues = new Set();
+  for (const id of ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) {
+    const r = review({ box: 3, seen: 4, right: 4, wrong: 0, slow: 0 }, { right: 1, wrong: 0 }, T0, id);
+    const wait = r.due - T0;
+    assert.ok(wait >= INTERVALS[4] * 0.9 && wait <= INTERVALS[4] * 1.1, `${id}: ${wait}`);
+    assert.equal(wait, review({ box: 3, seen: 4, right: 4, wrong: 0, slow: 0 }, { right: 1, wrong: 0 }, T0, id).due - T0);
+    dues.add(wait);
+  }
+  assert.ok(dues.size > 1, 'not all the same');
+  assert.equal(review(null, { right: 0, wrong: 1 }, T0, 'x').due, T0, 'a new mistake is due at once');
+});
+
 test('completing a lesson saves items, XP, level and unlocks the next node', () => {
   const s = defaultState(T0);
   const node = NODES[0];

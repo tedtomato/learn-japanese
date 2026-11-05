@@ -16,13 +16,17 @@ import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPr
 import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey, buyHearts, HEARTS_PRICE } from '../progress.js';
 import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
 import { GRAMMAR } from '../content/pack.js';
-import { jpItem, jpChunk, speechOf, kanaExample } from './text.js';
+import { jpItem, jpChunk, speechOf, kanaExample, LANG_ATTR } from './text.js';
+import { t, langName } from '../strings.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';
 import { rewardPopup, comboBurst } from '../fx.js';
 import { shareButton, wireShare } from '../share.js';
 
-const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', L.cheers[2][0], 'You got it!', 'Perfect!', L.cheers[1][0]];
+const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', L.cheers[2][0], 'You got it!', 'Perfect!', L.cheers[1][0]].map((p) => t(p));
+const SPEED_BONUS_MAX = 5; // XP a session can earn from quick answers
+// Share of the time limit after which a right answer counts as hesitant: a bit more room when building or typing.
+const hesitationRatio = (ex) => (ex.type === 'build' || ex.type === 'recall' ? 0.75 : 0.6);
 const HOUR = 60 * 60 * 1000;
 const pickOne = (list) => list[Math.floor(Math.random() * list.length)];
 
@@ -35,6 +39,7 @@ function timeLimit(ex) {
     case 'build': return Math.round(14 + ex.answer.length * 2.5 + audio);
     case 'match': return 8 + ex.pairs.length * 5;
     case 'speak': return 15;
+    case 'cloze': return 15;
     default: return null;
   }
 }
@@ -47,7 +52,7 @@ function label(item, kind) {
 
 const listenOff = () => (app.state.settings.listenOffUntil || 0) > app.now();
 const speakOff = () => (app.state.settings.speakOffUntil || 0) > app.now();
-const needsListening = (ex) => ex.prompt === 'audio' || ['audio', 'fast'].includes(ex.mode) || ex.type === 'dialogue' || ex.type === 'speak';
+const needsListening = (ex) => ex.prompt === 'audio' || ['audio', 'fast', 'dictation'].includes(ex.mode) || ex.type === 'dialogue' || ex.type === 'speak';
 
 export function startSession(root, { nodeId, itemIds, demo, kanjiOnly, kanaScript } = {}) {
   const now = app.now();
@@ -101,7 +106,7 @@ function renderShell(root, s) {
       <button class="icon-btn quit" aria-label="Quit">${icon('close', 26)}</button>
       <div class="bar bar-lg"><div class="bar-fill" style="width:0%"></div></div>
       ${s.mode === 'lesson' ? html`<span class="stat stat-hearts">${icon('heart', 24)}<b class="hearts-n">${currentHearts(app.state, app.now())}</b></span>`
-        : html`<span class="pill pill-blue">Practice</span>`}
+        : html`<span class="pill pill-blue">${t('Practice')}</span>`}
     </header>
     <div class="timer ${timed ? '' : 'off'}" aria-live="off"><span class="timer-n"></span><div class="timer-bar"><i></i></div></div>
     ${s.node ? html`<div class="lesson-meta"><b>Section ${s.node.sectionIndex + 1} – Unit ${s.node.unitIndex + 1}</b> · ${s.node.title}${s.node.kind === 'lesson' ? ` · Level ${Math.min(level + 1, MAX_LEVEL)}` : ''}</div>` : ''}
@@ -225,17 +230,17 @@ function retryIntro(root, s) {
   // Slow answers and hints come back too, but they were not mistakes: say so.
   const wrong = [...s.missed].filter((id) => s.results.get(id)?.wrong).length;
   const slow = s.missed.size - wrong;
-  const text = !wrong ? 'You got everything right! Let\'s go over the ones that took you a little longer.'
+  const text = t(!wrong ? 'You got everything right! Let\'s go over the ones that took you a little longer.'
     : slow ? 'Let\'s go over the ones you missed, and the ones that took you a little longer.'
-      : 'Let\'s correct the exercises you missed!';
+      : 'Let\'s correct the exercises you missed!');
   mount($('.lesson-body', root), html`<div class="interlude">
     <div class="bubble bubble-lg">${text}</div>
     ${mascot('cheer', 150)}</div>`);
-  footer(root, s, { canCheck: true, text: 'Continue', onCheck: () => { s.done += 1; next(root, s); } });
+  footer(root, s, { canCheck: true, text: t('Continue'), onCheck: () => { s.done += 1; next(root, s); } });
 }
 
 // ---------- Footer & feedback ----------
-function footer(root, s, { canCheck = false, onCheck, text = 'Check', skip } = {}) {
+function footer(root, s, { canCheck = false, onCheck, text = t('Check'), skip } = {}) {
   const foot = $('.lesson-foot', root);
   foot.className = 'lesson-foot';
   mount(foot, html`<div class="foot-inner">
@@ -259,7 +264,7 @@ function record(s, ids, key) {
 }
 
 // Scores the current exercise and shows the feedback bar. opts: answerText, meaning, chosenLabel,
-// item (for "explain"), noHeart (speech recognition misses), timing (from stopTimer).
+// item (for "explain"), noHeart (speech recognition misses), timing (from stopTimer), close (a typing slip: comes back like a slow answer).
 function result(root, s, ok, opts = {}) {
   if (s.checked) return;
   s.checked = true;
@@ -267,8 +272,9 @@ function result(root, s, ok, opts = {}) {
   const ex = s.current;
   const timing = opts.timing ?? stopTimer(s);
   const ids = ex.itemIds || [];
-  const hesitated = ok && ((timing && timing.ratio > 0.6) || !!ex.hinted);
-  const onTime = ok && timing && !timing.late;
+  const hesitated = ok && ((timing && timing.ratio > hesitationRatio(ex)) || !!ex.hinted || !!opts.close);
+  // The speed bonus is for answers in under half the time, and a session pays at most SPEED_BONUS_MAX of it.
+  const onTime = ok && timing && !timing.late && timing.ratio < 0.5 && s.speedBonus < SPEED_BONUS_MAX;
   if (timing) s.timedCount += 1;
   if (onTime) s.speedBonus += 1;
 
@@ -307,22 +313,22 @@ function result(root, s, ok, opts = {}) {
   const foot = $('.lesson-foot', root);
   foot.className = `lesson-foot ${ok ? 'good' : 'bad'}`;
   const badges = [];
-  if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} Speed bonus</span>`);
-  if (hesitated) badges.push(html`<span class="pill pill-orange">${ex.hinted ? 'Used a hint' : 'A bit slow'} — we'll practise it again</span>`);
+  if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} ${t('Speed bonus')}</span>`);
+  if (hesitated) badges.push(html`<span class="pill pill-orange">${opts.close ? t('Almost right') : ex.hinted ? t('Used a hint') : t('A bit slow')} — ${t('we\'ll practise it again')}</span>`);
   // How sure were you? A lucky guess comes back like a slow answer; a slow answer you knew does not.
   const sureable = ok && ids.length && !ex.hinted && ex.type !== 'intro' && ex.type !== 'match';
   if (sureable) badges.push(html`<button class="pill pill-sure" data-sure="${hesitated ? 'knew' : 'guessed'}">${hesitated ? '😎 I knew it' : '🤔 I guessed'}</button>`);
   mount(foot, html`<div class="foot-inner feedback">
     <div class="fb-text">
       <span class="fb-icon">${icon(ok ? 'check' : 'close', 26)}</span>
-      <div><b>${ok ? pickOne(PRAISE) : 'Correct answer:'}</b>
+      <div><b>${ok ? pickOne(PRAISE) : t('Correct answer:')}</b>
       ${!ok && opts.answerText ? html`<p class="jp-mix">${opts.answerText}</p>` : ''}
       ${opts.meaning ? html`<p class="fb-meaning">${item?.type === 'fword' && item.art ? art(item.art, 'art-inline') : ''} ${opts.meaning}</p>` : ''}
       ${badges.length ? html`<p class="fb-badges">${badges}</p>` : ''}</div>
     </div>
     <div class="fb-actions">
-      ${canExplain ? html`<button class="btn btn-ghost explain">Explain</button>` : ''}
-      <button class="btn ${ok ? 'btn-primary' : 'btn-danger'} check">${ok ? 'Continue' : 'Got it'}</button>
+      ${canExplain ? html`<button class="btn btn-ghost explain">${t('Explain')}</button>` : ''}
+      <button class="btn ${ok ? 'btn-primary' : 'btn-danger'} check">${ok ? t('Continue') : t('Got it')}</button>
     </div></div>`);
   // No auto-continue: the learner moves on when ready, so there is always time to tap Explain.
   const go = () => {
@@ -548,7 +554,7 @@ function introHtml(item, hint) {
 
 function renderIntro(root, s) {
   const item = ITEMS.get(s.current.itemId);
-  const kindLabel = { kana: 'New character', word: 'New word', sentence: 'New phrase', kanji: 'New kanji', kword: 'New kanji word', radical: 'New radical' }[item.type];
+  const kindLabel = t({ kana: 'New character', word: 'New word', sentence: 'New phrase', kanji: 'New kanji', kword: 'New kanji word', radical: 'New radical' }[item.type]);
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-gold">${icon('star', 14)} ${kindLabel}</span></p>
     ${speakerBubble(s, html`<div class="intro-card">${introHtml(item, s.current.hint)}
       <div class="intro-play"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 24)}</button>
@@ -556,7 +562,7 @@ function renderIntro(root, s) {
   wirePlay(root, s);
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   sayAs(root, s.speaker, speechOf(item));
-  footer(root, s, { canCheck: true, text: 'Continue', onCheck: () => { s.done += 1; next(root, s); } });
+  footer(root, s, { canCheck: true, text: t('Continue'), onCheck: () => { s.done += 1; next(root, s); } });
 }
 
 function renderTrace(root, s) {
@@ -600,6 +606,9 @@ function promptFor(root, s, ex, item) {
     ${canPeek ? html`<button class="show-romaji">Show ${L.roman}</button>` : ''}</div>`);
 }
 
+// A wrong answer made up for the question (the noun under the wrong article) is carried by the exercise.
+const optionItem = (ex, id) => ex.fakes?.[id] || ITEMS.get(id);
+
 function optionHtml(opt, ex) {
   if (ex.answerKind === 'en') return html`<span class="opt-label">${opt.en}</span>`;
   if (ex.answerKind === 'romaji') return html`<span class="opt-label">${opt.romaji}</span>`;
@@ -608,30 +617,53 @@ function optionHtml(opt, ex) {
   return html`<span class="opt-label fit ${isKana ? 'jp-lg' : ''} ${isKanji ? 'opt-kanji' : ''}">${isKana || isKanji ? html`<span class="jp">${opt.jp}</span>` : jpItem(opt, ex.hint)}</span>`;
 }
 
-// Recall without options: the meaning is shown, the learner types the word in romaji. Typing is
-// harder than picking, so a miss costs no heart.
+// Recall without options, typed. By default the meaning is shown and the learner types the word in
+// romaji. Latin-alphabet courses add two more: `dictation` (hear a word or sentence, type it) and
+// `translate` (read a sentence, type its meaning). Typing is harder than picking, so a miss costs no heart.
 function renderRecall(root, s) {
   const ex = s.current;
   const item = ITEMS.get(ex.itemId);
-  mount($('.lesson-body', root), html`<p class="instruction">How do you say this in ${L.name}?</p>
-    ${speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`)}
-    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type it in ${L.roman}…" aria-label="Your answer in ${L.roman}">
-    <p class="muted small recall-help">From memory — no choices this time! ${L.latin ? 'Accents and capitals don\'t matter.' : L.code === 'zh' ? 'Tone marks and spaces don\'t matter.' : 'Spaces and long vowels (ou / o) don\'t matter.'}</p>
-    ${memoryHint(item, true)}`);
+  const target = item.type === 'sentence' ? joinChunks(item.jp) : item.jp; // what is typed in dictation
+  const answers = [item.en, ...(item.accept || [])]; // what is accepted when translating
+  const help = L.latin ? 'Accents and capitals don\'t matter.' : L.code === 'zh' ? 'Tone marks and spaces don\'t matter.' : 'Spaces and long vowels (ou / o) don\'t matter.';
+  const mode = ex.mode;
+  let prompt = speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`);
+  let placeholder = t('Type it in {lang}…', { lang: langName() });
+  let instruction = t('How do you say this in {lang}?', { lang: langName() });
+  let intro = 'From memory — no choices this time!';
+  if (mode === 'dictation') {
+    prompt = speakerBubble(s, playButtons(speechOf(item)));
+    [placeholder, instruction, intro] = [t('Type what you hear…'), ex.instruction, 'Listen, then type what you hear.'];
+  } else if (mode === 'translate') {
+    prompt = promptFor(root, s, { ...ex, prompt: 'jp' }, item);
+    [placeholder, instruction, intro] = [t('Type the meaning…'), ex.instruction, 'Type it in your own words.'];
+  }
+  mount($('.lesson-body', root), html`<p class="instruction">${instruction}</p>
+    ${prompt}
+    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${placeholder}" aria-label="${t('Your answer')}" ${mode === 'translate' ? '' : html`lang="${LANG_ATTR}"`}>
+    <p class="muted small recall-help">${intro} ${mode === 'translate' ? 'Capitals and punctuation don\'t matter.' : help}</p>
+    ${mode ? '' : memoryHint(item, true)}`);
+  wirePlay(root, s);
   $('.hint-btn', root)?.addEventListener('click', (e) => {
     e.currentTarget.remove();
     $('.hint-body', root).hidden = false;
     ex.hinted = true;
   });
+  if (mode === 'dictation' || mode === 'translate') sayAs(root, s.speaker, speechOf(item));
   startTimer(root, s, null);
   const input = $('.recall-input', root);
+  const answerText = mode === 'translate' ? item.en : mode === 'dictation' ? target : withRoman(item.jp, item.romaji);
+  const said = mode ? `${target} = ${item.en}` : `${withRoman(item.jp, item.romaji)} = ${item.en}`;
   const check = () => {
     if (s.checked || !input.value.trim()) return;
-    const match = romajiMatch(input.value, item.romaji);
+    const match = mode === 'translate' ? (answers.some((a) => glossKey(a) === glossKey(input.value)) ? 'exact' : false)
+      : romajiMatch(input.value, mode === 'dictation' ? target : item.romaji);
     input.disabled = true;
     input.classList.add(match ? 'right' : 'wrong');
-    sayAs(root, s.speaker, speechOf(item));
-    result(root, s, !!match, { answerText: withRoman(item.jp, item.romaji), meaning: match === 'close' ? `Almost! It's spelled ${L.latin ? item.jp : `${item.romaji} (${item.jp})`}` : match ? `${withRoman(item.jp, item.romaji)} = ${item.en}` : `means "${item.en}"`, chosenLabel: input.value, noHeart: true, timing: null });
+    if (mode !== 'translate') sayAs(root, s.speaker, speechOf(item));
+    result(root, s, !!match, { answerText, close: match === 'close',
+      meaning: match === 'close' ? `Almost! It's spelled ${L.latin ? target : `${item.romaji} (${item.jp})`}` : match || mode ? said : `means "${item.en}"`,
+      chosenLabel: input.value, noHeart: true, timing: null });
   };
   input.addEventListener('input', () => setCheckEnabled(root, !!input.value.trim()));
   input.addEventListener('keydown', (e) => {
@@ -643,12 +675,13 @@ function renderRecall(root, s) {
   });
   footer(root, s, {
     onCheck: check,
-    skip: { label: "I don't know", onSkip: () => {
-      if (s.checked) return;
-      input.disabled = true;
-      sayAs(root, s.speaker, speechOf(item));
-      result(root, s, false, { answerText: withRoman(item.jp, item.romaji), meaning: `means "${item.en}"`, noHeart: true, timing: null });
-    } },
+    skip: mode === 'dictation' ? { label: t("Can't listen now"), onSkip: () => skipListening(root, s, 'listen') }
+      : { label: t("I don't know"), onSkip: () => {
+        if (s.checked) return;
+        input.disabled = true;
+        sayAs(root, s.speaker, speechOf(item));
+        result(root, s, false, { answerText, meaning: mode ? said : `means "${item.en}"`, noHeart: true, timing: null });
+      } },
   });
   setTimeout(() => input.focus(), 250);
 }
@@ -658,7 +691,7 @@ function renderGuess(root, s) {
   const ex = s.current;
   const item = ITEMS.get(ex.itemId);
   startTimer(root, s, null);
-  mount($('.lesson-body', root), html`<p class="instruction">New word — have a guess!</p>
+  mount($('.lesson-body', root), html`<p class="instruction">${t('New word — have a guess!')}</p>
     ${speakerBubble(s, html`<button class="say-inline" aria-label="Play">${icon('speaker', 22)}</button><span class="jp-lg guess-word">${jpItem(item, true)}</span>`)}
     <p class="muted small guess-help">No pressure: guessing first, even wrong, helps you remember it.</p>
     <div class="options list">${ex.options.map((en, i) => html`<button class="option" data-i="${i}"><span class="key">${i + 1}</span><span class="opt-label">${en}</span></button>`)}</div>`);
@@ -678,8 +711,8 @@ function renderGuess(root, s) {
     const foot = $('.lesson-foot', root);
     foot.className = `lesson-foot ${ok ? 'good' : 'guess'}`;
     mount(foot, html`<div class="foot-inner feedback"><div class="fb-text"><span class="fb-icon">${ok ? icon('check', 26) : '💡'}</span>
-      <div><b>${ok ? 'Good guess!' : 'Nice try!'}</b><p class="fb-meaning">${withRoman(item.jp, item.romaji)} = ${item.en}</p></div></div>
-      <div class="fb-actions"><button class="btn btn-primary check">Continue</button></div></div>`);
+      <div><b>${ok ? t('Good guess!') : t('Nice try!')}</b><p class="fb-meaning">${withRoman(item.jp, item.romaji)} = ${item.en}</p></div></div>
+      <div class="fb-actions"><button class="btn btn-primary check">${t('Continue')}</button></div></div>`);
     $('.check', foot).addEventListener('click', () => { s.done += 1; next(root, s); });
   };
   $$('.option', root).forEach((b) => b.addEventListener('click', () => pickGuess(b)));
@@ -687,7 +720,7 @@ function renderGuess(root, s) {
     const b = $$('.option', root)[Number(key) - 1];
     if (b) pickGuess(b);
   };
-  footer(root, s, { text: 'Pick a guess' });
+  footer(root, s, { text: t('Pick a guess') });
 }
 
 function renderChoice(root, s) {
@@ -698,7 +731,7 @@ function renderChoice(root, s) {
     ${promptFor(root, s, ex, item)}
     ${item.type === 'kana' && item.example ? html`<div class="kana-hint"><button class="link hint-btn">💡 Hint</button><div class="hint-body" hidden>${kanaExample(item, { asHint: true })}</div></div>` : ''}
     ${memoryHint(item, ex.kind === 'en2jp' || ex.kind === 'jp2en')}
-    <div class="options ${grid ? 'grid' : 'list'}">${ex.options.map((id, i) => html`<button class="option" data-id="${id}"><span class="key">${i + 1}</span>${optionHtml(ITEMS.get(id), ex)}</button>`)}</div>`);
+    <div class="options ${grid ? 'grid' : 'list'}">${ex.options.map((id, i) => html`<button class="option" data-id="${id}"><span class="key">${i + 1}</span>${optionHtml(optionItem(ex, id), ex)}</button>`)}</div>`);
   wirePlay(root, s);
   // The memory word as a hint; using it brings the character back sooner (like a hesitation).
   $('.hint-btn', root)?.addEventListener('click', (e) => {
@@ -725,14 +758,14 @@ function renderChoice(root, s) {
     });
     if (['word', 'sentence', 'kana', 'kword'].includes(item.type)) sayAs(root, s.speaker, speechOf(item));
     const meaning = item.en && ex.answerKind !== 'en' ? `${item.jp} = ${item.en}` : item.type === 'kana' ? `${item.jp} = ${item.romaji}${item.example ? ` — as in ${item.example.jp} (${item.example.romaji})` : ''}` : item.romaji && !L.latin ? `${item.jp} · ${item.romaji}` : null;
-    result(root, s, ok, { answerText: label(item, ex.answerKind === 'kana' ? 'jp' : ex.answerKind), meaning, chosenLabel: ok ? null : label(ITEMS.get(chosen), ex.answerKind === 'kana' ? 'jp' : ex.answerKind) });
+    result(root, s, ok, { answerText: label(item, ex.answerKind === 'kana' ? 'jp' : ex.answerKind), meaning, chosenLabel: ok ? null : label(optionItem(ex, chosen), ex.answerKind === 'kana' ? 'jp' : ex.answerKind) });
   };
   const choose = (btn) => {
     if (s.checked) return;
     $$('.option', root).forEach((b) => b.classList.toggle('selected', b === btn));
     chosen = btn.dataset.id;
     sfx('tap');
-    if (['jp', 'kana'].includes(ex.answerKind) && ex.prompt !== 'audio') speak(speechOf(ITEMS.get(chosen)), { speaker: s.speaker });
+    if (['jp', 'kana'].includes(ex.answerKind) && ex.prompt !== 'audio') speak(speechOf(optionItem(ex, chosen)), { speaker: s.speaker });
     setCheckEnabled(root, true);
   };
   $$('.option', root).forEach((b) => b.addEventListener('click', () => choose(b)));
@@ -742,14 +775,14 @@ function renderChoice(root, s) {
   };
   footer(root, s, {
     onCheck: check,
-    skip: ex.prompt === 'audio' ? { label: "Can't listen now", onSkip: () => skipListening(root, s, 'listen') } : null,
+    skip: ex.prompt === 'audio' ? { label: t("Can't listen now"), onSkip: () => skipListening(root, s, 'listen') } : null,
   });
 }
 
 function tileButton(ex, i, jpTiles, extra = '') {
   const sub = ex.tileRomaji?.[i];
   // The word's syllables sit side by side in one row (the tile itself stacks its content).
-  return html`<button class="tile ${extra} ${jpTiles ? 'jp' : ''}" data-i="${i}">${jpTiles && sub ? html`<span class="ruby-on tile-word">${jpChunk(ex.tiles[i], true, sub)}</span>` : ex.tiles[i]}</button>`;
+  return html`<button class="tile ${extra} ${jpTiles ? 'jp' : ''}" ${jpTiles ? html`lang="${LANG_ATTR}"` : ''} data-i="${i}">${jpTiles && sub ? html`<span class="ruby-on tile-word">${jpChunk(ex.tiles[i], true, sub)}</span>` : ex.tiles[i]}</button>`;
 }
 
 function renderBuild(root, s) {
@@ -797,7 +830,7 @@ function renderBuild(root, s) {
     }),
   );
   footer(root, s, {
-    skip: ex.mode === 'audio' || ex.mode === 'fast' ? { label: "Can't listen now", onSkip: () => skipListening(root, s, 'listen') } : null,
+    skip: ex.mode === 'audio' || ex.mode === 'fast' ? { label: t("Can't listen now"), onSkip: () => skipListening(root, s, 'listen') } : null,
     onCheck: () => {
       const given = placed.map((i) => ex.tiles[i]);
       // When listening, tiles that sound the same as the answer count too.
@@ -834,7 +867,7 @@ function renderMatch(root, s) {
   const sel = { l: null, r: null };
   const wrongIds = new Set();
   let matched = 0;
-  footer(root, s, { canCheck: false, text: 'Check', onCheck: () => {} });
+  footer(root, s, { canCheck: false, text: t('Check'), onCheck: () => {} });
   $$('.match-btn', root).forEach((b) =>
     b.addEventListener('click', () => {
       if (b.classList.contains('right') || s.checked) return;
@@ -903,12 +936,12 @@ function renderSpeak(root, s) {
       result(root, s, false, { answerText: item.text || item.jp, meaning: L.latin ? item.en : item.romaji, noHeart: true });
     }
   });
-  footer(root, s, { canCheck: false, text: 'Check', skip: { label: "Can't speak now", onSkip: () => skipListening(root, s, 'speak') } });
+  footer(root, s, { canCheck: false, text: t('Check'), skip: { label: t("Can't speak now"), onSkip: () => skipListening(root, s, 'speak') } });
 }
 
 function renderGrammar(root, s) {
   const g = GRAMMAR[s.current.grammarId];
-  const blocks = html`<div class="g-blocks">${g.blocks.map((b) => html`<div class="g-block g-${b.role}"><span class="jp">${jpChunk(b.jp, true)}</span><small>${b.en}</small></div>`)}</div>`;
+  const blocks = html`<div class="g-blocks">${g.blocks.map((b) => html`<div class="g-block g-${b.role}"><span class="jp" lang="${LANG_ATTR}">${jpChunk(b.jp, true)}</span><small>${b.en}</small></div>`)}</div>`;
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">Grammar in 15 seconds</span></p>
     <div class="card grammar-card"><h2>${g.title}</h2>${blocks}<p class="g-en">= ${g.en}</p><p>${g.rule}</p><p class="muted small">💡 ${g.tip}</p></div>`);
   speak(joinChunks(g.blocks.map((b) => b.jp)), { speaker: s.speaker });
@@ -918,8 +951,8 @@ function renderGrammar(root, s) {
 function grammarCheck(root, s, g) {
   const { check } = g;
   mount($('.lesson-body', root), html`<p class="instruction">Fill the gap — ${check.en}</p>
-    <div class="g-blocks g-quiz">${check.prompt.map((c) => (c ? html`<div class="g-block g-noun"><span class="jp">${jpChunk(c, true)}</span></div>` : html`<div class="g-block g-gap">?</div>`))}</div>
-    <div class="options grid">${check.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key">${i + 1}</span><span class="jp jp-lg">${jpChunk(o, true)}</span></button>`)}</div>`);
+    <div class="g-blocks g-quiz">${check.prompt.map((c) => (c ? html`<div class="g-block g-noun"><span class="jp" lang="${LANG_ATTR}">${jpChunk(c, true)}</span></div>` : html`<div class="g-block g-gap">?</div>`))}</div>
+    <div class="options grid">${check.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key">${i + 1}</span><span class="jp jp-lg" lang="${LANG_ATTR}">${jpChunk(o, true)}</span></button>`)}</div>`);
   startTimer(root, s, 15);
   const pickIt = (b) => {
     if (s.checked) return;
@@ -937,7 +970,36 @@ function grammarCheck(root, s, g) {
     const b = $$('.option', root)[Number(key) - 1];
     if (b) pickIt(b);
   };
-  footer(root, s, { canCheck: false, text: 'Pick an answer', onCheck: () => {} });
+  footer(root, s, { canCheck: false, text: t('Pick an answer'), onCheck: () => {} });
+}
+
+// A sentence (or a noun) with a gap, and three (or two) tiles to fill it with.
+function renderCloze(root, s) {
+  const ex = s.current;
+  const item = ITEMS.get(ex.itemId);
+  mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
+    ${ex.art ? html`<div class="cloze-art">${art(ex.art, 'art-lg')}</div>` : ''}
+    <div class="g-blocks g-quiz">${ex.prompt.map((c) => (c === null ? html`<div class="g-block g-gap">?</div>` : html`<div class="g-block g-noun"><span class="jp" lang="${LANG_ATTR}">${c}</span></div>`))}</div>
+    <div class="options grid">${ex.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key">${i + 1}</span><span class="jp jp-lg" lang="${LANG_ATTR}">${o}</span></button>`)}</div>`);
+  startTimer(root, s, timeLimit(ex));
+  const pickIt = (b) => {
+    if (s.checked) return;
+    const ok = b.dataset.o === ex.answer;
+    $$('.option', root).forEach((x) => {
+      x.disabled = true;
+      if (x.dataset.o === ex.answer) x.classList.add('right');
+      else if (x === b) x.classList.add('wrong');
+    });
+    $('.g-gap', root).textContent = ex.answer;
+    sayAs(root, s.speaker, speechOf(item));
+    result(root, s, ok, { answerText: ex.answer, meaning: `${item.type === 'sentence' ? joinChunks(item.jp) : item.jp} = ${item.en}`, chosenLabel: ok ? null : b.dataset.o });
+  };
+  $$('.option', root).forEach((b) => b.addEventListener('click', () => pickIt(b)));
+  s.keyHandler = (key) => {
+    const b = $$('.option', root)[Number(key) - 1];
+    if (b) pickIt(b);
+  };
+  footer(root, s, { canCheck: false, text: t('Pick an answer'), onCheck: () => {} });
 }
 
 function renderDialogue(root, s) {
@@ -993,7 +1055,7 @@ function renderDialogue(root, s) {
     const btn = $$('.dl-question .option', root)[Number(key) - 1];
     if (btn && !$('.dl-question', root).hidden) pickIt(btn);
   };
-  footer(root, s, { canCheck: false, text: 'Listen…', onCheck: () => {}, skip: { label: "Can't listen now", onSkip: () => skipListening(root, s, 'listen') } });
+  footer(root, s, { canCheck: false, text: 'Listen…', onCheck: () => {}, skip: { label: t("Can't listen now"), onSkip: () => skipListening(root, s, 'listen') } });
 }
 
 function renderTidbit(root, s) {
@@ -1007,12 +1069,12 @@ function renderTidbit(root, s) {
   $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   wireShare($('.lesson-body', root));
   if (t.kind === 'phrase') sayAs(root, s.speaker, t.item.jp.replace(/[～~]/g, ''));
-  footer(root, s, { canCheck: true, text: 'Continue', onCheck: () => { s.done += 1; next(root, s); } });
+  footer(root, s, { canCheck: true, text: t('Continue'), onCheck: () => { s.done += 1; next(root, s); } });
 }
 
 const RENDERERS = {
   recall: renderRecall, guess: renderGuess, intro: renderIntro, trace: renderTrace, choice: renderChoice, build: renderBuild, match: renderMatch,
-  speak: renderSpeak, grammar: renderGrammar, dialogue: renderDialogue, tidbit: renderTidbit,
+  speak: renderSpeak, cloze: renderCloze, grammar: renderGrammar, dialogue: renderDialogue, tidbit: renderTidbit,
 };
 
 // ---------- Finish ----------
@@ -1029,16 +1091,16 @@ function finish(root, s) {
   cleanup(s);
   app.inLesson = false;
   const now = app.now();
-  const bonusXp = Math.min(10, s.speedBonus);
+  const bonusXp = Math.min(SPEED_BONUS_MAX, s.speedBonus);
   const summary = completeSession(app.state, { node: s.node, mode: s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp });
   app.save();
   sfx('complete');
   const secs = Math.round((now - s.startedAt) / 1000);
   const accuracy = s.answered ? Math.round(((s.answered - s.mistakes) / s.answered) * 100) : 100;
-  const title = s.mode === 'practice' ? 'Practice complete!' : s.node?.kind === 'story' ? 'Story complete!' : summary.perfect ? 'Perfect lesson!' : 'Lesson complete!';
+  const title = t(s.mode === 'practice' ? 'Practice complete!' : s.node?.kind === 'story' ? 'Story complete!' : summary.perfect ? 'Perfect lesson!' : 'Lesson complete!');
   const extras = [];
   if (summary.streakExtended) extras.push(html`<p class="pill pill-orange">${icon('flame', 16)} ${summary.streak} day streak!</p>`);
-  if (bonusXp) extras.push(html`<p class="pill pill-gold">${icon('bolt', 16)} Speed bonus +${bonusXp} XP</p>`);
+  if (bonusXp) extras.push(html`<p class="pill pill-gold">${icon('bolt', 16)} ${t('Speed bonus +{n} XP', { n: bonusXp })}</p>`);
   if (summary.goalReached) extras.push(html`<p class="pill pill-gold">${icon('star', 16)} Daily goal reached! +5 gems</p>`);
   if (summary.mistakesCleared) extras.push(html`<p class="pill pill-green">${icon('check', 16)} All mistakes fixed! +5 gems</p>`);
   if (s.mode === 'practice') extras.push(html`<p class="pill pill-red">${icon('heart', 16)} +1 heart</p>`);
@@ -1056,7 +1118,7 @@ function finish(root, s) {
     </div>
     ${weekStrip(now)}
     ${s.node?.kind === 'review' ? html`<div class="trophy-share">${art('🏆', 'art-lg')}<div><b>${s.node.unit.title} trophy earned!</b>${shareButton(`🏆 I earned the "${s.node.unit.title}" trophy learning ${L.name} with Hajime! ${summary.streak > 1 ? `🔥 ${summary.streak} day streak.` : ''}`, 'Share on WhatsApp')}</div></div>` : ''}
-    <button class="btn btn-primary btn-block continue">Continue</button>
+    <button class="btn btn-primary btn-block continue">${t('Continue')}</button>
   </div>`);
   wireShare(root);
   $('.continue', root).addEventListener('click', () => {

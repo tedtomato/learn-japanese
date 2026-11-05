@@ -11,6 +11,12 @@ export const CHANGELOG = [
     'The English course reads prompts aloud in French; speaking checks are stricter for short, look-alike words (bonjour / bonsoir)',
     'Updates no longer reload the app in the middle of a mission, drill, sign spotter, tone trainer, quiz or listening mode',
     'If your phone is too full to save progress, the app now tells you',
+    'French, Spanish and English: new tasks — type what you hear, fill the gap in a sentence, type a sentence\'s meaning, and pick the right article (le / la, un / una)',
+    'Now and then a question offers the same noun under the wrong article (la café) as a wrong answer',
+    'The English course\'s instructions, feedback and buttons are in French',
+    'The speed bonus is for answers in under half the time, at most +5 XP a lesson; slow typing and builds are no longer flagged as hesitant so early',
+    'Reviews are spread out a little (±10%), and a typo that was "almost right" brings the word back sooner',
+    'Screen readers now use the right voice for the language you are learning',
   ] },
   { version: '0.91', date: '2 Nov 2026', changes: [
     'The language menu now opens every time you start the app: pick today\'s language and see your progress in each one. Close it with ✕ to carry on where you were',

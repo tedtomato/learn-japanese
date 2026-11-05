@@ -206,7 +206,7 @@ export const mistakeIds = (state) => learnedItemIds(state)
 // results: Map itemId → { right, wrong }. mode: 'lesson' | 'practice'.
 export function completeSession(state, { node, mode, results, mistakes, now, bonusXp = 0 }) {
   const missedBefore = mistakeIds(state).length;
-  for (const [id, r] of results) state.items[id] = review(state.items[id], r, now);
+  for (const [id, r] of results) state.items[id] = review(state.items[id], r, now, id);
   const mistakesLeft = mistakeIds(state).length;
   const mistakesCleared = missedBefore > 0 && mistakesLeft === 0;
 
@@ -251,7 +251,7 @@ export function completeListening(state, heard, now) {
 
 // Sign spotter: each answer is a review of the sign's kanji; +1 gem per right answer.
 export function recordSigns(state, results, gems, now) {
-  for (const [id, r] of results) if (state.items[id]) state.items[id] = review(state.items[id], r, now);
+  for (const [id, r] of results) if (state.items[id]) state.items[id] = review(state.items[id], r, now, id);
   state.gems += gems;
 }
 

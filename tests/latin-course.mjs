@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 
 const { ITEMS, NODES, SECTIONS } = await import('../app/js/course.js');
-const { generateLesson, generatePractice, makeRng } = await import('../app/js/lesson/generate.js');
+const { generateLesson, generatePractice, makeRng, demoExercises, DEMO_KINDS, articleParts } = await import('../app/js/lesson/generate.js');
+const { latinKey } = await import('../app/js/normalise.js');
 const { defaultState } = await import('../app/js/progress.js');
 const { L } = await import('../app/js/lang.js');
 const { romajiMatch, speechKey, sameTiles } = await import('../app/js/normalise.js');
@@ -127,5 +128,77 @@ export function latinCourseTests(code) {
     assert.ok(!sameTiles(['un', 'a'], ['una']));
     assert.ok(sameTiles(['Je', 'parle'], ['je', 'parle']));
     assert.ok(!sameTiles(['je', 'parle'], ['parle', 'je']));
+  });
+
+  test(`${code}: dictation, cloze, type-translate and article tasks are generated and well formed`, () => {
+    const state = defaultState(T0);
+    const kinds = { dictation: 'dictation', cloze: 'cloze', translate: 'type-translate', article: 'article' };
+    for (const k of Object.keys(kinds)) assert.ok(DEMO_KINDS[k], `${k} is in the test lab`);
+    const made = {};
+    for (let seed = 1; seed <= 6; seed++) {
+      for (const [demo, kind] of Object.entries(kinds)) {
+        for (const ex of demoExercises(demo, state, { rng: makeRng(seed) })) {
+          assert.equal(ex.kind, kind);
+          (made[kind] ||= []).push(ex);
+          const item = ITEMS.get(ex.itemId);
+          assert.deepEqual(ex.itemIds, [ex.itemId]);
+          if (kind === 'dictation' || kind === 'type-translate') {
+            assert.equal(ex.type, 'recall');
+            assert.ok(item.type === 'sentence' || kind === 'dictation');
+          } else {
+            assert.equal(ex.type, 'cloze');
+            assert.ok(ex.options.includes(ex.answer) && new Set(ex.options.map(latinKey)).size === ex.options.length, `${kind}: answer among distinct options`);
+            assert.equal(ex.prompt.filter((c) => c === null).length, 1, `${kind}: one gap`);
+          }
+          if (kind === 'cloze') {
+            assert.equal(ex.options.length, 3);
+            assert.ok(item.jp.includes(ex.answer));
+            assert.ok(ex.prompt.every((c, i) => c === null ? item.jp[i] === ex.answer : c === item.jp[i]));
+            for (const o of ex.options.filter((o) => o !== ex.answer)) assert.ok(!item.jp.some((c) => latinKey(c) === latinKey(o)), `distractor ${o} is not in ${item.text}`);
+          }
+          if (kind === 'article') {
+            const p = articleParts(item);
+            assert.ok(p && p.article === ex.answer && ex.prompt[1] === p.noun && ex.options.length === 2);
+          }
+        }
+      }
+    }
+    for (const kind of ['dictation', 'cloze', 'type-translate']) assert.ok(made[kind]?.length, `${kind} was generated`);
+    if (code !== 'en') assert.ok(made.article?.length, 'article was generated');
+    // Words whose article is ambiguous are never asked about.
+    for (const w of [...ITEMS.values()].filter((i) => i.type === 'word' && /^(l'|les |los |las )/i.test(i.jp))) assert.equal(articleParts(w), null, w.jp);
+    // They appear in lessons too, and dictation needs listening.
+    const types = new Set();
+    const heard = new Set();
+    for (const node of NODES.filter((n) => n.kind === 'lesson')) {
+      for (const canListen of [true, false]) {
+        for (const ex of generateLesson(node, state, { rng: makeRng(7), now: T0, level: 3, canListen }).exercises) {
+          if (['dictation', 'cloze', 'type-translate', 'article'].includes(ex.kind)) (canListen ? types : heard).add(ex.kind);
+        }
+      }
+    }
+    assert.ok(types.size >= 2, 'new task types turn up in lessons');
+    assert.ok(!heard.has('dictation'), 'no dictation when the learner cannot listen');
+  });
+
+  test(`${code}: wrong-article distractors are made up for nouns with an article, and never for ambiguous ones`, () => {
+    const state = defaultState(T0);
+    const nouns = [...ITEMS.values()].filter((i) => articleParts(i)).map((i) => i.id);
+    if (code === 'en') return;
+    assert.ok(nouns.length >= 10, 'enough nouns with an article');
+    let fakes = 0;
+    for (let seed = 1; seed <= 30; seed++) {
+      for (const ex of generatePractice(state, { rng: makeRng(seed), now: T0, itemIds: nouns.slice(0, 10) }).exercises) {
+        for (const [id, fake] of Object.entries(ex.fakes || {})) {
+          fakes += 1;
+          const item = ITEMS.get(ex.itemId);
+          const p = articleParts(item);
+          assert.equal(ex.answerKind, 'jp');
+          assert.equal(fake.jp, `${p.wrong} ${p.noun}`);
+          assert.ok(ex.options.includes(id) && ex.options.includes(item.id) && new Set(ex.options).size === ex.options.length);
+        }
+      }
+    }
+    assert.ok(fakes > 0, 'some questions offer the wrong article');
   });
 }

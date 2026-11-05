@@ -42,7 +42,7 @@ function explainGoal() {
     <ul>
       <li>${icon('star', 16)} Each lesson or practice: <b>+10 XP</b></li>
       <li>${icon('check', 16)} No mistakes: <b>+5 XP</b></li>
-      <li>${icon('bolt', 16)} Quick answers: up to <b>+10 XP</b> speed bonus</li>
+      <li>${icon('bolt', 16)} Answers in under half the time: <b>+1 XP</b> each, up to <b>+5 XP</b> speed bonus</li>
     </ul>
     <p>Reach your goal to earn <b>+5 gems</b>. Studying any amount each day keeps your 🔥 streak going.</p>
     <p class="muted small">Choose your goal:</p>

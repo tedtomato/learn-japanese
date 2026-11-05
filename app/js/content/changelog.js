@@ -370,3 +370,5 @@ export const CHANGELOG = [
 ];
 
 export const APP_RELEASE = CHANGELOG[0].version;
+// "5 Nov 2026" → "Nov 26": the release date shown on the start screen.
+export const APP_RELEASE_DATE = CHANGELOG[0].date.replace(/^\d+ (\w+) \d\d(\d\d)$/, '$1 $2');

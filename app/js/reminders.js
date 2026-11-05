@@ -2,6 +2,7 @@
 // about once a day ("periodic background sync"); if the learner has not studied that day it shows a
 // notification. The app leaves the worker a small note in Cache Storage, since the worker cannot read
 // the progress kept in localStorage.
+import { L } from './lang.js';
 import { dayKey, displayStreak, dueItemIds } from './progress.js';
 
 const NOTE_CACHE = 'reminder-note';
@@ -19,6 +20,8 @@ export function writeReminderNote(state, now) {
     streak: displayStreak(state, now),
     due: dueItemIds(state, now).filter((id) => state.items[id].seen > 0).length,
     today: dayKey(now),
+    name: L.name,
+    say: L.titleSay,
   };
   caches.open(NOTE_CACHE)
     .then((c) => c.put(NOTE_URL, new Response(JSON.stringify(note), { headers: { 'Content-Type': 'application/json' } })))

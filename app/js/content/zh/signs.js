@@ -28,7 +28,7 @@ const S = {
   up: { t: '上', r: 'shàng', say: '上', en: 'up' },
   down: { t: '下', r: 'xià', say: '下', en: 'down' },
   shopOpen: { t: '营业中', r: 'yíngyè zhōng', say: '营业中', en: 'open for business' },
-  shopClosed: { t: '关门', r: 'guānmén', say: '关门', en: 'closed' },
+  shopClosed: { t: '休息中', r: 'xiūxi zhōng', say: '休息中', en: 'closed (resting)' },
   noSmoking: { t: '禁止吸烟', r: 'jìnzhǐ xīyān', say: '禁止吸烟', en: 'no smoking' },
   smoking: { t: '吸烟区', r: 'xīyānqū', say: '吸烟区', en: 'smoking area' },
   noEntry: { t: '禁止入内', r: 'jìnzhǐ rùnèi', say: '禁止入内', en: 'no entry' },
@@ -60,7 +60,7 @@ const S = {
   china: { t: '中国', r: 'zhōngguó', say: '中国', en: 'China' },
   foreigners: { t: '外国人', r: 'wàiguórén', say: '外国人', en: 'foreigners' },
   chinese: { t: '中国公民', r: 'zhōngguó gōngmín', say: '中国公民', en: 'Chinese citizens' },
-  mountain: { t: '登山口', r: 'dēngshānkǒu', say: '登山口', en: 'trailhead (mountain path)' },
+  mountain: { t: '登山入口', r: 'dēngshān rùkǒu', say: '登山入口', en: 'trailhead (mountain path)' },
   forest: { t: '森林公园', r: 'sēnlín gōngyuán', say: '森林公园', en: 'forest park' },
 };
 
@@ -95,7 +95,7 @@ export const SIGN_SCENES = [
   { id: 'push', need: ['推', '拉'], q: 'The café door has a metal plate. You want to push it open. Which plate says push?', style: 'door', answer: S.push, wrong: [S.pull] },
   { id: 'pull', need: ['推', '拉'], q: 'Leaving the shop: this door opens towards you. Which plate says pull?', style: 'door', answer: S.pull, wrong: [S.push] },
   { id: 'lift-open', need: ['开', '关'], q: 'Someone is running for the lift! Which button keeps the doors open?', style: 'button', answer: S.doorOpen, wrong: [S.doorClose] },
-  { id: 'closed', need: ['关', '门', '开'], q: 'It\'s 10 p.m. Which sign on the shop door means it\'s closed?', style: 'wood', answer: S.shopClosed, wrong: [S.shopOpen] },
+  { id: 'closed', need: ['中'], q: 'It\'s 10 p.m. Which sign on the shop door means it\'s closed? (营业 = in business, 休息 = resting.)', style: 'wood', answer: S.shopClosed, wrong: [S.shopOpen] },
   { id: 'up', need: ['上', '下'], q: 'Your room is on the 18th floor and you are in the lobby. Which lift button?', style: 'button', answer: S.up, wrong: [S.down] },
   { id: 'no-smoking', need: ['禁', '止', '烟'], q: 'You want a table where nobody smokes. Which sign?', style: 'round', answer: S.noSmoking, wrong: [S.smoking] },
   { id: 'no-entry', need: ['禁', '止', '入'], q: 'A rope across a temple courtyard. Which sign tells you not to go in?', style: 'round', answer: S.noEntry, wrong: [S.entrance, S.exit] },
@@ -111,5 +111,5 @@ export const SIGN_SCENES = [
   { id: 'pharmacy', need: ['医', '院', '药'], q: 'You just need some headache tablets. Which shop?', style: 'street', answer: S.pharmacy, wrong: [S.hospital] },
   { id: 'cash-only', need: ['钱'], q: 'Your phone is dead but you have banknotes. Which noodle stall is fine?', style: 'wood', answer: S.cashOnly, wrong: [S.wechat] },
   { id: 'passport', need: ['中', '国', '人'], q: 'Passport control: which queue is for foreign visitors?', style: 'blue', answer: S.foreigners, wrong: [S.chinese] },
-  { id: 'trail', need: ['山', '口', '林'], q: 'Hiking day! Which sign marks the start of the mountain path?', style: 'wood', answer: S.mountain, wrong: [S.forest, S.exit] },
+  { id: 'trail', need: ['山', '入', '口', '林'], q: 'Hiking day! Which sign marks the start of the mountain path?', style: 'wood', answer: S.mountain, wrong: [S.forest, S.exit] },
 ];

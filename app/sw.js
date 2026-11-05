@@ -33,7 +33,7 @@ self.addEventListener('fetch', (event) => {
         const network = fetch(request).then((res) => {
           if (res.ok || res.type === 'opaque') cache.put(request, res.clone());
           return res;
-        }).catch(() => cached);
+        }).catch(() => cached || Response.error());
         return cached || network;
       }),
     );
@@ -60,11 +60,12 @@ async function remind() {
   const note = await res.json();
   const now = new Date();
   if (!note.on || note.lastDay === dayKey(now) || now.getHours() < 9 || now.getHours() >= 22) return;
+  const name = note.name || 'your language';
   const body = note.streak > 0
     ? `Keep your ${note.streak}-day streak going 🔥${note.due ? ` — ${note.due} words to review` : ''}`
-    : note.due ? `${note.due} words are ready to review. Two minutes is enough!` : 'A quick lesson keeps your Japanese fresh.';
+    : note.due ? `${note.due} words are ready to review. Two minutes is enough!` : `A quick lesson keeps your ${name} fresh.`;
   try {
-    await self.registration.showNotification('Time for Japanese! はじめ！', {
+    await self.registration.showNotification(note.name ? `Time for ${note.name}! ${note.say || ''}`.trim() : 'Time to practise!', {
       body, icon: './icons/icon-192.png', badge: './icons/icon-192.png', tag: 'daily-reminder', renotify: false,
     });
   } catch { /* notifications blocked since */ }

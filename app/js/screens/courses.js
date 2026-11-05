@@ -4,6 +4,7 @@
 import { COURSES, LANG, courseChosen, switchCourse, markLanguagePicked } from '../lang.js';
 import { AVAILABLE } from '../content/pack.js';
 import { app, flagSvg, saveSummary } from '../app.js';
+import { streakAt } from '../progress.js';
 import { html, mount, raw, $$ } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
@@ -19,10 +20,14 @@ const read = (key) => {
 // The course's summary (saved whenever that course saves), or what can be read from its progress.
 function progressOf(course) {
   const summary = read(`hajime.summary.${course.code}`);
-  if (summary?.started) return summary;
+  if (summary?.started) {
+    // Computed now from the saved streak fields (older summaries only have the number saved then).
+    const streak = summary.lastDay !== undefined ? streakAt({ count: summary.streakCount, lastDay: summary.lastDay, freezes: summary.freezes }, Date.now()) : summary.streak;
+    return { ...summary, streak };
+  }
   const saved = read(course.storageKey);
-  if (!saved || !(saved.stats?.lessons > 0 || Object.keys(saved.nodes || {}).length)) return null;
-  return { xp: saved.xp || 0, streak: saved.streak?.count || 0, done: Object.values(saved.nodes || {}).filter((n) => n?.level > 0).length, total: 0, words: null, unit: '' };
+  if (!saved || !(saved.stats?.lessons > 0 || saved.xp > 0 || Object.keys(saved.nodes || {}).length)) return null;
+  return { xp: saved.xp || 0, streak: saved.streak ? streakAt(saved.streak, Date.now()) : 0, done: Object.values(saved.nodes || {}).filter((n) => n?.level > 0).length, total: 0, words: null, unit: '' };
 }
 
 const pct = (p) => (p.total ? Math.min(100, Math.round((p.done / p.total) * 100)) : 0);

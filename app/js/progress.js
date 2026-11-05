@@ -1,7 +1,7 @@
 // Learner progress: pure functions over a plain state object, plus saving to the device.
 import { NODES, MAX_LEVEL, ITEMS } from './course.js';
 import { review, isDue } from './srs.js';
-import { L } from './lang.js';
+import { L, COURSES } from './lang.js';
 
 // Each course keeps its own progress; test mode keeps its own copy too.
 export const STORAGE_KEY = L.storageKey;
@@ -127,12 +127,13 @@ export function msToNextHeart(state, now) {
 }
 
 // ---- Streak ----
-export function displayStreak(state, now) {
-  const { count, lastDay, freezes } = state.streak;
+// The streak to show for { count, lastDay, freezes }: it lapses once more days passed than freezes cover.
+export function streakAt({ count, lastDay, freezes = 0 }, now) {
   if (!lastDay) return 0;
   const gap = daysBetween(lastDay, dayKey(now));
   return gap <= 1 + freezes ? count : 0;
 }
+export const displayStreak = (state, now) => streakAt(state.streak, now);
 
 export function recordActivity(state, now) {
   const today = dayKey(now);
@@ -290,12 +291,16 @@ export const backupStale = (state, now) => Object.keys(state.items).length >= 10
   && (!state.backupAt || now - state.backupAt > BACKUP_DAYS * 86400000);
 
 export function exportBackup(state, now = Date.now()) {
-  return JSON.stringify({ app: 'hajime', exportedAt: new Date(now).toISOString(), progress: state }, null, 1);
+  return JSON.stringify({ app: 'hajime', course: L.code, exportedAt: new Date(now).toISOString(), progress: state }, null, 1);
 }
 
 export function importBackup(text, now = Date.now()) {
   const data = JSON.parse(text);
   if (!data || data.app !== 'hajime' || typeof data.progress !== 'object') throw new Error('This is not a Hajime backup file.');
+  // A backup remembers its course; restoring another course's file would overwrite this one's progress.
+  if (data.course && data.course !== L.code) {
+    throw new Error(`This is a ${COURSES[data.course]?.name || data.course} backup, but you are learning ${L.name}. Switch language first, then restore it.`);
+  }
   return migrate(data.progress, now);
 }
 
@@ -316,11 +321,14 @@ export function courseSummary(state, now) {
   return {
     xp: state.xp,
     streak: displayStreak(state, now),
+    // The streak fields, so the language screen can tell later whether it has lapsed (streakAt).
+    streakCount: state.streak.count,
+    lastDay: state.streak.lastDay,
+    freezes: state.streak.freezes,
     done: NODES.filter((n) => isNodeDone(state, n)).length,
     total: NODES.length,
     words: learnedItemIds(state).filter((id) => ['word', 'sentence'].includes(ITEMS.get(id).type)).length,
     unit: at >= NODES.length ? 'Course complete' : unit?.title || '',
-    started: state.stats.lessons > 0 || Object.keys(state.nodes).length > 0,
-    at: now,
+    started: state.stats.lessons > 0 || Object.keys(state.nodes).length > 0 || state.xp > 0,
   };
 }

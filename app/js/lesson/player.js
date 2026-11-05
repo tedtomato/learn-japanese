@@ -1055,7 +1055,7 @@ function finish(root, s) {
       <div class="result blue"><span>Time</span><b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b></div>
     </div>
     ${weekStrip(now)}
-    ${s.node?.kind === 'review' ? html`<div class="trophy-share">${art('🏆', 'art-lg')}<div><b>${s.node.unit.title} trophy earned!</b>${shareButton(`🏆 I earned the "${s.node.unit.title}" trophy learning Japanese with Hajime! ${summary.streak > 1 ? `🔥 ${summary.streak} day streak.` : ''}`, 'Share on WhatsApp')}</div></div>` : ''}
+    ${s.node?.kind === 'review' ? html`<div class="trophy-share">${art('🏆', 'art-lg')}<div><b>${s.node.unit.title} trophy earned!</b>${shareButton(`🏆 I earned the "${s.node.unit.title}" trophy learning ${L.name} with Hajime! ${summary.streak > 1 ? `🔥 ${summary.streak} day streak.` : ''}`, 'Share on WhatsApp')}</div></div>` : ''}
     <button class="btn btn-primary btn-block continue">Continue</button>
   </div>`);
   wireShare(root);

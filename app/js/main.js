@@ -28,6 +28,9 @@ const TABS = [
   ['profile', 'Profile', 'profile'],
 ];
 
+// Screens that run an activity: the bottom bar stays, but an update never reloads the page mid-run.
+const ACTIVITIES = ['mission', 'drill', 'signs', 'tones', 'quiz', 'listen'];
+
 let lastTab = null;
 function renderNav(active) {
   const changed = active !== lastTab;
@@ -67,6 +70,7 @@ function route() {
   view.replaceChildren(root);
   $('#modal').classList.remove('open');
   app.inLesson = false;
+  app.busy = ACTIVITIES.includes(name);
 
   const inSession = name === 'courses' || name === 'lesson' || (name === 'practice' && (arg === 'go' || arg === 'kanji-go' || arg === 'mistakes-go' || arg === 'hiragana-go' || arg === 'katakana-go')) || (name === 'lab' && !!arg);
   document.body.classList.toggle('in-lesson', inSession);
@@ -89,7 +93,7 @@ function route() {
   else if (name === 'profile') renderProfile(root, arg);
   else renderLearn(root);
   if (!inSession) {
-    renderNav(name === 'collection' || name === 'quiz' || name === 'listen' || name === 'signs' || name === 'mission' || name === 'drill' || name === 'tones' ? 'practice' : name === 'lab' ? 'profile' : TABS.some(([id]) => id === name) ? name : 'learn');
+    renderNav(name === 'collection' || ACTIVITIES.includes(name) ? 'practice' : name === 'lab' ? 'profile' : TABS.some(([id]) => id === name) ? name : 'learn');
     window.scrollTo(0, 0);
   }
 }

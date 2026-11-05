@@ -3,12 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Hajime — Learn Japanese</title>
-  <meta name="description" content="Learn Japanese from zero with short, playful daily lessons.">
+  <title>Hajime — Learn languages</title>
+  <meta name="description" content="Hajime — learn languages: Japanese, Chinese, French, Spanish, English. Short, playful daily lessons from zero.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Hajime">
-  <meta property="og:title" content="Hajime — Learn Japanese from zero">
-  <meta property="og:description" content="Short, playful daily lessons: words, phrases, kana and kanji.">
+  <meta property="og:title" content="Hajime — learn languages from zero">
+  <meta property="og:description" content="Japanese, Chinese, French, Spanish and English: short, playful daily lessons with words, phrases and spaced repetition.">
   <meta property="og:url" content="https://tedtomato.github.io/learn-japanese/">
   <meta property="og:image" content="https://tedtomato.github.io/learn-japanese/icons/share.png">
   <meta property="og:image:width" content="1200">
@@ -30,7 +30,8 @@
   <script>
     // Apply the saved theme before first paint to avoid a flash.
     try {
-      var t = JSON.parse(localStorage.getItem('hajime.progress.v1') || '{}').settings?.theme;
+      var keys = { ja: 'hajime.progress.v1', zh: 'hajime.zh.progress.v1', fr: 'hajime.fr.progress.v1', es: 'hajime.es.progress.v1', en: 'hajime.en.progress.v1' };
+      var t = JSON.parse(localStorage.getItem(keys[localStorage.getItem('hajime.course')] || keys.ja) || '{}').settings?.theme;
       if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
     } catch (e) {}
   </script>

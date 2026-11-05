@@ -59,6 +59,7 @@ export const app = {
     else location.hash = hash;
   },
   inLesson: false,
+  busy: false, // on a screen that runs an activity (mission, drill, signs, tones, quiz, listening) — no update reloads
 };
 
 // The language screen reads each course's summary (see courseSummary).

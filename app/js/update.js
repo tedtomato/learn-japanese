@@ -7,6 +7,9 @@
 import { app, toast } from './app.js';
 import { VERSION } from './version.js';
 
+// Lessons and other screens that run a session (missions, drills, quiz…) must never be reloaded under the learner.
+const busy = () => app.inLesson || app.busy;
+
 let registration = null;
 let openedAt = Date.now();
 let checking = null;
@@ -47,7 +50,7 @@ function apply(worker) {
 }
 
 function offer(worker, { force = false } = {}) {
-  if (force || (!app.inLesson && Date.now() - openedAt < FRESH_MS)) return apply(worker);
+  if (force || (!busy() && Date.now() - openedAt < FRESH_MS)) return apply(worker);
   toast('A new version of Hajime is ready.', { action: 'Update', onAction: () => apply(worker), ms: 0 });
 }
 
@@ -106,7 +109,7 @@ async function check({ manual = false } = {}) {
   if (latest === VERSION) return 'latest';
   latestSeen = latest;
   // Decide now whether to update without asking: downloading can outlast the "just opened" window.
-  const force = manual || (!app.inLesson && Date.now() - openedAt < FRESH_MS);
+  const force = manual || (!busy() && Date.now() - openedAt < FRESH_MS);
   if (!registration) {
     offer(null, { force });
     return 'updating';
@@ -118,7 +121,7 @@ async function check({ manual = false } = {}) {
     /* fall through to the wait / hard refresh */
   }
   const worker = await waitForWaiting(registration);
-  offer(worker, { force: force && !app.inLesson });
+  offer(worker, { force: force && !busy() });
   return 'updating';
 }
 

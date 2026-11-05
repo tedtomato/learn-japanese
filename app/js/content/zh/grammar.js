@@ -39,7 +39,7 @@ export const GRAMMAR = {
   hen: {
     title: '很 + adjective — "is (very)…"',
     rule: 'To describe something, use 很 + adjective — not 是. 很 is often just "is", not a strong "very".',
-    blocks: [{ jp: '熊猫', role: 'noun', en: 'panda' }, { jp: '很', role: 'particle', en: '(very)' }, { jp: '可爱', role: 'noun', en: 'cute' }],
+    blocks: [{ jp: '熊猫', role: 'noun', en: 'panda' }, { jp: '很', role: 'particle', en: '(very)' }, { jp: '可爱', role: 'verb', en: 'cute' }],
     en: 'Pandas are (very) cute.',
     tip: 'Never 是 + adjective: say 我很好, not 我是好.',
     check: { prompt: ['山', null, '漂亮'], en: 'The mountain is beautiful', options: ['很', '是', '的'], answer: '很' },
@@ -111,7 +111,7 @@ export const GRAMMAR = {
   tai: {
     title: '太…了 — "so… / too…"',
     rule: '太 + adjective + 了 = "so…!" (excited) or "too…" (complaining).',
-    blocks: [{ jp: '太', role: 'particle', en: 'so' }, { jp: '好吃', role: 'noun', en: 'delicious' }, { jp: '了', role: 'end', en: '!' }],
+    blocks: [{ jp: '太', role: 'particle', en: 'so' }, { jp: '好吃', role: 'verb', en: 'delicious' }, { jp: '了', role: 'end', en: '!' }],
     en: 'So delicious!',
     tip: '太贵了 = too expensive! The tone of voice tells which.',
     check: { prompt: ['太', '牛', null], en: 'So awesome!', options: ['了', '吗', '的'], answer: '了' },

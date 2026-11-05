@@ -50,7 +50,7 @@ const fmtDate = (t) => new Date(t).toLocaleDateString('en-GB', { day: 'numeric',
 
 // Backups go through the phone's share menu (→ Drive: Save) where it can share files, else to
 // Downloads. Shared as .txt: Android only shares a short list of file types, and JSON isn't one.
-const backupFile = (state) => new File([exportBackup(state)], `hajime-backup-${new Date().toISOString().slice(0, 10)}.txt`, { type: 'text/plain' });
+const backupFile = (state) => new File([exportBackup(state)], `hajime-backup-${L.code}-${new Date().toISOString().slice(0, 10)}.txt`, { type: 'text/plain' });
 const canShareFiles = () => {
   try {
     return !!navigator.canShare?.({ files: [new File(['x'], 'x.txt', { type: 'text/plain' })] });

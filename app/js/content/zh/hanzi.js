@@ -47,7 +47,7 @@ export const KANJI = [
   { k: '元', meaning: 'yuan (money)', on: 'yuán', kun: '', parts: [['二', 'two'], ['儿', 'legs']], story: 'Two coins balanced on a pair of legs, walking out of your wallet — one yuan.',
     words: [['元', 'yuán', 'yuán', 'yuan'], ['十元', 'shíyuán', 'shíyuán', 'ten yuan']] },
   { k: '钱', meaning: 'money', on: 'qián', kun: '', parts: [['钅', 'metal'], ['戋', 'small slices']], story: 'Metal cut into small slices: coins, money.',
-    words: [['钱', 'qián', 'qián', 'money'], ['多少钱', 'duōshaoqián', 'duōshaoqián', 'how much?']] },
+    words: [['钱', 'qián', 'qián', 'money'], ['多少钱', 'duōshao qián', 'duōshao qián', 'how much?']] },
   { k: '开', meaning: 'open', on: 'kāi', kun: '', parts: [['一', 'bar'], ['廾', 'two hands']], story: 'Two hands lift the bar off the gate: open!',
     words: [['开', 'kāi', 'kāi', 'open'], ['开门', 'kāimén', 'kāimén', 'to open the door']] },
   { k: '关', meaning: 'close, shut', on: 'guān', kun: '', parts: [['丷', 'two bolts'], ['天', 'big gate']], story: 'Two bolts slide across the top of the big gate: it\'s shut.',

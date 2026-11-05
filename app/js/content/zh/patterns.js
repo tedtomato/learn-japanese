@@ -23,7 +23,7 @@ export const PATTERNS = [
   {
     id: 'qing-gei-wo', jp: '请给我', romaji: 'qǐng gěi wǒ', slotLast: true, title: '请给我 ___', meaning: 'Please give me ___', art: '🙏',
     en: (w) => `Please give me ${w}`,
-    slots: [['w-cai4dan1', 'the menu'], ['w-shui3', 'water'], ['w-re4shui3', 'hot water'], ['w-cha2', 'tea'], ['w-zhe4ge', 'this one'], ['w-fang2ka3', 'the room card'], ['w-yao4', 'medicine'], ['w-piao4', 'a ticket']],
+    slots: [['w-cai4dan1', 'the menu'], ['w-shui3', 'water'], ['w-re4shui3', 'hot water'], ['w-cha2', 'tea'], ['w-zhe4ge', 'this one'], ['w-fang2ka3', 'the room card'], ['w-yao4', 'medicine'], ['w-yi4-zhang1-piao4', 'a ticket']],
   },
   {
     id: 'xihuan', jp: '我喜欢', romaji: 'wǒ xǐhuan', slotLast: true, title: '我喜欢 ___', meaning: 'I like ___', art: '😋',

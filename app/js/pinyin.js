@@ -5,7 +5,9 @@
 const INITIALS = ['', 'b', 'p', 'm', 'f', 'd', 't', 'n', 'l', 'g', 'k', 'h', 'j', 'q', 'x', 'zh', 'ch', 'sh', 'r', 'z', 'c', 's', 'y', 'w'];
 const FINALS = ['a', 'o', 'e', 'i', 'u', 'v', 'ai', 'ei', 'ao', 'ou', 'an', 'en', 'ang', 'eng', 'ong', 'er', 'ia', 'ie', 'iao', 'iu', 'ian', 'in',
   'iang', 'ing', 'iong', 'ua', 'uo', 'uai', 'ui', 'uan', 'un', 'uang', 'ueng', 've', 'ue', 'van', 'vn', 'n', 'ng', 'm'];
-const SYLLABLES = new Set(INITIALS.flatMap((i) => FINALS.map((f) => i + f)));
+// A syllable without an initial can only start with a, o or e (ai, ang, er…): i, u and ü finals are
+// written yi, wu, yu there, so "fàngǔan" cannot be mistaken for fang + uan (饭馆 is fàn + guǎn).
+const SYLLABLES = new Set(INITIALS.flatMap((i) => FINALS.filter((f) => i || /^[aoe]/.test(f)).map((f) => i + f)));
 
 const TONE_MARKS = { '̄': 1, '́': 2, '̌': 3, '̀': 4 };
 const isHanzi = (ch) => /\p{Script=Han}/u.test(ch);

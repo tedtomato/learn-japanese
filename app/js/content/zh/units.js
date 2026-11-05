@@ -39,7 +39,7 @@ export const SECTIONS_DATA = [
           ] },
           { title: 'Thank you', words: [
             ['谢谢', 'xièxie', 'thank you', '🙏', { note: 'Between close friends and family it is said less than in English — too many thanks can sound distant.' }],
-            ['不客气', 'búkèqi', 'you\'re welcome', '😊', { note: 'Literally "don\'t be a guest". Also: 不用谢 (no need to thank).' }],
+            ['不客气', 'búkèqi', 'you\'re welcome', '😊', { note: 'Literally "no need to be polite" (客气 = polite, a guest\'s manners). Also: 不用谢 (no need to thank).' }],
             ['请', 'qǐng', 'please', '🤲', { note: 'Goes first: 请 + what you ask. 请进 = please come in.' }],
           ] },
           { title: 'Sorry', words: [
@@ -88,6 +88,7 @@ export const SECTIONS_DATA = [
             ['酒店', 'jiǔdiàn', 'hotel', '🏨', { note: '酒 means alcohol, but 酒店 is simply a hotel.' }],
             ['饭馆', 'fànguǎn', 'restaurant (small)', '🍜', { note: 'A small local restaurant.' }],
             ['餐厅', 'cāntīng', 'restaurant / dining room', '🍽️'],
+            ['一张票', 'yì zhāng piào', 'one ticket', '🎫', { note: 'Tickets need a measure word: 张 is for flat things (tickets, paper). 我要一张票 = I\'d like a ticket.' }],
           ] },
           { title: 'Which way?', words: [
             ['哪里', 'nǎlǐ', 'where', '❓', { note: 'In Beijing you will hear 哪儿 (nǎr) instead — same meaning.', alt: ['哪儿'] }],
@@ -101,10 +102,58 @@ export const SECTIONS_DATA = [
             { jp: ['酒店', '在', '哪里'], romaji: 'jiǔdiàn zài nǎlǐ', en: 'Where is the hotel', alt: ['Where\'s the hotel'] },
             { jp: ['在', '右边'], romaji: 'zài yòubian', en: 'It is on the right', alt: ['It\'s on the right', 'On the right'] },
           ] },
-          { title: 'Directions', sentences: [
+          { title: 'Directions', words: [
+            ['请问', 'qǐngwèn', 'excuse me, may I ask…', '💬', { note: 'The polite way to start a question to a stranger: 请问，洗手间在哪里？' }],
+            ['然后', 'ránhòu', 'then / afterwards', '⏭️', { note: 'Links steps: 一直走，然后在右边 = go straight, then it\'s on the right.' }],
+          ], sentences: [
+            { jp: ['请问', '洗手间', '在', '哪里'], romaji: 'qǐngwèn xǐshǒujiān zài nǎlǐ', en: 'Excuse me, where is the restroom', alt: ['Excuse me, where is the toilet', 'Excuse me, where is the bathroom', 'Where is the restroom, please'] },
             { jp: ['在', '左边'], romaji: 'zài zuǒbian', en: 'It is on the left', alt: ['It\'s on the left', 'On the left'] },
             { jp: ['一直', '走'], romaji: 'yìzhí zǒu', en: 'Go straight ahead', alt: ['Go straight', 'Straight ahead'] },
             { jp: ['洗手间', '在', '那里'], romaji: 'xǐshǒujiān zài nàlǐ', en: 'The restroom is over there', alt: ['The toilet is over there', 'The bathroom is there'] },
+          ] },
+        ],
+      },
+      {
+        id: 'numbers',
+        title: 'Numbers, prices & time',
+        desc: 'Count, read prices in yuan and tell the time',
+        facts: [FACT.language, FACT.festivals],
+        phrases: ['Shopping & Paying'],
+        lessons: [
+          { title: '1 to 3', words: [
+            ['一', 'yī', 'one', '1️⃣', { note: 'Said yī alone, but yí or yì before another word: 一个 yí ge, 一杯 yì bēi.', alt: ['1'] }],
+            ['二', 'èr', 'two', '2️⃣', { note: 'For counting and in numbers (十二 = 12). For "two of something", use 两.', alt: ['2'] }],
+            ['三', 'sān', 'three', '3️⃣', { alt: ['3'] }],
+          ] },
+          { title: '4 to 6', words: [
+            ['四', 'sì', 'four', '4️⃣', { note: 'Sounds like 死 (death), so buildings often skip the 4th floor.', alt: ['4'] }],
+            ['五', 'wǔ', 'five', '5️⃣', { alt: ['5'] }],
+            ['六', 'liù', 'six', '6️⃣', { note: 'A lucky number: it sounds like "smooth".', alt: ['6'] }],
+          ] },
+          { title: '7 to 10', words: [
+            ['七', 'qī', 'seven', '7️⃣', { alt: ['7'] }],
+            ['八', 'bā', 'eight', '8️⃣', { note: 'The luckiest number: it sounds like 发 (get rich). The Beijing Olympics opened on 8/8/08 at 8:08 pm!', alt: ['8'] }],
+            ['九', 'jiǔ', 'nine', '9️⃣', { alt: ['9'] }],
+            ['十', 'shí', 'ten', '🔟', { note: 'Numbers build like Lego: 十一 = 11, 二十 = 20, 五十五 = 55.', alt: ['10'] }],
+          ] },
+          { title: 'Big numbers', words: [
+            ['两', 'liǎng', 'two (of something)', '✌️', { note: 'Before a measure word: 两个人 (two people), 两点 (2 o\'clock). Never 二个.', alt: ['2'] }],
+            ['百', 'bǎi', 'hundred', '💯', { note: '一百 = 100, 三百 = 300.', alt: ['100'] }],
+            ['千', 'qiān', 'thousand', '🪙', { note: '一千 = 1,000.', alt: ['1000'] }],
+            ['万', 'wàn', 'ten thousand', '💰', { note: 'Chinese counts in ten-thousands: 10,000 = 一万.', alt: ['10000'] }],
+          ] },
+          { title: 'Money & time', words: [
+            ['块', 'kuài', 'yuan (spoken)', '💴', { note: 'What people say: 五十块 = 50 yuan. 元 is the written word on price tags.' }],
+            ['元', 'yuán', 'yuan (written)', '🏷️', { note: 'The currency is the renminbi (RMB); its unit is the yuan, ¥.' }],
+            ['点', 'diǎn', 'o\'clock', '🕒', { note: 'After the hour: 三点 = 3 o\'clock. 2 o\'clock is 两点.' }],
+            ['半', 'bàn', 'half past', '🕧', { note: 'After the hour: 三点半 = half past three.' }],
+            ['现在', 'xiànzài', 'now', '⌚'],
+          ] },
+          { title: 'How much? What time?', grammar: 'ji', sentences: [
+            { jp: ['五十', '块'], romaji: 'wǔshí kuài', en: '50 yuan', alt: ['Fifty yuan', 'It is 50 yuan', 'It\'s 50 yuan'] },
+            { jp: ['一百', '块'], romaji: 'yìbǎi kuài', en: '100 yuan', alt: ['One hundred yuan', 'It is 100 yuan', 'It\'s 100 yuan'] },
+            { jp: ['现在', '几', '点'], romaji: 'xiànzài jǐ diǎn', en: 'What time is it now', alt: ['What time is it'] },
+            { jp: ['三', '点', '半'], romaji: 'sān diǎn bàn', en: 'Half past three', alt: ['It is half past three', 'It\'s 3:30', '3:30'] },
           ] },
         ],
       },
@@ -131,6 +180,7 @@ export const SECTIONS_DATA = [
             ['啤酒', 'píjiǔ', 'beer', '🍺', { note: '青岛 (Qīngdǎo) is the famous Chinese beer.' }],
             ['干杯', 'gānbēi', 'cheers!', '🍻', { note: 'Literally "dry the glass" — at dinners it can mean drinking it all!' }],
             ['冰的', 'bīng de', 'iced / cold', '🧊', { note: 'Drinks often come warm or room temperature. Ask for 冰的 if you want it cold.' }],
+            ['还是', 'háishi', 'or (in a question)', '🔄', { note: 'Offers a choice: 热的还是冰的？ = hot or iced?' }],
           ] },
           { title: 'Tastes', words: [
             ['好吃', 'hǎochī', 'delicious', '😋', { note: 'For food. For drinks say 好喝 (hǎohē).' }],
@@ -177,6 +227,7 @@ export const SECTIONS_DATA = [
             ['我听不懂', 'wǒ tīng bu dǒng', 'I don\'t understand', '🤷', { note: 'Literally "I hear but don\'t understand".' }],
             ['英语', 'Yīngyǔ', 'English', '🔤', { alt: ['英文'] }],
             ['救命', 'jiùmìng', 'help!', '🆘', { note: 'Only in an emergency — literally "save life".' }],
+            ['请帮我', 'qǐng bāng wǒ', 'please help me', '🤝', { note: 'The everyday way to ask for help — lost, stuck with a bag, need a hand.' }],
             ['没问题', 'méi wèntí', 'no problem', '👌'],
           ] },
           { title: 'Questions', grammar: 'ma', sentences: [
@@ -184,50 +235,6 @@ export const SECTIONS_DATA = [
             { jp: ['可以', '用', '微信', '吗'], romaji: 'kěyǐ yòng Wēixìn ma', en: 'Can I use WeChat', alt: ['Can I pay with WeChat', 'Can I use WeChat Pay'] },
             { jp: ['你', '会', '说', '英语', '吗'], romaji: 'nǐ huì shuō Yīngyǔ ma', en: 'Can you speak English', alt: ['Do you speak English'] },
             { jp: ['请', '等', '一下'], romaji: 'qǐng děng yíxià', en: 'Please wait a moment', alt: ['Wait a moment please', 'One moment please'] },
-          ] },
-        ],
-      },
-      {
-        id: 'numbers',
-        title: 'Numbers, prices & time',
-        desc: 'Count, read prices in yuan and tell the time',
-        facts: [FACT.language, FACT.festivals],
-        phrases: ['Shopping & Paying'],
-        lessons: [
-          { title: '1 to 3', words: [
-            ['一', 'yī', 'one', '1️⃣', { note: 'Said yī alone, but yí or yì before another word: 一个 yí gè, 一杯 yì bēi.', alt: ['1'] }],
-            ['二', 'èr', 'two', '2️⃣', { note: 'For counting and in numbers (十二 = 12). For "two of something", use 两.', alt: ['2'] }],
-            ['三', 'sān', 'three', '3️⃣', { alt: ['3'] }],
-          ] },
-          { title: '4 to 6', words: [
-            ['四', 'sì', 'four', '4️⃣', { note: 'Sounds like 死 (death), so buildings often skip the 4th floor.', alt: ['4'] }],
-            ['五', 'wǔ', 'five', '5️⃣', { alt: ['5'] }],
-            ['六', 'liù', 'six', '6️⃣', { note: 'A lucky number: it sounds like "smooth".', alt: ['6'] }],
-          ] },
-          { title: '7 to 10', words: [
-            ['七', 'qī', 'seven', '7️⃣', { alt: ['7'] }],
-            ['八', 'bā', 'eight', '8️⃣', { note: 'The luckiest number: it sounds like 发 (get rich). The Beijing Olympics opened on 8/8/08 at 8:08 pm!', alt: ['8'] }],
-            ['九', 'jiǔ', 'nine', '9️⃣', { alt: ['9'] }],
-            ['十', 'shí', 'ten', '🔟', { note: 'Numbers build like Lego: 十一 = 11, 二十 = 20, 五十五 = 55.', alt: ['10'] }],
-          ] },
-          { title: 'Big numbers', words: [
-            ['两', 'liǎng', 'two (of something)', '✌️', { note: 'Before a measure word: 两个人 (two people), 两点 (2 o\'clock). Never 二个.', alt: ['2'] }],
-            ['百', 'bǎi', 'hundred', '💯', { note: '一百 = 100, 三百 = 300.', alt: ['100'] }],
-            ['千', 'qiān', 'thousand', '🪙', { note: '一千 = 1,000.', alt: ['1000'] }],
-            ['万', 'wàn', 'ten thousand', '💰', { note: 'Chinese counts in ten-thousands: 10,000 = 一万.', alt: ['10000'] }],
-          ] },
-          { title: 'Money & time', words: [
-            ['块', 'kuài', 'yuan (spoken)', '💴', { note: 'What people say: 五十块 = 50 yuan. 元 is the written word on price tags.' }],
-            ['元', 'yuán', 'yuan (written)', '🏷️', { note: 'The currency is the renminbi (RMB); its unit is the yuan, ¥.' }],
-            ['点', 'diǎn', 'o\'clock', '🕒', { note: 'After the hour: 三点 = 3 o\'clock. 2 o\'clock is 两点.' }],
-            ['半', 'bàn', 'half past', '🕧', { note: 'After the hour: 三点半 = half past three.' }],
-            ['现在', 'xiànzài', 'now', '⌚'],
-          ] },
-          { title: 'How much? What time?', grammar: 'ji', sentences: [
-            { jp: ['五十', '块'], romaji: 'wǔshí kuài', en: '50 yuan', alt: ['Fifty yuan', 'It is 50 yuan', 'It\'s 50 yuan'] },
-            { jp: ['一百', '块'], romaji: 'yìbǎi kuài', en: '100 yuan', alt: ['One hundred yuan', 'It is 100 yuan', 'It\'s 100 yuan'] },
-            { jp: ['现在', '几', '点'], romaji: 'xiànzài jǐ diǎn', en: 'What time is it now', alt: ['What time is it'] },
-            { jp: ['三', '点', '半'], romaji: 'sān diǎn bàn', en: 'Half past three', alt: ['It is half past three', 'It\'s 3:30', '3:30'] },
           ] },
         ],
       },
@@ -241,7 +248,8 @@ export const SECTIONS_DATA = [
         lessons: [
           { title: 'Checking in', words: [
             ['预订', 'yùdìng', 'reservation', '📋', { note: 'Also used as a verb: to book.' }],
-            ['办理入住', 'bànlǐ rùzhù', 'check in', '🛎️', { note: '入住 = move in. Hotels will ask for your passport (护照, hùzhào).' }],
+            ['办理入住', 'bànlǐ rùzhù', 'check in', '🛎️', { note: '入住 = move in. Hotels will ask for your passport.' }],
+            ['护照', 'hùzhào', 'passport', '📓', { note: 'Hotels scan it at check-in — keep it with you, not in the suitcase.' }],
             ['房间', 'fángjiān', 'room', '🚪'],
             ['房卡', 'fángkǎ', 'room key card', '🔑'],
           ] },
@@ -272,8 +280,8 @@ export const SECTIONS_DATA = [
         phrases: ['Dining & Food'],
         lessons: [
           { title: 'Table for…', words: [
-            ['一个人', 'yí gè rén', 'one person', '🧍'],
-            ['两个人', 'liǎng gè rén', 'two people', '👫', { note: 'Staff ask 几位? (how many people?) — answer with the number.' }],
+            ['一个人', 'yí ge rén', 'one person', '🧍'],
+            ['两个人', 'liǎng ge rén', 'two people', '👫', { note: 'Staff ask 几位? (how many people?) — answer with the number.' }],
             ['菜单', 'càidān', 'menu', '🗒️', { note: 'Many restaurants have you order by scanning a QR code on the table.' }],
             ['推荐', 'tuījiàn', 'recommend', '👍'],
           ] },
@@ -283,7 +291,7 @@ export const SECTIONS_DATA = [
             ['不要肉', 'bú yào ròu', 'no meat, please', '🙅', { note: 'Dishes "without meat" may still use meat broth or lard — ask clearly.' }],
           ] },
           { title: 'Ordering', grammar: 'ge', sentences: [
-            { jp: ['两', '个', '人'], romaji: 'liǎng gè rén', en: 'Two people', alt: ['A table for two', 'We are two', 'There are two of us'] },
+            { jp: ['两', '个', '人'], romaji: 'liǎng ge rén', en: 'Two people', alt: ['A table for two', 'We are two', 'There are two of us'] },
             { jp: ['请', '给', '我', '菜单'], romaji: 'qǐng gěi wǒ càidān', en: 'The menu please', alt: ['Menu please', 'Please give me the menu', 'Can I have the menu'] },
             { jp: ['你', '推荐', '什么'], romaji: 'nǐ tuījiàn shénme', en: 'What do you recommend', alt: ['What would you recommend'] },
             { jp: ['再', '来', '一', '瓶', '啤酒'], romaji: 'zài lái yì píng píjiǔ', en: 'One more bottle of beer', alt: ['Another beer please', 'Another bottle of beer', 'One more beer please'] },
@@ -291,7 +299,7 @@ export const SECTIONS_DATA = [
           { title: 'Allergies', words: [
             ['花生', 'huāshēng', 'peanut', '🥜', { note: 'Very common in Chinese cooking (宫保鸡丁!).' }],
             ['素食', 'sùshí', 'vegetarian food', '🥦'],
-            ['再来一个', 'zài lái yí gè', 'one more', '➕', { note: '来 (come) is the casual way to order: 来一个 = one of those!' }],
+            ['再来一个', 'zài lái yí ge', 'one more', '➕', { note: '来 (come) is the casual way to order: 来一个 = one of those!' }],
           ], sentences: [
             { jp: ['我', '吃素'], romaji: 'wǒ chīsù', en: 'I am vegetarian', alt: ['I\'m vegetarian', 'I eat vegetarian', 'I am a vegetarian'] },
             { jp: ['我', '对', '花生', '过敏'], romaji: 'wǒ duì huāshēng guòmǐn', en: 'I am allergic to peanuts', alt: ['I\'m allergic to peanuts', 'I have a peanut allergy'] },
@@ -346,6 +354,7 @@ export const SECTIONS_DATA = [
             ['疼', 'téng', 'hurts / painful', '🤕', { note: 'Point and say 这里疼 — "it hurts here".' }],
             ['药', 'yào', 'medicine', '💊', { note: 'Pharmacies often sell both Western and traditional Chinese medicine (中药).' }],
             ['药店', 'yàodiàn', 'pharmacy', '🏪', { note: 'Look for a green cross sign.' }],
+            ['怎么了', 'zěnme le', 'what\'s wrong?', '❓', { note: 'What a pharmacist or doctor asks. Answer by pointing: 这里疼.' }],
           ] },
           { title: 'Doctor & hospital', words: [
             ['医院', 'yīyuàn', 'hospital', '🏥', { note: 'In China you go to a hospital even for small things — there are few GP clinics.' }],
@@ -391,7 +400,7 @@ export const SECTIONS_DATA = [
             ['朋友', 'péngyou', 'friend', '🤝'],
             ['老师', 'lǎoshī', 'teacher', '🧑‍🏫', { note: 'Also a respectful way to address any teacher-like expert.' }],
             ['学生', 'xuésheng', 'student', '🧑‍🎓'],
-            ['医生', 'yīshēng', 'doctor', '🧑‍⚕️'],
+            ['司机', 'sījī', 'driver', '🚌', { note: 'Taxi and bus drivers. Address a taxi driver as 师傅 (shīfu, "master").' }],
           ] },
           { title: 'Where from?', words: [
             ['美国人', 'Měiguórén', 'American', '🇺🇸', { note: '美国 (beautiful country) = USA, + 人 (person).' }],
@@ -459,7 +468,7 @@ export const SECTIONS_DATA = [
             ['猫', 'māo', 'cat', '🐱'],
             ['狗', 'gǒu', 'dog', '🐶'],
             ['鸟', 'niǎo', 'bird', '🐦'],
-            ['熊猫', 'xióngmāo', 'panda', '🐼', { note: 'Literally "bear cat". See them in Chengdu (成都).' }],
+            ['熊猫', 'xióngmāo', 'panda', '🐼', { note: 'Literally "bear cat". See them in Chengdu (成都) or at the Beijing Zoo.' }],
           ] },
           { title: 'Nature', words: [
             ['山', 'shān', 'mountain', '⛰️', { note: 'Looks like three peaks!' }],

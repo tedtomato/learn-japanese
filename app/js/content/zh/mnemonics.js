@@ -27,13 +27,17 @@ export const MNEMONICS = {
   'w-chu1zu1che1': '“Choo-dzoo-chuh” — choo-choo! No, it’s a taxi zooming by 🚕',
   'w-piao4': '“Pyow!” — the ticket machine fires your ticket out: pyow! 🎫',
   'w-jiu3dian4': '“Jyo dyen” — “Joe’s den”: a cozy hotel run by Joe 🏨',
-  'w-fang4uan3': '“Fahn-gwahn” — a fan of good food: the little restaurant fan club 🍜',
+  'w-fan4guan3': '“Fahn-gwahn” — a fan of good food: the little restaurant fan club 🍜',
   'w-can1ting1': '“Tsahn-ting” — “can ting!” cans clink in the dining room 🍽️',
   'w-na3li3': '“Nah-lee?” — your friend Lee is gone… “Nah, Lee, where are you?” 🔎',
+  'w-qing3wen4': '“Ching wen?” — the bell chings, then “when?”: excuse me, may I ask when…? 🔔',
+  'w-ran2hou4': '“Rahn-hoe” — you ran straight, then “ho!” — turn right: and then… ⏭️',
   'w-zuo3bian': '“Dzwaw-byen” — “swore by Ben”: Ben always turns left ⬅️',
   'w-you4bian': '“Yo, Ben!” — Ben is on your right, you yell yo! ➡️',
   'w-yi4zhi2-zou3': '“Ee-jir dzoh” — “easy, Joe”: just walk straight ahead ⬆️',
   // food
+  'w-hai2shi': '“High-shir?” — “Hi, sure?” hot or iced — this one or that one? 🔄',
+  'w-yi4-zhang1-piao4': '“Ee jahng pyow” — one flat ticket flies out of the machine: ee-jahng, pyow! 🎫',
   'w-zhe4ge': '“Juh-guh!” — you jab your finger: this one, this jug! 👉',
   'w-wo3-yao4': '“Waw yow!” — “Wow, yow, I want that!” 🙋',
   'w-qing3-gei3-wo3': '“Ching, gay, waw” — the bell rings (please), gimme, wow! 🔔🙏',
@@ -61,6 +65,7 @@ export const MNEMONICS = {
   'w-wo3-ting1-bu-dong3': '“Waw ting boo dong” — wow, all I hear is ting, boo, dong: I don’t understand 🤯',
   'w-ying1yu3': '“Ying-yoo” — “in you!” there’s English in you 🇬🇧',
   'w-jiu4ming4': '“Jyo-ming!” — “Joe, mean it!” — falling tones shouted: HELP! 🆘',
+  'w-qing3-bang1-wo3': '“Ching bahng waw” — the bell chings, bang! — wow, please help me! 🤝',
   'w-mei2-wen4ti2': '“May wun-tee” — “may one tea” fix it? No problem! 👌',
   // numbers
   'w-yi1': '“Ee” — one long, flat “eeee” like a single line 1️⃣',
@@ -83,6 +88,7 @@ export const MNEMONICS = {
   'w-ban4': '“Bahn!” — the clock is chopped in half with a bang: half past 🕧',
   'w-xian4zai4': '“Shyen-dzai” — “shine, sigh”: now is the time to shine ⏰',
   // hotel
+  'w-hu4zhao4': '“Hoo-jow” — “Who, Joe?” the clerk squints at your passport photo 📓',
   'w-yu4ding4': '“Yoo-ding!” — “You! Ding!” the bell rings: your reservation is ready 🛎️',
   'w-ban4li3-ru4zhu4': '“Bahn-lee roo-joo” — Ban Lee rolls into his room: check in 🧳',
   'w-fang2jian1': '“Fahng-jyen” — a room with a fan for Jen 🛏️',
@@ -93,8 +99,8 @@ export const MNEMONICS = {
   'w-mi4ma3': '“Mee-mah!” — the password is “Me, Ma!” 🔐',
   'w-xing2li': '“Shing-lee” — shingly heavy luggage rolling behind you 🧳',
   // eating out
-  'w-yi2-ge4-ren2': '“Ee guh run” — one guy runs in alone: one person ☝️',
-  'w-liang3-ge4-ren2': '“Lyahng guh run” — a pair of guys run in: two people ✌️',
+  'w-yi2-ge-ren2': '“Ee guh run” — one guy runs in alone: one person ☝️',
+  'w-liang3-ge-ren2': '“Lyahng guh run” — a pair of guys run in: two people ✌️',
   'w-cai4dan1': '“Tsai-dahn” — “sigh, Dan!” Dan can’t choose from the menu 📜',
   'w-tui1jian4': '“Tway-jyen” — “Tw-eight Jen” — Jen recommends dish no. 8 👍',
   'w-guo4min3': '“Gwaw-min” — “Go, man!” you flee the peanuts: allergic 🤧',
@@ -102,7 +108,7 @@ export const MNEMONICS = {
   'w-bu2-yao4-rou4': '“Boo, yow, roe!” — boo to meat: no meat, please 🙅🥩',
   'w-hua1sheng1': '“Hwah-shung” — “wow, shell!” crack a peanut shell 🥜',
   'w-su4shi2': '“Soo-shir” — “Sue’s share”: Sue’s vegetarian plate 🥗',
-  'w-zai4-lai2-yi2-ge4': '“Dzai lie ee guh” — “sigh, lie, eager”: one more, please! 🔁',
+  'w-zai4-lai2-yi2-ge': '“Dzai lie ee guh” — “sigh, lie, eager”: one more, please! 🔁',
   // trains
   'w-gao1tie3': '“Gaow-tyeh” — “go, tie!” your tie flaps on the high-speed train 🚄',
   'w-zhan4tai2': '“Jahn-tie” — John ties his shoe on the platform 🚉',
@@ -115,6 +121,7 @@ export const MNEMONICS = {
   'w-shang4hai3': '“Shahng-hi” — “Shang, high!” skyscrapers on the sea: Shanghai 🌃',
   'w-nan2jing1': '“Nahn-jing” — the Southern (nán) capital (jīng): Nanjing 🏛️',
   // help
+  'w-zen3me-le': '“Dzun-muh luh” — “Zen, mum, la!” she asks calmly: what’s wrong? ❓',
   'w-teng2': '“Tung!” — you bite your tongue: ow, it hurts! 🤕',
   'w-yao4': '“Yow!” — “Yow, it hurts — medicine, please!” 💊',
   'w-yao4dian4': '“Yow-dyen” — “yow” medicine (yào) shop (diàn): pharmacy 💊🏪',
@@ -125,6 +132,7 @@ export const MNEMONICS = {
   'w-mi2lu4': '“Mee-loo?” — “me? loo?” — lost looking for the loo 🗺️',
   'w-zhe4li3': '“Juh-lee!” — “Jolly!” you point down: right here 📍',
   // people
+  'w-si1ji1': '“Suh-jee” — “Sir, gee!” the driver tips his cap and starts the engine 🚌',
   'w-wo3': '“Waw” — “Wow, it’s me!” 🙋',
   'w-ni3': '“Nee” — you point at the knee of the person next to you: you 👉',
   'w-ta1': '“Tah” — “ta-da!” — here he is (or she is) 🧍',

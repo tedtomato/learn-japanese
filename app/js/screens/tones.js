@@ -8,6 +8,7 @@ import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { speak, sfx } from '../audio.js';
 import { pinyinParts, stripTones } from '../pinyin.js';
+import { shuffle } from '../lesson/generate.js';
 
 export const TONES = [
   { n: 1, name: 'High & flat', tip: 'Hold it high and steady, like singing a note: māāā', path: 'M6 8 H46', ex: ['妈', 'mā', 'mother'] },
@@ -29,7 +30,6 @@ const SETS = [
 const ROUNDS = 10;
 const MARKS = { '̄': 1, '́': 2, '̌': 3, '̀': 4 };
 export const toneOf = (syllable) => [...syllable.normalize('NFD')].map((c) => MARKS[c]).find(Boolean) || 0;
-const shuffle = (list) => list.map((x) => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(([, x]) => x);
 
 export const contour = (t, size = 40) => raw(`<svg class="tone-contour" width="${size}" height="${Math.round(size * 0.92)}" viewBox="0 0 52 48" aria-hidden="true">
   <path d="M4 4 H48 M4 24 H48 M4 44 H48" class="tone-lines"/><path d="${TONES[t - 1].path}" class="tone-path"/></svg>`);

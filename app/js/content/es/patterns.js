@@ -15,7 +15,7 @@ export const PATTERNS = [
   {
     id: 'por-favor', jp: 'por favor', romaji: 'por favor', title: '___ por favor', meaning: '___, please', art: '🤲',
     en: (w) => `${cap(w)}, please`,
-    slots: [['w-el-cafe', 'the coffee'], ['w-la-cerveza', 'the beer'], ['w-el-agua', 'the water'], ['w-el-vino', 'the wine'], ['w-la-carta', 'the menu'], ['w-la-cuenta', 'the bill'], ['w-el-pan', 'the bread'], ['w-el-billete', 'the ticket'], ['w-la-tortilla', 'the tortilla']],
+    slots: [['w-la-carta', 'the menu'], ['w-la-cuenta', 'the bill'], ['w-el-agua', 'the water'], ['w-el-pan', 'the bread']],
   },
   {
     id: 'me-gusta', jp: 'me gusta', romaji: 'me gusta', slotLast: true, title: 'me gusta ___', meaning: 'I like ___', art: '😍',

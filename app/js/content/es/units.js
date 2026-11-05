@@ -41,7 +41,7 @@ export const SECTIONS_DATA = [
             ['buenas noches', 'good evening / good night', '🌙', { note: 'Both hello and goodbye once it is dark.' }],
           ] },
           { title: 'Thank you', words: [
-            ['gracias', 'thank you', '🙏', { note: 'In most of Spain the c sounds like "th": GRAH-thyahs. In Latin America and the Canaries: GRAH-syahs.' }],
+            ['gracias', 'thank you', '🙏', { note: 'In most of Spain the c sounds like "th": GRAH-thyahs. In Latin America, the Canaries and much of Andalusia: GRAH-syahs.' }],
             ['muchas gracias', 'thank you very much', '💐'],
             ['de nada', 'you\'re welcome', '😊', { note: 'Literally "of nothing".' }],
             ['por favor', 'please', '🤲', { note: 'Spaniards use it less than English speakers — a friendly tone does the job.' }],
@@ -55,7 +55,8 @@ export const SECTIONS_DATA = [
           { title: 'Yes & no', words: [
             ['sí', 'yes', '✅', { note: 'With the accent it means yes; si without one means "if".', alt: ['si'] }],
             ['no', 'no / not', '❌', { note: 'Also "not": goes right before the verb.' }],
-            ['vale', 'okay', '👍', { note: 'You will hear it all day in Spain. In Latin America: está bien, dale (Argentina) or órale (Mexico).' }],
+            ['también', 'also / too', '➕', { note: 'Yo también = me too. Tampoco = neither.' }],
+            ['vale', 'okay', '👍', { note: 'You will hear it all day in Spain. In Latin America: está bien, dale (Argentina) or sale / va (Mexico).' }],
           ] },
           { title: 'Goodbye', words: [
             ['adiós', 'goodbye', '🏃', { note: 'Spaniards often say it in passing, even as a quick hello on the street.' }],
@@ -100,6 +101,8 @@ export const SECTIONS_DATA = [
             ['el baño', 'toilet / bathroom', '🚻', { note: 'Signs in Spain often say servicios or aseos.' }],
             ['el taxi', 'taxi', '🚕', { note: 'A green light on the roof means it is free.' }],
             ['el billete', 'ticket', '🎫', { note: 'In Latin America: el boleto. (Un billete is also a banknote.)' }],
+            ['la entrada', 'entrance / entry', '👉', { note: 'Also a ticket for a show or museum.' }],
+            ['la salida', 'exit', '🚨', { note: 'Look for the green sign: salida (de emergencia).' }],
           ] },
           { title: 'Places', words: [
             ['el hotel', 'hotel', '🏨', { note: 'The h is silent: oh-TEL.' }],
@@ -152,6 +155,8 @@ export const SECTIONS_DATA = [
             ['el café', 'coffee', '☕', { note: 'Café solo = espresso, cortado = with a dash of milk, café con leche = half milk.' }],
             ['la cerveza', 'beer', '🍺', { note: 'Ask for una caña for a small draught beer.' }],
             ['el vino', 'wine', '🍷', { note: 'Vino tinto = red wine, vino blanco = white wine.' }],
+            ['la leche', 'milk', '🥛', { note: 'Café con leche is the standard breakfast coffee.' }],
+            ['la caña', 'small draught beer', '🍺', { note: 'The everyday way to order a beer at the bar: una caña.' }],
           ] },
           { title: 'Tapas', words: [
             ['la tapa', 'tapa (small dish)', '🍽', { note: 'In some cities, like Granada, a free tapa comes with every drink.' }],
@@ -164,6 +169,7 @@ export const SECTIONS_DATA = [
             ['la paella', 'paella', '🍚', { note: 'A rice dish from Valencia, named after its wide, shallow pan.' }],
             ['el pescado', 'fish (to eat)', '🐟', { note: 'A live fish swimming in the sea is el pez.' }],
             ['la ensalada', 'salad', '🥗'],
+            ['el desayuno', 'breakfast', '🍞', { note: 'Light in Spain: coffee with toast (tostada) or a pastry.' }],
           ] },
           { title: 'Cheers!', words: [
             ['salud', 'cheers!', '🍻', { note: 'Literally "health". Also said when someone sneezes.' }],
@@ -197,17 +203,22 @@ export const SECTIONS_DATA = [
             ['la tienda', 'shop', '🏪'],
             ['el mercado', 'market', '🍉', { note: 'Covered food markets like La Boqueria in Barcelona are great for tapas too.' }],
             ['la panadería', 'bakery', '🍞'],
+            ['abierto', 'open', '🚪', { note: 'Feminine: abierta. Plural: abiertos, abiertas.' }],
+            ['cerrado', 'closed', '🔐', { note: 'Feminine: cerrada. Many small shops are cerrado at lunchtime.' }],
           ] },
           { title: 'Money', words: [
             ['el dinero', 'money', '💰', { note: 'In Latin America you will often hear la plata (literally "silver").' }],
             ['el euro', 'euro', '🪙'],
             ['la tarjeta', 'card', '💳', { note: 'Cards are accepted almost everywhere in Spain, even for small amounts.' }],
             ['en efectivo', 'in cash', '💵'],
+            ['la propina', 'tip', '💴', { note: 'Tipping is small in Spain: rounding up or leaving some coins is plenty.' }],
           ] },
           { title: 'How much?', words: [
             ['¿cuánto cuesta?', 'how much is it?', '🏷', { note: 'For several things: ¿cuánto cuestan?', alt: ['cuánto cuesta', 'cuanto cuesta'] }],
             ['caro', 'expensive', '💎', { note: 'Feminine: cara. Plural: caros, caras.' }],
             ['barato', 'cheap', '🤏'],
+            ['más', 'more', '➕', { note: 'With an accent. Más barato = cheaper.' }],
+            ['menos', 'less / fewer', '🤏', { note: 'Menos caro = less expensive.' }],
             ['la bolsa', 'bag', '🛍', { note: 'Shops charge a few cents for a bag — bring your own.' }],
           ] },
           { title: 'Clothes', words: [
@@ -266,10 +277,20 @@ export const SECTIONS_DATA = [
             ['nueve', 'nine', '9⃣'],
             ['diez', 'ten', '🔟', { note: 'In Spain the z sounds like "th": dyeth. In Latin America: dyes.' }],
             ['veinte', 'twenty', '🔢'],
+            ['treinta', 'thirty', '🔢'],
+            ['cincuenta', 'fifty', '🔢'],
             ['cien', 'a hundred', '💯'],
+          ] },
+          { title: '11 to 15', words: [
+            ['once', 'eleven', '🔢', { note: 'Not "once" in English!' }],
+            ['doce', 'twelve', '🔢'],
+            ['trece', 'thirteen', '🔢'],
+            ['catorce', 'fourteen', '🔢'],
+            ['quince', 'fifteen', '🔢'],
           ] },
           { title: 'Time', words: [
             ['la hora', 'hour / time', '⌚', { note: '¿Qué hora es? = what time is it?' }],
+            ['y media', 'half past', '🕧', { note: 'Son las siete y media = it\'s half past seven. Y cuarto = quarter past.' }],
             ['el minuto', 'minute', '⏱'],
             ['hoy', 'today', '📅'],
             ['mañana', 'tomorrow', '⏭', { note: 'La mañana = the morning. Mañana por la mañana = tomorrow morning.' }],
@@ -359,6 +380,7 @@ export const SECTIONS_DATA = [
             ['el piso', 'flat / apartment', '🏙', { note: 'Also means "floor". In Latin America: el departamento or el apartamento.' }],
             ['la habitación', 'room / bedroom', '🚪', { note: 'In Latin America also el cuarto or la recámara (Mexico).' }],
             ['la cocina', 'kitchen', '🍳', { note: 'Also means "cooking" or "cuisine": la cocina española.' }],
+            ['pequeño', 'small', '🤏', { note: 'Feminine: pequeña. Un piso pequeño = a small flat. Big = grande (same for both genders).' }],
           ] },
           { title: 'Furniture', words: [
             ['la cama', 'bed', '🛏'],
@@ -460,7 +482,7 @@ export const SECTIONS_DATA = [
           { title: 'Feelings', words: [
             ['contento', 'happy', '😄', { note: 'Feminine: contenta. Feelings use estar: estoy contento.' }],
             ['triste', 'sad', '😔'],
-            ['cansado', 'tired', '😴', { note: 'Feminine: cansada.' }],
+            ['cansado', 'tired', '😴', { note: 'Feminine: cansada. Some sentences are spoken by a woman, so you will see the feminine cansada and perdida; a man says cansado, perdido.' }],
             ['nervioso', 'nervous', '😱', { note: 'Feminine: nerviosa.' }],
           ] },
           { title: 'Hungry & thirsty', words: [
@@ -574,7 +596,6 @@ export const SECTIONS_DATA = [
           { title: 'Going out', words: [
             ['la fiesta', 'party', '🎵'],
             ['el bar', 'bar', '🍻', { note: 'Spanish bars are for everyone: coffee in the morning, tapas at night, kids included.' }],
-            ['la caña', 'small draught beer', '🍺'],
             ['quedar', 'to meet up', '🧑‍🤝‍🧑', { note: '¿Quedamos? = shall we meet up? Mostly Spain.' }],
           ] },
           { title: 'Casual feelings', words: [
@@ -668,7 +689,7 @@ export const DIALOGUES = {
     lines: [
       { who: 0, jp: '¿Qué hora es?', en: 'What time is it?' },
       { who: 1, jp: 'Son las siete y media.', en: 'It\'s half past seven.' },
-      { who: 0, jp: '¡Uf! El tren sale a las ocho.', en: 'Phew! The train leaves at eight.' },
+      { who: 0, jp: '¡Uf! El tren sale a las ocho.', en: 'Oh no! The train leaves at eight.' },
       { who: 1, jp: 'Tranquila, tenemos treinta minutos.', en: 'Relax, we have thirty minutes.' },
     ],
     question: 'When does the train leave?',
@@ -702,8 +723,8 @@ export const DIALOGUES = {
     title: 'Weekend plans',
     cast: ['woman2', 'woman'],
     lines: [
-      { who: 0, jp: '¿Qué tiempo hace mañana?', en: 'What\'s the weather like tomorrow?' },
-      { who: 1, jp: 'Hace sol y mucho calor.', en: 'It\'s sunny and very hot.' },
+      { who: 0, jp: '¿Qué tiempo va a hacer mañana?', en: 'What\'s the weather going to be like tomorrow?' },
+      { who: 1, jp: 'Va a hacer sol y mucho calor.', en: 'It\'s going to be sunny and very hot.' },
       { who: 0, jp: '¡Genial! Vamos a la playa.', en: 'Great! Let\'s go to the beach.' },
       { who: 1, jp: 'Vale, ¡venga!', en: 'Okay, come on then!' },
     ],

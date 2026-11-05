@@ -31,7 +31,7 @@ export const MISSIONS = [
     steps: [
       { prompt: 'Get her attention politely.',
         replies: [R('Disculpe', 'excuse me', true), R('¡Salud!', 'cheers!', false, '"Cheers!" — you\'re not holding a drink!'), R('Buenas noches', 'good night', false, '"Good night" at 10 a.m.? She\'ll be puzzled.')] },
-      { who: 'woman2', jp: 'Sí, dime.', en: 'Yes, tell me.',
+      { who: 'woman2', jp: 'Sí, dígame.', en: 'Yes, tell me.',
         replies: [R('¿Dónde está el metro?', 'where is the metro?', true), R('¿Dónde está la playa?', 'where is the beach?', false, 'That asks for the beach — tempting, but you need the metro.'), R('¿Dónde está el hotel?', 'where is the hotel?', false, 'That asks for the hotel.')] },
       { who: 'woman2', jp: 'Siga todo recto y luego a la derecha.', en: 'Go straight ahead and then to the right.', prompt: 'Which way do you go?',
         replies: [E('⬆️ Straight, then ➡️ right', true), E('⬆️ Straight, then ⬅️ left', false, 'Izquierda is left — she said derecha (right).'), E('⬅️ Left, then ⬆️ straight', false, 'Todo recto (straight ahead) came first, then a la derecha (right).')] },

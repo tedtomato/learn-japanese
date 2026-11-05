@@ -11,11 +11,10 @@ import { sfx, speak } from '../audio.js';
 import { mascot } from '../mascot.js';
 import { PATTERNS } from '../content/pack.js';
 import { recordSigns } from '../progress.js';
-import { romajiMatch } from '../lesson/generate.js';
+import { romajiMatch, shuffle } from '../lesson/generate.js';
 
 export const DRILL_MIN = 3;
 const ROUNDS = ['fill', 'fill', 'fill', 'type', 'fill', 'fill', 'type', 'type'];
-const shuffle = (list) => list.map((x) => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(([, x]) => x);
 
 export const drillSlots = (state, p) => p.slots.filter(([id]) => state.items[id]?.seen && ITEMS.has(id))
   .map(([id, en]) => ({ id, en, word: ITEMS.get(id) }));

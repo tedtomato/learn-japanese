@@ -37,11 +37,13 @@ export const SECTIONS_DATA = [
             ['こんにちは', 'konnichiwa', 'hello', '👋', { note: 'The everyday hello, from late morning to evening.' }],
             ['おはよう', 'ohayou', 'good morning (casual)', '🌅', { note: 'With friends and family. To be polite, say おはようございます.' }],
             ['おはようございます', 'ohayou gozaimasu', 'good morning (polite)', '🌄', { note: 'Polite: shops, hotels, colleagues, people you don\'t know.' }],
+            ['こんばんは', 'konbanwa', 'good evening', '🌃', { note: 'After dark. The last は is read "wa", as a particle.' }],
           ] },
           { title: 'Thank you', words: [
             ['ありがとう', 'arigatou', 'thanks (friends & family)', '🤗', { note: 'Casual — with friends and family.' }],
             ['ありがとうございます', 'arigatou gozaimasu', 'thank you (polite)', '🙇', { note: 'Polite — the safe choice with anyone you don\'t know well.' }],
             ['どうも', 'doumo', 'thanks (quick)', '👍', { note: 'A quick, light thanks — when someone holds a door or hands you something.' }],
+            ['どうぞ', 'douzo', 'please / here you go', '🤲', { note: 'Said when offering something or inviting you to go ahead.' }],
           ] },
           { title: 'Very polite thanks', words: [
             ['どうもありがとう', 'doumo arigatou', 'thanks a lot (casual)', '💝', { note: 'Warm and casual, with friends and family.' }],
@@ -52,6 +54,9 @@ export const SECTIONS_DATA = [
             ['はい', 'hai', 'yes', '✅', { note: 'Also means "I\'m listening" or "here you go".' }],
             ['いいえ', 'iie', 'no', '❌', { note: 'Quite direct. People often soften a no with ちょっと… ("well, a bit…").' }],
             ['すみません', 'sumimasen', 'excuse me / sorry', '🙋', { note: 'To get attention (even to call a waiter), to apologise, or as a light thank-you.' }],
+            ['ごめんなさい', 'gomen nasai', 'I am sorry', '😔', { note: 'A more personal apology, for when you are really at fault.' }],
+            ['わかりました', 'wakarimashita', 'understood', '✅', { note: 'Literally "I have understood". Polite: わかりません means "I don\'t understand".', alt: ['分かりました'] }],
+            ['けっこうです', 'kekkou desu', 'no thank you / that is fine', '🙅', { note: 'A polite way to decline an offer. Depending on the tone it can also mean "that is fine".', alt: ['結構です'] }],
           ] },
           { title: 'See you!', words: [
             ['じゃあね', 'jaa ne', 'bye (casual)', '🏃', { note: 'With friends and family. さようなら sounds like a long or final farewell, so it is rarely used.' }],
@@ -166,6 +171,8 @@ export const SECTIONS_DATA = [
             ['いくら', 'ikura', 'how much', '💴'],
             ['カード', 'kaado', 'card', '💳'],
             ['げんきん', 'genkin', 'cash', '💵', { alt: ['現金'] }],
+            ['ふくろ', 'fukuro', 'bag (shop bag)', '🛍️', { note: 'Shops ask ふくろ、いりますか ("do you need a bag?").', alt: ['袋'] }],
+            ['いらっしゃいませ', 'irasshaimase', 'welcome (said by shop staff)', '🏪', { note: 'You hear it when you walk into a shop or restaurant. You do not need to answer.' }],
           ] },
           { title: 'Help!', words: [
             ['わかりません', 'wakarimasen', 'I don\'t understand', '🤷', { alt: ['分かりません'] }],
@@ -189,7 +196,7 @@ export const SECTIONS_DATA = [
         lessons: [
           { title: '1 to 3', words: [['いち', 'ichi', 'one', '1️⃣'], ['に', 'ni', 'two', '2️⃣'], ['さん', 'san', 'three', '3️⃣']] },
           { title: '4 to 6', words: [['よん', 'yon', 'four', '4️⃣', { note: 'Also し, but よん is safer — し sounds like "death".' }], ['ご', 'go', 'five', '5️⃣'], ['ろく', 'roku', 'six', '6️⃣']] },
-          { title: '7 to 10', words: [['なな', 'nana', 'seven', '7️⃣'], ['はち', 'hachi', 'eight', '8️⃣'], ['きゅう', 'kyuu', 'nine', '9️⃣'], ['じゅう', 'juu', 'ten', '🔟']] },
+          { title: '7 to 10', words: [['なな', 'nana', 'seven', '7️⃣', { note: 'Also しち (shichi), as in しちじ = 7 o\'clock.' }], ['はち', 'hachi', 'eight', '8️⃣'], ['きゅう', 'kyuu', 'nine', '9️⃣', { note: 'Also く (ku), as in くじ = 9 o\'clock.' }], ['じゅう', 'juu', 'ten', '🔟']] },
           { title: 'Big numbers', words: [
             ['ひゃく', 'hyaku', 'hundred', '💯', { note: '500 = ごひゃく (five hundred). 300 is さんびゃく — the sound softens.', alt: ['百'] }],
             ['せん', 'sen', 'thousand', '🪙', { note: '2,000 = にせん. 3,000 is さんぜん.', alt: ['千'] }],
@@ -220,6 +227,7 @@ export const SECTIONS_DATA = [
             ['よやく', 'yoyaku', 'reservation', '📋', { alt: ['予約'] }],
             ['チェックイン', 'chekkuin', 'check-in', '🛎️', { note: 'English said the Japanese way. Check-out is チェックアウト.' }],
             ['へや', 'heya', 'room', '🚪', { alt: ['部屋'] }],
+            ['パスポート', 'pasupooto', 'passport', '📕', { note: 'English said the Japanese way. You show it at check-in.' }],
             ['かぎ', 'kagi', 'key', '🔑', { alt: ['鍵'] }],
           ] },
           { title: 'Hotel life', words: [
@@ -312,7 +320,7 @@ export const SECTIONS_DATA = [
           { title: 'Feeling ill', words: [
             ['いたい', 'itai', 'it hurts', '🤕', { alt: ['痛い'] }],
             ['くすり', 'kusuri', 'medicine', '💊', { alt: ['薬'] }],
-            ['くすりや', 'kusuriya', 'pharmacy', '⚕️', { note: 'くすり (medicine) + や (shop). Big chains are called ドラッグストア (drugstore).', alt: ['薬屋'] }],
+            ['やっきょく', 'yakkyoku', 'pharmacy', '⚕️', { note: 'The word on the sign (薬局). Drugstore chains are called ドラッグストア.', alt: ['薬局'] }],
             ['びょういん', 'byouin', 'hospital', '🏥', { alt: ['病院'] }],
           ] },
           { title: 'Getting help', words: [
@@ -332,7 +340,7 @@ export const SECTIONS_DATA = [
           ] },
           { title: 'Finding help', sentences: [
             { jp: ['みち', 'に', 'まよいました'], romaji: 'michi ni mayoimashita', en: 'I am lost', alt: ['I\'m lost', 'I got lost', 'I lost my way'] },
-            { jp: ['くすりや', 'は', 'どこ', 'です', 'か'], romaji: 'kusuriya wa doko desu ka', en: 'Where is the pharmacy', alt: ['Where is a pharmacy', 'Where\'s the pharmacy'] },
+            { jp: ['やっきょく', 'は', 'どこ', 'です', 'か'], romaji: 'yakkyoku wa doko desu ka', en: 'Where is the pharmacy', alt: ['Where is a pharmacy', 'Where\'s the pharmacy'] },
             { jp: ['びょういん', 'は', 'どこ', 'です', 'か'], romaji: 'byouin wa doko desu ka', en: 'Where is the hospital', alt: ['Where is a hospital', 'Where\'s the hospital'] },
           ] },
         ],

@@ -3,7 +3,7 @@
 // units get one short hiragana "Read it" lesson each, and the rest of hiragana comes in the
 // "Kana corner" at the end. Katakana is not taught for now.
 import { kanaId } from './content/kana.js';
-import { toneNumbers } from './pinyin.js';
+import { slug } from './normalise.js';
 import { L } from './lang.js';
 import { KANA, KANA_WORDS, SECTIONS_DATA, DIALOGUES, KANJI, RADICALS, KANJI_LESSONS, PEEK_KANJI, MNEMONICS } from './content/pack.js';
 
@@ -17,17 +17,14 @@ const isHiragana = (c) => KANA.get(c).script === 'hiragana';
 function addItem(item) {
   if (ITEMS.has(item.id)) {
     const old = ITEMS.get(item.id);
-    if (old.jp.toString() !== item.jp.toString()) throw new Error(`Item id clash: ${item.id}`);
+    if (old.jp.toString() !== item.jp.toString()) throw new Error(`Item id clash: "${old.jp}" and "${item.jp}" both make the id ${item.id}`);
     return item.id; // the same word reused later in the course
   }
   ITEMS.set(item.id, item);
   return item.id;
 }
 
-// Ids from the romanisation; pinyin tones become numbers (买 mǎi → mai3, 卖 mài → mai4).
-// Latin-alphabet courses drop accents instead (le café → le-cafe, ¿dónde? → donde).
-const plainLatin = (s) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/œ/g, 'oe').replace(/æ/g, 'ae');
-export const slug = (s) => (L.latin ? plainLatin(s) : toneNumbers(s)).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+export { slug };
 const kanaChars = (text) => [...text].filter((c) => KANA.has(c));
 
 function kanaItem(ch) {
@@ -187,5 +184,3 @@ SECTIONS.forEach((section, s) =>
     }),
   ),
 );
-
-export const unitOfItem = (item) => SECTIONS.flatMap((s) => s.units).find((u) => u.id.endsWith(`-${item.unit}`));

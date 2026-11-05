@@ -11,8 +11,8 @@ import { person, nameOf } from '../characters.js';
 import { speak, sfx, buzz } from '../audio.js';
 import { MISSIONS } from '../content/pack.js';
 import { completeMission, unitLessonsDone } from '../progress.js';
+import { shuffle } from '../lesson/generate.js';
 
-const shuffle = (list) => list.map((x) => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(([, x]) => x);
 export const missionUnit = (m) => SECTIONS.flatMap((s) => s.units).find((u) => u.id === m.unit);
 export const missionOpen = (state, m) => app.testMode || unitLessonsDone(state, missionUnit(m));
 const starsFor = (mistakes) => (mistakes === 0 ? 3 : mistakes <= 2 ? 2 : 1);

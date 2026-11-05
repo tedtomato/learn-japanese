@@ -10,11 +10,11 @@ import { sfx } from '../audio.js';
 import { KINDS, emojiFor } from '../tidbits.js';
 import { mascot } from '../mascot.js';
 import { FACT_QUIZ } from '../content/pack.js';
+import { shuffle } from '../lesson/generate.js';
 
 export const QUIZ_MIN_FACTS = 4;
 const QUESTIONS = 5;
 
-const shuffle = (list) => list.map((x) => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(([, x]) => x);
 export function seenFacts(state) {
   const seen = new Set(state.seen.fact);
   return KINDS.fact.list.filter((f) => seen.has(f.id) && FACT_QUIZ[f.id]);

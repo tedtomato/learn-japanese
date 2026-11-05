@@ -45,7 +45,7 @@ export const FACTS = [
   { id: 36, category: 'Daily Life & Customs', title: 'Menú del Día', text: 'Many restaurants offer a weekday menú del día at lunch: a fixed price for a starter, a main course, dessert or coffee, bread and a drink.', icon: 'food' },
   { id: 37, category: 'Daily Life & Customs', title: 'The Evening Stroll', text: 'The paseo is a relaxed evening walk through town, when families and friends stroll, chat and stop for a drink.', icon: 'city' },
 
-  { id: 38, category: 'Language & Regions', title: 'Four Languages', text: 'Castilian Spanish is the official language of the whole country, while Catalan, Galician and Basque are also co-official in their own regions.', icon: 'speech' },
+  { id: 38, category: 'Language & Regions', title: 'Four Languages', text: 'Castilian Spanish is the official language of the whole country, while Catalan (called Valencian in Valencia), Galician and Basque are also co-official in their own regions — and Aranese, a variety of Occitan, in Catalonia\'s Val d\'Aran.', icon: 'speech' },
   { id: 39, category: 'Language & Regions', title: 'A Mystery Language', text: 'Basque (euskera) is a language isolate: it is not related to Spanish or to any other known language in the world.', icon: 'speech' },
   { id: 40, category: 'Language & Regions', title: 'Upside-Down Marks', text: 'Spanish opens questions and exclamations with upside-down marks — ¿ and ¡ — so readers know the tone from the start of the sentence.', icon: 'book' },
   { id: 41, category: 'Language & Regions', title: 'The Story of Ñ', text: 'The letter ñ began as a double n written with a small n on top, which shrank into the wavy line (tilde) over the letter.', icon: 'book' },

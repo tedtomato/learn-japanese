@@ -194,6 +194,7 @@ export const GLOSSARY = {
   zapatos: { en: 'shoes', note: 'Los zapatos. One shoe = un zapato.' },
   caros: { en: 'expensive', note: 'Masculine plural of caro, to match los zapatos.' },
   bolsa: { en: 'bag', note: 'La bolsa.' },
+  dos: { en: 'two', note: 'Dos cafés = two coffees. The numbers are in Numbers & time.' },
   hora: { en: 'hour / time', note: '¿Qué hora es? = what time is it?' },
   lunes: { en: 'Monday', note: 'El lunes. Same form in the plural: los lunes = on Mondays.' },
   sábado: { en: 'Saturday', note: 'El sábado.' },

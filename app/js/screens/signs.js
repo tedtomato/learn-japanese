@@ -10,10 +10,10 @@ import { sfx, speak } from '../audio.js';
 import { mascot } from '../mascot.js';
 import { SIGN_SCENES } from '../content/pack.js';
 import { recordSigns } from '../progress.js';
+import { shuffle } from '../lesson/generate.js';
 
 export const SIGNS_MIN = 3;
 const QUESTIONS = 8;
-const shuffle = (list) => list.map((x) => [Math.random(), x]).sort((a, b) => a[0] - b[0]).map(([, x]) => x);
 const kanjiIds = (text) => [...text].map((c) => `kj-${c}`);
 
 export const signScenes = (state) => SIGN_SCENES.filter((s) => s.need.every((k) => state.items[`kj-${k}`]?.seen));

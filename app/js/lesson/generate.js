@@ -2,6 +2,7 @@
 import { FAMILIAR_IDS, ITEMS } from '../course.js';
 import { byUrgency } from '../srs.js';
 import { L, LANG } from '../lang.js';
+import { romajiMatch } from '../normalise.js';
 import { GRAMMAR, STROKES, FILLERS as JP_FILLERS, FILLER_ROMAJI, GLOSS_FILLERS } from '../content/pack.js';
 
 export function makeRng(seed = Date.now()) {
@@ -15,7 +16,7 @@ export function makeRng(seed = Date.now()) {
   };
 }
 
-export function shuffle(list, rng) {
+export function shuffle(list, rng = Math.random) {
   const a = [...list];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(rng() * (i + 1));
@@ -37,7 +38,7 @@ const QUESTION_TYPES = {
 };
 
 // Extra tiles for translating into the language of the meanings (French in the English course).
-const EN_FILLERS = GLOSS_FILLERS || ['the', 'is', 'a', 'you', 'I', 'my', 'please', 'what', 'this', 'like', 'are', 'and'];
+const GLOSS_TILES = GLOSS_FILLERS || ['the', 'is', 'a', 'you', 'I', 'my', 'please', 'what', 'this', 'like', 'are', 'and'];
 
 // Romaji for any sentence chunk, used to label Japanese tiles while hints are on.
 let chunkRomaji;
@@ -136,7 +137,7 @@ function choiceOptions(item, answerKind, ctx) {
 // げんき sounds exactly like おげんき, so a listener could not tell them apart.
 function tileDistractors(answer, candidates, count, ctx, bySound = false) {
   const lower = new Set(answer.map((w) => w.toLowerCase()));
-  const sounds = bySound ? answer.map(romajiOfChunk).filter(Boolean) : [];
+  const sounds = bySound && !L.latin ? answer.map(romajiOfChunk).filter(Boolean) : [];
   const clash = (r) => r && sounds.some((a) => a.startsWith(r) || a.endsWith(r) || r.startsWith(a) || r.endsWith(a));
   const pool = candidates.filter((w) => {
     const key = w.toLowerCase();
@@ -182,7 +183,7 @@ function buildExercise(item, type, ctx) {
     case 'build-jp2en': {
       const answer = enWords(item.en);
       const others = sentencePool(ctx).flatMap((s) => enWords(s.en));
-      const extra = tileDistractors(answer, [...others, ...EN_FILLERS], 3, ctx);
+      const extra = tileDistractors(answer, [...others, ...GLOSS_TILES], 3, ctx);
       return { ...base, type: 'build', mode: 'jp2en', answer, accept: item.accept, tiles: shuffle([...answer, ...extra], ctx.rng), instruction: 'Translate this sentence' };
     }
     case 'build-en2jp':
@@ -280,24 +281,8 @@ function recallExercises(ids, state, count, rng) {
   return shuffle(words, rng).slice(0, count).map((it) => ({ type: 'recall', itemId: it.id, itemIds: [it.id], kind: 'recall' }));
 }
 
-// Lenient romaji check: case, spaces, punctuation, apostrophes and long-vowel spellings (ou / oo / ō,
-// uu / ū…) don't matter. One slip in a longer word counts as "almost" (still right).
-const squash = (r) => r.toLowerCase().replace(/[üǖǘǚǜ]/g, 'u').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/v/g, 'u').replace(/[^a-z]/g, '')
-  .replace(/ou/g, 'o').replace(/([aeiou])\1+/g, '$1');
-function editDistance(a, b) {
-  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
-  for (let j = 1; j <= b.length; j++) d[0][j] = j;
-  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) {
-    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-  }
-  return d[a.length][b.length];
-}
-export function romajiMatch(typed, answer) {
-  const [t, a] = [squash(typed), squash(answer)];
-  if (!t) return false;
-  if (t === a) return 'exact';
-  return a.length >= 5 && editDistance(t, a) === 1 ? 'close' : false;
-}
+// Lenient check of typed answers lives with the other text normalisers.
+export { romajiMatch };
 
 export function generateLesson(node, state, opts = {}) {
   const { rng = makeRng(), now = Date.now() } = opts;

@@ -48,7 +48,7 @@ export const MNEMONICS = {
   'w-kanpai': '“Can, pie!” — clink your can and your pie together: cheers! 🥂',
   'w-biiru': '“Beer” said the Japanese way: bii-ru 🍺',
   'w-osake': '“Oh, sake!” — the word you know as sake means any alcohol in Japan 🍶',
-  'w-nihonshu': '“Knee-hone shoe” — Nihon (Japan) + shu (drink): Japan’s own rice wine 🍶',
+  'w-nihonshu': '“Knee-hone shoe” — Nihon (Japan) + shu (alcohol): Japan’s own rice wine 🍶',
   'w-oishii': '“Oy, she…” — “Oy, she ate it all!” It was that delicious 😋',
   'w-karai': '“Curry, eye!” — the curry is so spicy your eyes water 🌶️',
   'w-hotto': '“Hot” said the Japanese way: ho-tto ☕',
@@ -155,7 +155,7 @@ export const MNEMONICS = {
   // help & health
   'w-itai': '“Eat eye?!” — ouch, that would hurt! 🤕',
   'w-kusuri': '“Coo, Sue, Ree!” — Sue coos to Ree as she gives her the medicine 💊',
-  'w-kusuriya': '“Coo, Sue, Ree, yah!” — where Sue gets Ree’s medicine: the pharmacy ⚕️',
+  'w-yakkyoku': '“Yak, key, yoke!” — a yak with a key to the medicine cabinet and a yoke on its back: the pharmacy ⚕️',
   'w-byouin': '“Bee, oh, in!” — stung by a bee, oh, straight into hospital 🏥',
   'w-kyuukyuusha': '“Cue, cue, sha!” — the siren goes kyuu-kyuu: the ambulance 🚑',
   'w-keisatsu': '“Kay sat, Sue!” — Kay sat on Sue’s bike: call the police 👮',

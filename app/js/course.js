@@ -4,7 +4,7 @@
 // "Kana corner" at the end. Katakana is not taught for now.
 import { kanaId } from './content/kana.js';
 import { slug } from './normalise.js';
-import { L } from './lang.js';
+import { L, joinChunks } from './lang.js';
 import { KANA, KANA_WORDS, SECTIONS_DATA, DIALOGUES, KANJI, RADICALS, KANJI_LESSONS, PEEK_KANJI, MNEMONICS } from './content/pack.js';
 
 export const ITEMS = new Map();
@@ -44,7 +44,7 @@ function wordItem(w, ctx) {
 function sentenceItem({ jp, romaji = jp.join(' '), en, alt = [] }, ctx) {
   const romajiChunks = L.latin ? jp : romaji.split(' ');
   if (romajiChunks.length !== jp.length) throw new Error(`Romaji "${romaji}" must have one word per chunk`);
-  const text = jp.join(L.latin ? ' ' : '');
+  const text = joinChunks(jp);
   return addItem({ id: `s-${slug(romaji)}`, type: 'sentence', jp, text, romaji, romajiChunks, en, accept: [en, ...alt], unit: ctx.unit, section: ctx.section, chars: kanaChars(text) });
 }
 

@@ -15,10 +15,10 @@ export const PATTERNS = [
   {
     id: 'je-voudrais', jp: 'je voudrais', romaji: 'je voudrais', slotLast: true, title: 'je voudrais ___', meaning: 'I would like ___', art: '🙋',
     en: (w) => `I would like ${w}`,
-    slots: [['w-la-carte', 'the menu'], ['w-l-addition', 'the bill'], ['w-le-cafe', 'the coffee'], ['w-le-the', 'the tea'], ['w-le-vin', 'the wine'], ['w-la-biere', 'the beer'], ['w-le-croissant', 'the croissant'], ['w-le-fromage', 'the cheese'], ['w-le-jus-d-orange', 'the orange juice']],
+    slots: [['w-la-carte', 'the menu'], ['w-l-addition', 'the bill'], ['w-la-cle', 'the key'], ['w-le-recu', 'the receipt']],
   },
   {
-    id: 'combien-coute', jp: 'combien coûte', romaji: 'combien coûte', slotLast: true, title: 'combien coûte ___', meaning: 'How much is ___?', art: '💰',
+    id: 'c-est-combien', jp: 'c\'est combien,', romaji: 'c\'est combien,', slotLast: true, title: 'c\'est combien, ___', meaning: 'How much is ___?', art: '💰',
     en: (w) => `How much is ${w}?`,
     slots: [['w-le-billet', 'the ticket'], ['w-le-sac', 'the bag'], ['w-la-carte-postale', 'the postcard'], ['w-le-cadeau', 'the gift'], ['w-le-pain', 'the bread'], ['w-la-baguette', 'the baguette'], ['w-le-croissant', 'the croissant'], ['w-le-fromage', 'the cheese'], ['w-le-taxi', 'the taxi'], ['w-le-parapluie', 'the umbrella']],
   },

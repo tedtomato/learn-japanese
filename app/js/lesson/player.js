@@ -2,7 +2,8 @@
 // Each task has a countdown (speed bonus when answered in time). Correct answers move on
 // automatically after a second; wrong or hesitant answers are noted and come back at the end in a
 // "Let's correct the exercises you missed" round.
-import { L, withRoman } from '../lang.js';
+import { L, withRoman, joinChunks } from '../lang.js';
+import { glossKey, sameTiles } from '../normalise.js';
 import { ITEMS, NODE_BY_ID, MAX_LEVEL } from '../course.js';
 import { app, modal } from '../app.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
@@ -23,7 +24,6 @@ import { shareButton, wireShare } from '../share.js';
 
 const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', L.cheers[2][0], 'You got it!', 'Perfect!', L.cheers[1][0]];
 const HOUR = 60 * 60 * 1000;
-const norm = (s) => s.toLowerCase().replace(/[’']/g, '').replace(/[^\p{L}\p{N}\s]/gu, '').replace(/\s+/g, ' ').trim();
 const pickOne = (list) => list[Math.floor(Math.random() * list.length)];
 
 // Seconds allowed for a task; null = untimed.
@@ -801,10 +801,10 @@ function renderBuild(root, s) {
     onCheck: () => {
       const given = placed.map((i) => ex.tiles[i]);
       // When listening, tiles that sound the same as the answer count too.
-      const sound = (chunks) => chunks.map(romajiOfChunk).join('').replace(/ /g, '');
+      const sound = (chunks) => chunks.map(romajiOfChunk).map((r) => r.replace(/ /g, '')).join(L.latin ? ' ' : '');
       const ok = jpTiles
-        ? given.join('') === ex.answer.join('') || ((ex.mode === 'audio' || ex.mode === 'fast') && given.every(romajiOfChunk) && sound(given) === sound(ex.answer))
-        : (ex.accept || [ex.answer.join(' ')]).some((a) => norm(a) === norm(given.join(' ')));
+        ? sameTiles(given, ex.answer) || ((ex.mode === 'audio' || ex.mode === 'fast') && given.every(romajiOfChunk) && sound(given) === sound(ex.answer))
+        : (ex.accept || [ex.answer.join(' ')]).some((a) => glossKey(a) === glossKey(given.join(' ')));
       line.classList.add(ok ? 'right' : 'wrong');
       sayAs(root, s.speaker, speechOf(item));
       result(root, s, ok, {
@@ -911,7 +911,7 @@ function renderGrammar(root, s) {
   const blocks = html`<div class="g-blocks">${g.blocks.map((b) => html`<div class="g-block g-${b.role}"><span class="jp">${jpChunk(b.jp, true)}</span><small>${b.en}</small></div>`)}</div>`;
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">Grammar in 15 seconds</span></p>
     <div class="card grammar-card"><h2>${g.title}</h2>${blocks}<p class="g-en">= ${g.en}</p><p>${g.rule}</p><p class="muted small">💡 ${g.tip}</p></div>`);
-  speak(g.blocks.map((b) => b.jp).join(L.latin ? ' ' : ''), { speaker: s.speaker });
+  speak(joinChunks(g.blocks.map((b) => b.jp)), { speaker: s.speaker });
   footer(root, s, { canCheck: true, text: 'Test me (15 s)', onCheck: () => grammarCheck(root, s, g) });
 }
 

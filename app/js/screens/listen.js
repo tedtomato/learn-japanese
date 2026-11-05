@@ -1,14 +1,14 @@
 // Hands-free listening, for walks and commutes: for each phrase the app says the English, leaves a
 // pause to say it yourself, then gives the Japanese twice. Due and weakest phrases come first.
 // The screen is kept awake (it stops when the phone locks). +5 XP for 10 phrases or more.
-import { L } from '../lang.js';
+import { L, joinChunks } from '../lang.js';
 import { ITEMS } from '../course.js';
 import { app } from '../app.js';
 import { html, mount, $ } from '../dom.js';
 import { icon } from '../icons.js';
 import { art } from '../art.js';
 import { mascot } from '../mascot.js';
-import { speak, speakEnglish, stopSpeaking, canSpeakAloud } from '../audio.js';
+import { speak, speakGloss, stopSpeaking, canSpeakAloud } from '../audio.js';
 import { strength } from '../srs.js';
 import { learnedItemIds, completeListening, LISTEN_XP_MIN } from '../progress.js';
 import { speechOf } from '../lesson/text.js';
@@ -45,7 +45,7 @@ export function renderListen(root) {
       <button class="btn btn-secondary listen-pause">${icon('pause', 20)} Pause</button>
       <button class="btn btn-ghost listen-next">Next ${icon('arrow', 18)}</button>
     </div>
-    <p class="muted small listen-help">Hear the English, say it in ${L.name} before ${L.cast.woman2} does, then repeat after her. Keep the screen on — the phone can go in your pocket with headphones.</p>
+    <p class="muted small listen-help">Hear the ${L.gloss}, say it in ${L.name} before ${L.cast.woman2} does, then repeat after her. Keep the screen on — the phone can go in your pocket with headphones.</p>
   </main>`);
 
   const pauseLabel = () => html`${icon(paused ? 'play' : 'pause', 20)} ${paused ? 'Resume' : 'Pause'}`;
@@ -62,11 +62,11 @@ export function renderListen(root) {
     $('.listen-en', root).textContent = it.en;
     $('.listen-jp', root).hidden = true;
     step('🎧 Listen…');
-    await speakEnglish(it.en);
+    await speakGloss(it.en);
     if (id !== run || paused) return;
     step(`🗣️ Say it in ${L.name}!`);
     if (!(await wait(THINK_MS, id))) return;
-    $('.listen-jp .jp', root).textContent = Array.isArray(it.jp) ? it.jp.join(L.latin ? ' ' : '') : it.jp;
+    $('.listen-jp .jp', root).textContent = Array.isArray(it.jp) ? joinChunks(it.jp) : it.jp;
     $('.listen-jp small', root).textContent = L.latin ? it.en : it.romaji;
     $('.listen-jp', root).hidden = false;
     step(`👂 ${L.cast.woman2} says…`);

@@ -1,6 +1,7 @@
 // Speech in the course's language (Japanese or Chinese) with the device's voices, voice casting for
 // the lesson characters, speech recognition for speaking exercises, and small generated sound effects.
 import { L } from './lang.js';
+import { speechKey, similarity } from './normalise.js';
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : undefined;
 let jaVoices = [];
@@ -89,15 +90,17 @@ export function speak(text, { speaker = 'narrator', slow = false, fast = false, 
   });
 }
 
-// English prompts for the hands-free listening mode, in the device's English voice.
-export function speakEnglish(text) {
+// Prompts in the language of the meanings (English; French in the English course) for the
+// hands-free listening mode, in the device's voice for that language.
+export function speakGloss(text) {
   return new Promise((resolve) => {
     if (!synth || !text) return resolve();
     synth.cancel();
     const u = new SpeechSynthesisUtterance(text);
-    u.lang = 'en-US';
-    const en = synth.getVoices().find((v) => /^en([-_]|$)/i.test(v.lang));
-    if (en) u.voice = en;
+    const code = L.gloss === 'French' ? 'fr' : 'en';
+    u.lang = code === 'fr' ? 'fr-FR' : 'en-US';
+    const voice = synth.getVoices().find((v) => v.lang.toLowerCase().replace('_', '-').startsWith(code));
+    if (voice) u.voice = voice;
     u.rate = 0.95;
     let done = false;
     const finish = () => !done && (done = true, resolve());
@@ -144,29 +147,15 @@ export function listen({ timeoutMs = 7000 } = {}) {
   });
 }
 
-const toHira = (s) => s.replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
-// Latin-alphabet courses: capitals, accents and apostrophes don't matter either.
-const normLatin = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^\p{L}\p{N}]/gu, '');
-const normJa = (s) => (L.latin ? normLatin(s) : toHira(s).replace(/[\s、。！？!?.,・～〜ー，：；“”]/g, ''));
-
-function similarity(a, b) {
-  if (!a || !b) return 0;
-  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
-  for (let j = 1; j <= b.length; j++) d[0][j] = j;
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
-      d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
-    }
-  }
-  return 1 - d[a.length][b.length] / Math.max(a.length, b.length);
-}
-
 // Is what the recogniser heard close enough to the target (kana) or one of its other spellings?
 export function speechMatches(heard, targets) {
-  const goals = targets.map(normJa).filter(Boolean);
+  const goals = targets.map(speechKey).filter(Boolean);
+  // Latin words are short and close to each other (bonjour / bonsoir, non / nom), so the fuzzy
+  // match is stricter, and not used at all for words of four letters or fewer.
+  const fuzzy = (g) => (L.latin ? (g.length <= 4 ? 2 : 0.8) : 0.6);
   return heard.some((h) => {
-    const n = normJa(h);
-    return goals.some((g) => n.includes(g) || g.includes(n) && n.length >= g.length * 0.7 || similarity(n, g) >= 0.6);
+    const n = speechKey(h);
+    return goals.some((g) => n.includes(g) || g.includes(n) && n.length >= g.length * 0.7 || similarity(n, g) >= fuzzy(g));
   });
 }
 

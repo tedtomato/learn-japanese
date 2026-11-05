@@ -6,7 +6,7 @@
 
 export const COURSES = {
   ja: {
-    code: 'ja', name: 'Japanese', native: '日本語', country: 'Japan', flag: 'jp',
+    code: 'ja', name: 'Japanese', native: '日本語', country: 'Japan', flag: 'jp', gloss: 'English',
     speech: 'ja-JP', roman: 'romaji', chars: 'kanji', Chars: 'Kanji', charOne: 'kanji', glyph: '漢',
     titleNative: 'はじめ', titleSay: 'はじめ！', voiceTest: 'こんにちは', hasKana: true,
     cast: { woman: 'Yuki', woman2: 'Mika' },
@@ -14,7 +14,7 @@ export const COURSES = {
     storageKey: 'hajime.progress.v1', testKey: 'hajime.test-progress.v1',
   },
   zh: {
-    code: 'zh', name: 'Chinese', native: '中文', country: 'China', flag: 'cn',
+    code: 'zh', name: 'Chinese', native: '中文', country: 'China', flag: 'cn', gloss: 'English',
     speech: 'zh-CN', roman: 'pinyin', chars: 'characters', Chars: 'Characters', charOne: 'character', glyph: '字',
     titleNative: '开始', titleSay: '开始！', voiceTest: '你好', hasKana: false,
     cast: { woman: 'Lìlì', woman2: 'Xiǎoměi' },
@@ -72,6 +72,9 @@ export const LANG = COURSES[readCourse()] ? readCourse() : 'ja';
 export const L = COURSES[LANG];
 
 // The text shown under words (romanisation) — none in Latin-alphabet courses, where it is the word itself.
+// Sentence chunks as one line of text: spaces between words in Latin-alphabet courses, none in Japanese / Chinese.
+export const joinChunks = (chunks) => chunks.join(L.latin ? ' ' : '');
+
 export const withRoman = (jp, romaji) => (L.latin || !romaji || romaji === jp ? jp : `${jp} · ${romaji}`);
 
 // The language menu opens every time the app starts; once a language is picked (or the menu is
@@ -100,7 +103,12 @@ export function switchCourse(code) {
   } catch {
     return;
   }
+  if (code === LANG) {
+    // Same course: just go to the path (once; the hash change or the explicit event routes it).
+    if (location.hash === '#/learn') window.dispatchEvent(new HashChangeEvent('hashchange'));
+    else location.hash = '#/learn';
+    return;
+  }
   location.hash = '#/learn';
-  if (code === LANG) window.dispatchEvent(new HashChangeEvent('hashchange'));
-  else location.reload();
+  location.reload();
 }

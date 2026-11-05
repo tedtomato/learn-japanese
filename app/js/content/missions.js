@@ -13,8 +13,8 @@ export const MISSIONS = [
     steps: [
       { who: 'woman2', jp: 'はじめまして！ミカです。', romaji: 'hajimemashite! mika desu', en: 'Nice to meet you! I\'m Mika.',
         replies: [R('はじめまして', 'hajimemashite', 'nice to meet you', true), R('おやすみなさい', 'oyasuminasai', 'good night', false, 'That\'s "good night" — you just arrived!'), R('じゃあね', 'jaa ne', 'bye', false, 'That\'s "bye" — leaving already?')] },
-      { who: 'woman2', jp: 'おげんきですか。', romaji: 'ogenki desu ka', en: 'How are you?',
-        replies: [R('げんきです', 'genki desu', 'I am well', true), R('いいえ', 'iie', 'no', false, '"No" is a strange answer to "how are you?"'), R('もしもし', 'moshi moshi', 'hello (phone)', false, 'That\'s how you say hello on the phone.')] },
+      { who: 'woman2', jp: 'げんきですか。', romaji: 'genki desu ka', en: 'Are you well after the trip?',
+        replies: [R('げんきです', 'genki desu', 'I am well', true), R('いいえ', 'iie', 'no', false, '"No" is a strange answer to "how are you?"'), R('もしもし', 'moshimoshi', 'hello (phone)', false, 'That\'s how you say hello on the phone.')] },
       { who: 'woman2', jp: 'これ、どうぞ。', romaji: 'kore, douzo', en: 'Here, this is for you. 🎁',
         replies: [R('ありがとうございます', 'arigatou gozaimasu', 'thank you (polite)', true), R('おはようございます', 'ohayou gozaimasu', 'good morning', false, 'That\'s "good morning" — say thank you for the gift!'), R('はい', 'hai', 'yes', false, '"Yes"… then say thank you!')] },
       { who: 'woman2', jp: 'おやすみなさい！', romaji: 'oyasuminasai', en: 'Good night!',
@@ -33,7 +33,7 @@ export const MISSIONS = [
       { who: 'woman', jp: 'まっすぐです。それから、みぎです。', romaji: 'massugu desu. sorekara, migi desu', en: 'Straight ahead. Then, to the right.', prompt: 'Which way do you go?',
         replies: [E('⬆️ Straight, then ➡️ right', true), E('⬆️ Straight, then ⬅️ left', false, 'ひだり is left — she said みぎ (right).'), E('⬅️ Left, then ⬆️ straight', false, 'まっすぐ (straight) came first, then みぎ (right).')] },
       { prompt: 'Thank her politely.',
-        replies: [R('ありがとうございます', 'arigatou gozaimasu', 'thank you (polite)', true), R('おやすみなさい', 'oyasuminasai', 'good night', false, '"Good night" — it\'s the middle of the day!'), R('もしもし', 'moshi moshi', 'hello (phone)', false, 'That\'s for the phone.')] },
+        replies: [R('ありがとうございます', 'arigatou gozaimasu', 'thank you (polite)', true), R('おやすみなさい', 'oyasuminasai', 'good night', false, '"Good night" — it\'s the middle of the day!'), R('もしもし', 'moshimoshi', 'hello (phone)', false, 'That\'s for the phone.')] },
     ],
   },
   {
@@ -127,7 +127,7 @@ export const MISSIONS = [
         replies: [R('ありがとうございます', 'arigatou gozaimasu', 'thank you', true), R('のりかえはどこですか', 'norikae wa doko desu ka', 'where do I change?', false, 'No need to change trains — just say thank you.'), R('おやすみなさい', 'oyasuminasai', 'good night', false, 'It\'s 8 in the morning!')] },
       { who: 'woman', jp: 'つぎは きょうと、きょうとです。', romaji: 'tsugi wa kyouto, kyouto desu', en: 'Next stop: Kyoto, Kyoto.', prompt: 'The train announcement! What do you do?',
         replies: [E('🎒 Get ready — next stop is yours', true), E('😴 Sleep, it\'s far away', false, 'つぎ = next: Kyoto is the next stop!'), E('🔄 Change trains here', false, 'のりかえ would mean changing. つぎ means next.')] },
-      { who: 'woman2', jp: 'どちらまで？', romaji: 'dochira made?', en: 'Where to?', prompt: 'In the taxi. Ask to go to your hotel.',
+      { who: 'woman', jp: 'どちらまで？', romaji: 'dochira made?', en: 'Where to?', prompt: 'In the taxi. Ask to go to your hotel.',
         replies: [R('ホテルまでおねがいします', 'hoteru made onegaishimasu', 'to the hotel please', true), R('ホテルはどこですか', 'hoteru wa doko desu ka', 'where is the hotel?', false, 'The driver asks you! Say ホテルまで (to the hotel).'), R('えきまでおねがいします', 'eki made onegaishimasu', 'to the station please', false, 'You just came from the station!')] },
     ],
   },

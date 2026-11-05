@@ -46,6 +46,8 @@ export const SECTIONS_DATA = [
             ['bonjour', 'hello / good morning', '👋', { note: 'Say it to everyone when you walk into a shop, a café or a bus. Skipping it sounds rude!' }],
             ['bonsoir', 'good evening', '🌙', { note: 'From late afternoon on, instead of bonjour.' }],
             ['salut', 'hi / bye (casual)', '😀', { note: 'Only with friends and people your age. It works for hello and for goodbye.' }],
+            ['madame', 'madam / Mrs', '👘', { note: 'Add it to a greeting to be polite: bonjour madame. Said on its own, it is how you address a woman.' }],
+            ['monsieur', 'sir / Mr', '👔', { note: 'Bonjour monsieur. Never say "mademoiselle" anymore: madame is used for every adult woman.' }],
           ] },
           { title: 'Thank you', words: [
             ['merci', 'thank you', '🙏'],
@@ -138,7 +140,7 @@ export const SECTIONS_DATA = [
           { title: 'Bread & cheese', words: [
             ['le pain', 'bread', '🍞'],
             ['la baguette', 'baguette', '🍞', { note: 'The long, crusty loaf. Many people buy one fresh every day.' }],
-            ['le croissant', 'croissant', '🍞', { note: 'A breakfast treat. The chocolate one is a pain au chocolat (or chocolatine in the south-west!).' }],
+            ['le croissant', 'croissant', '🍪', { note: 'A breakfast treat. The chocolate one is a pain au chocolat (or chocolatine in the south-west!).' }],
             ['le fromage', 'cheese', '🧀'],
           ] },
           { title: 'Cheers!', words: [
@@ -148,9 +150,9 @@ export const SECTIONS_DATA = [
           ] },
           { title: 'Ordering', words: [
             ['je voudrais', 'I would like', '🙋', { note: 'The polite way to order or ask for anything.' }],
-            ['la carte', 'the menu', '📋', { note: 'Le menu is a set menu at a fixed price. La carte also means card or map.' }],
-            ['l\'addition', 'the bill / check', '🧾', { note: 'Staff will not bring it until you ask: they don\'t want to rush you.' }],
-            ['le serveur', 'waiter', '🧑‍🍳', { note: 'A waitress is la serveuse. To call them, just say s\'il vous plaît!', alt: ['la serveuse'] }],
+            ['la carte', 'menu', '📋', { note: 'Le menu is a set menu at a fixed price. La carte also means card or map.' }],
+            ['l\'addition', 'bill / check', '🧾', { note: 'Staff will not bring it until you ask: they don\'t want to rush you.' }],
+            ['le serveur', 'waiter', '🛎️', { note: 'A waitress is la serveuse. To call them, just say s\'il vous plaît!', alt: ['la serveuse'] }],
           ] },
           { title: 'Tastes', words: [
             ['délicieux', 'delicious', '😋', { note: 'With a feminine noun: délicieuse.', alt: ['délicieuse'] }],
@@ -174,7 +176,7 @@ export const SECTIONS_DATA = [
       {
         id: 'shopping',
         title: 'Shopping & money',
-        desc: 'Prices, paying by card, markets and the bakery',
+        desc: 'Count to ten, prices, paying by card, markets and the bakery',
         facts: [FACT.daily, FACT.city],
         phrases: [PHRASE.shopping],
         dialogues: ['d-market'],
@@ -190,8 +192,24 @@ export const SECTIONS_DATA = [
             ['les espèces', 'cash', '💵', { note: 'Also called le liquide.' }],
             ['le reçu', 'receipt', '🧾'],
           ] },
+          { title: 'One to three', words: [
+            ['un', 'one', '1️⃣', { note: 'Before a feminine noun it becomes une: une bière. Un and une also mean "a".', alt: ['1', 'une'] }],
+            ['deux', 'two', '2️⃣', { alt: ['2'] }],
+            ['trois', 'three', '3️⃣', { alt: ['3'] }],
+          ] },
+          { title: 'Four to six', words: [
+            ['quatre', 'four', '4️⃣', { alt: ['4'] }],
+            ['cinq', 'five', '5️⃣', { alt: ['5'] }],
+            ['six', 'six', '6️⃣', { note: 'Said "siss" alone, but "si" before a consonant: six croissants.', alt: ['6'] }],
+          ] },
+          { title: 'Seven to ten', words: [
+            ['sept', 'seven', '7️⃣', { note: 'The p is silent: "set".', alt: ['7'] }],
+            ['huit', 'eight', '8️⃣', { alt: ['8'] }],
+            ['neuf', 'nine', '9️⃣', { note: 'Neuf also means "new"!', alt: ['9'] }],
+            ['dix', 'ten', '🔟', { alt: ['10'] }],
+          ] },
           { title: 'Shops', words: [
-            ['la boulangerie', 'bakery', '🍞', { note: 'Bread, croissants and cakes. Say bonjour when you come in!' }],
+            ['la boulangerie', 'bakery', '🍰', { note: 'Bread, croissants and cakes. Say bonjour when you come in!' }],
             ['la pharmacie', 'pharmacy', '💊', { note: 'Look for the green cross.' }],
             ['le marché', 'market', '🍎'],
             ['le supermarché', 'supermarket', '🏪'],
@@ -211,6 +229,7 @@ export const SECTIONS_DATA = [
             { jp: ['je', 'ne', 'comprends', 'pas'], en: 'I do not understand', alt: ['I don\'t understand'] },
             { jp: ['je', 'ne', 'sais', 'pas'], en: 'I do not know', alt: ['I don\'t know'] },
             { jp: ['je', 'regarde', 'seulement'], en: 'I am just looking', alt: ['I\'m just looking', 'Just looking', 'I\'m only looking'] },
+            { jp: ['vous', 'parlez', 'anglais'], en: 'Do you speak English', alt: ['You speak English', 'Can you speak English'] },
           ] },
         ],
       },
@@ -223,27 +242,11 @@ export const SECTIONS_DATA = [
       {
         id: 'numbers',
         title: 'Numbers & time',
-        desc: 'Count, read prices and tell the time',
+        desc: 'Bigger numbers, days and telling the time',
         facts: [FACT.language, FACT.history],
         phrases: [PHRASE.hotel],
         dialogues: ['d-train'],
         lessons: [
-          { title: 'One to three', words: [
-            ['un', 'one', '1️⃣', { note: 'Before a feminine noun it becomes une: une bière. Un and une also mean "a".', alt: ['1', 'une'] }],
-            ['deux', 'two', '2️⃣', { alt: ['2'] }],
-            ['trois', 'three', '3️⃣', { alt: ['3'] }],
-          ] },
-          { title: 'Four to six', words: [
-            ['quatre', 'four', '4️⃣', { alt: ['4'] }],
-            ['cinq', 'five', '5️⃣', { alt: ['5'] }],
-            ['six', 'six', '6️⃣', { note: 'Said "siss" alone, but "si" before a consonant: six croissants.', alt: ['6'] }],
-          ] },
-          { title: 'Seven to ten', words: [
-            ['sept', 'seven', '7️⃣', { note: 'The p is silent: "set".', alt: ['7'] }],
-            ['huit', 'eight', '8️⃣', { alt: ['8'] }],
-            ['neuf', 'nine', '9️⃣', { note: 'Neuf also means "new"!', alt: ['9'] }],
-            ['dix', 'ten', '🔟', { alt: ['10'] }],
-          ] },
           { title: 'Bigger numbers', words: [
             ['vingt', 'twenty', '🔢', { note: 'The g and t are silent: "van".', alt: ['20'] }],
             ['cinquante', 'fifty', '🔢', { alt: ['50'] }],
@@ -258,6 +261,11 @@ export const SECTIONS_DATA = [
           ] },
           { title: 'Days', words: [
             ['lundi', 'Monday', '📅', { note: 'Days and months take no capital letter in French.' }],
+            ['mardi', 'Tuesday', '📅'],
+            ['samedi', 'Saturday', '📅'],
+            ['dimanche', 'Sunday', '📅', { note: 'Many shops are closed on Sunday, especially in small towns.' }],
+          ] },
+          { title: 'Weekend & day', words: [
             ['le week-end', 'weekend', '😎'],
             ['le matin', 'morning', '🌅'],
             ['le soir', 'evening', '🌃'],
@@ -285,7 +293,7 @@ export const SECTIONS_DATA = [
         lessons: [
           { title: 'Family', words: [
             ['la famille', 'family', '👫'],
-            ['la mère', 'mother', '🧑', { note: 'Mum is maman, dad is papa.' }],
+            ['la mère', 'mother', '💐', { note: 'Mum is maman, dad is papa.' }],
             ['le père', 'father', '🧑'],
             ['les enfants', 'children', '🧑‍🤝‍🧑', { note: 'One child: l\'enfant.' }],
           ] },
@@ -392,14 +400,14 @@ export const SECTIONS_DATA = [
           { title: 'Nice or not?', words: [
             ['il fait beau', 'the weather is nice', '😎', { note: 'Weather uses il fait… (literally "it makes").' }],
             ['il fait chaud', 'it\'s hot', '🔥'],
-            ['il fait froid', 'it\'s cold', '❄️'],
+            ['il fait froid', 'it\'s cold', '🗻'],
             ['il pleut', 'it\'s raining', '☂️'],
           ] },
           { title: 'Seasons', words: [
             ['le printemps', 'spring', '🌸', { note: 'Au printemps = in spring. The other seasons take en: en été, en automne, en hiver.' }],
             ['l\'été', 'summer', '☀️'],
             ['l\'automne', 'autumn / fall', '🍃', { note: 'The m is silent: "o-ton".' }],
-            ['l\'hiver', 'winter', '❄️'],
+            ['l\'hiver', 'winter', '⛰️'],
           ] },
           { title: 'Nature', words: [
             ['la mer', 'sea', '🌊'],
@@ -447,7 +455,7 @@ export const SECTIONS_DATA = [
           { title: 'Hungry & thirsty', words: [
             ['j\'ai faim', 'I\'m hungry', '😋', { note: 'Literally "I have hunger".' }],
             ['j\'ai soif', 'I\'m thirsty', '🥤'],
-            ['j\'ai froid', 'I\'m cold', '❄️', { note: 'Never "je suis froid" — that means you are a cold person!' }],
+            ['j\'ai froid', 'I\'m cold', '🧥', { note: 'Never "je suis froid" — that means you are a cold person!' }],
             ['j\'ai chaud', 'I\'m hot', '🔥'],
           ] },
           { title: 'Nice to meet you', words: [
@@ -464,7 +472,7 @@ export const SECTIONS_DATA = [
           { title: 'Question words', words: [
             ['pourquoi', 'why', '❔', { note: 'Answer with parce que (because).' }],
             ['quand', 'when', '🕒'],
-            ['qui', 'who', '🧑'],
+            ['qui', 'who', '🔎'],
             ['comment', 'how', '❓'],
           ] },
           { title: 'I\'m hungry', grammar: 'avoir', sentences: [
@@ -606,7 +614,7 @@ export const DIALOGUES = {
     title: 'At the café',
     cast: ['woman', 'woman2'],
     lines: [
-      { who: 0, jp: 'Bonjour! Qu\'est-ce que vous voulez?', en: 'Hello! What would you like?' },
+      { who: 0, jp: 'Bonjour! Qu\'est-ce que je vous sers?', en: 'Hello! What can I get you?' },
       { who: 1, jp: 'Je voudrais un café et un croissant, s\'il vous plaît.', en: 'I\'d like a coffee and a croissant, please.' },
       { who: 0, jp: 'Et avec ça?', en: 'Anything else?' },
       { who: 1, jp: 'Une carafe d\'eau, s\'il vous plaît. Merci!', en: 'A jug of water, please. Thanks!' },

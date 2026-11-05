@@ -294,7 +294,7 @@ export const SECTIONS_DATA = [
             ['のりかえ', 'norikae', 'transfer (change trains)', '🔄', { alt: ['乗り換え'] }],
           ] },
           { title: 'Going places', words: [
-            ['いきます', 'ikimasu', 'to go', '➡️', { alt: ['行きます'] }],
+            ['いきます', 'ikimasu', 'go / goes (polite)', '➡️', { note: 'The polite form of "to go".', alt: ['行きます'] }],
             ['まで', 'made', 'to / until', '🏁', { note: 'After a place: ホテル まで = to the hotel.' }],
             ['きょうと', 'kyouto', 'Kyoto', '⛩️', { alt: ['京都'] }],
           ] },

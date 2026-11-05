@@ -13,10 +13,10 @@ export const GRAMMAR = {
   },
   ka: {
     title: 'か — the question mark you can hear',
-    rule: 'Add か after です to turn a statement into a question. No word-order change!',
+    rule: 'Add か after です (or after a polite verb ending in ます) to turn a statement into a question. No word-order change!',
     blocks: [{ jp: 'えき', role: 'noun', en: 'station' }, { jp: 'は', role: 'particle', en: 'as for' }, { jp: 'どこ', role: 'noun', en: 'where' }, { jp: 'です', role: 'end', en: 'is' }, { jp: 'か', role: 'end', en: '?' }],
     en: 'Where is the station?',
-    tip: 'は (as for…) is read "wa" when it is a particle.',
+    tip: 'Also with verbs: いきます か = "do you go?". は (as for…) is read "wa" when it is a particle.',
     check: { prompt: ['トイレ', 'は', 'どこ', 'です', null], en: 'Where is the toilet?', options: ['か', 'と', 'を'], answer: 'か' },
   },
   to: {

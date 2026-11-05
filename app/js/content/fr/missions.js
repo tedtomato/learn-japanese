@@ -96,7 +96,7 @@ export const MISSIONS = [
       { who: 'woman', jp: 'Cent euros, s\'il vous plaît.', en: 'A hundred euros, please.', prompt: 'How much do you pay?',
         replies: [E('100 euros', true), E('20 euros', false, 'Vingt is 20 — she said cent, 100.'), E('50 euros', false, 'Cinquante is 50 — she said cent, 100.')] },
       { prompt: 'Pay and thank her.',
-        replies: [R('Voici. Merci beaucoup!', 'here you are. thank you very much!', true), R('C\'est trop cher!', 'it\'s too expensive!', false, 'Maybe… but there\'s no haggling at the ticket office!'), R('Je ne comprends pas', 'I don\'t understand', false, 'You understood perfectly: cent euros!')] },
+        replies: [R('Voilà. Merci beaucoup!', 'here you are. thank you very much!', true), R('C\'est trop cher!', 'it\'s too expensive!', false, 'Maybe… but there\'s no haggling at the ticket office!'), R('Je ne comprends pas', 'I don\'t understand', false, 'You understood perfectly: cent euros!')] },
     ],
   },
   {

@@ -14,7 +14,7 @@ export const GRAMMAR = {
   },
   gender: {
     title: 'le, la, les — "the"',
-    rule: 'Every noun is masculine or feminine. "The" is le (masculine), la (feminine), l\' before a vowel, and les for plurals.',
+    rule: 'Every noun is masculine or feminine. "The" is le (masculine), la (feminine), l\' before a vowel or a silent h, and les for plurals.',
     blocks: [{ jp: 'où', role: 'particle', en: 'where' }, { jp: 'est', role: 'verb', en: 'is' }, { jp: 'la', role: 'particle', en: 'the (fem.)' }, { jp: 'gare', role: 'noun', en: 'station' }],
     en: 'Where is the station?',
     tip: '"A" works the same way: un (masculine), une (feminine). Learn every noun with its article: le métro, la gare.',
@@ -57,7 +57,7 @@ export const GRAMMAR = {
     rule: 'My follows the noun\'s gender, not yours: mon (masculine), ma (feminine), mes (plural).',
     blocks: [{ jp: 'ma', role: 'particle', en: 'my (fem.)' }, { jp: 'sœur', role: 'noun', en: 'sister' }, { jp: 'est', role: 'verb', en: 'is' }, { jp: 'professeur', role: 'noun', en: 'teacher' }],
     en: 'My sister is a teacher.',
-    tip: '"Your" works the same: ton, ta, tes (with tu) and votre, vos (with vous).',
+    tip: 'Before a vowel, even a feminine noun takes mon: mon amie, mon école. "Your" works the same: ton, ta, tes (with tu) and votre, vos (with vous).',
     check: { prompt: [null, 'frère', 'est', 'médecin'], en: 'My brother is a doctor', options: ['mon', 'ma', 'mes'], answer: 'mon' },
   },
   'il-y-a': {
@@ -97,7 +97,7 @@ export const GRAMMAR = {
     rule: 'In spoken French, a statement becomes a yes/no question when your voice goes up at the end. No word change needed!',
     blocks: [{ jp: 'tu', role: 'noun', en: 'you' }, { jp: 'es', role: 'verb', en: 'are' }, { jp: 'fatigué', role: 'noun', en: 'tired' }, { jp: '?', role: 'end', en: '(rising voice)' }],
     en: 'Are you tired?',
-    tip: 'More formal: est-ce que tu es fatigué? or es-tu fatigué? Question words go first in writing: pourquoi tu es triste?',
+    tip: 'More formal: est-ce que tu es fatigué? or es-tu fatigué? In writing, the question word goes first and the verb comes before the pronoun: pourquoi es-tu triste? (Speech often says pourquoi tu es triste?)',
     check: { prompt: [null, 'parlez', 'anglais'], en: 'Do you speak English?', options: ['vous', 'je', 'tu'], answer: 'vous' },
   },
 };
@@ -141,6 +141,8 @@ export const GLOSSARY = {
   on: { en: 'we / one / people', note: 'Everyday French uses on for "we": on va à la plage = let\'s go to the beach.' },
   nous: { en: 'we', note: 'More formal than on.' },
   vous: { en: 'you (polite or plural)', note: 'For strangers, staff, older people, or several people.' },
+  comment: { en: 'how', note: 'Comment allez-vous? = how are you? Also comment vous appelez-vous? = what\'s your name?' },
+  anglais: { en: 'English', note: 'Vous parlez anglais? = do you speak English? No capital letter in French.' },
   // Possessives
   mon: { en: 'my (masculine)', note: 'Mon frère, mon passeport.' },
   ma: { en: 'my (feminine)', note: 'Ma sœur, ma famille.' },
@@ -224,6 +226,6 @@ export const GLOSSARY = {
   crevé: { en: 'exhausted (slang)', note: 'Literally "burst" (like a tyre). A woman says crevée.' },
   pote: { en: 'mate / buddy', note: 'Slang for ami.' },
   fric: { en: 'money (slang)', note: 'Like "cash" or "dough".' },
-  Camille: { en: 'Camille (a name)', note: 'A popular French name, mostly for women.' },
+  Camille: { en: 'Camille (a name)', note: 'A French first name for women and men. In this course Camille is a woman.' },
   Paris: { en: 'Paris', note: 'The s is silent: "pa-ree".' },
 };

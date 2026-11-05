@@ -400,7 +400,7 @@ export const SECTIONS_DATA = [
           { title: 'Nice or not?', words: [
             ['il fait beau', 'the weather is nice', '😎', { note: 'Weather uses il fait… (literally "it makes").' }],
             ['il fait chaud', 'it\'s hot', '🔥'],
-            ['il fait froid', 'it\'s cold', '🗻'],
+            ['il fait froid', 'it\'s cold', '🧊'],
             ['il pleut', 'it\'s raining', '☂️'],
           ] },
           { title: 'Seasons', words: [

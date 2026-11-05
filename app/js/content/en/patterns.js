@@ -8,7 +8,7 @@ export const PATTERNS = [
   {
     id: 'where-is', jp: 'Where is the', romaji: 'Where is the', slotLast: true, title: 'Where is the ___', meaning: 'Où est ___ ?', art: '🗺️',
     en: (w) => `Où est ${w} ?`,
-    slots: [['w-station', 'la gare'], ['w-platform', 'le quai'], ['w-hotel', 'l\'hôtel'], ['w-toilet', 'les toilettes'], ['w-bus-stop', 'l\'arrêt de bus'], ['w-airport', 'l\'aéroport'], ['w-shop', 'le magasin'], ['w-pub', 'le pub'], ['w-hospital', 'l\'hôpital'], ['w-chemist', 'la pharmacie']],
+    slots: [['w-station', 'la gare'], ['w-hotel', 'l\'hôtel'], ['w-toilet', 'les toilettes'], ['w-bus-stop', 'l\'arrêt de bus'], ['w-airport', 'l\'aéroport'], ['w-shop', 'le magasin'], ['w-pub', 'le pub'], ['w-hospital', 'l\'hôpital'], ['w-chemist', 'la pharmacie']],
   },
   {
     id: 'id-like', jp: 'I\'d like a', romaji: 'I\'d like a', slotLast: true, title: 'I\'d like a ___', meaning: 'Je voudrais un(e) ___', art: '🙋',
@@ -28,11 +28,11 @@ export const PATTERNS = [
   {
     id: 'i-need', jp: 'I need a', romaji: 'I need a', slotLast: true, title: 'I need a ___', meaning: 'J\'ai besoin d\'un(e) ___', art: '🆘',
     en: (w) => `J'ai besoin ${w}`,
-    slots: [['w-doctor', 'd\'un médecin'], ['w-taxi', 'd\'un taxi'], ['w-map', 'd\'un plan'], ['w-ticket', 'd\'un billet'], ['w-bag', 'd\'un sac'], ['w-key', 'd\'une clé'], ['w-phone', 'd\'un téléphone'], ['w-hotel', 'd\'un hôtel']],
+    slots: [['w-doctor', 'd\'un médecin'], ['w-taxi', 'd\'un taxi'], ['w-map', 'd\'un plan'], ['w-ticket', 'd\'un billet'], ['w-bag', 'd\'un sac'], ['w-key', 'd\'une clé'], ['w-phone', 'd\'un téléphone']],
   },
   {
     id: 'please', jp: 'please', romaji: 'please', title: '___ please', meaning: '___, s\'il vous plaît', art: '🤲',
     en: (w) => `${w}, s'il vous plaît`,
-    slots: [['w-water', 'De l\'eau'], ['w-tea', 'Du thé'], ['w-coffee', 'Du café'], ['w-milk', 'Du lait'], ['w-wine', 'Du vin'], ['w-cake', 'Du gâteau'], ['w-fish-and-chips', 'Un poisson-frites'], ['w-single', 'Un aller simple'], ['w-return', 'Un aller-retour']],
+    slots: [['w-water', 'De l\'eau'], ['w-tea', 'Du thé'], ['w-coffee', 'Du café'], ['w-milk', 'Du lait'], ['w-wine', 'Du vin'], ['w-fish-and-chips', 'Un poisson-frites']],
   },
 ];

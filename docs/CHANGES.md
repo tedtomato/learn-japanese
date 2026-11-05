@@ -3,6 +3,19 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 17 — 5 Nov 2026 (review fixes: app code)
+| Request | Status | Release |
+|---|---|---|
+| One text-normalisation module (`normalise.js`) per course for typed answers, speech, ids and tiles; Latin courses no longer fold vowels (vous ≠ vos, pour ≠ poor, año ≠ ano; sœur = soeur) | ✅ | 0.92 |
+| Tiles compared word by word (par + le ≠ parle); tile distractors keep near-miss words in Latin courses; stricter speech match for Latin (≥ 0.8, exact for ≤ 4 letters) | ✅ | 0.92 |
+| English course: prompts read in French (`speakGloss`) | ✅ | 0.92 |
+| Language screen computes the streak from saved fields; XP alone counts as started | ✅ | 0.92 |
+| Backups carry their course and filename code; another course's backup is refused | ✅ | 0.92 |
+| Neutral page title/manifest; reminder and share text use the course name; theme pre-paint reads the course's key | ✅ | 0.92 |
+| No update reload during missions, drills, signs, tones, quiz, listening (`app.busy`) | ✅ | 0.92 |
+| Chinese pinyin splitter (饭馆), same-course language pick routes once, save failure toast, `.corrupt` copy of unreadable progress, offline font fallback, per-course path version | ✅ | 0.92 |
+| Tests: per-course typed answers, speech, tiles, backup course, summary streak, every course builds without id clashes; shared `shuffle`, dead code removed | ✅ | 0.92 |
+
 ## Batch 16 — 2 Nov 2026
 | Request | Status | Release |
 |---|---|---|

@@ -616,7 +616,7 @@ export const DIALOGUES = {
       { who: 1, jp: 'I\'d like a tea with milk, please.', en: 'Je voudrais un thé au lait, s\'il vous plaît.' },
       { who: 0, jp: 'Anything to eat?', en: 'Quelque chose à manger ?' },
       { who: 1, jp: 'A piece of cake, please. Thank you!', en: 'Une part de gâteau, s\'il vous plaît. Merci !' },
-      { who: 0, jp: 'Of course! Take a seat.', en: 'Bien sûr ! Installez-vous.' },
+      { who: 0, jp: 'You\'re welcome!', en: 'De rien !' },
     ],
     question: 'Qu\'est-ce qu\'Olivia commande ?',
     options: ['Un thé au lait et du gâteau', 'Un café et un sandwich', 'Une pinte et du poisson-frites'],

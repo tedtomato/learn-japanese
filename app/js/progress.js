@@ -16,7 +16,10 @@ export const FREEZE_PRICE = 50;
 export const HEARTS_PRICE = 30; // gems for a full set of hearts
 export const MAX_FREEZES = 2;
 
-export const COURSE_VERSION = 9; // bumped when the path is rebuilt, so finished lessons are carried over
+// Bumped when a course's path is rebuilt, so finished lessons are carried over. One number per course,
+// so rebuilding the Japanese path does not re-migrate the others.
+export const COURSE_VERSIONS = { ja: 9, zh: 9, fr: 9, es: 9, en: 9 };
+export const COURSE_VERSION = COURSE_VERSIONS[L.code] ?? 9;
 
 export function defaultState(now = Date.now()) {
   return {
@@ -268,10 +271,17 @@ export function completeMission(state, id, stars, now) {
 
 // ---- Saving on the device ----
 export function loadState(storage, now = Date.now(), key = STORAGE_KEY) {
+  let raw = null;
   try {
-    const raw = storage?.getItem(key);
+    raw = storage?.getItem(key);
     return migrate(raw ? JSON.parse(raw) : null, now);
   } catch {
+    // Unreadable progress: keep the text aside, as the next save would replace it.
+    try {
+      if (raw) storage.setItem(`${key}.corrupt`, raw);
+    } catch {
+      /* nowhere to keep it */
+    }
     return defaultState(now);
   }
 }

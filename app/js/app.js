@@ -26,12 +26,16 @@ const readFlag = () => {
 };
 const keyFor = (test) => (test ? TEST_STORAGE_KEY : STORAGE_KEY);
 
+let saveWarned = false;
 export const app = {
   testMode: readFlag(),
   state: loadState(storage, Date.now(), keyFor(readFlag())),
   now: () => Date.now(),
   save() {
-    saveState(storage, app.state, keyFor(app.testMode));
+    if (!saveState(storage, app.state, keyFor(app.testMode)) && !saveWarned) {
+      saveWarned = true; // once, so a full phone does not nag on every answer
+      toast('Could not save your progress — the phone may be full or in private mode. Save a backup from Profile.', { ms: 8000 });
+    }
     applySettings();
     if (!app.testMode) {
       writeReminderNote(app.state, app.now());

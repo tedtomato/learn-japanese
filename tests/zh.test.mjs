@@ -48,3 +48,10 @@ test('Chinese extras: every word has a memory trick, missions and drills point a
   assert.ok(MISSIONS.length >= 9 && MISSIONS.every((m) => units.has(m.unit) && m.steps.every((s) => s.replies.some((r) => r.ok))));
   for (const p of PATTERNS) for (const [id] of p.slots) assert.equal(ITEMS.get(id)?.type, 'word', `${p.id}: ${id}`);
 });
+
+test('Chinese typed answers ignore tones and ü, and 饭馆 splits as fàn + guǎn', async () => {
+  const { romajiMatch } = await import('../app/js/normalise.js');
+  assert.equal(romajiMatch('nihao', 'nǐhǎo'), 'exact');
+  assert.equal(romajiMatch('lv', 'lǚ'), 'exact');
+  assert.deepEqual(pinyinParts('饭馆', 'fànguǎn').map((p) => p.romaji), ['fàn', 'guǎn']);
+});

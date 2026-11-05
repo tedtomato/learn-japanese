@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   defaultState, currentHearts, loseHeart, recordActivity, displayStreak, completeSession, migrate, exportBackup, importBackup,
-  currentNodeIndex, mistakeIds, completeListening, completeMission, backupStale, HEART_REFILL_MS, MAX_HEARTS,
+  streakAt, courseSummary, currentNodeIndex, mistakeIds, completeListening, completeMission, backupStale, HEART_REFILL_MS, MAX_HEARTS,
 } from '../app/js/progress.js';
 import { review, INTERVALS, MAX_BOX } from '../app/js/srs.js';
 import { NODES } from '../app/js/course.js';
@@ -121,4 +121,29 @@ test('backups: due after two weeks once there is something to keep, and the date
   assert.equal(backupStale(s, T0 + 13 * DAY), false);
   assert.equal(backupStale(s, T0 + 15 * DAY), true);
   assert.equal(importBackup(exportBackup(s)).backupAt, T0);
+});
+
+test('backups remember their course and refuse another course', () => {
+  const s = defaultState(T0);
+  const file = JSON.parse(exportBackup(s, T0));
+  assert.equal(file.course, 'ja');
+  const other = JSON.stringify({ ...file, course: 'fr' });
+  assert.throws(() => importBackup(other, T0), /French backup/);
+  const older = JSON.stringify({ ...file, course: undefined });
+  assert.equal(importBackup(older, T0).xp, 0, 'backups from before the course was saved still restore');
+});
+
+test('the language screen can work out a lapsed streak from the saved summary', () => {
+  const s = defaultState(T0);
+  s.streak = { count: 5, lastDay: '2026-10-18', freezes: 1, best: 5 };
+  const sum = courseSummary(s, T0);
+  assert.deepEqual([sum.streakCount, sum.lastDay, sum.freezes], [5, '2026-10-18', 1]);
+  assert.equal(streakAt({ count: sum.streakCount, lastDay: sum.lastDay, freezes: sum.freezes }, T0 + DAY), 5);
+  assert.equal(streakAt({ count: 5, lastDay: sum.lastDay, freezes: 1 }, T0 + 7 * DAY), 0);
+});
+
+test('XP alone (listening, missions) counts as started', () => {
+  const s = defaultState(T0);
+  s.xp = 10;
+  assert.equal(courseSummary(s, T0).started, true);
 });

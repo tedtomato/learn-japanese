@@ -1,6 +1,17 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.92', date: '5 Nov 2026', changes: [
+    'French, Spanish and English: typed answers are checked letter by letter now — "vos" is no longer accepted for "vous", or "ano" for "año" (accents and capitals still don\'t matter, and "soeur" works for "sœur")',
+    'Building a sentence from word tiles no longer accepts words glued together (par + le is not "parle")',
+    'The language screen shows your real streak, even after a few days away',
+    'Backups remember their language and have it in the file name; restoring another language\'s backup is refused instead of overwriting your progress',
+    'Reminders, sharing and the page title no longer say "Japanese" in the other courses',
+    'Chinese: 饭馆 now shows fàn guǎn',
+    'The English course reads prompts aloud in French; speaking checks are stricter for short, look-alike words (bonjour / bonsoir)',
+    'Updates no longer reload the app in the middle of a mission, drill, sign spotter, tone trainer, quiz or listening mode',
+    'If your phone is too full to save progress, the app now tells you',
+  ] },
   { version: '0.91', date: '2 Nov 2026', changes: [
     'The language menu now opens every time you start the app: pick today\'s language and see your progress in each one. Close it with ✕ to carry on where you were',
   ] },

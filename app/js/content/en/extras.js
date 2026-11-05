@@ -5,7 +5,7 @@
 
 export const FACTS = [
   {"id": 1, "category": "Food & Drink", "title": "A Nation of Tea Drinkers", "text": "Tea is the favourite hot drink in the UK. Most people drink black tea with a splash of milk, and 'Shall I put the kettle on?' is a classic way to welcome a guest.", "icon": "tea"},
-  {"id": 2, "category": "Food & Drink", "title": "Fish and Chips", "text": "Fish and chips became a popular meal in the 1800s. During the Second World War it was one of the few foods that was never rationed.", "icon": "fish"},
+  {"id": 2, "category": "Food & Drink", "title": "Fish and Chips", "text": "Fish and chips became a popular meal in the 1800s. During the Second World War it was never rationed, unlike most other foods.", "icon": "fish"},
   {"id": 3, "category": "Food & Drink", "title": "The Full English", "text": "A full English breakfast usually has eggs, bacon, sausages, baked beans, grilled tomato, mushrooms and toast. Scotland, Wales and Northern Ireland have their own versions.", "icon": "food"},
   {"id": 4, "category": "Food & Drink", "title": "Sunday Roast", "text": "Many families eat a Sunday roast: roast meat with roast potatoes, vegetables and gravy. With roast beef you often get a Yorkshire pudding, a crispy batter cup.", "icon": "food"},
   {"id": 5, "category": "Food & Drink", "title": "Afternoon Tea", "text": "Afternoon tea became fashionable in the 1840s thanks to Anna, Duchess of Bedford, who felt hungry between lunch and a late dinner. Today it means tea, small sandwiches, cakes and scones with jam and cream.", "icon": "sweets"},
@@ -44,7 +44,7 @@ export const FACTS = [
   {"id": 33, "category": "Language & Accents", "title": "So Many Accents", "text": "British accents change a lot from place to place. Scouse from Liverpool, Geordie from Newcastle and Cockney from London all sound very different.", "icon": "speech"},
   {"id": 34, "category": "Language & Accents", "title": "Rhyming Slang", "text": "In Cockney rhyming slang, a word is replaced by a phrase that rhymes with it: 'apples and pears' means 'stairs'.", "icon": "fruit"},
   {"id": 35, "category": "Language & Accents", "title": "Welsh", "text": "Welsh is an official language in Wales, and road signs there are written in both Welsh and English. 'Croeso' means 'welcome'.", "icon": "speech"},
-  {"id": 36, "category": "Language & Accents", "title": "A Very Long Name", "text": "A village in Wales has one of the longest place names in Europe: Llanfairpwllgwyngyll, which is usually shortened from a 58-letter name.", "icon": "book"},
+  {"id": 36, "category": "Language & Accents", "title": "A Very Long Name", "text": "A village in Wales has one of the longest place names in Europe. Its full name has 58 letters, so people usually shorten it to Llanfairpwll or Llanfair PG.", "icon": "book"},
   {"id": 37, "category": "Language & Accents", "title": "Colour or Color?", "text": "British and American spelling are different: colour and color, centre and center. Noah Webster's American dictionary of 1828 made many of these changes popular in the US.", "icon": "book"},
   {"id": 38, "category": "Language & Accents", "title": "A World Language", "text": "English is an official language in dozens of countries, from Australia and Canada to India, Nigeria and Jamaica. Each has its own words, like the Australian 'arvo' for 'afternoon'.", "icon": "globe"},
 
@@ -65,7 +65,7 @@ export const FACTS = [
 
 export const PHRASES = [
   {"id": 1, "category": "Les bases polies", "jp": "Hello", "romaji": "", "say": "Hé-lo", "en": "Bonjour", "icon": "speech"},
-  {"id": 2, "category": "Les bases polies", "jp": "Thank you", "romaji": "", "say": "Sènk-iou", "en": "Merci", "icon": "speech"},
+  {"id": 2, "category": "Les bases polies", "jp": "Thank you", "romaji": "", "say": "THènk-iou", "en": "Merci (TH : langue entre les dents, ni s ni z)", "icon": "speech"},
   {"id": 3, "category": "Les bases polies", "jp": "Please", "romaji": "", "say": "Pliiz", "en": "S'il vous plaît", "icon": "speech"},
   {"id": 4, "category": "Les bases polies", "jp": "Sorry", "romaji": "", "say": "So-ri", "en": "Désolé / Pardon", "icon": "bowing"},
   {"id": 5, "category": "Les bases polies", "jp": "Excuse me", "romaji": "", "say": "Ex-kiouz mi", "en": "Excusez-moi", "icon": "speech"},
@@ -73,28 +73,28 @@ export const PHRASES = [
   {"id": 7, "category": "Les bases polies", "jp": "How are you?", "romaji": "", "say": "Hao ar iou ?", "en": "Comment allez-vous ?", "icon": "speech"},
   {"id": 8, "category": "Les bases polies", "jp": "See you later", "romaji": "", "say": "Sii iou lé-teu", "en": "À plus tard", "icon": "speech"},
 
-  {"id": 9, "category": "Se déplacer", "jp": "Where is the station?", "romaji": "", "say": "Ouèr iz ze sté-cheun ?", "en": "Où est la gare ?", "icon": "train"},
+  {"id": 9, "category": "Se déplacer", "jp": "Where is the station?", "romaji": "", "say": "Ouèr iz THeu sté-cheun ?", "en": "Où est la gare ?", "icon": "train"},
   {"id": 10, "category": "Se déplacer", "jp": "A return to London, please", "romaji": "", "say": "Eu ri-teurn tou Leun-deun, pliiz", "en": "Un aller-retour pour Londres, s'il vous plaît", "icon": "ticket"},
   {"id": 11, "category": "Se déplacer", "jp": "Which platform?", "romaji": "", "say": "Ouitch plat-form ?", "en": "Quel quai ?", "icon": "train"},
-  {"id": 12, "category": "Se déplacer", "jp": "Does this bus go to the centre?", "romaji": "", "say": "Deuz ziss beuss go tou ze senn-teu ?", "en": "Ce bus va-t-il au centre-ville ?", "icon": "bus"},
+  {"id": 12, "category": "Se déplacer", "jp": "Does this bus go to the centre?", "romaji": "", "say": "Deuz THiss beuss go tou THeu senn-teu ?", "en": "Ce bus va-t-il au centre-ville ?", "icon": "bus"},
   {"id": 13, "category": "Se déplacer", "jp": "Is it far?", "romaji": "", "say": "Iz it far ?", "en": "C'est loin ?", "icon": "globe"},
   {"id": 14, "category": "Se déplacer", "jp": "I'm lost", "romaji": "", "say": "Aïm lost", "en": "Je suis perdu", "icon": "person"},
 
   {"id": 15, "category": "Au restaurant & au pub", "jp": "A table for two, please", "romaji": "", "say": "Eu té-beul for tou, pliiz", "en": "Une table pour deux, s'il vous plaît", "icon": "food"},
-  {"id": 16, "category": "Au restaurant & au pub", "jp": "Can I have the menu?", "romaji": "", "say": "Kèn aï hav ze mè-niou ?", "en": "Je peux avoir la carte ?", "icon": "book"},
+  {"id": 16, "category": "Au restaurant & au pub", "jp": "Can I have the menu?", "romaji": "", "say": "Kèn aï hav THeu mè-niou ?", "en": "Je peux avoir la carte ?", "icon": "book"},
   {"id": 17, "category": "Au restaurant & au pub", "jp": "I'd like a coffee, please", "romaji": "", "say": "Aïd laïk eu ko-fi, pliiz", "en": "Je voudrais un café, s'il vous plaît", "icon": "coffee"},
   {"id": 18, "category": "Au restaurant & au pub", "jp": "Tap water, please", "romaji": "", "say": "Tap ouô-teu, pliiz", "en": "Une carafe d'eau, s'il vous plaît", "icon": "drink"},
   {"id": 19, "category": "Au restaurant & au pub", "jp": "Cheers!", "romaji": "", "say": "Tchiirz !", "en": "Santé !", "icon": "beer"},
-  {"id": 20, "category": "Au restaurant & au pub", "jp": "Can I have the bill, please?", "romaji": "", "say": "Kèn aï hav ze bil, pliiz ?", "en": "L'addition, s'il vous plaît", "icon": "coin"},
+  {"id": 20, "category": "Au restaurant & au pub", "jp": "Can I have the bill, please?", "romaji": "", "say": "Kèn aï hav THeu bil, pliiz ?", "en": "L'addition, s'il vous plaît", "icon": "coin"},
 
   {"id": 21, "category": "Shopping & paiement", "jp": "How much is it?", "romaji": "", "say": "Hao meutch iz it ?", "en": "C'est combien ?", "icon": "coin"},
-  {"id": 22, "category": "Shopping & paiement", "jp": "Can I pay by card?", "romaji": "", "say": "Kèn aï pé baï kard ?", "en": "Je peux payer par carte ?", "icon": "bank"},
-  {"id": 23, "category": "Shopping & paiement", "jp": "I'm just looking, thanks", "romaji": "", "say": "Aïm djeust lou-king, sènks", "en": "Je regarde seulement, merci", "icon": "shop"},
+  {"id": 22, "category": "Shopping & paiement", "jp": "Can I pay by card?", "romaji": "", "say": "Kèn aï péï baï kard ?", "en": "Je peux payer par carte ?", "icon": "bank"},
+  {"id": 23, "category": "Shopping & paiement", "jp": "I'm just looking, thanks", "romaji": "", "say": "Aïm djeust lou-king, THènks", "en": "Je regarde seulement, merci", "icon": "shop"},
   {"id": 24, "category": "Shopping & paiement", "jp": "Do you have a bigger size?", "romaji": "", "say": "Dou iou hav eu bi-gueu saïz ?", "en": "Vous l'avez dans une taille au-dessus ?", "icon": "shop"},
-  {"id": 25, "category": "Shopping & paiement", "jp": "No bag, thanks", "romaji": "", "say": "No bag, sènks", "en": "Pas besoin de sac, merci", "icon": "shop"},
+  {"id": 25, "category": "Shopping & paiement", "jp": "No bag, thanks", "romaji": "", "say": "No bag, THènks", "en": "Pas besoin de sac, merci", "icon": "shop"},
 
   {"id": 26, "category": "À l'hôtel", "jp": "I have a reservation", "romaji": "", "say": "Aï hav eu ré-zeu-vé-cheun", "en": "J'ai une réservation", "icon": "hotel"},
-  {"id": 27, "category": "À l'hôtel", "jp": "What's the Wi-Fi password?", "romaji": "", "say": "Ouots ze ouaï-faï pass-oueurd ?", "en": "Quel est le mot de passe du wifi ?", "icon": "hotel"},
+  {"id": 27, "category": "À l'hôtel", "jp": "What's the Wi-Fi password?", "romaji": "", "say": "Ouots THeu ouaï-faï pass-oueurd ?", "en": "Quel est le mot de passe du wifi ?", "icon": "hotel"},
   {"id": 28, "category": "À l'hôtel", "jp": "What time is breakfast?", "romaji": "", "say": "Ouot taïm iz brèk-feust ?", "en": "À quelle heure est le petit-déjeuner ?", "icon": "food"},
   {"id": 29, "category": "À l'hôtel", "jp": "Can I leave my bags here?", "romaji": "", "say": "Kèn aï liiv maï bagz hiir ?", "en": "Je peux laisser mes bagages ici ?", "icon": "hotel"},
   {"id": 30, "category": "À l'hôtel", "jp": "What time is check-out?", "romaji": "", "say": "Ouot taïm iz tchèk-aot ?", "en": "À quelle heure faut-il libérer la chambre ?", "icon": "bed"},
@@ -102,7 +102,7 @@ export const PHRASES = [
   {"id": 31, "category": "Urgences & santé", "jp": "Help!", "romaji": "", "say": "Hèlp !", "en": "Au secours !", "icon": "siren"},
   {"id": 32, "category": "Urgences & santé", "jp": "Call an ambulance!", "romaji": "", "say": "Kôl eun am-biou-leunss !", "en": "Appelez une ambulance !", "icon": "medical"},
   {"id": 33, "category": "Urgences & santé", "jp": "I need a doctor", "romaji": "", "say": "Aï niid eu dok-teu", "en": "J'ai besoin d'un médecin", "icon": "medical"},
-  {"id": 34, "category": "Urgences & santé", "jp": "Where is the nearest chemist?", "romaji": "", "say": "Ouèr iz ze nii-reust ké-mist ?", "en": "Où est la pharmacie la plus proche ?", "icon": "medical"},
+  {"id": 34, "category": "Urgences & santé", "jp": "Where is the nearest chemist?", "romaji": "", "say": "Ouèr iz THeu nii-reust ké-mist ?", "en": "Où est la pharmacie la plus proche ?", "icon": "medical"},
   {"id": 35, "category": "Urgences & santé", "jp": "I don't understand", "romaji": "", "say": "Aï dount eun-deu-stand", "en": "Je ne comprends pas", "icon": "speech"},
   {"id": 36, "category": "Urgences & santé", "jp": "Can you speak slowly, please?", "romaji": "", "say": "Kèn iou spiik slo-li, pliiz ?", "en": "Vous pouvez parler lentement, s'il vous plaît ?", "icon": "speech"},
 ];

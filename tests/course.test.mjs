@@ -9,6 +9,7 @@ import { STROKES } from '../app/js/content/strokes.js';
 import { syllables, syllablesFor } from '../app/js/romaji.js';
 import { artCode } from '../app/js/art.js';
 import { existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 
 test('the course starts with Tokyo phrases and has no hiragana-only sections', () => {
   assert.equal(SECTIONS[0].id, 'tokyo');
@@ -134,5 +135,14 @@ test('pattern drills only use real words, and every sentence they build reads na
     assert.ok(p.slots.length >= 3, p.id);
     assert.ok(existsSync(new URL(`../app/art/${artCode(p.art)}.svg`, import.meta.url)), `${p.id}: no art for ${p.art}`);
     for (const [id, en] of p.slots) assert.ok(ITEMS.get(id)?.type === 'word' && en, `${p.id}: ${id}`);
+  }
+});
+
+test('every course builds: no two different words share an id', () => {
+  const script = "const { ITEMS } = await import('./app/js/course.js'); console.log(ITEMS.size);";
+  for (const code of ['ja', 'zh', 'fr', 'es', 'en']) {
+    const run = () => execFileSync(process.execPath, ['--input-type=module', '-e', `globalThis.__HAJIME_COURSE__ = '${code}'; ${script}`],
+      { cwd: new URL('..', import.meta.url), encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] });
+    assert.ok(Number(run()) > 100, `${code} builds`);
   }
 });

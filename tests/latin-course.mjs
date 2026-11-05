@@ -8,6 +8,8 @@ const { ITEMS, NODES, SECTIONS } = await import('../app/js/course.js');
 const { generateLesson, generatePractice, makeRng } = await import('../app/js/lesson/generate.js');
 const { defaultState } = await import('../app/js/progress.js');
 const { L } = await import('../app/js/lang.js');
+const { romajiMatch, speechKey, sameTiles } = await import('../app/js/normalise.js');
+const { speechMatches } = await import('../app/js/audio.js');
 const pack = await import('../app/js/content/pack.js');
 const { artCode } = await import('../app/js/art.js');
 const { EMOJI_NAMES } = await import('../app/js/tidbits.js');
@@ -95,5 +97,35 @@ export function latinCourseTests(code) {
       assert.ok(hasArt(p.art), `${p.id}: art ${p.art}`);
       for (const [id] of p.slots) assert.equal(ITEMS.get(id)?.type, 'word', `${p.id}: ${id}`);
     }
+  });
+
+  test(`${code}: typed answers keep letters apart (no romaji vowel folding) but forgive accents and punctuation`, () => {
+    assert.equal(romajiMatch('vos', 'vous'), false);
+    assert.equal(romajiMatch('poor', 'pour'), false);
+    assert.equal(romajiMatch('too', 'to'), false);
+    assert.equal(romajiMatch('ano', 'año'), false);
+    assert.equal(romajiMatch('soeur', 'sœur'), 'exact');
+    assert.equal(romajiMatch('cafe', 'café'), 'exact');
+    assert.equal(romajiMatch('ou est', 'où est'), 'exact');
+    assert.equal(romajiMatch("L'eau", 'l’eau'), 'exact');
+    assert.equal(romajiMatch('bonjuor', 'bonjour'), false);
+    assert.equal(romajiMatch('bonjou', 'bonjour'), 'close');
+    assert.equal(romajiMatch('', 'bonjour'), false);
+  });
+
+  test(`${code}: speech matching is strict for short and similar words`, () => {
+    assert.ok(speechMatches(['Bonjour'], ['bonjour']));
+    assert.ok(speechMatches(['oh bonjour madame'], ['bonjour']));
+    assert.ok(!speechMatches(['bonsoir'], ['bonjour']));
+    assert.ok(!speechMatches(['nom'], ['non']));
+    assert.ok(!speechMatches(['cola'], ['hola']));
+    assert.equal(speechKey('Où est ?'), 'ouest');
+  });
+
+  test(`${code}: tiles are compared word by word`, () => {
+    assert.ok(!sameTiles(['par', 'le'], ['parle']));
+    assert.ok(!sameTiles(['un', 'a'], ['una']));
+    assert.ok(sameTiles(['Je', 'parle'], ['je', 'parle']));
+    assert.ok(!sameTiles(['je', 'parle'], ['parle', 'je']));
   });
 }

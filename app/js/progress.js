@@ -18,7 +18,8 @@ export const MAX_FREEZES = 2;
 
 // Bumped when a course's path is rebuilt, so finished lessons are carried over. One number per course,
 // so rebuilding the Japanese path does not re-migrate the others.
-export const COURSE_VERSIONS = { ja: 9, zh: 9, fr: 9, es: 9, en: 9 };
+// Bumped per course when its path is rebuilt (lessons moved or added), so finished lessons carry over.
+export const COURSE_VERSIONS = { ja: 9, zh: 10, fr: 10, es: 10, en: 9 };
 export const COURSE_VERSION = COURSE_VERSIONS[L.code] ?? 9;
 
 export function defaultState(now = Date.now()) {

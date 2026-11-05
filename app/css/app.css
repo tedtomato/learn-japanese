@@ -624,6 +624,11 @@ span.c-purple { color: var(--purple); }
 .splash h1 { color: #fff; font-size: 40px; }
 .splash h1 .jp { display: block; font-size: 22px; opacity: .9; }
 .splash p { font-weight: 700; opacity: .92; }
+.splash-flags { display: flex; gap: 10px; justify-content: center; margin: 4px 0 10px; }
+.splash-flags span { display: flex; opacity: .8; transition: transform .2s; }
+.splash-flags span svg { border-radius: 7px; box-shadow: 0 3px 0 rgba(0, 0, 0, .18); }
+.splash-flags span.on { opacity: 1; transform: scale(1.25); }
+.splash-flags span.on svg { box-shadow: 0 0 0 3px #fff, 0 3px 0 rgba(0, 0, 0, .18); }
 .splash-go { margin-top: 18px; min-width: 220px; --t: var(--green-edge); animation: pulse .9s ease-in-out infinite alternate; }
 .splash-credits { position: absolute; bottom: calc(16px + var(--safe-bottom)); left: 0; right: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,.88); font-size: 12px; font-weight: 700; }
 .splash-credits .made { display: inline-flex; align-items: center; gap: 6px; }

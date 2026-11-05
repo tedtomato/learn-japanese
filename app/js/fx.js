@@ -1,6 +1,8 @@
 // Celebration effects: the startup splash, and reward pop-ups (chests, bonuses) with an animated
 // chest that bursts open and gems flying out.
-import { L, courseChosen } from './lang.js';
+import { L, COURSES, courseChosen } from './lang.js';
+import { AVAILABLE } from './content/pack.js';
+import { flagSvg } from './app.js';
 import { html, mount, raw, $ } from './dom.js';
 import { mascot } from './mascot.js';
 import { sfx, speak } from './audio.js';
@@ -48,7 +50,10 @@ export function splash() {
   el.className = 'splash';
   // Before a language is picked, the splash speaks for every course.
   const first = !courseChosen();
+  // The flags of every language the app teaches, the current one in front.
+  const flags = AVAILABLE.map((code) => COURSES[code]).map((c) => html`<span class="${c.code === L.code && !first ? 'on' : ''}" title="${c.name}">${raw(flagSvg(c.flag, 34))}</span>`);
   mount(el, html`<div class="splash-inner">${mascot('cheer', 150)}<h1>Hajime ${first ? '' : html`<span class="jp">${L.titleNative}</span>`}</h1><p>${first ? 'Japanese, Chinese, French, Spanish, English' : `Learn ${L.name}`}, one day at a time</p>
+      <div class="splash-flags" aria-label="Languages: ${AVAILABLE.map((code) => COURSES[code].name).join(', ')}">${flags}</div>
       <button class="btn btn-white splash-go">Tap to start</button></div>
     <div class="splash-credits"><span class="beta">Beta version - Oct 26 · v${APP_RELEASE}</span>
       <span class="made">Created by Seb and Claude AI ${raw(CLAUDE_SPARK)}</span></div>`);

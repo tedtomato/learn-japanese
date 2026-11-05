@@ -48,10 +48,10 @@ export const SECTIONS_DATA = [
             ['good evening', 'bonsoir', '🌃', { note: 'Pour saluer en arrivant le soir. Pour partir, on dit good night.' }],
           ] },
           { title: 'Merci', words: [
-            ['thank you', 'merci', '🙏'],
+            ['thank you', 'merci', '🙏', { note: 'Le th se prononce langue entre les dents : ni « s » ni « z ». Dans les prononciations de l\'appli, il est noté TH (THènk-iou).' }],
             ['thanks', 'merci (familier)', '👍', { note: 'Un peu plus léger que thank you. Les Britanniques disent aussi cheers.' }],
             ['please', 's\'il vous plaît', '🤲', { note: 'Indispensable au Royaume-Uni : oublier please peut paraître impoli.' }],
-            ['you\'re welcome', 'de rien', '😊', { note: 'Au Royaume-Uni on entend souvent no worries ou not at all ; you\'re welcome est plus américain.', alt: ['you are welcome'] }],
+            ['you\'re welcome', 'de rien', '😊', { note: 'Tout à fait courant au Royaume-Uni aussi. Plus décontracté : no worries, not at all ou no problem.', alt: ['you are welcome'] }],
           ] },
           { title: 'Pardon', words: [
             ['sorry', 'désolé', '😔', { note: 'Les Britanniques disent sorry tout le temps, même quand c\'est vous qui les bousculez !' }],
@@ -65,8 +65,8 @@ export const SECTIONS_DATA = [
             ['OK', 'd\'accord', '👌', { alt: ['okay', 'ok'] }],
           ] },
           { title: 'Au revoir', words: [
-            ['goodbye', 'au revoir', '🏃', { note: 'Un peu formel. Au quotidien : bye ou bye-bye.' }],
-            ['bye', 'salut (en partant)', '👋'],
+            ['goodbye', 'au revoir', '👋', { note: 'Un peu formel. Au quotidien : bye ou bye-bye.' }],
+            ['bye', 'salut (en partant)', '✌️'],
             ['see you later', 'à plus tard', '📅', { note: 'Souvent juste see you ! Ne promet pas vraiment de se revoir le jour même.' }],
             ['good night', 'bonne nuit', '🌙', { note: 'Pour partir le soir ou aller se coucher.' }],
           ] },
@@ -100,7 +100,7 @@ export const SECTIONS_DATA = [
           ] },
           { title: 'Lieux', words: [
             ['hotel', 'hôtel', '🏨', { note: 'Le h se prononce : a hotel, pas an hotel.' }],
-            ['toilet', 'toilettes', '🚻', { note: 'Familier : the loo. Aux États-Unis, on dit restroom ou bathroom.', alt: ['toilets', 'loo'] }],
+            ['toilet', 'toilettes', '🚻', { note: 'Familier : the loo. Aux États-Unis, on dit restroom ou bathroom.', alt: ['toilets'] }],
             ['map', 'plan / carte', '🗺️'],
             ['airport', 'aéroport', '✈️'],
           ] },
@@ -114,6 +114,8 @@ export const SECTIONS_DATA = [
             ['single', 'aller simple', '➡️', { note: 'A single to York = un aller simple pour York. Aux États-Unis : one-way.' }],
             ['return', 'aller-retour', '🔁', { note: 'Aux États-Unis : round trip.' }],
             ['next', 'prochain', '⏭️', { note: 'The next train = le prochain train.' }],
+            ['queue', 'file d\'attente / faire la queue', '🧍', { note: 'Les Britanniques font la queue très sagement. Aux États-Unis : line.' }],
+            ['reservation', 'réservation', '📋', { note: 'Aussi : booking (très courant pour un hôtel ou un train). I have a reservation = j\'ai une réservation.', alt: ['booking'] }],
           ] },
           { title: 'Où est… ?', grammar: 'where-is', sentences: [
             { jp: ['where', 'is', 'the', 'station'], en: 'Où est la gare', alt: ['Où se trouve la gare', 'La gare est où', 'Elle est où la gare', 'Où est la station'] },
@@ -145,8 +147,9 @@ export const SECTIONS_DATA = [
           { title: 'Au pub', words: [
             ['pub', 'pub', '🍺', { note: 'Abréviation de public house. Au pub, on commande et on paie au bar : pas de service à table.' }],
             ['pint', 'pinte (environ 57 cl)', '🍺', { note: 'La pinte britannique fait 568 ml. Demi : a half.' }],
-            ['cheers', 'santé ! / merci', '🍻', { note: 'Pour trinquer… mais aussi un merci familier très britannique.' }],
+            ['cheers', 'santé ! / merci', '🍻', { note: 'Deux sens : « santé ! » en trinquant, et un « merci » familier très britannique (à un serveur, un chauffeur, un ami : cheers, mate!).' }],
             ['wine', 'vin', '🍷'],
+            ['beer', 'bière', '🍺', { note: 'Au pub : a pint of beer, ou simplement a pint. Les bières pression : lager (blonde), bitter (brune, servie peu fraîche), ale.' }],
           ] },
           { title: 'Plats', words: [
             ['fish and chips', 'poisson-frites', '🐟', { note: 'Chips = frites au Royaume-Uni (fries aux États-Unis). Les chips françaises s\'appellent crisps.', alt: ['fish & chips', 'fish n chips'] }],
@@ -204,6 +207,7 @@ export const SECTIONS_DATA = [
             ['bag', 'sac', '🛍️', { note: 'Les sacs en plastique sont payants : on vous demandera Do you need a bag?' }],
             ['receipt', 'ticket de caisse', '🧾', { note: 'Le p ne se prononce pas : « ri-sîte ».' }],
             ['closed', 'fermé', '❌'],
+            ['open', 'ouvert', '✅', { note: 'Open / closed sur la porte des magasins. Aussi un verbe : What time do you open? = vous ouvrez à quelle heure ?' }],
           ] },
           { title: 'Vêtements', words: [
             ['jumper', 'pull', '🧥', { note: 'Aux États-Unis : sweater.', alt: ['sweater'] }],
@@ -266,6 +270,7 @@ export const SECTIONS_DATA = [
             ['today', 'aujourd\'hui', '📅'],
             ['tomorrow', 'demain', '📅'],
             ['Monday', 'lundi', '📅', { note: 'Les jours prennent une majuscule en anglais : Monday, Tuesday, Wednesday…', alt: ['monday'] }],
+            ['yesterday', 'hier', '📅', { note: 'Yesterday morning = hier matin, yesterday evening = hier soir.' }],
             ['weekend', 'week-end', '😎'],
           ] },
           { title: 'Quelle heure est-il ?', grammar: 'time', sentences: [
@@ -277,7 +282,7 @@ export const SECTIONS_DATA = [
           { title: 'Deux billets', grammar: 'plural', sentences: [
             { jp: ['two', 'tickets', 'please'], en: 'Deux billets s\'il vous plaît', alt: ['Deux tickets s\'il vous plaît', 'Deux billets s\'il te plaît', 'Deux billets'] },
             { jp: ['three', 'coffees', 'please'], en: 'Trois cafés s\'il vous plaît', alt: ['Trois cafés s\'il te plaît', 'Trois cafés'] },
-            { jp: ['I', 'have', 'two', 'bags'], en: 'J\'ai deux sacs', alt: ['J\'ai 2 sacs'] },
+            { jp: ['I\'ve', 'got', 'two', 'bags'], en: 'J\'ai deux sacs', alt: ['J\'ai 2 sacs'] },
           ] },
         ],
       },
@@ -293,7 +298,7 @@ export const SECTIONS_DATA = [
             ['family', 'famille', '🧑‍🤝‍🧑'],
             ['mum', 'maman', '💝', { note: 'Aux États-Unis : mom. Plus formel : mother.', alt: ['mom', 'mother'] }],
             ['dad', 'papa', '👔', { note: 'Plus formel : father.', alt: ['father'] }],
-            ['grandma', 'mamie', '🧓', { note: 'Plus formel : grandmother. Aussi : nan ou nana dans beaucoup de familles britanniques.', alt: ['grandmother', 'granny'] }],
+            ['grandma', 'mamie', '🧓', { note: 'Plus formel : grandmother. Aussi : nan ou nana dans beaucoup de familles britanniques.', alt: ['grandmother', 'granny', 'nan', 'nana'] }],
           ] },
           { title: 'Frères & sœurs', words: [
             ['brother', 'frère', '👫'],
@@ -329,7 +334,7 @@ export const SECTIONS_DATA = [
             { jp: ['she', 'is', 'a', 'teacher'], en: 'Elle est professeure', alt: ['Elle est professeur', 'Elle est prof', 'Elle est enseignante', 'C\'est une prof', 'C\'est une professeure'] },
             { jp: ['he', 'is', 'a', 'doctor'], en: 'Il est médecin', alt: ['Il est docteur', 'C\'est un médecin'] },
             { jp: ['I\'m', 'a', 'student'], en: 'Je suis étudiant', alt: ['Je suis étudiante'] },
-            { jp: ['I', 'have', 'a', 'brother'], en: 'J\'ai un frère' },
+            { jp: ['I\'ve', 'got', 'a', 'brother'], en: 'J\'ai un frère' },
           ] },
         ],
       },
@@ -346,6 +351,7 @@ export const SECTIONS_DATA = [
             ['flat', 'appartement', '🏙️', { note: 'Aux États-Unis : apartment.', alt: ['apartment'] }],
             ['bedroom', 'chambre', '🛏️'],
             ['kitchen', 'cuisine', '🍳'],
+            ['room', 'pièce / chambre d\'hôtel', '🛎️', { note: 'Une chambre d\'hôtel : a room (a double room, a single room). Pour la chambre à coucher chez soi : bedroom.' }],
           ] },
           { title: 'Dehors & dedans', words: [
             ['garden', 'jardin', '🌳', { note: 'Aux États-Unis : yard. Les Britanniques adorent jardiner.' }],
@@ -449,7 +455,7 @@ export const SECTIONS_DATA = [
           { title: 'Émotions fortes', words: [
             ['excited', 'impatient / tout excité', '🤩', { note: 'Faux ami : I\'m excited = j\'ai hâte, c\'est génial ! Rien de gênant.' }],
             ['angry', 'en colère', '😤'],
-            ['worried', 'inquiet', '😱'],
+            ['worried', 'inquiet', '😔'],
             ['relaxed', 'détendu', '😌'],
           ] },
           { title: 'Réagir', words: [
@@ -497,9 +503,10 @@ export const SECTIONS_DATA = [
             ['medicine', 'médicament', '💊'],
             ['headache', 'mal de tête', '🤕', { note: 'Ache = douleur : toothache (mal de dents), stomach ache (mal de ventre).' }],
             ['a cold', 'un rhume', '🤧', { note: 'I\'ve got a cold = j\'ai un rhume.' }],
+            ['allergic', 'allergique', '🤧', { note: 'I\'m allergic to nuts = je suis allergique aux noix. À dire au restaurant avant de commander.' }],
           ] },
           { title: 'Problèmes', words: [
-            ['lost', 'perdu', '🗺️', { note: 'I\'m lost = je suis perdu. I lost my bag = j\'ai perdu mon sac.' }],
+            ['lost', 'perdu', '🗺️', { note: 'I\'m lost = je suis perdu. I\'ve lost my bag = j\'ai perdu mon sac.' }],
             ['passport', 'passeport', '📕'],
             ['wallet', 'portefeuille', '💰', { note: 'Pour un porte-monnaie : purse. Aux États-Unis, purse = sac à main.' }],
             ['need', 'avoir besoin de', '🙋', { note: 'I need = j\'ai besoin de, il me faut.' }],
@@ -513,13 +520,14 @@ export const SECTIONS_DATA = [
           { title: 'J\'ai besoin d\'un médecin', sentences: [
             { jp: ['I', 'need', 'a', 'doctor'], en: 'J\'ai besoin d\'un médecin', alt: ['Il me faut un médecin', 'J\'ai besoin d\'un docteur'] },
             { jp: ['call', 'an', 'ambulance'], en: 'Appelez une ambulance', alt: ['Appelle une ambulance'] },
-            { jp: ['I', 'have', 'a', 'headache'], en: 'J\'ai mal à la tête', alt: ['J\'ai un mal de tête'] },
-            { jp: ['I', 'lost', 'my', 'passport'], en: 'J\'ai perdu mon passeport' },
+            { jp: ['I\'ve', 'got', 'a', 'headache'], en: 'J\'ai mal à la tête', alt: ['J\'ai un mal de tête'] },
+            { jp: ['I\'ve', 'lost', 'my', 'passport'], en: 'J\'ai perdu mon passeport' },
           ] },
           { title: 'Vous pouvez répéter ?', grammar: 'can', sentences: [
             { jp: ['can', 'you', 'help', 'me'], en: 'Vous pouvez m\'aider', alt: ['Pouvez-vous m\'aider', 'Tu peux m\'aider', 'Peux-tu m\'aider', 'Est-ce que vous pouvez m\'aider'] },
             { jp: ['I', 'don\'t', 'understand'], en: 'Je ne comprends pas', alt: ['Je comprends pas'] },
             { jp: ['can', 'you', 'speak', 'slowly'], en: 'Vous pouvez parler lentement', alt: ['Pouvez-vous parler lentement', 'Tu peux parler lentement', 'Vous pouvez parler doucement'] },
+            { jp: ['do', 'you', 'speak', 'French'], en: 'Vous parlez français', alt: ['Parlez-vous français', 'Tu parles français', 'Est-ce que vous parlez français', 'Est-ce que tu parles français', 'Parles-tu français'] },
             { jp: ['can', 'you', 'say', 'that', 'again'], en: 'Vous pouvez répéter', alt: ['Pouvez-vous répéter', 'Tu peux répéter', 'Vous pouvez le redire', 'Pouvez-vous répéter ça'] },
           ] },
         ],
@@ -553,7 +561,7 @@ export const SECTIONS_DATA = [
           { title: 'Un petit thé ?', words: [
             ['cuppa', 'une tasse de thé', '🍵', { note: 'De cup of : Fancy a cuppa? = Un petit thé ?' }],
             ['fancy', 'avoir envie de', '😋', { note: 'Fancy a drink? = ça te dit un verre ? Aux États-Unis : want a drink?' }],
-            ['fair enough', 'c\'est vrai / d\'accord', '👍'],
+            ['fair enough', 'soit / c\'est juste', '👍', { note: 'Pour accepter un argument ou un refus sans discuter : « soit », « d\'accord, c\'est raisonnable ».' }],
             ['bless you', 'à vos souhaits', '🤧'],
           ] },
           { title: 'Comme au pub', sentences: [
@@ -607,8 +615,8 @@ export const DIALOGUES = {
       { who: 0, jp: 'Hi! What can I get you?', en: 'Bonjour ! Qu\'est-ce que je vous sers ?' },
       { who: 1, jp: 'I\'d like a tea with milk, please.', en: 'Je voudrais un thé au lait, s\'il vous plaît.' },
       { who: 0, jp: 'Anything to eat?', en: 'Quelque chose à manger ?' },
-      { who: 1, jp: 'A piece of cake, please. Can I pay by card?', en: 'Une part de gâteau, s\'il vous plaît. Je peux payer par carte ?' },
-      { who: 0, jp: 'Of course!', en: 'Bien sûr !' },
+      { who: 1, jp: 'A piece of cake, please. Thank you!', en: 'Une part de gâteau, s\'il vous plaît. Merci !' },
+      { who: 0, jp: 'Of course! Take a seat.', en: 'Bien sûr ! Installez-vous.' },
     ],
     question: 'Qu\'est-ce qu\'Olivia commande ?',
     options: ['Un thé au lait et du gâteau', 'Un café et un sandwich', 'Une pinte et du poisson-frites'],
@@ -629,13 +637,13 @@ export const DIALOGUES = {
     title: 'On se voit quand ?',
     cast: ['woman', 'woman2'],
     lines: [
-      { who: 0, jp: 'What time is the film tomorrow?', en: 'À quelle heure est le film demain ?' },
+      { who: 0, jp: 'What time is the train tomorrow?', en: 'À quelle heure est le train demain ?' },
       { who: 1, jp: 'At half past seven.', en: 'À sept heures et demie.' },
-      { who: 0, jp: 'Great! See you at seven o\'clock at the station?', en: 'Super ! On se retrouve à sept heures à la gare ?' },
-      { who: 1, jp: 'OK, see you tomorrow!', en: 'D\'accord, à demain !' },
+      { who: 0, jp: 'OK! See you at seven o\'clock at the station?', en: 'D\'accord ! On se retrouve à sept heures à la gare ?' },
+      { who: 1, jp: 'Yes, see you tomorrow!', en: 'Oui, à demain !' },
     ],
     question: 'À quelle heure se retrouvent-elles ?',
-    options: ['À sept heures, à la gare', 'À sept heures et demie, au cinéma', 'À huit heures, au pub'],
+    options: ['À sept heures, à la gare', 'À sept heures et demie, au pub', 'À huit heures, au pub'],
   },
   'd-meet': {
     title: 'Faire connaissance',
@@ -644,7 +652,7 @@ export const DIALOGUES = {
       { who: 0, jp: 'Where are you from, Emma?', en: 'Tu viens d\'où, Emma ?' },
       { who: 1, jp: 'I\'m from Manchester. And you?', en: 'Je viens de Manchester. Et toi ?' },
       { who: 0, jp: 'I\'m from Edinburgh. I\'m a teacher.', en: 'Je viens d\'Édimbourg. Je suis professeure.' },
-      { who: 1, jp: 'Really? My sister is a teacher too!', en: 'Vraiment ? Ma sœur aussi est professeure !' },
+      { who: 1, jp: 'Oh! My sister is a teacher too!', en: 'Oh ! Ma sœur aussi est professeure !' },
     ],
     question: 'Qui est professeure ?',
     options: ['Olivia et la sœur d\'Emma', 'Emma et sa mère', 'Personne'],
@@ -654,9 +662,9 @@ export const DIALOGUES = {
     cast: ['woman', 'woman2'],
     lines: [
       { who: 0, jp: 'I live in a new flat now!', en: 'J\'habite dans un nouvel appartement maintenant !' },
-      { who: 1, jp: 'Lovely! Is there a garden?', en: 'Génial ! Il y a un jardin ?' },
+      { who: 1, jp: 'Oh, OK! Is there a garden?', en: 'Ah, d\'accord ! Il y a un jardin ?' },
       { who: 0, jp: 'No, but there are two bedrooms and a big kitchen.', en: 'Non, mais il y a deux chambres et une grande cuisine.' },
-      { who: 1, jp: 'Brilliant! I\'ll put the kettle on.', en: 'Génial ! Je mets la bouilloire en route.' },
+      { who: 1, jp: 'OK! I\'ll put the kettle on.', en: 'D\'accord ! Je mets la bouilloire en route.' },
     ],
     question: 'Qu\'est-ce qu\'il n\'y a pas dans l\'appartement ?',
     options: ['Un jardin', 'Une cuisine', 'Des chambres'],
@@ -676,9 +684,9 @@ export const DIALOGUES = {
     title: 'Lundi matin',
     cast: ['woman', 'woman2'],
     lines: [
-      { who: 0, jp: 'All right? How was your weekend?', en: 'Salut, ça va ? C\'était comment, ton week-end ?' },
+      { who: 0, jp: 'Hi! How was your weekend?', en: 'Salut ! C\'était comment, ton week-end ?' },
       { who: 1, jp: 'Not bad, thanks. I watched the football. You?', en: 'Pas mal, merci. J\'ai regardé le foot. Et toi ?' },
-      { who: 0, jp: 'I\'m knackered. My brother had a party!', en: 'Je suis crevée. Mon frère a fait une fête !' },
+      { who: 0, jp: 'I\'m tired. My brother had a party!', en: 'Je suis fatiguée. Mon frère a fait une fête !' },
     ],
     question: 'Pourquoi Emma est-elle fatiguée ?',
     options: ['Son frère a fait une fête', 'Elle a joué au football', 'Elle a beaucoup travaillé'],
@@ -687,7 +695,7 @@ export const DIALOGUES = {
     title: 'À la pharmacie',
     cast: ['woman2', 'woman'],
     lines: [
-      { who: 0, jp: 'Hello, can you help me? I have a headache.', en: 'Bonjour, vous pouvez m\'aider ? J\'ai mal à la tête.' },
+      { who: 0, jp: 'Hello, can you help me? I\'ve got a headache.', en: 'Bonjour, vous pouvez m\'aider ? J\'ai mal à la tête.' },
       { who: 1, jp: 'Of course. Take two of these every four hours.', en: 'Bien sûr. Prenez-en deux toutes les quatre heures.' },
       { who: 0, jp: 'Sorry, can you speak slowly?', en: 'Pardon, vous pouvez parler lentement ?' },
       { who: 1, jp: 'Two tablets… every four hours.', en: 'Deux comprimés… toutes les quatre heures.' },
@@ -701,10 +709,10 @@ export const DIALOGUES = {
     lines: [
       { who: 0, jp: 'Fancy a drink? It\'s my round.', en: 'Ça te dit un verre ? C\'est ma tournée.' },
       { who: 1, jp: 'Brilliant! A pint, please.', en: 'Génial ! Une pinte, s\'il te plaît.' },
-      { who: 0, jp: 'Here you go. That\'s ten quid for two.', en: 'Et voilà. Ça fait dix livres pour les deux.' },
-      { who: 1, jp: 'Cheers, mate!', en: 'Merci, ma belle ! Santé !' },
+      { who: 0, jp: 'Here you go. Cheers!', en: 'Et voilà. Santé !' },
+      { who: 1, jp: 'Cheers, mate! I\'ll get the next one.', en: 'Santé ! La prochaine, c\'est pour moi.' },
     ],
-    question: 'Qui paie les boissons ?',
+    question: 'Qui paie la première tournée ?',
     options: ['Emma : c\'est sa tournée', 'Olivia', 'Chacune paie la sienne'],
   },
 };

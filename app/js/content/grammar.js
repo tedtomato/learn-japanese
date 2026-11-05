@@ -51,6 +51,14 @@ export const GRAMMAR = {
     tip: 'さま is extra polite (customers), くん is for boys, ちゃん for children and close friends.',
     check: { prompt: ['ゆき', null, 'は', 'せんせい', 'です'], en: 'Ms Yuki is a teacher', options: ['さん', 'です', 'を'], answer: 'さん' },
   },
+  subj: {
+    title: 'が — marks the subject',
+    rule: 'X が … = "X is / exists / hurts". が points at the thing the sentence is about: よやく が あります = "there is a reservation".',
+    blocks: [{ jp: 'よやく', role: 'noun', en: 'reservation' }, { jp: 'が', role: 'particle', en: '(subject)' }, { jp: 'あります', role: 'verb', en: 'there is / I have' }],
+    en: 'I have a reservation.',
+    tip: 'Same pattern for pain: ここ が いたい です = "here hurts".',
+    check: { prompt: ['よやく', null, 'あります'], en: 'I have a reservation', options: ['が', 'と', 'か'], answer: 'が' },
+  },
   ga: {
     title: 'が すき — saying what you like',
     rule: 'X が すき です = "I like X".',

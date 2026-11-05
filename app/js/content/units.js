@@ -229,7 +229,7 @@ export const SECTIONS_DATA = [
             ['パスワード', 'pasuwaado', 'password', '🔐'],
             ['にもつ', 'nimotsu', 'luggage', '🧳', { alt: ['荷物'] }],
           ] },
-          { title: 'At the front desk', grammar: 'ga', sentences: [
+          { title: 'At the front desk', grammar: 'subj', sentences: [
             { jp: ['よやく', 'が', 'あります'], romaji: 'yoyaku ga arimasu', en: 'I have a reservation', alt: ['I have a booking', 'I\'ve got a reservation'] },
             { jp: ['チェックイン', 'を', 'おねがいします'], romaji: 'chekkuin o onegaishimasu', en: 'Check-in please', alt: ['I would like to check in', 'Check in please'] },
             { jp: ['ワイファイ', 'の', 'パスワード', 'は'], romaji: 'waifai no pasuwaado wa', en: 'What is the Wi-Fi password', alt: ['The Wi-Fi password?', 'What\'s the Wi-Fi password'] },
@@ -325,7 +325,7 @@ export const SECTIONS_DATA = [
             ['みち', 'michi', 'road / way', '🛣️', { alt: ['道'] }],
             ['ここ', 'koko', 'here', '📍'],
           ] },
-          { title: 'Call for help', grammar: 'ga', sentences: [
+          { title: 'Call for help', grammar: 'subj', sentences: [
             { jp: ['ここ', 'が', 'いたい', 'です'], romaji: 'koko ga itai desu', en: 'It hurts here', alt: ['Here hurts', 'It hurts right here'] },
             { jp: ['いしゃ', 'を', 'よんで', 'ください'], romaji: 'isha o yonde kudasai', en: 'Please call a doctor', alt: ['Call a doctor please'] },
             { jp: ['きゅうきゅうしゃ', 'を', 'よんで', 'ください'], romaji: 'kyuukyuusha o yonde kudasai', en: 'Please call an ambulance', alt: ['Call an ambulance please'] },
@@ -504,7 +504,7 @@ export const DIALOGUES = {
       { who: 1, jp: 'すみません、げんきんだけです。', en: 'Sorry, cash only.' },
       { who: 0, jp: 'わかりました。', en: 'Understood.' },
     ],
-    question: 'Can he pay by card?',
+    question: 'Can she pay by card?',
     options: ['No, it is cash only', 'Yes, cards are fine', 'He did not ask about paying'],
   },
   'd-meet': {

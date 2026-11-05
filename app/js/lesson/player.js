@@ -317,7 +317,7 @@ function result(root, s, ok, opts = {}) {
   if (hesitated) badges.push(html`<span class="pill pill-orange">${opts.close ? t('Almost right') : ex.hinted ? t('Used a hint') : t('A bit slow')} — ${t('we\'ll practise it again')}</span>`);
   // How sure were you? A lucky guess comes back like a slow answer; a slow answer you knew does not.
   const sureable = ok && ids.length && !ex.hinted && ex.type !== 'intro' && ex.type !== 'match';
-  if (sureable) badges.push(html`<button class="pill pill-sure" data-sure="${hesitated ? 'knew' : 'guessed'}">${hesitated ? '😎 I knew it' : '🤔 I guessed'}</button>`);
+  if (sureable) badges.push(html`<button class="pill pill-sure" data-sure="${hesitated ? 'knew' : 'guessed'}">${t(hesitated ? '😎 I knew it' : '🤔 I guessed')}</button>`);
   mount(foot, html`<div class="foot-inner feedback">
     <div class="fb-text">
       <span class="fb-icon">${icon(ok ? 'check' : 'close', 26)}</span>

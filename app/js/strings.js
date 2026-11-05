@@ -33,6 +33,8 @@ const FRENCH = {
   'Check': 'Vérifier',
   'Continue': 'Continuer',
   'Got it': 'Compris',
+  '😎 I knew it': '😎 Je le savais',
+  '🤔 I guessed': '🤔 J\'ai deviné',
   'Explain': 'Expliquer',
   'Correct answer:': 'Bonne réponse :',
   'Speed bonus': 'Bonus de vitesse',

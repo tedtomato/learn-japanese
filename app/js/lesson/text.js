@@ -4,6 +4,7 @@ import { art } from '../art.js';
 import { syllablesFor } from '../romaji.js';
 import { romajiOfChunk } from './generate.js';
 import { L, LANG } from '../lang.js';
+import { t } from '../strings.js';
 
 // Marks text in the course language, so screen readers use the right voice for it.
 export const LANG_ATTR = L.speech.slice(0, 2);
@@ -48,10 +49,10 @@ export function kanaExample(item, { asHint = false } = {}) {
     // The word in romaji with this character's sound highlighted (e·moji), since the kana can't be read yet.
     const parts = syllablesFor(ex.jp, ex.romaji);
     const sound = parts ? parts.map((p) => (p.text.includes(item.jp) ? html`<mark>${p.romaji}</mark>` : p.romaji)) : ex.romaji;
-    return html`<span class="kana-example">${ex.art ? art(ex.art, 'art-ex') : ''}<span><small>${parts && parts[0].text.includes(item.jp) ? 'Like the start of' : 'Like in'}</small> <b class="ex-romaji">${sound}</b>${ex.en ? html` <small>(${ex.en})</small>` : ''}<br><span class="jp hint-kana">${word}</span></span></span>`;
+    return html`<span class="kana-example">${ex.art ? art(ex.art, 'art-ex') : ''}<span><small>${parts && parts[0].text.includes(item.jp) ? t('Like the start of') : t('Like in')}</small> <b class="ex-romaji">${sound}</b>${ex.en ? html` <small>(${ex.en})</small>` : ''}<br><span class="jp hint-kana">${word}</span></span></span>`;
   }
   return html`<button class="kana-example" data-say="${ex.jp}">${ex.art ? art(ex.art, 'art-ex') : ''}
-    <span><small>As in</small> <b class="jp">${word}</b> <span class="ex-romaji">${ex.romaji}</span>${ex.en ? html` <small>(${ex.en})</small>` : ''}</span></button>`;
+    <span><small>${t('As in')}</small> <b class="jp">${word}</b> <span class="ex-romaji">${ex.romaji}</span>${ex.en ? html` <small>(${ex.en})</small>` : ''}</span></button>`;
 }
 
 // What to say out loud for an item.

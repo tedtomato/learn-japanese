@@ -5,6 +5,7 @@ import { html } from './dom.js';
 import { icon } from './icons.js';
 import { art } from './art.js';
 import { shareButton, tidbitShareText } from './share.js';
+import { t } from './strings.js';
 
 export const KINDS = {
   fact: { list: FACTS, title: 'Did you know?', collection: 'Fun facts' },
@@ -64,14 +65,14 @@ export function tidbitBody(kind, item) {
   }
   if (kind === 'phrase') {
     return html`<div class="tidbit-phrase">
-      <button class="say-inline" data-say="${phraseSpeech(item)}" aria-label="Play">${icon('speaker', 22)}</button>
-      <div><div class="jp jp-lg">${item.jp}</div><div class="tidbit-romaji">${item.romaji ? html`${item.romaji} <span class="muted">(${item.say})</span>` : html`<span class="muted">Sounds like: ${item.say}</span>`}</div>
+      <button class="say-inline" data-say="${phraseSpeech(item)}" aria-label="${t('Play')}">${icon('speaker', 22)}</button>
+      <div><div class="jp jp-lg">${item.jp}</div><div class="tidbit-romaji">${item.romaji ? html`${item.romaji} <span class="muted">(${item.say})</span>` : html`<span class="muted">${t('Sounds like:')} ${item.say}</span>`}</div>
       <div class="tidbit-en">${art(emojiFor(item.icon), 'art-inline')} ${item.en}</div></div></div>`;
   }
   return html`<div class="tidbit-kanji">
     <button class="kanji-big jp" data-say="${item.kun ? item.kun.split(' ')[0].replace(/[()]/g, '') : item.k}" aria-label="Play">${item.k}</button>
     <div><b>${item.en}</b>${readings(item.on, item.kun)}
-    <div class="small">Example word: <span class="jp">${item.ex}</span></div>
+    <div class="small">${t('Example word:')} <span class="jp">${item.ex}</span></div>
     ${item.tip ? html`<div class="small muted">💡 ${item.tip}</div>` : ''}</div></div>`;
 }
 
@@ -80,13 +81,13 @@ export function tidbitBody(kind, item) {
 export function readings(on, kun) {
   if (!on && !kun) return '';
   // A Chinese character has one reading (its pinyin).
-  if (LANG === 'zh') return html`<div class="readings"><div><span class="rd-label">Say</span> ${on || kun}</div></div>`;
-  return html`<div class="readings">${kun ? html`<div><span class="rd-label">Alone, say</span> ${kun}</div>` : ''}${on ? html`<div><span class="rd-label">In longer words</span> ${on}</div>` : ''}</div>`;
+  if (LANG === 'zh') return html`<div class="readings"><div><span class="rd-label">${t('Say')}</span> ${on || kun}</div></div>`;
+  return html`<div class="readings">${kun ? html`<div><span class="rd-label">${t('Alone, say')}</span> ${kun}</div>` : ''}${on ? html`<div><span class="rd-label">${t('In longer words')}</span> ${on}</div>` : ''}</div>`;
 }
 
 export function tidbitCard(kind, item, { next = false } = {}) {
   return html`<section class="card tidbit tidbit-${kind}">
-    <div class="tidbit-kicker"><span>${KINDS[kind].title}</span>${next ? html`<button class="link next-tidbit">Another ${icon('arrow', 14)}</button>` : ''}</div>
+    <div class="tidbit-kicker"><span>${t(KINDS[kind].title)}</span>${next ? html`<button class="link next-tidbit">${t('Another')} ${icon('arrow', 14)}</button>` : ''}</div>
     ${tidbitBody(kind, item)}
     <div class="tidbit-actions">${shareButton(tidbitShareText(kind, item))}</div>
   </section>`;

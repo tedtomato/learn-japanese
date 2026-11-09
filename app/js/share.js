@@ -4,6 +4,7 @@ import { L } from './lang.js';
 const FLAG = L.flagEmoji || (L.flag === 'cn' ? '🇨🇳' : '🇯🇵');
 import { html } from './dom.js';
 import { icon } from './icons.js';
+import { t } from './strings.js';
 
 export const APP_URL = 'https://tedtomato.github.io/learn-japanese/';
 
@@ -38,8 +39,8 @@ export function tidbitShareText(kind, item) {
 }
 
 // A small WhatsApp-green share button; data-share holds the message.
-export const shareButton = (text, label = 'Share') =>
-  html`<button class="share-btn" data-share="${text}" aria-label="Share on WhatsApp">${icon('share', 16)}<span>${label}</span></button>`;
+export const shareButton = (text, label = t('Share')) =>
+  html`<button class="share-btn" data-share="${text}" aria-label="${t('Share on WhatsApp')}">${icon('share', 16)}<span>${label}</span></button>`;
 
 // Wires every [data-share] button inside root.
 export function wireShare(root) {

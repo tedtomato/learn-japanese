@@ -34,6 +34,8 @@ async function saveCourse(course) {
 
 // The install waits briefly for the page to say which course it is showing (first ever install).
 let courseWaiters = [];
+let installed = false; // this worker finished installing
+let askedFor = null; // the course the page last asked for
 const courseFromPage = (ms) => new Promise((resolve) => {
   courseWaiters.push(resolve);
   setTimeout(() => resolve(null), ms);
@@ -76,6 +78,9 @@ self.addEventListener('install', (event) => {
     const previous = await previousCache();
     const course = (await savedCourse()) || (await courseFromPage(4000));
     await fill(cache, [...m.shared, ...(m.courses[course] || [])], m, previous);
+    installed = true;
+    // The page named another course while this was downloading.
+    if (askedFor && askedFor !== course && m.courses[askedFor]) await fill(cache, m.courses[askedFor], m, previous);
   })());
 });
 
@@ -90,6 +95,7 @@ self.addEventListener('activate', (event) => {
 // { course } from the page (on every start and when the course changes): remember it and cache that course's files.
 async function useCourse(course) {
   await saveCourse(course);
+  if (!installed) return; // the install (still running) copies and downloads this course itself
   const m = await manifest();
   if (!m.courses[course]) return;
   await fill(await caches.open(CACHE), m.courses[course], m, null);
@@ -99,6 +105,7 @@ self.addEventListener('message', (event) => {
   if (event.data === 'skipWaiting') self.skipWaiting();
   const course = event.data?.course;
   if (typeof course !== 'string') return;
+  askedFor = course;
   courseWaiters.splice(0).forEach((resolve) => resolve(course));
   event.waitUntil(useCourse(course).catch(() => {}));
 });

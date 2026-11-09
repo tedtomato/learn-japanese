@@ -11,7 +11,7 @@ import { KINDS, emojiFor } from '../tidbits.js';
 import { mascot } from '../mascot.js';
 import { FACT_QUIZ } from '../content/pack.js';
 import { shuffle } from '../lesson/generate.js';
-import { t } from '../strings.js';
+import { t, countryName } from '../strings.js';
 import { hideNav } from './activity.js';
 
 export const QUIZ_MIN_FACTS = 4;
@@ -74,7 +74,7 @@ export function renderFactQuiz(root) {
     <main class="page quiz quiz-end">
       ${mascot(score >= questions.length - 1 ? 'cheer' : 'happy', 110)}
       <h1>${score} / ${questions.length}</h1>
-      <p class="muted">${score === questions.length ? t('Perfect — you really know {country}!', { country: L.country }) : score >= 3 ? t('Nice! A few more to remember.') : t('Every fact you read counts. Try again!')}</p>
+      <p class="muted">${score === questions.length ? t('Perfect — you really know {country}!', { country: countryName() }) : score >= 3 ? t('Nice! A few more to remember.') : t('Every fact you read counts. Try again!')}</p>
       ${score ? html`<p class="pill pill-gold">${icon('gem', 16)} +${score} ${t('gems')}</p>` : ''}
       <button class="btn btn-primary btn-block quiz-again">${t('Another quiz')}</button>
       <a class="btn btn-white btn-block" href="#/collection/fact">${t('Back to fun facts')}</a>

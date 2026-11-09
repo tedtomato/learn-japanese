@@ -1254,7 +1254,8 @@ body.activity .page { padding-bottom: calc(24px + var(--safe-bottom)); }
 .collections.two { grid-template-columns: repeat(2, 1fr); }
 
 /* First-run hint from Kuri. */
-.node-mascot.first-run .bubble { max-width: 150px; }
+.node-mascot.first-run { right: 1%; }
+.node-mascot.first-run .bubble { max-width: 124px; }
 .node-mascot.first-run .bubble b { font-size: 13px; line-height: 1.3; }
 
 /* Unit goal (its mission) in the banner, and the jump-ahead button. */

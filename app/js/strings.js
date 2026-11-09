@@ -135,7 +135,7 @@ const FRENCH = {
   'Listen again': 'Écouter encore',
   'Listen…': 'Écoute…',
   'Quick break': 'Petite pause',
-  'Here\'s a {thing} you\'ll see in {country}…': 'Voici un {thing} que tu verras en {country}…',
+  'Here\'s a {thing} you\'ll see {where}…': 'Voici un {thing} que tu verras {where}…',
   'Did you know? A fun fact about {country}…': 'Le savais-tu ? Une anecdote sur {country}…',
   'Time\'s up': 'Temps écoulé',
   '{n} lessons unlocked as played': '{n} leçons comptées comme faites',
@@ -349,7 +349,7 @@ const FRENCH = {
   'Today': 'Aujourd’hui',
   'Library': 'Bibliothèque',
   'Missions': 'Missions',
-  'Real situations in {country} — one after each unit.': 'Des situations réelles en {country} — une après chaque unité.',
+  'Real situations {where} — one after each unit.': 'Des situations réelles {where} — une après chaque unité.',
   'Quick games': 'Jeux rapides',
   'Pattern drills': 'Exercices de modèles',
   'One sentence, many words: swap words in until it\'s automatic.': 'Une phrase, plusieurs mots : change les mots jusqu’à ce que ce soit automatique.',
@@ -485,3 +485,9 @@ export function t(key, vars = {}) {
 
 // "English" → "anglais" in the English course.
 export const langName = () => NAMES[L.gloss]?.[L.name] ?? L.name;
+// Any course's language name, capitalised, for the language screen ("Japonais" in the French interface).
+export const langNameOf = (name) => { const n = NAMES[L.gloss]?.[name] ?? name; return n[0].toUpperCase() + n.slice(1); };
+// The course's country, in the language of the interface: "the UK" / "le Royaume-Uni", and "in the UK" / "au Royaume-Uni".
+const COUNTRIES = { French: { en: ['le Royaume-Uni', 'au Royaume-Uni'] } };
+export const countryName = () => COUNTRIES[L.gloss]?.[L.code]?.[0] ?? L.country;
+export const countryIn = () => COUNTRIES[L.gloss]?.[L.code]?.[1] ?? `in ${L.country}`;

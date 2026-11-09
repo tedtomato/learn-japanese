@@ -3,6 +3,18 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 18 — 9 Nov 2026 (review fixes: performance and start-up)
+| Request | Status | Release |
+|---|---|---|
+| Only the active course's content is downloaded (`pack.js` awaits one `import()`); ≈ 500 KB less JS per start | ✅ | 0.94 |
+| Learn path drawn by evaluating the Bézier curves in JS (≈ 350 ms → under 5 ms), laid out once, and not redrawn when nothing moved | ✅ | 0.94 |
+| Splash is in `index.html` (first paint no longer waits for the scripts); picking a language no longer shows it twice | ✅ | 0.94 |
+| Offline cache per course (shared + the active course; other courses on demand); share image and 512 px icons no longer precached | ✅ | 0.94 |
+| Updates copy unchanged files from the previous cache (`files.json` hashes); a slow install is waited for, a failed one keeps the old version and retries | ✅ | 0.94 |
+| Google Fonts stylesheet no longer blocks rendering (self-hosting needs network access to fonts.googleapis.com) | 🚧 | 0.94 |
+| Release number moved to `version.js`, so the changelog is off the start-up path once the Profile screen loads it lazily | 🚧 | 0.94 |
+| Road-works sign in the course's language and font | ✅ | 0.94 |
+
 ## Batch 17 — 5 Nov 2026 (review fixes: app code)
 | Request | Status | Release |
 |---|---|---|

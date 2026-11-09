@@ -8,7 +8,7 @@ import { streakAt } from '../progress.js';
 import { html, mount, raw, $$ } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
-import { t } from '../strings.js';
+import { t, langNameOf } from '../strings.js';
 
 const read = (key) => {
   try {
@@ -38,7 +38,7 @@ function courseCard(c) {
   const current = c.code === LANG && courseChosen();
   return html`<button class="course-card ${current ? 'on' : ''}" data-course="${c.code}">
     <span class="course-top">${raw(flagSvg(c.flag, 52))}
-      <span class="course-name"><b>${c.name}</b><small>${c.native !== c.name ? html`<span class="native">${c.native}</span> · ` : ''}${t(c.gloss === 'French' ? 'for French speakers' : 'from English')}</small></span>
+      <span class="course-name"><b>${langNameOf(c.name)}</b><small>${c.native !== c.name ? html`<span class="native">${c.native}</span> · ` : ''}${t(c.gloss === 'French' ? 'for French speakers' : 'from English')}</small></span>
       ${current ? html`<span class="pill pill-green">${t('Current course')}</span>` : html`<span class="course-go">${icon('arrow', 20)}</span>`}</span>
     ${p ? html`<span class="course-progress">
         ${p.total ? html`<span class="course-bar" role="progressbar" aria-valuenow="${pct(p)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${Math.max(pct(p), 3)}%"></i></span>

@@ -10,7 +10,7 @@ import { COURSE_CODES, EXTRA_EMOJIS, courseEmojis, artFile } from './course-art.
 
 const root = new URL('..', import.meta.url).pathname;
 const src = join(root, 'app');
-const out = join(root, 'dist');
+const out = process.env.BUILD_OUT || join(root, 'dist'); // BUILD_OUT: tests build into a temporary folder
 
 function commit() {
   if (process.env.GITHUB_SHA) return process.env.GITHUB_SHA.slice(0, 7);

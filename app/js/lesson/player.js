@@ -19,7 +19,7 @@ import {
 import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
 import { GRAMMAR } from '../content/pack.js';
 import { jpItem, jpChunk, speechOf, kanaExample, LANG_ATTR } from './text.js';
-import { t, langName } from '../strings.js';
+import { t, langName, countryName, countryIn } from '../strings.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';
 import { rewardPopup, comboBurst } from '../fx.js';
@@ -1083,7 +1083,7 @@ function renderTidbit(root, s) {
   const tid = nextTidbit(app.state, Math.random, ['fact', 'kanji'], { facts: unit?.facts });
   app.save();
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">${t('Quick break')}</span></p>
-    ${speakerBubble(s, tid.kind === 'kanji' ? t('Here\'s a {thing} you\'ll see in {country}…', { thing: L.charOne, country: L.country }) : t('Did you know? A fun fact about {country}…', { country: L.country }))}
+    ${speakerBubble(s, tid.kind === 'kanji' ? t('Here\'s a {thing} you\'ll see {where}…', { thing: L.charOne, where: countryIn() }) : t('Did you know? A fun fact about {country}…', { country: countryName() }))}
     ${tidbitCard(tid.kind, tid.item)}`);
   $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   wireShare($('.lesson-body', root));

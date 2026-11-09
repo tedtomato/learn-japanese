@@ -19,7 +19,7 @@ import { missionCards } from './mission.js';
 import { toneChart } from './tones.js';
 import { drillCards } from './drill.js';
 import { jpItem, speechOf } from '../lesson/text.js';
-import { t } from '../strings.js';
+import { t, countryIn } from '../strings.js';
 
 const level = (st) => (st === 0 ? 'none' : st < 0.34 ? 'weak' : st < 0.67 ? 'mid' : 'strong');
 
@@ -173,7 +173,7 @@ export function renderPractice(root, focus) {
       </div>
     </section>
     ${mistakesCard(state)}
-    ${backupStale(state, now) ? html`<a class="card kanji-practice backup-nudge" href="#/profile/backup"><span class="kanji-chip">${art('💾', 'art-row')}</span>
+    ${backupStale(state, now) ? html`<a class="card kanji-practice backup-nudge" href="#/profile/backup"><span class="kanji-chip">${art('☁️', 'art-row')}</span>
       <div><b>${t('Back up your progress')}</b><small>${state.backupAt ? t('Your last backup is over 2 weeks old') : t('Keep it safe in Google Drive — takes 10 seconds')}</small></div><span class="btn btn-secondary">${t('Back up')}</span></a>` : ''}
     ${words.length >= 3 ? html`<a class="card kanji-practice listen-entry" href="#/listen"><span class="kanji-chip">${art('🎧', 'art-row')}</span>
       <div><b>${t('Listening mode')}</b><small>${t('Hands-free for walks: hear it, say it, repeat')}</small></div><span class="btn btn-secondary">${t('Play')}</span></a>` : ''}
@@ -183,7 +183,7 @@ export function renderPractice(root, focus) {
     <p class="muted small section-more">${t('More to play in')} <button class="link" data-section="games">🎮 ${t('Games')}</button></p>` : ''}
 
     ${section === 'games' ? html`${MISSIONS.length ? html`<h2 class="sub-title">${t('Missions')}</h2>
-    <p class="muted small list-help">${t('Real situations in {country} — one after each unit.', { country: L.country })}</p>
+    <p class="muted small list-help">${t('Real situations {where} — one after each unit.', { where: countryIn() })}</p>
     ${missionCards(state)}` : ''}
     ${quickGames.length ? html`<h2 class="sub-title">${t('Quick games')}</h2>${quickGames}` : ''}
     ${PATTERNS.length ? html`<h2 class="sub-title">${t('Pattern drills')}</h2>

@@ -1,13 +1,13 @@
 // Celebration effects: the startup splash, and reward pop-ups (chests, bonuses) with an animated
 // chest that bursts open and gems flying out.
-import { L, COURSES, courseChosen } from './lang.js';
+import { L, COURSES, courseChosen, takeSkipSplash } from './lang.js';
 import { AVAILABLE } from './content/pack.js';
 import { flagSvg } from './app.js';
 import { html, mount, raw, $ } from './dom.js';
 import { mascot } from './mascot.js';
 import { sfx, speak } from './audio.js';
 import { icon } from './icons.js';
-import { APP_RELEASE, APP_RELEASE_DATE } from './content/changelog.js';
+import { APP_RELEASE, APP_RELEASE_DATE } from './version.js';
 
 const CHEST = `<svg class="fx-chest" viewBox="0 0 120 100" aria-hidden="true">
   <g class="fx-rays">${Array.from({ length: 12 }, (_, i) => `<rect x="58" y="-30" width="4" height="34" rx="2" transform="rotate(${i * 30} 60 50)"/>`).join('')}</g>
@@ -46,18 +46,40 @@ const CLAUDE_SPARK = `<svg class="claude-spark" viewBox="0 0 40 40" aria-label="
 // The start screen: name, mascot, credits. Tapping it says "Hajime!" out loud (phones only allow
 // sound after a tap) and opens the app.
 export function splash() {
-  const el = document.createElement('div');
+  // index.html already carries the splash (so the first paint is meaningful): fill in the parts that depend on
+  // the course and take it over. Without it (unbuilt app, the lab) the splash is created here.
+  const existing = [...document.querySelectorAll('.splash')].find((e) => !e.__adopted);
+  if (takeSkipSplash()) {
+    // Reloaded by a course switch: the start screen was already shown.
+    existing?.remove();
+    return;
+  }
+  const el = existing || document.createElement('div');
   el.className = 'splash';
+  el.__adopted = true;
+  el.dataset.ready = '1'; // scripts and tests can wait for [data-ready]: the tap is handled from here on
   // Before a language is picked, the splash speaks for every course.
   const first = !courseChosen();
   // The flags of every language the app teaches, the current one in front.
   const flags = AVAILABLE.map((code) => COURSES[code]).map((c) => html`<span class="${c.code === L.code && !first ? 'on' : ''}" title="${c.name}">${raw(flagSvg(c.flag, 34))}</span>`);
-  mount(el, html`<div class="splash-inner">${mascot('cheer', 150)}<h1>Hajime ${first ? '' : html`<span class="jp">${L.titleNative}</span>`}</h1><p>${first ? 'Japanese, Chinese, French, Spanish, English' : `Learn ${L.name}`}, one day at a time</p>
-      <div class="splash-flags" aria-label="Languages: ${AVAILABLE.map((code) => COURSES[code].name).join(', ')}">${flags}</div>
+  const title = html`Hajime ${first ? '' : html`<span class="jp">${L.titleNative}</span>`}`;
+  const tagline = `${first ? 'Japanese, Chinese, French, Spanish, English' : `Learn ${L.name}`}, one day at a time`;
+  const flagRow = html`<div class="splash-flags" aria-label="Languages: ${AVAILABLE.map((code) => COURSES[code].name).join(', ')}">${flags}</div>`;
+  const inner = existing && el.querySelector('.splash-inner');
+  if (inner) {
+    // Keep the mascot and button in place (no flicker, the entrance animation is not replayed).
+    el.querySelector('h1').innerHTML = title.__raw;
+    el.querySelector('.splash-inner > p').textContent = tagline;
+    el.querySelector('.splash-flags').outerHTML = flagRow.__raw;
+    if (!el.querySelector('.claude-spark')) el.querySelector('.made')?.insertAdjacentHTML('beforeend', ` ${CLAUDE_SPARK}`);
+  } else {
+    mount(el, html`<div class="splash-inner">${mascot('cheer', 150)}<h1>${title}</h1><p>${tagline}</p>
+      ${flagRow}
       <button class="btn btn-white splash-go">Tap to start</button></div>
     <div class="splash-credits"><span class="beta">Beta version - ${APP_RELEASE_DATE} · v${APP_RELEASE}</span>
       <span class="made">Created by Seb and Claude AI ${raw(CLAUDE_SPARK)}</span></div>`);
-  document.body.append(el);
+  }
+  if (!existing) document.body.append(el);
   let closed = false;
   const close = () => {
     if (closed) return;

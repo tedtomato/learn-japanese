@@ -35,4 +35,39 @@ export const PATTERNS = [
     en: (w) => `${w}, s'il vous plaît`,
     slots: [['w-water', 'De l\'eau'], ['w-tea', 'Du thé'], ['w-coffee', 'Du café'], ['w-milk', 'Du lait'], ['w-wine', 'Du vin'], ['w-fish-and-chips', 'Un poisson-frites']],
   },
+  {
+    id: 'i-want-to', jp: 'I want to', romaji: 'I want to', slotLast: true, title: 'I want to ___', meaning: 'Je veux ___', art: '🎁',
+    en: (w) => `Je veux ${w}`,
+    slots: [['w-go', 'aller'], ['w-eat', 'manger'], ['w-drink', 'boire'], ['w-sleep', 'dormir'], ['w-buy', 'acheter'], ['w-speak', 'parler'], ['w-order', 'commander'], ['w-try', 'essayer']],
+  },
+  {
+    id: 'i-dont', jp: 'I don\'t', romaji: 'I don\'t', slotLast: true, title: 'I don\'t ___', meaning: 'Je ne ___ pas', art: '🙅',
+    en: (w) => (/^[aeiouhéè]/.test(w) ? `Je n'${w} pas` : `Je ne ${w} pas`),
+    slots: [['w-eat', 'mange'], ['w-drink', 'bois'], ['w-work', 'travaille'], ['w-sleep', 'dors'], ['w-understand', 'comprends'], ['w-speak', 'parle'], ['w-like', 'aime'], ['w-want', 'veux']],
+  },
+  {
+    id: 'she-can', jp: 'She can', romaji: 'She can', slotLast: true, title: 'She can ___', meaning: 'Elle peut ___', art: '💪',
+    en: (w) => `Elle peut ${w}`,
+    slots: [['w-speak', 'parler'], ['w-come', 'venir'], ['w-go', 'aller'], ['w-work', 'travailler'], ['w-help', 'aider'], ['w-drink', 'boire']],
+  },
+  {
+    id: 'lets', jp: 'Let\'s', romaji: 'Let\'s', slotLast: true, title: 'Let\'s ___', meaning: 'Si on ___ ?', art: '🤝',
+    en: (w) => `Si on ${w} ?`,
+    slots: [['w-go', 'allait'], ['w-eat', 'mangeait'], ['w-drink', 'buvait un verre'], ['w-try', 'essayait'], ['w-buy', 'achetait'], ['w-sleep', 'dormait']],
+  },
+  {
+    id: 'im-feeling', jp: 'I\'m', romaji: 'I\'m', slotLast: true, title: 'I\'m ___', meaning: 'Je suis ___', art: '😊',
+    en: (w) => `Je suis ${w}`,
+    slots: [['w-happy', 'heureux'], ['w-sad', 'triste'], ['w-tired', 'fatigué'], ['w-angry', 'en colère'], ['w-relaxed', 'détendu'], ['w-excited', 'impatient'], ['w-worried', 'inquiet'], ['w-lost', 'perdu']],
+  },
+  {
+    id: 'do-you', jp: 'Do you', romaji: 'Do you', slotLast: true, title: 'Do you ___ ?', meaning: 'Est-ce que tu ___ ?', art: '❓',
+    en: (w) => `Est-ce que tu ${w} ?`,
+    slots: [['w-eat', 'manges'], ['w-drink', 'bois'], ['w-speak', 'parles'], ['w-work', 'travailles'], ['w-live', 'habites'], ['w-understand', 'comprends'], ['w-like', 'aimes']],
+  },
+  {
+    id: 'i-verb', jp: 'I', romaji: 'I', slotLast: true, title: 'I ___', meaning: 'Je ___', art: '🙋',
+    en: (w) => (/^[aeiouhéè]/.test(w) ? `J'${w}` : `Je ${w}`),
+    slots: [['w-eat', 'mange'], ['w-drink', 'bois'], ['w-work', 'travaille'], ['w-sleep', 'dors'], ['w-live', 'habite'], ['w-speak', 'parle'], ['w-like', 'aime']],
+  },
 ];

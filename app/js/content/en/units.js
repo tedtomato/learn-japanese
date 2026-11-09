@@ -39,7 +39,7 @@ export const SECTIONS_DATA = [
         desc: 'Saluer, remercier et s\'excuser… beaucoup',
         facts: [FACT.language, FACT.traditions],
         phrases: [PH.polite],
-        dialogues: ['d-hello'],
+        dialogues: ['d-hello', 'd-hello2'],
         lessons: [
           { title: 'Bonjour', words: [
             ['hello', 'bonjour', '👋', { note: 'Marche à toute heure, avec tout le monde.' }],
@@ -84,7 +84,7 @@ export const SECTIONS_DATA = [
         desc: 'Gares, métro, bus et trouver les toilettes',
         facts: [FACT.transport, FACT.city],
         phrases: [PH.around, PH.hotel],
-        dialogues: ['d-station'],
+        dialogues: ['d-station', 'd-station2'],
         lessons: [
           { title: 'À la gare', words: [
             ['station', 'gare / station', '🚉'],
@@ -110,6 +110,12 @@ export const SECTIONS_DATA = [
             ['right', 'droite', '➡️', { note: 'On the right = à droite. Right veut aussi dire « exact ».' }],
             ['straight on', 'tout droit', '⬆️', { note: 'Aux États-Unis : straight ahead.', alt: ['straight ahead'] }],
           ] },
+          { title: 'Verbes de déplacement', words: [
+            ['go', 'aller', '🏃', { note: 'Go, went, gone. Pour une destination : go to London. Au passé : I went to York.' }],
+            ['come', 'venir', '👉', { note: 'Come with me = viens avec moi. Pour l\'origine : where do you come from? = d\'où venez-vous ?' }],
+            ['arrive', 'arriver', '🚉', { note: 'Arrive in une ville (arrive in London), arrive at un lieu précis (arrive at the station).' }],
+            ['leave', 'partir / quitter', '🚪', { note: 'Leave, left, left : le même left que « gauche » ! Par exemple : the train leaves at nine.' }],
+          ] },
           { title: 'Billets', words: [
             ['single', 'aller simple', '➡️', { note: 'A single to York = un aller simple pour York. Aux États-Unis : one-way.' }],
             ['return', 'aller-retour', '🔁', { note: 'Aux États-Unis : round trip.' }],
@@ -122,6 +128,12 @@ export const SECTIONS_DATA = [
             { jp: ['where', 'are', 'the', 'toilets'], en: 'Où sont les toilettes', alt: ['Où se trouvent les toilettes', 'Les toilettes sont où', 'Elles sont où les toilettes'] },
             { jp: ['it\'s', 'on', 'the', 'left'], en: 'C\'est à gauche', alt: ['À gauche', 'Elle est à gauche', 'Il est à gauche', 'C\'est sur la gauche'] },
             { jp: ['go', 'straight on'], en: 'Allez tout droit', alt: ['Va tout droit', 'Tout droit', 'Continuez tout droit', 'Continue tout droit'] },
+          ] },
+          { title: 'Je vais à Londres', sentences: [
+            { jp: ['I\'d', 'like', 'to', 'go', 'to', 'London'], en: 'Je voudrais aller à Londres', alt: ['J\'aimerais aller à Londres', 'Je voudrais aller à Londres s\'il vous plaît'] },
+            { jp: ['come', 'with', 'me'], en: 'Viens avec moi', alt: ['Venez avec moi', 'Viens avec moi s\'il te plaît'] },
+            { jp: ['does', 'this', 'train', 'go', 'to', 'York'], en: 'Ce train va à York', alt: ['Est-ce que ce train va à York', 'Ce train va-t-il à York', 'Ce train va jusqu\'à York'] },
+            { jp: ['we', 'arrive', 'in', 'London'], en: 'Nous arrivons à Londres', alt: ['On arrive à Londres', 'Nous arrivons à Londres'] },
           ] },
           { title: 'Au guichet', sentences: [
             { jp: ['a', 'return', 'to', 'London', 'please'], en: 'Un aller-retour pour Londres s\'il vous plaît', alt: ['Un aller-retour pour Londres s\'il te plaît', 'Un aller-retour pour Londres'] },
@@ -136,7 +148,7 @@ export const SECTIONS_DATA = [
         desc: 'Commander au café et au pub, et demander l\'addition',
         facts: [FACT.food],
         phrases: [PH.food],
-        dialogues: ['d-cafe'],
+        dialogues: ['d-cafe', 'd-cafe2'],
         lessons: [
           { title: 'Boissons', words: [
             ['water', 'eau', '💧', { note: 'Tap water = l\'eau du robinet, gratuite au restaurant si on la demande.' }],
@@ -169,6 +181,12 @@ export const SECTIONS_DATA = [
             ['waiter', 'serveur', '🧑‍🍳', { note: 'On n\'appelle pas « Waiter ! » : on lève la main et on dit excuse me.' }],
             ['tip', 'pourboire', '🪙', { note: 'Environ 10 % au restaurant s\'il n\'est pas déjà inclus (service charge). Pas au pub.' }],
           ] },
+          { title: 'Verbes de table', words: [
+            ['drink', 'boire', '🥤', { note: 'Drink, drank, drunk. Aussi un nom : a drink = une boisson, un verre (fancy a drink? = on prend un verre ?).' }],
+            ['want', 'vouloir', '🎁', { note: 'I want… sonne brusque à un serveur : préférez I\'d like… Entre amis, do you want a tea? est très naturel.' }],
+            ['order', 'commander', '📋', { note: 'I\'d like to order, please. Au pub, on commande directement au bar.' }],
+            ['try', 'essayer / goûter', '😋', { note: 'Try this! = goûte ça ! Aussi : can I try it on? = puis-je l\'essayer ? (vêtements).' }],
+          ] },
           { title: 'Je voudrais…', grammar: 'would-like', sentences: [
             { jp: ['I\'d', 'like', 'a', 'coffee'], en: 'Je voudrais un café', alt: ['J\'aimerais un café', 'Un café s\'il vous plaît', 'Je voudrais un café s\'il vous plaît'] },
             { jp: ['I\'d', 'like', 'some', 'water'], en: 'Je voudrais de l\'eau', alt: ['J\'aimerais de l\'eau', 'De l\'eau s\'il vous plaît', 'Je voudrais un peu d\'eau'] },
@@ -180,6 +198,12 @@ export const SECTIONS_DATA = [
             { jp: ['I\'m', 'hungry'], en: 'J\'ai faim', alt: ['J\'ai très faim'] },
             { jp: ['can', 'I', 'have', 'the', 'bill', 'please'], en: 'Je peux avoir l\'addition s\'il vous plaît', alt: ['L\'addition s\'il vous plaît', 'Puis-je avoir l\'addition s\'il vous plaît', 'Est-ce que je peux avoir l\'addition s\'il vous plaît', 'Je peux avoir l\'addition'] },
           ] },
+          { title: 'Je bois du thé', grammar: 'present-simple', sentences: [
+            { jp: ['I', 'drink', 'tea'], en: 'Je bois du thé', alt: ['Je bois le thé', 'Je bois de thé'] },
+            { jp: ['do', 'you', 'want', 'a', 'coffee'], en: 'Tu veux un café', alt: ['Vous voulez un café', 'Voulez-vous un café', 'Veux-tu un café'] },
+            { jp: ['she', 'orders', 'fish and chips'], en: 'Elle commande du poisson-frites', alt: ['Elle commande un poisson-frites', 'Elle commande des fish and chips'] },
+            { jp: ['we', 'don\'t', 'want', 'dessert'], en: 'Nous ne voulons pas de dessert', alt: ['On ne veut pas de dessert', 'Nous ne voulons pas de dessert merci'] },
+          ] },
         ],
       },
       {
@@ -188,7 +212,7 @@ export const SECTIONS_DATA = [
         desc: 'Les prix, les livres et les pence, payer par carte',
         facts: [FACT.city, FACT.sport],
         phrases: [PH.shop],
-        dialogues: ['d-shop'],
+        dialogues: ['d-shop', 'd-shop2'],
         lessons: [
           { title: 'Combien ?', words: [
             ['how much', 'combien', '💰', { note: 'How much is it? = c\'est combien ?' }],
@@ -215,6 +239,12 @@ export const SECTIONS_DATA = [
             ['shoes', 'chaussures', '👢'],
             ['umbrella', 'parapluie', '☂️', { note: 'Le meilleur achat d\'un séjour au Royaume-Uni !' }],
           ] },
+          { title: 'Acheter', words: [
+            ['buy', 'acheter', '🛍️', { note: 'Buy, bought, bought. Le contraire : sell. I\'d like to buy a ticket = je voudrais acheter un billet.' }],
+            ['pay', 'payer', '💳', { note: 'Pay by card, pay in cash. Pour un objet : pay for the tickets.' }],
+            ['choose', 'choisir', '👉', { note: 'Choose, chose, chosen. Which one do you choose? = lequel choisissez-vous ?' }],
+            ['wear', 'porter (un vêtement)', '👕', { note: 'Wear, wore, worn. Seulement pour les vêtements : pour un sac, on dit carry.' }],
+          ] },
           { title: 'C\'est combien ?', grammar: 'do-question', sentences: [
             { jp: ['how much', 'is', 'this'], en: 'Combien ça coûte', alt: ['C\'est combien', 'Ça coûte combien', 'Combien coûte ceci', 'Combien est-ce'] },
             { jp: ['do', 'you', 'have', 'a', 'bag'], en: 'Vous avez un sac', alt: ['Avez-vous un sac', 'Est-ce que vous avez un sac', 'Tu as un sac', 'As-tu un sac'] },
@@ -225,6 +255,12 @@ export const SECTIONS_DATA = [
             { jp: ['I\'m', 'just', 'looking'], en: 'Je regarde seulement', alt: ['Je regarde juste', 'Je ne fais que regarder', 'Je regarde'] },
             { jp: ['do', 'you', 'take', 'cash'], en: 'Vous acceptez les espèces', alt: ['Acceptez-vous les espèces', 'Vous prenez le liquide', 'Est-ce que vous acceptez les espèces', 'Vous acceptez le liquide'] },
             { jp: ['the', 'shop', 'is', 'closed'], en: 'Le magasin est fermé', alt: ['La boutique est fermée'] },
+          ] },
+          { title: 'Je voudrais acheter', sentences: [
+            { jp: ['I', 'want', 'to', 'buy', 'a', 'jumper'], en: 'Je veux acheter un pull', alt: ['Je voudrais acheter un pull', 'J\'ai envie d\'acheter un pull'] },
+            { jp: ['can', 'I', 'try', 'it', 'on'], en: 'Je peux l\'essayer', alt: ['Puis-je l\'essayer', 'Est-ce que je peux l\'essayer', 'Je peux essayer ça'] },
+            { jp: ['I\'ll', 'take', 'it'], en: 'Je le prends', alt: ['Je prends ça', 'Je le prendrai', 'Je vais le prendre'] },
+            { jp: ['I', 'don\'t', 'want', 'a', 'bag'], en: 'Je ne veux pas de sac', alt: ['Je ne veux pas un sac', 'Pas de sac pour moi'] },
           ] },
         ],
       },
@@ -240,7 +276,7 @@ export const SECTIONS_DATA = [
         desc: 'Compter, dire l\'heure et parler des jours',
         facts: [FACT.history, FACT.sport],
         phrases: [PH.shop, PH.hotel],
-        dialogues: ['d-time'],
+        dialogues: ['d-time', 'd-time2'],
         lessons: [
           { title: '1 à 4', words: [
             ['one', 'un', '1️⃣', { alt: ['1'] }],
@@ -260,6 +296,37 @@ export const SECTIONS_DATA = [
             ['twenty', 'vingt', '🔢', { note: 'Puis twenty-one, twenty-two… Plus simple qu\'en français : pas de soixante-dix !', alt: ['20'] }],
             ['hundred', 'cent', '💯', { note: 'On dit a hundred ou one hundred. 250 = two hundred and fifty (le and est britannique).', alt: ['100', 'a hundred', 'one hundred'] }],
           ] },
+          { title: '11 à 14', words: [
+            ['eleven', 'onze', '🔢', { alt: ['11'] }],
+            ['twelve', 'douze', '🔢', { alt: ['12'] }],
+            ['thirteen', 'treize', '🔢', { note: 'Les nombres en -teen ont l\'accent sur la fin : thirTEEN. Les dizaines en -ty l\'ont au début : THIRty.', alt: ['13'] }],
+            ['fourteen', 'quatorze', '🔢', { alt: ['14'] }],
+          ] },
+          { title: '15 à 19', words: [
+            ['fifteen', 'quinze', '🔢', { alt: ['15'] }],
+            ['sixteen', 'seize', '🔢', { alt: ['16'] }],
+            ['seventeen', 'dix-sept', '🔢', { alt: ['17'] }],
+            ['eighteen', 'dix-huit', '🔢', { alt: ['18'] }],
+            ['nineteen', 'dix-neuf', '🔢', { alt: ['19'] }],
+          ] },
+          { title: 'Les dizaines', words: [
+            ['thirty', 'trente', '🔢', { alt: ['30'] }],
+            ['forty', 'quarante', '🔢', { note: 'Piège d\'orthographe : four, mais forty (sans u).', alt: ['40'] }],
+            ['fifty', 'cinquante', '🔢', { alt: ['50'] }],
+            ['sixty', 'soixante', '🔢', { alt: ['60'] }],
+          ] },
+          { title: 'Encore des dizaines', words: [
+            ['seventy', 'soixante-dix', '🔢', { note: 'Ici, pas de soixante-dix compliqué : seventy, eighty, ninety suivent la même logique que sixty.', alt: ['70'] }],
+            ['eighty', 'quatre-vingts', '🔢', { alt: ['80'] }],
+            ['ninety', 'quatre-vingt-dix', '🔢', { alt: ['90'] }],
+            ['zero', 'zéro', '🔢', { note: 'Dans un numéro de téléphone, on dit souvent oh ; en sport, nil ou nought.', alt: ['0', 'oh', 'nought'] }],
+          ] },
+          { title: 'Âge et prix', sentences: [
+            { jp: ['I\'m', 'twenty', 'years', 'old'], en: 'J\'ai vingt ans', alt: ['Je suis âgé de vingt ans', 'Je suis âgée de vingt ans', 'J\'ai 20 ans'] },
+            { jp: ['it\'s', 'fifty', 'pence'], en: 'Ça fait cinquante pence', alt: ['C\'est cinquante pence', 'Cinquante pence', 'Ça coûte cinquante pence'] },
+            { jp: ['the', 'ticket', 'is', 'thirty', 'pounds'], en: 'Le billet coûte trente livres', alt: ['Le billet est à trente livres', 'Le ticket coûte trente livres', 'Le billet fait trente livres'] },
+            { jp: ['there', 'are', 'sixty', 'minutes'], en: 'Il y a soixante minutes', alt: ['Il y a 60 minutes'] },
+          ] },
           { title: 'L\'heure', words: [
             ['o\'clock', 'heure(s) pile', '🕐', { note: 'Seulement pour l\'heure pile : three o\'clock = 3 h 00.', alt: ['oclock'] }],
             ['half past', 'et demie', '🕧', { note: 'Half past two = 2 h 30. À l\'oral britannique, on raccourcit : half two = 2 h 30 (et non 1 h 30 !).' }],
@@ -273,11 +340,38 @@ export const SECTIONS_DATA = [
             ['yesterday', 'hier', '📅', { note: 'Yesterday morning = hier matin, yesterday evening = hier soir.' }],
             ['weekend', 'week-end', '😎'],
           ] },
+          { title: 'Mardi à vendredi', words: [
+            ['Tuesday', 'mardi', '📅', { alt: ['tuesday'] }],
+            ['Wednesday', 'mercredi', '📅', { note: 'Le premier d ne se prononce pas : « OUÈNZ-dei ».', alt: ['wednesday'] }],
+            ['Thursday', 'jeudi', '📅', { alt: ['thursday'] }],
+            ['Friday', 'vendredi', '📅', { alt: ['friday'] }],
+          ] },
+          { title: 'Samedi et dimanche', words: [
+            ['Saturday', 'samedi', '📅', { alt: ['saturday'] }],
+            ['Sunday', 'dimanche', '📅', { note: 'Le dimanche est le jour du Sunday roast, le grand repas en famille.', alt: ['sunday'] }],
+            ['week', 'semaine', '📅'],
+            ['month', 'mois', '📅'],
+            ['year', 'an / année', '📅', { note: 'Pour l\'âge, on dit I\'m twenty (years old) : jamais « I have twenty ».' }],
+          ] },
+          { title: 'Les mois', words: [
+            ['January', 'janvier', '🎌', { note: 'Les mois prennent une majuscule en anglais : January, May, August…', alt: ['january'] }],
+            ['May', 'mai', '🌸', { alt: ['may'] }],
+            ['August', 'août', '☀️', { alt: ['august'] }],
+            ['December', 'décembre', '🎁', { alt: ['december'] }],
+            ['birthday', 'anniversaire', '🍰', { note: 'Happy birthday! = joyeux anniversaire. Pour un mariage, un jubilé : anniversary.' }],
+          ] },
           { title: 'Quelle heure est-il ?', grammar: 'time', sentences: [
             { jp: ['what', 'time', 'is', 'it'], en: 'Quelle heure est-il', alt: ['Il est quelle heure', 'Quelle heure il est'] },
             { jp: ['it\'s', 'three', 'o\'clock'], en: 'Il est trois heures', alt: ['Il est 3 heures', 'Il est 3 h', 'Trois heures'] },
             { jp: ['it\'s', 'half past', 'two'], en: 'Il est deux heures et demie', alt: ['Il est 2 h 30', 'Il est deux heures trente', 'Deux heures et demie'] },
             { jp: ['see', 'you', 'tomorrow'], en: 'À demain', alt: ['On se voit demain', 'À demain alors'] },
+          ] },
+          { title: 'À quelle heure ?', grammar: 'at-on', sentences: [
+            { jp: ['the', 'train', 'is', 'at', 'half past', 'seven'], en: 'Le train est à sept heures et demie', alt: ['Le train est à 7 h 30', 'Le train est à sept heures trente', 'Le train part à sept heures et demie'] },
+            { jp: ['see', 'you', 'on', 'Monday'], en: 'À lundi', alt: ['On se voit lundi', 'À lundi prochain', 'À bientôt lundi'] },
+            { jp: ['the', 'shop', 'opens', 'at', 'nine'], en: 'Le magasin ouvre à neuf heures', alt: ['Le magasin ouvre à 9 heures', 'La boutique ouvre à neuf heures'] },
+            { jp: ['my', 'birthday', 'is', 'in', 'May'], en: 'Mon anniversaire est en mai', alt: ['Mon anniversaire est au mois de mai', 'Mon anniversaire, c\'est en mai'] },
+            { jp: ['it\'s', 'quarter', 'past', 'four'], en: 'Il est quatre heures et quart', alt: ['Il est 4 h 15', 'Il est quatre heures quinze', 'Quatre heures et quart'] },
           ] },
           { title: 'Deux billets', grammar: 'plural', sentences: [
             { jp: ['two', 'tickets', 'please'], en: 'Deux billets s\'il vous plaît', alt: ['Deux tickets s\'il vous plaît', 'Deux billets s\'il te plaît', 'Deux billets'] },
@@ -292,7 +386,7 @@ export const SECTIONS_DATA = [
         desc: 'Se présenter, parler de sa famille et de son métier',
         facts: [FACT.history, FACT.language],
         phrases: [PH.polite],
-        dialogues: ['d-meet'],
+        dialogues: ['d-meet', 'd-meet2'],
         lessons: [
           { title: 'La famille', words: [
             ['family', 'famille', '🧑‍🤝‍🧑'],
@@ -324,6 +418,22 @@ export const SECTIONS_DATA = [
             ['British', 'britannique', '🇬🇧', { alt: ['british'] }],
             ['American', 'américain', '🇺🇸', { alt: ['american'] }],
           ] },
+          { title: 'Je, tu, il, elle', words: [
+            ['I', 'je', '🙋', { note: 'Toujours une majuscule, même au milieu d\'une phrase. Contractions : I\'m, I\'ve, I\'d.' }],
+            ['you', 'tu / vous', '🫵', { note: 'Un seul mot pour tu, vous et même « vous tous ».' }],
+            ['he', 'il', '🧑', { note: 'Pour un homme ou un garçon. Pour une chose : it.' }],
+            ['she', 'elle', '🧑', { note: 'Pour une femme ou une fille. Pour une chose : it, jamais she.' }],
+          ] },
+          { title: 'Nous, ils, ça', words: [
+            ['we', 'nous / on', '👫', { note: 'We sert aussi pour « on » : we are tired = on est fatigués.' }],
+            ['they', 'ils / elles', '🧑‍🤝‍🧑', { note: 'Un seul mot pour ils et elles. Aussi pour une personne dont on ne précise pas le genre.' }],
+            ['it', 'il / elle / ça (une chose)', '📍', { note: 'Pour une chose, un animal ou la météo : it\'s raining. Jamais « he » pour une chose.' }],
+          ] },
+          { title: 'Verbes essentiels', words: [
+            ['be', 'être', '🧍', { note: 'Am, is, are ; passé was / were. Be est irrégulier : voir la fiche des conjugaisons.' }],
+            ['have', 'avoir / prendre', '🤲', { note: 'He / she has. Aussi « prendre » : have a coffee, have breakfast. Au passé : had.' }],
+            ['do', 'faire', '💪', { note: 'Do, does, did. Sert aussi d\'auxiliaire : do you…? I don\'t…' }],
+          ] },
           { title: 'Je m\'appelle…', grammar: 'possessive', sentences: [
             { jp: ['my', 'name', 'is', 'Emma'], en: 'Je m\'appelle Emma', alt: ['Mon nom est Emma', 'Mon prénom est Emma', 'Moi c\'est Emma'] },
             { jp: ['I\'m', 'French'], en: 'Je suis français', alt: ['Je suis française'] },
@@ -336,6 +446,13 @@ export const SECTIONS_DATA = [
             { jp: ['I\'m', 'a', 'student'], en: 'Je suis étudiant', alt: ['Je suis étudiante'] },
             { jp: ['I\'ve', 'got', 'a', 'brother'], en: 'J\'ai un frère' },
           ] },
+          { title: 'Il, elle, nous, ils', grammar: 'pronouns', sentences: [
+            { jp: ['she', 'is', 'my', 'sister'], en: 'Elle est ma sœur', alt: ['C\'est ma sœur', 'Elle, c\'est ma sœur'] },
+            { jp: ['he', 'works', 'in', 'London'], en: 'Il travaille à Londres' },
+            { jp: ['we', 'are', 'friends'], en: 'Nous sommes amis', alt: ['Nous sommes amies', 'On est amis', 'On est amies', 'Nous sommes des amis'] },
+            { jp: ['they', 'are', 'teachers'], en: 'Ils sont professeurs', alt: ['Elles sont professeures', 'Ils sont enseignants', 'Elles sont enseignantes', 'Ils sont profs', 'Elles sont profs'] },
+            { jp: ['they', 'are', 'from', 'France'], en: 'Ils viennent de France', alt: ['Elles viennent de France', 'Ils sont de France', 'Elles sont de France'] },
+          ] },
         ],
       },
       {
@@ -344,7 +461,7 @@ export const SECTIONS_DATA = [
         desc: 'La maison, les objets et les habitudes de tous les jours',
         facts: [FACT.traditions, FACT.city],
         phrases: [PH.hotel],
-        dialogues: ['d-flat'],
+        dialogues: ['d-flat', 'd-flat2'],
         lessons: [
           { title: 'La maison', words: [
             ['house', 'maison', '🏠'],
@@ -386,6 +503,20 @@ export const SECTIONS_DATA = [
             { jp: ['there', 'are', 'two', 'bedrooms'], en: 'Il y a deux chambres', alt: ['Il y a 2 chambres'] },
             { jp: ['where', 'are', 'my', 'keys'], en: 'Où sont mes clés', alt: ['Mes clés sont où', 'Elles sont où mes clés'] },
           ] },
+          { title: 'Je ne… pas', grammar: 'negation', sentences: [
+            { jp: ['I', 'don\'t', 'eat', 'meat'], en: 'Je ne mange pas de viande', alt: ['Je ne mange pas la viande'] },
+            { jp: ['she', 'doesn\'t', 'work', 'on', 'Sunday'], en: 'Elle ne travaille pas le dimanche', alt: ['Elle ne travaille pas dimanche'] },
+            { jp: ['we', 'don\'t', 'have', 'a', 'garden'], en: 'Nous n\'avons pas de jardin', alt: ['On n\'a pas de jardin'] },
+            { jp: ['there', 'isn\'t', 'a', 'sofa'], en: 'Il n\'y a pas de canapé', alt: ['Il n\'y a pas de sofa'] },
+            { jp: ['I', 'can\'t', 'sleep'], en: 'Je n\'arrive pas à dormir', alt: ['Je ne peux pas dormir', 'Je ne parviens pas à dormir'] },
+          ] },
+          { title: 'Hier', grammar: 'past-simple', sentences: [
+            { jp: ['I', 'went', 'to', 'London', 'yesterday'], en: 'Je suis allé à Londres hier', alt: ['Je suis allée à Londres hier', 'Hier, je suis allé à Londres', 'Hier, je suis allée à Londres', 'Hier je suis allé à Londres'] },
+            { jp: ['we', 'ate', 'fish and chips'], en: 'Nous avons mangé du poisson-frites', alt: ['On a mangé du poisson-frites', 'Nous avons mangé un poisson-frites', 'Nous avons mangé des fish and chips'] },
+            { jp: ['she', 'drank', 'a', 'coffee'], en: 'Elle a bu un café' },
+            { jp: ['he', 'bought', 'a', 'ticket'], en: 'Il a acheté un billet', alt: ['Il a acheté un ticket'] },
+            { jp: ['it', 'was', 'a', 'lovely', 'day'], en: 'C\'était une belle journée', alt: ['Il faisait beau', 'C\'était une magnifique journée', 'C\'était une journée agréable'] },
+          ] },
         ],
       },
       {
@@ -394,7 +525,7 @@ export const SECTIONS_DATA = [
         desc: 'Le sujet de conversation préféré des Britanniques',
         facts: [FACT.nature],
         phrases: [PH.polite],
-        dialogues: ['d-weather'],
+        dialogues: ['d-weather', 'd-weather2'],
         lessons: [
           { title: 'Le temps', words: [
             ['weather', 'temps (météo)', '☁️', { note: 'Ne pas confondre avec whether (si), qui se prononce pareil.' }],
@@ -444,7 +575,7 @@ export const SECTIONS_DATA = [
         desc: 'Dire comment on se sent et faire la conversation',
         facts: [FACT.sport, FACT.traditions],
         phrases: [PH.polite],
-        dialogues: ['d-smalltalk'],
+        dialogues: ['d-smalltalk', 'd-smalltalk2'],
         lessons: [
           { title: 'Comment te sens-tu ?', words: [
             ['happy', 'heureux / content', '😊'],
@@ -462,6 +593,12 @@ export const SECTIONS_DATA = [
             ['really', 'vraiment / ah bon ?', '😲', { note: 'Really? = ah bon ? Pour montrer qu\'on écoute.' }],
             ['great', 'super', '👍'],
             ['not bad', 'pas mal', '👌', { note: 'Litote très britannique : not bad peut vouloir dire « très bien » !' }],
+          ] },
+          { title: 'Aimer', words: [
+            ['like', 'aimer', '👍', { note: 'I like tea = j\'aime le thé (un goût). Pour dire « je t\'aime », on utilise love, pas like.' }],
+            ['love', 'adorer / aimer', '❤️', { note: 'Plus fort que like. Entre amis : I love it! = j\'adore ! Pour une personne : I love you.' }],
+            ['hate', 'détester', '😤', { note: 'Très fort. Plus doux et plus poli : I don\'t like…' }],
+            ['prefer', 'préférer', '💝', { note: 'I prefer tea to coffee = je préfère le thé au café (avec to, pas than).' }],
           ] },
           { title: 'Loisirs', words: [
             ['football', 'football', '⚽', { note: 'Aux États-Unis : soccer (football = football américain). Familier au Royaume-Uni : footy.', alt: ['soccer'] }],
@@ -482,6 +619,23 @@ export const SECTIONS_DATA = [
             { jp: ['not bad', 'thanks'], en: 'Pas mal merci', alt: ['Pas mal, merci', 'Ça va merci'] },
             { jp: ['I\'m', 'on', 'holiday'], en: 'Je suis en vacances' },
           ] },
+          { title: 'Qui, quoi, quand', words: [
+            ['who', 'qui', '🔎', { note: 'Who is that? = qui est-ce ? Pour « à qui » : whose.' }],
+            ['what', 'quoi / que / quel', '❔', { note: 'What time is it? = quelle heure est-il ? What is your name? = comment t\'appelles-tu ?' }],
+            ['when', 'quand', '🕐', { note: 'When is the next train? = quand est le prochain train ?' }],
+          ] },
+          { title: 'Pourquoi, quel, comment', words: [
+            ['why', 'pourquoi', '🤷', { note: 'On répond avec because (parce que) : why are you tired? Because I work a lot.' }],
+            ['which', 'quel / lequel', '👉', { note: 'Pour choisir parmi un petit nombre : which platform? Si le choix est ouvert, on dit what.' }],
+            ['how', 'comment', '💬', { note: 'How are you? s\'associe à d\'autres mots : how old (quel âge), how long (combien de temps), how many.' }],
+          ] },
+          { title: 'Questions', grammar: 'qwords', sentences: [
+            { jp: ['who', 'is', 'that'], en: 'Qui est-ce', alt: ['Qui est-ce là', 'Qui est cette personne', 'Qui est-ce que c\'est'] },
+            { jp: ['what', 'is', 'your', 'name'], en: 'Comment tu t\'appelles', alt: ['Comment vous appelez-vous', 'Quel est ton nom', 'Quel est votre nom', 'Comment t\'appelles-tu'] },
+            { jp: ['why', 'are', 'you', 'sad'], en: 'Pourquoi es-tu triste', alt: ['Pourquoi êtes-vous triste', 'Pourquoi tu es triste', 'Pourquoi vous êtes triste'] },
+            { jp: ['how', 'old', 'are', 'you'], en: 'Quel âge as-tu', alt: ['Quel âge avez-vous', 'Tu as quel âge', 'Vous avez quel âge'] },
+            { jp: ['when', 'is', 'your', 'birthday'], en: 'C\'est quand ton anniversaire', alt: ['Quand est ton anniversaire', 'Quand est votre anniversaire', 'C\'est quand votre anniversaire'] },
+          ] },
         ],
       },
       {
@@ -490,7 +644,7 @@ export const SECTIONS_DATA = [
         desc: 'Pharmacie, médecin, urgences… et faire répéter',
         facts: [FACT.history, FACT.nature],
         phrases: [PH.help],
-        dialogues: ['d-chemist'],
+        dialogues: ['d-chemist', 'd-chemist2'],
         lessons: [
           { title: 'Urgences', words: [
             ['help', 'à l\'aide / aider', '🆘', { note: 'Help! = au secours ! Le numéro d\'urgence au Royaume-Uni est le 999 (le 112 marche aussi).' }],
@@ -538,7 +692,7 @@ export const SECTIONS_DATA = [
         desc: 'Parler comme un vrai Britannique (ou presque)',
         facts: [FACT.language, FACT.food],
         phrases: [PH.food, PH.polite],
-        dialogues: ['d-pub'],
+        dialogues: ['d-pub', 'd-pub2'],
         lessons: [
           { title: 'Salut, mon pote', words: [
             ['mate', 'pote', '🤝', { note: 'Très courant, même avec un inconnu : Cheers, mate! Aux États-Unis : buddy, dude.' }],
@@ -714,5 +868,182 @@ export const DIALOGUES = {
     ],
     question: 'Qui paie la première tournée ?',
     options: ['Emma : c\'est sa tournée', 'Olivia', 'Chacune paie la sienne'],
+  },
+  'd-hello2': {
+    title: 'Bonsoir à l\'hôtel',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Good evening! Welcome to the hotel.', en: 'Bonsoir ! Bienvenue à l\'hôtel.' },
+      { who: 1, jp: 'Good evening. I have a reservation.', en: 'Bonsoir. J\'ai une réservation.' },
+      { who: 0, jp: 'What\'s your name, please?', en: 'Votre nom, s\'il vous plaît ?' },
+      { who: 1, jp: 'It\'s Olivia Brown. Thank you!', en: 'Olivia Brown. Merci !' },
+    ],
+    question: 'Pourquoi Olivia est-elle à l\'hôtel ?',
+    options: ['Elle a une réservation', 'Elle cherche la gare', 'Elle veut un café'],
+    questions: [
+      { question: 'Pourquoi Olivia est-elle à l\'hôtel ?', options: ['Elle a une réservation', 'Elle cherche la gare', 'Elle veut un café'] },
+      { question: 'Comment s\'appelle-t-elle ?', options: ['Olivia Brown', 'Emma Brown', 'Olivia Green'] },
+    ],
+  },
+  'd-station2': {
+    title: 'Le bon quai',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Excuse me, how much is a return to Oxford?', en: 'Excusez-moi, combien coûte un aller-retour pour Oxford ?' },
+      { who: 1, jp: 'It\'s thirty pounds.', en: 'Trente livres.' },
+      { who: 0, jp: 'And which platform, please?', en: 'Et quel quai, s\'il vous plaît ?' },
+      { who: 1, jp: 'Platform four. The train leaves at ten past nine.', en: 'Quai quatre. Le train part à neuf heures dix.' },
+    ],
+    question: 'Quel est le numéro du quai ?',
+    options: ['Le quai 4', 'Le quai 9', 'Le quai 10'],
+    questions: [
+      { question: 'Quel est le numéro du quai ?', options: ['Le quai 4', 'Le quai 9', 'Le quai 10'] },
+      { question: 'Combien coûte l\'aller-retour ?', options: ['30 livres', '13 livres', '40 livres'] },
+    ],
+  },
+  'd-cafe2': {
+    title: 'La note',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Can we have the bill, please?', en: 'Pouvons-nous avoir l\'addition, s\'il vous plaît ?' },
+      { who: 1, jp: 'Of course. That\'s eleven pounds fifty.', en: 'Bien sûr. Ça fait onze livres cinquante.' },
+      { who: 0, jp: 'Do you take cards?', en: 'Vous acceptez les cartes ?' },
+      { who: 1, jp: 'Yes, of course.', en: 'Oui, bien sûr.' },
+      { who: 0, jp: 'Great, I\'ll pay by card. Thank you!', en: 'Parfait, je paie par carte. Merci !' },
+    ],
+    question: 'Comment la cliente va-t-elle payer ?',
+    options: ['Par carte', 'En espèces', 'Elle ne paie pas'],
+    questions: [
+      { question: 'Comment la cliente va-t-elle payer ?', options: ['Par carte', 'En espèces', 'Elle ne paie pas'] },
+      { question: 'Combien coûte l\'addition ?', options: ['11,50 £', '15 £', '12 £'] },
+    ],
+  },
+  'd-shop2': {
+    title: 'Le pull',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Can I try this jumper on?', en: 'Je peux essayer ce pull ?' },
+      { who: 1, jp: 'Of course. The changing rooms are on the right.', en: 'Bien sûr. Les cabines d\'essayage sont à droite.' },
+      { who: 0, jp: 'It\'s lovely. How much is it?', en: 'Il est très joli. Combien coûte-t-il ?' },
+      { who: 1, jp: 'It\'s twenty-five pounds.', en: 'Vingt-cinq livres.' },
+    ],
+    question: 'Où sont les cabines d\'essayage ?',
+    options: ['À droite', 'À gauche', 'Au fond du magasin'],
+    questions: [
+      { question: 'Où sont les cabines d\'essayage ?', options: ['À droite', 'À gauche', 'Au fond du magasin'] },
+      { question: 'Combien coûte le pull ?', options: ['25 livres', '15 livres', '50 livres'] },
+    ],
+  },
+  'd-time2': {
+    title: 'Un rendez-vous',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Fancy a coffee on Friday?', en: 'Ça te dit un café vendredi ?' },
+      { who: 1, jp: 'Sure! What time?', en: 'Volontiers ! À quelle heure ?' },
+      { who: 0, jp: 'Half past ten?', en: 'Dix heures et demie ?' },
+      { who: 1, jp: 'Perfect. See you on Friday!', en: 'Parfait. À vendredi !' },
+    ],
+    question: 'Quand se retrouvent-elles ?',
+    options: ['Vendredi à dix heures et demie', 'Vendredi à dix heures', 'Lundi à dix heures et demie'],
+    questions: [
+      { question: 'Quand se retrouvent-elles ?', options: ['Vendredi à dix heures et demie', 'Vendredi à dix heures', 'Lundi à dix heures et demie'] },
+      { question: 'Qu\'est-ce qu\'elles vont faire ?', options: ['Prendre un café', 'Aller au cinéma', 'Prendre le train'] },
+    ],
+  },
+  'd-meet2': {
+    title: 'Ma famille',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Is this your brother?', en: 'C\'est ton frère ?' },
+      { who: 1, jp: 'Yes, this is my brother, Tom. He\'s a doctor.', en: 'Oui, c\'est mon frère, Tom. Il est médecin.' },
+      { who: 0, jp: 'And your sister?', en: 'Et ta sœur ?' },
+      { who: 1, jp: 'She\'s a student in Cardiff.', en: 'Elle est étudiante à Cardiff.' },
+    ],
+    question: 'Quel est le métier de Tom ?',
+    options: ['Médecin', 'Professeur', 'Étudiant'],
+    questions: [
+      { question: 'Quel est le métier de Tom ?', options: ['Médecin', 'Professeur', 'Étudiant'] },
+      { question: 'Que fait la sœur ?', options: ['Elle est étudiante à Cardiff', 'Elle est médecin à Londres', 'Elle est professeure'] },
+    ],
+  },
+  'd-flat2': {
+    title: 'Où sont mes clés ?',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Where are my keys? I can\'t find them.', en: 'Où sont mes clés ? Je ne les trouve pas.' },
+      { who: 1, jp: 'Are they in the kitchen?', en: 'Elles sont dans la cuisine ?' },
+      { who: 0, jp: 'No, they aren\'t.', en: 'Non, elles n\'y sont pas.' },
+      { who: 1, jp: 'Look! They\'re on the sofa.', en: 'Regarde ! Elles sont sur le canapé.' },
+    ],
+    question: 'Où sont les clés ?',
+    options: ['Sur le canapé', 'Dans la cuisine', 'Dans le jardin'],
+    questions: [
+      { question: 'Où sont les clés ?', options: ['Sur le canapé', 'Dans la cuisine', 'Dans le jardin'] },
+      { question: 'Que cherche la première personne ?', options: ['Ses clés', 'Son téléphone', 'Son passeport'] },
+    ],
+  },
+  'd-weather2': {
+    title: 'Sortir ou pas ?',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Fancy a walk?', en: 'Ça te dit une promenade ?' },
+      { who: 1, jp: 'What\'s the weather like?', en: 'Quel temps fait-il ?' },
+      { who: 0, jp: 'It\'s sunny, but it\'s windy.', en: 'Il fait beau, mais il y a du vent.' },
+      { who: 1, jp: 'OK, I\'ll take a jumper.', en: 'D\'accord, je prends un pull.' },
+    ],
+    question: 'Que va prendre la seconde personne ?',
+    options: ['Un pull', 'Un parapluie', 'Un manteau'],
+    questions: [
+      { question: 'Que va prendre la seconde personne ?', options: ['Un pull', 'Un parapluie', 'Un manteau'] },
+      { question: 'Quel temps fait-il ?', options: ['Ensoleillé et venteux', 'Pluvieux et froid', 'Neigeux'] },
+    ],
+  },
+  'd-smalltalk2': {
+    title: 'C\'est mon anniversaire !',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Why are you so happy today?', en: 'Pourquoi es-tu si contente aujourd\'hui ?' },
+      { who: 1, jp: 'It\'s my birthday!', en: 'C\'est mon anniversaire !' },
+      { who: 0, jp: 'Happy birthday! How old are you?', en: 'Joyeux anniversaire ! Tu as quel âge ?' },
+      { who: 1, jp: 'Twenty-five. Thank you!', en: 'Vingt-cinq ans. Merci !' },
+    ],
+    question: 'Pourquoi est-elle contente ?',
+    options: ['C\'est son anniversaire', 'Il fait beau', 'Elle a gagné un match'],
+    questions: [
+      { question: 'Pourquoi est-elle contente ?', options: ['C\'est son anniversaire', 'Il fait beau', 'Elle a gagné un match'] },
+      { question: 'Quel âge a-t-elle ?', options: ['25 ans', '20 ans', '15 ans'] },
+    ],
+  },
+  'd-chemist2': {
+    title: 'Je suis perdu',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Excuse me, I\'m lost. Can you help me?', en: 'Excusez-moi, je suis perdue. Vous pouvez m\'aider ?' },
+      { who: 1, jp: 'Of course. Where do you want to go?', en: 'Bien sûr. Où voulez-vous aller ?' },
+      { who: 0, jp: 'To the hospital, please.', en: 'À l\'hôpital, s\'il vous plaît.' },
+      { who: 1, jp: 'Go straight on, then it\'s on the left.', en: 'Allez tout droit, puis c\'est à gauche.' },
+    ],
+    question: 'Où veut aller la première personne ?',
+    options: ['À l\'hôpital', 'À la gare', 'À l\'hôtel'],
+    questions: [
+      { question: 'Où veut aller la première personne ?', options: ['À l\'hôpital', 'À la gare', 'À l\'hôtel'] },
+      { question: 'Que doit-elle faire d\'abord ?', options: ['Aller tout droit', 'Tourner à droite', 'Prendre le bus'] },
+    ],
+  },
+  'd-pub2': {
+    title: 'Une tournée',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'What are you drinking, mate?', en: 'Qu\'est-ce que tu bois, mon pote ?' },
+      { who: 1, jp: 'A pint of lager, cheers!', en: 'Une pinte de blonde, merci !' },
+      { who: 0, jp: 'I\'ll have a cuppa. I\'m driving.', en: 'Moi, je prends un thé. Je conduis.' },
+      { who: 1, jp: 'No worries!', en: 'Pas de souci !' },
+    ],
+    question: 'Pourquoi prend-il un thé ?',
+    options: ['Il conduit', 'Il n\'aime pas la bière', 'Il est fatigué'],
+    questions: [
+      { question: 'Pourquoi prend-il un thé ?', options: ['Il conduit', 'Il n\'aime pas la bière', 'Il est fatigué'] },
+      { question: 'Que boit l\'autre personne ?', options: ['Une pinte de blonde', 'Du vin', 'Un thé'] },
+    ],
   },
 };

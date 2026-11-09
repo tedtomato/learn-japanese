@@ -38,7 +38,8 @@ test('streak grows on consecutive days, resets after a gap, freezes cover a miss
 test('spaced repetition moves items up on success and down on mistakes', () => {
   let r = review(null, { right: 1, wrong: 0 }, T0);
   assert.equal(r.box, 1);
-  assert.equal(r.due, T0 + INTERVALS[1]);
+  assert.equal(r.due, T0 + DAY, 'the first review is a day away (grace period)');
+  assert.equal(review(r, { right: 1, wrong: 0 }, T0 + DAY).due, T0 + DAY + INTERVALS[2], 'later reviews follow the boxes');
   for (let i = 0; i < 10; i++) r = review(r, { right: 1, wrong: 0 }, T0);
   assert.equal(r.box, MAX_BOX);
   r = review(r, { right: 0, wrong: 1 }, T0);
@@ -55,7 +56,7 @@ test('review dates drift by at most 10% and the same item always drifts the same
     dues.add(wait);
   }
   assert.ok(dues.size > 1, 'not all the same');
-  assert.equal(review(null, { right: 0, wrong: 1 }, T0, 'x').due, T0, 'a new mistake is due at once');
+  assert.equal(review({ box: 2, seen: 3, right: 3, wrong: 0, slow: 0 }, { right: 0, wrong: 1 }, T0, 'x').due, T0, 'a mistake on a known item is due at once');
 });
 
 test('completing a lesson saves items, XP, level and unlocks the next node', () => {

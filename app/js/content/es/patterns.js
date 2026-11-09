@@ -36,5 +36,45 @@ export const PATTERNS = [
     id: 'me-duele', jp: 'me duele', romaji: 'me duele', slotLast: true, title: 'me duele ___', meaning: 'My ___ hurts', art: '🤕',
     en: (w) => `My ${w} hurts`,
     slots: [['w-la-cabeza', 'head'], ['w-la-garganta', 'throat'], ['w-el-estomago', 'stomach'], ['w-la-mano', 'hand'], ['w-el-pie', 'foot'], ['w-la-espalda', 'back'], ['w-el-diente', 'tooth']],
+  },  // Verb and sentence slots: the verb stays in the infinitive after a conjugated helper.
+  {
+    id: 'no-quiero', jp: 'no quiero', romaji: 'no quiero', slotLast: true, title: 'no quiero ___', meaning: 'I don\'t want to ___', art: '🙅',
+    en: (w) => `I don't want to ${w}`,
+    slots: [['w-comer', 'eat'], ['w-beber', 'drink'], ['w-dormir', 'sleep'], ['w-trabajar', 'work'], ['w-hablar', 'speak'], ['w-vivir', 'live'], ['w-leer', 'read'], ['w-ir', 'go'], ['w-comprar', 'buy'], ['w-venir', 'come']],
+  },
+  {
+    id: 'puedo', jp: 'puedo', romaji: 'puedo', slotLast: true, title: 'puedo ___', meaning: 'I can ___', art: '💪',
+    en: (w) => `I can ${w}`,
+    slots: [['w-comer', 'eat'], ['w-beber', 'drink'], ['w-dormir', 'sleep'], ['w-trabajar', 'work'], ['w-hablar', 'speak'], ['w-vivir', 'live'], ['w-leer', 'read'], ['w-ir', 'go'], ['w-comprar', 'buy'], ['w-venir', 'come']],
+  },
+  {
+    id: 'tengo-que', jp: 'tengo que', romaji: 'tengo que', slotLast: true, title: 'tengo que ___', meaning: 'I have to ___', art: '🏃',
+    en: (w) => `I have to ${w}`,
+    slots: [['w-comer', 'eat'], ['w-beber', 'drink'], ['w-dormir', 'sleep'], ['w-trabajar', 'work'], ['w-hablar', 'speak'], ['w-vivir', 'live'], ['w-leer', 'read'], ['w-ir', 'go'], ['w-comprar', 'buy'], ['w-venir', 'come']],
+  },
+  {
+    id: 'vamos-a', jp: 'vamos a', romaji: 'vamos a', slotLast: true, title: 'vamos a ___', meaning: 'Let\'s ___', art: '🤝',
+    en: (w) => `Let's ${w}`,
+    slots: [['w-comer', 'eat'], ['w-beber', 'drink'], ['w-dormir', 'sleep'], ['w-trabajar', 'work'], ['w-hablar', 'talk'], ['w-leer', 'read'], ['w-comprar', 'shop']],
+  },
+  {
+    id: 'necesito', jp: 'necesito', romaji: 'necesito', slotLast: true, title: 'necesito ___', meaning: 'I need ___', art: '🆘',
+    en: (w) => `I need ${w}`,
+    slots: [['w-la-llave', 'the key'], ['w-la-ayuda', 'help'], ['w-el-pasaporte', 'the passport'], ['w-la-maleta', 'the suitcase'], ['w-el-medico', 'a doctor'], ['w-el-dinero', 'money'], ['w-la-medicina', 'medicine'], ['w-la-tarjeta', 'the card']],
+  },
+  {
+    id: 'tengo', jp: 'tengo', romaji: 'tengo', slotLast: true, title: 'tengo ___', meaning: 'I have ___', art: '🎁',
+    en: (w) => `I have ${w}`,
+    slots: [['w-la-llave', 'the key'], ['w-el-pasaporte', 'the passport'], ['w-la-maleta', 'the suitcase'], ['w-el-bolso', 'the bag'], ['w-la-tarjeta', 'the card'], ['w-el-billete', 'the ticket'], ['w-la-cartera', 'the wallet'], ['w-el-movil', 'the phone']],
+  },
+  {
+    id: 'estoy', jp: 'estoy', romaji: 'estoy', slotLast: true, title: 'estoy ___', meaning: 'I am ___ (feeling)', art: '😌',
+    en: (w) => `I'm ${w}`,
+    slots: [['w-contento', 'happy'], ['w-triste', 'sad'], ['w-cansado', 'tired'], ['w-nervioso', 'nervous']],
+  },
+  {
+    id: 'es-muy', jp: 'es muy', romaji: 'es muy', slotLast: true, title: 'es muy ___', meaning: 'It is very ___', art: '👍',
+    en: (w) => `It's very ${w}`,
+    slots: [['w-rico', 'tasty'], ['w-caro', 'expensive'], ['w-barato', 'cheap'], ['w-pequeno', 'small'], ['w-bueno', 'good'], ['w-alto', 'tall'], ['w-simpatico', 'nice'], ['w-joven', 'young']],
   },
 ];

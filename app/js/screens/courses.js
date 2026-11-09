@@ -8,6 +8,7 @@ import { streakAt } from '../progress.js';
 import { html, mount, raw, $$ } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
+import { t } from '../strings.js';
 
 const read = (key) => {
   try {
@@ -37,20 +38,20 @@ function courseCard(c) {
   const current = c.code === LANG && courseChosen();
   return html`<button class="course-card ${current ? 'on' : ''}" data-course="${c.code}">
     <span class="course-top">${raw(flagSvg(c.flag, 52))}
-      <span class="course-name"><b>${c.name}</b><small>${c.native !== c.name ? html`<span class="native">${c.native}</span> · ` : ''}${c.gloss === 'French' ? 'for French speakers' : 'from English'}</small></span>
-      ${current ? html`<span class="pill pill-green">Current</span>` : html`<span class="course-go">${icon('arrow', 20)}</span>`}</span>
+      <span class="course-name"><b>${c.name}</b><small>${c.native !== c.name ? html`<span class="native">${c.native}</span> · ` : ''}${t(c.gloss === 'French' ? 'for French speakers' : 'from English')}</small></span>
+      ${current ? html`<span class="pill pill-green">${t('Current course')}</span>` : html`<span class="course-go">${icon('arrow', 20)}</span>`}</span>
     ${p ? html`<span class="course-progress">
         ${p.total ? html`<span class="course-bar" role="progressbar" aria-valuenow="${pct(p)}" aria-valuemin="0" aria-valuemax="100"><i style="width:${Math.max(pct(p), 3)}%"></i></span>
           <span class="course-pct">${pct(p)}%</span>` : ''}
       </span>
       <span class="course-stats">
-        <span class="c-orange">${icon('flame', 16)} ${p.streak} day${p.streak === 1 ? '' : 's'}</span>
+        <span class="c-orange">${icon('flame', 16)} ${t(p.streak === 1 ? '{n} day' : '{n} days', { n: p.streak })}</span>
         <span class="c-gold">${icon('bolt', 16)} ${p.xp} XP</span>
-        ${p.words != null ? html`<span class="c-green">${icon('word', 16)} ${p.words} words</span>` : ''}
-        ${p.total ? html`<span class="muted">${p.done} / ${p.total} lessons</span>` : ''}
+        ${p.words != null ? html`<span class="c-green">${icon('word', 16)} ${t('{n} words', { n: p.words })}</span>` : ''}
+        ${p.total ? html`<span class="muted">${t('{a} / {b} lessons', { a: p.done, b: p.total })}</span>` : ''}
       </span>
-      ${p.unit ? html`<span class="course-unit">${p.unit === 'Course complete' ? '🏆 Course complete' : html`Next up: <b>${p.unit}</b>`}</span>` : ''}`
-    : html`<span class="course-new">Not started yet — tap to begin</span>`}
+      ${p.unit ? html`<span class="course-unit">${p.unit === 'Course complete' ? `🏆 ${t('Course complete')}` : html`${t('Next up:')} <b>${p.unit}</b>`}</span>` : ''}`
+    : html`<span class="course-new">${t(current ? 'Your first lesson is waiting on the path' : 'Not started yet — tap to begin')}</span>`}
   </button>`;
 }
 
@@ -59,11 +60,11 @@ export function renderCourses(root) {
   if (!app.testMode) saveSummary(); // the loaded course's numbers, fresh (Japanese on a first launch)
   const list = AVAILABLE.map((code) => COURSES[code]);
   const started = list.filter((c) => progressOf(c));
-  mount(root, html`${chosen ? html`<header class="topbar topbar-back"><a class="icon-btn" href="#/learn" aria-label="Back">${icon('close', 24)}</a><h1>Languages</h1></header>` : ''}
+  mount(root, html`${chosen ? html`<header class="topbar topbar-back"><a class="icon-btn" href="#/learn" aria-label="${t('Back')}">${icon('close', 24)}</a><h1>${t('Languages')}</h1></header>` : ''}
   <main class="page courses-page">
     <section class="courses-hero">${mascot(chosen ? 'happy' : 'cheer', 96)}
-      <div><h1>${chosen ? 'Which language today?' : 'What do you want to learn?'}</h1>
-      <p class="muted">${started.length ? `You are learning ${started.length} language${started.length > 1 ? 's' : ''}. Each one keeps its own progress, streak and gems.` : 'Pick a language to start. You can switch any time from the flag at the top — each language keeps its own progress.'}</p></div>
+      <div><h1>${t(chosen ? 'Which language today?' : 'What do you want to learn?')}</h1>
+      <p class="muted">${started.length ? t(started.length > 1 ? 'You are learning {n} languages. Each one keeps its own progress, streak and gems.' : 'You are learning {n} language. Each one keeps its own progress, streak and gems.', { n: started.length }) : t('Pick a language to start. You can switch any time from the flag at the top — each language keeps its own progress.')}</p></div>
     </section>
     <div class="course-cards">${list.map(courseCard)}</div>
   </main>`);

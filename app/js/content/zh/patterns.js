@@ -35,4 +35,44 @@ export const PATTERNS = [
     en: (w) => `To ${w}, please`,
     slots: [['w-jiu3dian4', 'the hotel'], ['w-huo3che1zhan4', 'the train station'], ['w-yi1yuan4', 'the hospital'], ['w-bei3jing1', 'Beijing'], ['w-shang4hai3', 'Shanghai'], ['w-nan2jing1', 'Nanjing'], ['w-can1ting1', 'the restaurant']],
   },
+  {
+    id: 'wo-chi', jp: '我吃', romaji: 'wǒ chī', slotLast: true, title: '我吃 ___', meaning: 'I eat ___', art: '🍽️',
+    en: (w) => `I eat ${w}`,
+    slots: [['w-jiao3zi', 'dumplings'], ['w-mian4tiao2', 'noodles'], ['w-mi3fan4', 'rice'], ['w-bao1zi', 'steamed buns'], ['w-rou4', 'meat'], ['w-yu2', 'fish'], ['w-ji1', 'chicken'], ['w-ping2guo3', 'an apple']],
+  },
+  {
+    id: 'wo-he', jp: '我喝', romaji: 'wǒ hē', slotLast: true, title: '我喝 ___', meaning: 'I drink ___', art: '🥤',
+    en: (w) => `I drink ${w}`,
+    slots: [['w-cha2', 'tea'], ['w-ka1fei1', 'coffee'], ['w-shui3', 'water'], ['w-re4shui3', 'hot water'], ['w-pi2jiu3', 'beer']],
+  },
+  {
+    id: 'wo-bu-yao', jp: '我不要', romaji: 'wǒ bú yào', slotLast: true, title: '我不要 ___', meaning: 'I don\'t want ___', art: '🙅',
+    en: (w) => `I don't want ${w}`,
+    slots: [['w-rou4', 'meat'], ['w-la4', 'spicy food'], ['w-bing1-de', 'an iced one'], ['w-ji1', 'chicken'], ['w-yu2', 'fish'], ['w-zhe4ge', 'this one'], ['w-pi2jiu3', 'beer']],
+  },
+  {
+    id: 'wo-xiang', jp: '我想', romaji: 'wǒ xiǎng', slotLast: true, title: '我想 ___', meaning: 'I want to ___', art: '💝',
+    en: (w) => `I want to ${w}`,
+    slots: [['w-qu4', 'go'], ['w-chi1', 'eat'], ['w-he1', 'drink'], ['w-mai3', 'buy'], ['w-kan4', 'look'], ['w-lai2', 'come'], ['w-hui2', 'go back']],
+  },
+  {
+    id: 'wo-bu', jp: '我不', romaji: 'wǒ bù', slotLast: true, title: '我不 ___', meaning: 'I don\'t ___', art: '🙅',
+    en: (w) => `I don't ${w}`,
+    slots: [['w-chi1', 'eat'], ['w-he1', 'drink'], ['w-mai3', 'buy'], ['w-kan4', 'look'], ['w-dong3', 'understand'], ['w-shuo1', 'speak'], ['w-xi3huan', 'like it']],
+  },
+  {
+    id: 'verb-le', jp: '了', romaji: 'le', title: '___ 了', meaning: '___ (done)', art: '🏁',
+    en: (w) => `${w}`,
+    slots: [['w-chi1', 'I ate'], ['w-he1', 'I drank'], ['w-mai3', 'I bought it'], ['w-qu4', 'I went'], ['w-lai2', 'I came'], ['w-kan4', 'I saw it'], ['w-hui2', 'I went back']],
+  },
+  {
+    id: 'mei-verb', jp: '没', romaji: 'méi', slotLast: true, title: '没 ___', meaning: 'didn\'t ___', art: '❌',
+    en: (w) => `${w}`,
+    slots: [['w-chi1', 'I didn\'t eat'], ['w-he1', 'I didn\'t drink'], ['w-mai3', 'I didn\'t buy it'], ['w-qu4', 'I didn\'t go'], ['w-lai2', 'I didn\'t come'], ['w-kan4', 'I didn\'t see it'], ['w-hui2', 'I didn\'t go back']],
+  },
+  {
+    id: 'xingqi-wo-qu', jp: '我去北京', romaji: 'wǒ qù Běijīng', title: '___ 我去北京', meaning: '___ I go to Beijing', art: '📅',
+    en: (w) => `${w} I go to Beijing`,
+    slots: [['w-xing1qi1yi1', 'On Monday'], ['w-xing1qi1wu3', 'On Friday'], ['w-xing1qi1tian1', 'On Sunday'], ['w-jin1tian1', 'Today'], ['w-ming2tian1', 'Tomorrow']],
+  },
 ];

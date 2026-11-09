@@ -3,6 +3,7 @@
 
 const DAY = 24 * 60 * 60 * 1000;
 export const INTERVALS = [0, 0.5 * DAY, 1 * DAY, 3 * DAY, 7 * DAY, 16 * DAY, 35 * DAY];
+export const FIRST_GRACE = DAY; // the first review of an item is at least a day away
 export const MAX_BOX = INTERVALS.length - 1;
 
 // A hesitation (correct but slow) keeps the item in its box and brings it back sooner.
@@ -21,7 +22,10 @@ export function review(record, { right, wrong, hesitated = 0 }, now, id = null) 
   if (wrong > 0) box = Math.max(0, prev.box - 2);
   else if (hesitated > 0) box = Math.max(prev.box, 1);
   else box = Math.min(MAX_BOX, prev.box + 1);
-  const wait = (hesitated > 0 && !wrong ? INTERVALS[box] / 2 : INTERVALS[box]) * (id ? drift(id, prev.seen) : 1);
+  let wait = (hesitated > 0 && !wrong ? INTERVALS[box] / 2 : INTERVALS[box]) * (id ? drift(id, prev.seen) : 1);
+  // Grace period: something just learned is not "due" until a day has passed, so a lesson is not flagged
+  // for review minutes after it was finished (the retry round already covers the shaky ones).
+  if (!prev.seen) wait = Math.max(wait, FIRST_GRACE);
   const missed = wrong > 0 ? now : right > 0 && !hesitated ? undefined : prev.missed;
   return {
     box,
@@ -29,6 +33,7 @@ export function review(record, { right, wrong, hesitated = 0 }, now, id = null) 
     right: prev.right + right,
     wrong: prev.wrong + wrong,
     slow: (prev.slow || 0) + hesitated,
+    first: prev.first || now,
     last: now,
     due: now + wait,
     ...(missed ? { missed } : {}),

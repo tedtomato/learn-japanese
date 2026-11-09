@@ -4,7 +4,7 @@ import { raw } from './dom.js';
 const EYES = {
   happy: '<ellipse cx="45" cy="62" rx="5" ry="6.5" fill="#2b2b2b"/><ellipse cx="75" cy="62" rx="5" ry="6.5" fill="#2b2b2b"/><circle cx="46.8" cy="59.5" r="1.8" fill="#fff"/><circle cx="76.8" cy="59.5" r="1.8" fill="#fff"/>',
   cheer: '<path d="M39 63q6-8 12 0M69 63q6-8 12 0" stroke="#2b2b2b" stroke-width="4" fill="none" stroke-linecap="round"/>',
-  sad: '<ellipse cx="45" cy="64" rx="4.5" ry="5.5" fill="#2b2b2b"/><ellipse cx="75" cy="64" rx="4.5" ry="5.5" fill="#2b2b2b"/><path d="M38 54l12 3M82 54l-12 3" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>',
+  sad: '<ellipse cx="45" cy="64" rx="4.5" ry="5.5" fill="#2b2b2b"/><ellipse cx="75" cy="64" rx="4.5" ry="5.5" fill="#2b2b2b"/><path d="M38 57l12-3M82 57l-12-3" stroke="#2b2b2b" stroke-width="3" stroke-linecap="round"/>',
 };
 
 const MOUTH = {

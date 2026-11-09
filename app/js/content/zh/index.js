@@ -4,12 +4,13 @@ export { SECTIONS_DATA, DIALOGUES } from './units.js';
 export { KANJI, RADICALS, KANJI_LESSONS } from './hanzi.js';
 export { FACTS, PHRASES, KANJI as PEEK_KANJI } from './extras.js';
 export { FACT_QUIZ } from './fact-quiz.js';
-export { GRAMMAR, GLOSSARY } from './grammar.js';
+export { GRAMMAR, GLOSSARY, CONJUGATIONS } from './grammar.js';
 export { SIGN_SCENES } from './signs.js';
 export { STROKES } from './strokes.js';
 export { MNEMONICS } from './mnemonics.js';
 export { MISSIONS } from './missions.js';
 export { PATTERNS } from './patterns.js';
+export { PRONUNCIATION } from './pronunciation.js';
 
 export const KANA = new Map();
 export const HIRAGANA_ROWS = [];

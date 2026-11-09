@@ -37,4 +37,45 @@ export const PATTERNS = [
     en: (w) => `${cap(w)} is on the left`,
     slots: [['w-la-gare', 'the station'], ['w-le-metro', 'the metro'], ['w-l-hotel', 'the hotel'], ['w-la-pharmacie', 'the pharmacy'], ['w-le-musee', 'the museum'], ['w-la-boulangerie', 'the bakery'], ['w-le-supermarche', 'the supermarket'], ['w-l-arret-de-bus', 'the bus stop']],
   },
+  // Verb drills: the verb is fixed, the object changes. Feminine words keep their article after à / de.
+  {
+    id: 'je-prends', jp: 'je prends', romaji: 'je prends', slotLast: true, title: 'je prends ___', meaning: 'I take ___', art: '🤏',
+    en: (w) => `I take ${w}`,
+    slots: [['w-le-metro', 'the metro'], ['w-le-bus', 'the bus'], ['w-le-train', 'the train'], ['w-le-taxi', 'a taxi'], ['w-le-pain', 'the bread'], ['w-le-croissant', 'a croissant'], ['w-le-cafe', 'a coffee'], ['w-le-billet', 'the ticket']],
+  },
+  {
+    id: 'je-mange', jp: 'je mange', romaji: 'je mange', slotLast: true, title: 'je mange ___', meaning: 'I eat ___', art: '🍽️',
+    en: (w) => `I eat ${w}`,
+    slots: [['w-le-pain', 'bread'], ['w-la-baguette', 'the baguette'], ['w-le-croissant', 'a croissant'], ['w-le-fromage', 'cheese']],
+  },
+  {
+    id: 'je-bois', jp: 'je bois', romaji: 'je bois', slotLast: true, title: 'je bois ___', meaning: 'I drink ___', art: '🥤',
+    en: (w) => `I drink ${w}`,
+    slots: [['w-le-cafe', 'coffee'], ['w-le-the', 'tea'], ['w-le-vin', 'wine'], ['w-la-biere', 'beer'], ['w-l-eau', 'water'], ['w-le-jus-d-orange', 'orange juice']],
+  },
+  {
+    id: 'je-vais-a', jp: 'je vais à', romaji: 'je vais à', slotLast: true, title: 'je vais à ___', meaning: 'I am going to ___', art: '🏃',
+    en: (w) => `I am going to ${w}`,
+    slots: [['w-la-gare', 'the station'], ['w-la-plage', 'the beach'], ['w-la-maison', 'home'], ['w-la-pharmacie', 'the pharmacy'], ['w-la-boulangerie', 'the bakery'], ['w-l-hotel', 'the hotel'], ['w-l-hopital', 'the hospital'], ['w-la-montagne', 'the mountains']],
+  },
+  {
+    id: 'tu-as', jp: 'tu as', romaji: 'tu as', slotLast: true, title: 'tu as ___?', meaning: 'Do you have ___?', art: '🎒',
+    en: (w) => `Do you have ${w}?`,
+    slots: [['w-la-cle', 'the key'], ['w-le-billet', 'the ticket'], ['w-le-passeport', 'the passport'], ['w-le-portefeuille', 'the wallet'], ['w-le-telephone', 'the phone'], ['w-le-livre', 'the book']],
+  },
+  {
+    id: 'vous-avez', jp: 'vous avez', romaji: 'vous avez', slotLast: true, title: 'vous avez ___?', meaning: 'Do you have ___? (polite)', art: '🛍️',
+    en: (w) => `Do you have ${w}?`,
+    slots: [['w-la-carte', 'the menu'], ['w-la-chambre', 'a room'], ['w-le-pain', 'bread'], ['w-le-fromage', 'cheese'], ['w-le-sac', 'a bag'], ['w-la-carte-postale', 'postcards']],
+  },
+  {
+    id: 'on-va-a', jp: 'on va à', romaji: 'on va à', slotLast: true, title: 'on va à ___', meaning: 'Let\'s go to ___', art: '👉',
+    en: (w) => `Let's go to ${w}`,
+    slots: [['w-la-plage', 'the beach'], ['w-la-mer', 'the sea'], ['w-la-montagne', 'the mountains'], ['w-la-gare', 'the station'], ['w-la-maison', 'home'], ['w-la-boulangerie', 'the bakery']],
+  },
+  {
+    id: 'j-ai-besoin-de', jp: 'j\'ai besoin de', romaji: 'j\'ai besoin de', slotLast: true, title: 'j\'ai besoin de ___', meaning: 'I need ___', art: '🤲',
+    en: (w) => `I need ${w}`,
+    slots: [['w-la-cle', 'the key'], ['w-la-carte', 'the card'], ['w-la-chambre', 'a room'], ['w-l-ambulance', 'an ambulance'], ['w-l-eau', 'water'], ['w-la-police', 'the police']],
+  },
 ];

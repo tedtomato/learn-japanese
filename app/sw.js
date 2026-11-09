@@ -1,12 +1,82 @@
 // Service worker: keeps the app working offline and installs new versions in the background.
-// The build stamps VERSION and the file list; a new version means a new cache.
+// The build stamps VERSION; files.json (written by the build) lists what to cache: the files every course
+// needs, plus one list per course. The page tells the worker which course is active (postMessage); the other
+// courses' files are fetched, then kept, the first time they are needed.
 const VERSION = '__APP_VERSION__';
-const FILES = __PRECACHE_FILES__;
 const CACHE = `hajime-${VERSION}`;
 const FONT_CACHE = 'hajime-fonts';
+const NOTE_CACHE = 'course-note'; // not "hajime-…": survives every cleanup
+const COURSE_NOTE = './__course.json';
+const reload = (f) => new Request(f, { cache: 'reload' });
+
+let manifestPromise = null;
+// files.json of this version, straight from the network (a different version means the site is mid-publish).
+function manifest() {
+  manifestPromise ||= fetch(reload('./files.json')).then(async (res) => {
+    if (!res.ok) throw new Error(`files.json ${res.status}`);
+    const m = await res.json();
+    if (m.version !== VERSION) throw new Error('files.json is from another version');
+    return m;
+  }).catch((err) => { manifestPromise = null; throw err; });
+  return manifestPromise;
+}
+
+async function savedCourse() {
+  try {
+    const res = await (await caches.open(NOTE_CACHE)).match(COURSE_NOTE);
+    return res ? (await res.json()).course : null;
+  } catch { return null; }
+}
+async function saveCourse(course) {
+  const cache = await caches.open(NOTE_CACHE);
+  await cache.put(COURSE_NOTE, new Response(JSON.stringify({ course }), { headers: { 'Content-Type': 'application/json' } }));
+}
+
+// The install waits briefly for the page to say which course it is showing (first ever install).
+let courseWaiters = [];
+const courseFromPage = (ms) => new Promise((resolve) => {
+  courseWaiters.push(resolve);
+  setTimeout(() => resolve(null), ms);
+});
+
+// Files the previous version cached that this version has byte-identical (same hash) are copied, not downloaded.
+// Scripts carry the version in their import addresses (?v=…), so a copy gets the new stamp.
+async function previousCache() {
+  for (const key of (await caches.keys()).sort().reverse()) {
+    if (!key.startsWith('hajime-') || key === CACHE || key === FONT_CACHE) continue;
+    const cache = await caches.open(key);
+    const res = await cache.match('./files.json');
+    if (res) return { cache, manifest: await res.json() };
+  }
+  return null;
+}
+
+async function fill(cache, urls, m, previous) {
+  const missing = [];
+  for (const url of urls) if (!(await cache.match(url))) missing.push(url);
+  const fresh = [];
+  for (const url of missing) {
+    const path = url.split('?')[0];
+    const same = previous && m.files[path] && previous.manifest.files?.[path] === m.files[path];
+    const old = same ? await previous.cache.match(path, { ignoreSearch: true }) : null;
+    if (!old) { fresh.push(url); continue; }
+    if (path.endsWith('.js') && previous.manifest.v) {
+      const text = (await old.text()).replaceAll(`?v=${previous.manifest.v}`, `?v=${m.v}`);
+      await cache.put(url, new Response(text, { headers: { 'Content-Type': old.headers.get('Content-Type') || 'text/javascript' } }));
+    } else await cache.put(url, old);
+  }
+  // addAll is all-or-nothing per call, and what is already stored is kept: an install that failed half-way resumes.
+  await cache.addAll(fresh.map(reload));
+}
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(FILES.map((f) => new Request(f, { cache: 'reload' })))));
+  event.waitUntil((async () => {
+    const m = await manifest();
+    const cache = await caches.open(CACHE);
+    const previous = await previousCache();
+    const course = (await savedCourse()) || (await courseFromPage(4000));
+    await fill(cache, [...m.shared, ...(m.courses[course] || [])], m, previous);
+  })());
 });
 
 self.addEventListener('activate', (event) => {
@@ -17,8 +87,20 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+// { course } from the page (on every start and when the course changes): remember it and cache that course's files.
+async function useCourse(course) {
+  await saveCourse(course);
+  const m = await manifest();
+  if (!m.courses[course]) return;
+  await fill(await caches.open(CACHE), m.courses[course], m, null);
+}
+
 self.addEventListener('message', (event) => {
   if (event.data === 'skipWaiting') self.skipWaiting();
+  const course = event.data?.course;
+  if (typeof course !== 'string') return;
+  courseWaiters.splice(0).forEach((resolve) => resolve(course));
+  event.waitUntil(useCourse(course).catch(() => {}));
 });
 
 self.addEventListener('fetch', (event) => {
@@ -46,8 +128,18 @@ self.addEventListener('fetch', (event) => {
     event.respondWith(caches.match('./index.html', { cacheName: CACHE }).then((res) => res || fetch(request)));
     return;
   }
-  event.respondWith(caches.match(request, { cacheName: CACHE, ignoreSearch: true }).then((res) => res || fetch(request)));
+  event.respondWith(caches.match(request, { cacheName: CACHE, ignoreSearch: true }).then((res) => res || fetchAndKeep(request)));
 });
+
+// A file that was not precached (another course's content, a picture): from the network, then kept for offline.
+async function fetchAndKeep(request) {
+  const res = await fetch(request);
+  if (res.ok && res.type === 'basic' && !new URL(request.url).pathname.endsWith('/sw.js')) {
+    const copy = res.clone();
+    caches.open(CACHE).then((cache) => cache.put(request, copy)).catch(() => {});
+  }
+  return res;
+}
 
 // ---- Daily reminder ----
 // The phone wakes the worker about once a day (periodic background sync, Android Chrome with the app on

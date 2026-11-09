@@ -31,6 +31,7 @@ export const SECTIONS_DATA = [
         desc: 'Greet people, thank them and say sorry',
         facts: [FACT.language, FACT.festivals],
         phrases: ['Key Polite Basics'],
+        dialogues: ['d-hello-2'],
         lessons: [
           { title: 'Hello', words: [
             ['你好', 'nǐhǎo', 'hello', '👋', { note: 'The everyday hello, any time of day.' }],
@@ -71,7 +72,7 @@ export const SECTIONS_DATA = [
         desc: 'Stations, the subway, taxis and finding the toilet',
         facts: [FACT.transport, FACT.city],
         phrases: ['Getting Around & Transit'],
-        dialogues: ['d-station'],
+        dialogues: ['d-station', 'd-around-2'],
         lessons: [
           { title: 'Stations', words: [
             ['车站', 'chēzhàn', 'station / stop', '🚏'],
@@ -119,6 +120,7 @@ export const SECTIONS_DATA = [
         desc: 'Count, read prices in yuan and tell the time',
         facts: [FACT.language, FACT.festivals],
         phrases: ['Shopping & Paying'],
+        dialogues: ['d-numbers-2'],
         lessons: [
           { title: '1 to 3', words: [
             ['一', 'yī', 'one', '1️⃣', { note: 'Said yī alone, but yí or yì before another word: 一个 yí ge, 一杯 yì bēi.', alt: ['1'] }],
@@ -163,7 +165,7 @@ export const SECTIONS_DATA = [
         desc: 'Order, say cheers and ask for the bill',
         facts: [FACT.food],
         phrases: ['Dining & Food'],
-        dialogues: ['d-tea'],
+        dialogues: ['d-tea', 'd-food-2'],
         lessons: [
           { title: 'Ordering', words: [
             ['这个', 'zhège', 'this one', '👇', { note: 'Point and say 这个 — it works everywhere!' }],
@@ -210,7 +212,7 @@ export const SECTIONS_DATA = [
         desc: 'Prices, bargaining, paying by phone and asking for help',
         facts: [FACT.modern, FACT.city],
         phrases: ['Shopping & Paying', 'Help & Emergency'],
-        dialogues: ['d-price', 'd-wechat'],
+        dialogues: ['d-price', 'd-wechat', 'd-shopping-2'],
         lessons: [
           { title: 'How much?', words: [
             ['多少钱', 'duōshao qián', 'how much (money)', '💴'],
@@ -244,7 +246,7 @@ export const SECTIONS_DATA = [
         desc: 'Check in, find your room, Wi-Fi and breakfast',
         facts: [FACT.modern, FACT.city],
         phrases: ['Hotel & Practical Questions'],
-        dialogues: ['d-hotel'],
+        dialogues: ['d-hotel', 'd-hotel-2'],
         lessons: [
           { title: 'Checking in', words: [
             ['预订', 'yùdìng', 'reservation', '📋', { note: 'Also used as a verb: to book.' }],
@@ -278,6 +280,7 @@ export const SECTIONS_DATA = [
         desc: 'A table for two, recommendations, allergies and one more beer',
         facts: [FACT.food],
         phrases: ['Dining & Food'],
+        dialogues: ['d-eating-2'],
         lessons: [
           { title: 'Table for…', words: [
             ['一个人', 'yí ge rén', 'one person', '🧍'],
@@ -313,7 +316,7 @@ export const SECTIONS_DATA = [
         desc: 'High-speed trains, platforms, changing lines and taxis',
         facts: [FACT.transport],
         phrases: ['Getting Around & Transit'],
-        dialogues: ['d-taxi'],
+        dialogues: ['d-taxi', 'd-trains-2'],
         lessons: [
           { title: 'On the platform', words: [
             ['高铁', 'gāotiě', 'high-speed train', '🚄', { note: 'China has the world\'s largest high-speed rail network: Beijing to Shanghai in about 4.5 hours.' }],
@@ -349,6 +352,7 @@ export const SECTIONS_DATA = [
         desc: 'Pharmacies, doctors and what to say in an emergency',
         facts: [FACT.modern, FACT.history],
         phrases: ['Help & Emergency'],
+        dialogues: ['d-help-2'],
         lessons: [
           { title: 'Feeling ill', words: [
             ['疼', 'téng', 'hurts / painful', '🤕', { note: 'Point and say 这里疼 — "it hurts here".' }],
@@ -389,7 +393,7 @@ export const SECTIONS_DATA = [
         title: 'People & jobs',
         desc: 'Say who you are, where you\'re from and what you do',
         facts: [FACT.language, FACT.modern],
-        dialogues: ['d-meet'],
+        dialogues: ['d-meet', 'd-people-2'],
         lessons: [
           { title: 'I & you', words: [
             ['我', 'wǒ', 'I / me', '🙋'],
@@ -423,6 +427,19 @@ export const SECTIONS_DATA = [
             { jp: ['我', '叫', '安娜'], romaji: 'wǒ jiào Ānnà', en: 'My name is Anna', alt: ['I am Anna', 'I\'m Anna', 'I am called Anna'] },
             { jp: ['她', '是', '我', '的', '朋友'], romaji: 'tā shì wǒ de péngyou', en: 'She is my friend', alt: ['She\'s my friend', 'He is my friend'] },
           ] },
+          { title: 'We & they', words: [
+            ['我们', 'wǒmen', 'we / us', '🧑‍🤝‍🧑', { note: '们 makes people words plural. 咱们 (zánmen) is a friendlier "we" that includes the listener.' }],
+            ['你们', 'nǐmen', 'you (all)', '👫', { note: 'The plural of 你. For one polite person it is 您; "you all" is simply 你们.' }],
+            ['他们', 'tāmen', 'they / them', '🧍', { note: '他们 for men or mixed groups, 她们 for all women, 它们 for things — all sound the same: tāmen.' }],
+            ['那个', 'nàge', 'that one', '👇', { note: 'The partner of 这个 (this one). Point and say 那个!' }],
+          ] },
+          { title: 'We are…', grammar: 'men', sentences: [
+            { jp: ['我们', '是', '朋友'], romaji: 'wǒmen shì péngyou', en: 'We are friends', alt: ['We\'re friends'] },
+            { jp: ['你们', '是', '学生', '吗'], romaji: 'nǐmen shì xuésheng ma', en: 'Are you students', alt: ['Are you all students', 'Are you (all) students'] },
+            { jp: ['他们', '是', '老师'], romaji: 'tāmen shì lǎoshī', en: 'They are teachers', alt: ['They\'re teachers'] },
+            { jp: ['我们', '去', '北京'], romaji: 'wǒmen qù Běijīng', en: 'We are going to Beijing', alt: ['We go to Beijing', 'We\'re going to Beijing'] },
+            { jp: ['那个', '很', '漂亮'], romaji: 'nàge hěn piàoliang', en: 'That one is beautiful', alt: ['That one is very beautiful', 'That is beautiful', 'That is pretty', 'That one is pretty'] },
+          ] },
         ],
       },
       {
@@ -430,7 +447,7 @@ export const SECTIONS_DATA = [
         title: 'Food words',
         desc: 'Rice, noodles, dumplings — and what you like',
         facts: [FACT.food, FACT.festivals],
-        dialogues: ['d-dumplings'],
+        dialogues: ['d-dumplings', 'd-meals-2'],
         lessons: [
           { title: 'Staples', words: [
             ['米饭', 'mǐfàn', 'rice (cooked)', '🍚', { note: 'Southern China eats more rice, the north more noodles and buns.' }],
@@ -463,6 +480,7 @@ export const SECTIONS_DATA = [
         title: 'Around you',
         desc: 'Animals, nature and everyday things',
         facts: [FACT.nature],
+        dialogues: ['d-world-2'],
         lessons: [
           { title: 'Animals', words: [
             ['猫', 'māo', 'cat', '🐱'],
@@ -489,6 +507,160 @@ export const SECTIONS_DATA = [
           ] },
         ],
       },
+      {
+        id: 'verbs',
+        title: 'Everyday verbs',
+        desc: 'Come, eat, drink, want, speak, buy — the verbs you use all day',
+        facts: [FACT.language, FACT.food],
+        dialogues: ['d-verbs-2'],
+        lessons: [
+          { title: 'Come, eat, drink', words: [
+            ['来', 'lái', 'to come', '🏃', { note: 'Also "bring" when ordering: 来一瓶啤酒 = a beer, please.' }],
+            ['吃', 'chī', 'to eat', '🍽️', { note: '吃饭 (eat rice) means "have a meal" — whatever the food is.' }],
+            ['喝', 'hē', 'to drink', '🥤', { note: 'Soup is 喝 too: you drink it, not eat it.' }],
+          ] },
+          { title: 'Want, have, need', words: [
+            ['想', 'xiǎng', 'to want to / to think', '💝', { note: '想 + verb = "would like to": 我想去. 要 is stronger — "I want / I\'ll have".' }],
+            ['有', 'yǒu', 'to have / there is', '🤲', { note: 'Its "not" form is always 没有, never 不有.' }],
+            ['需要', 'xūyào', 'to need', '📋', { note: '需要 + noun or verb: 我需要帮助 = I need help.' }],
+          ] },
+          { title: 'Be, speak, understand', words: [
+            ['是', 'shì', 'to be (is / am / are)', '✅', { note: 'Links two nouns only: 我是学生. Never before an adjective — use 很.' }],
+            ['说', 'shuō', 'to speak / to say', '🗣️', { note: '说英语 = speak English.' }],
+            ['懂', 'dǒng', 'to understand', '🔎', { note: '我懂了 = I get it. 听不懂 = hear it but can\'t make sense of it.' }],
+          ] },
+          { title: 'Buy, look, return', words: [
+            ['买', 'mǎi', 'to buy', '🛍️', { note: 'Not to be confused with 卖 (mài), "to sell" — same sound, falling tone.' }],
+            ['看', 'kàn', 'to look / watch / read', '📺', { note: 'One verb for looking, watching films and reading: 看书, 看电影.' }],
+            ['回', 'huí', 'to go back / return', '🔁', { note: '回酒店 = go back to the hotel. No word for "to" is needed.' }],
+          ] },
+          { title: 'I eat, I drink', grammar: 'svo', sentences: [
+            { jp: ['我', '吃', '饺子'], romaji: 'wǒ chī jiǎozi', en: 'I eat dumplings', alt: ['I\'m eating dumplings', 'I am eating dumplings'] },
+            { jp: ['你', '喝', '茶', '吗'], romaji: 'nǐ hē chá ma', en: 'Do you drink tea', alt: ['Are you drinking tea', 'Do you want tea'] },
+            { jp: ['我', '想', '喝', '水'], romaji: 'wǒ xiǎng hē shuǐ', en: 'I want to drink water', alt: ['I would like to drink water', 'I\'d like some water', 'I want water'] },
+            { jp: ['我', '想', '买', '票'], romaji: 'wǒ xiǎng mǎi piào', en: 'I want to buy a ticket', alt: ['I would like to buy a ticket', 'I\'d like to buy a ticket'] },
+            { jp: ['我', '想', '看', '熊猫'], romaji: 'wǒ xiǎng kàn xióngmāo', en: 'I want to see pandas', alt: ['I want to see the pandas', 'I want to see a panda', 'I would like to see pandas'] },
+          ] },
+          { title: 'Can you speak it?', sentences: [
+            { jp: ['你', '说', '英语', '吗'], romaji: 'nǐ shuō Yīngyǔ ma', en: 'Do you speak English', alt: ['Can you speak English', 'Are you speaking English'] },
+            { jp: ['我', '有', '票'], romaji: 'wǒ yǒu piào', en: 'I have a ticket', alt: ['I\'ve got a ticket', 'I have the ticket'] },
+            { jp: ['你', '想', '回', '酒店', '吗'], romaji: 'nǐ xiǎng huí jiǔdiàn ma', en: 'Do you want to go back to the hotel', alt: ['Would you like to return to the hotel', 'Do you want to go back to the hotel'] },
+          ] },
+        ],
+      },
+      {
+        id: 'calendar',
+        title: 'Days, dates & time',
+        desc: 'Count to 100, name the days and say when things happen',
+        facts: [FACT.language, FACT.festivals],
+        dialogues: ['d-calendar-2'],
+        lessons: [
+          { title: '11 to 100', words: [
+            ['十一', 'shíyī', 'eleven', '🔢', { note: 'Ten + one. 12 is 十二, 13 is 十三…', alt: ['11'] }],
+            ['二十', 'èrshí', 'twenty', '🔢', { note: 'Two tens. 21 is 二十一, 30 is 三十.', alt: ['20'] }],
+            ['五十', 'wǔshí', 'fifty', '🔢', { alt: ['50'] }],
+            ['九十九', 'jiǔshíjiǔ', 'ninety-nine', '🔢', { note: 'Nine tens and nine. No special words from 11 to 99 — just stack the digits.', alt: ['99'] }],
+            ['一百', 'yìbǎi', 'one hundred', '💯', { alt: ['100'] }],
+          ] },
+          { title: 'Minutes', words: [
+            ['分', 'fēn', 'minute (on the clock)', '🕐', { note: '三点十分 = 3:10. After 点 you can drop 分 for the last digit: 三点五分 = 3:05.' }],
+            ['分钟', 'fēnzhōng', 'minutes (how long)', '⏱️', { note: '十分钟 = ten minutes — a length of time, not a time on the clock.' }],
+            ['一刻', 'yíkè', 'a quarter of an hour', '🕒', { note: '三点一刻 = a quarter past three (3:15). 三刻 = 3:45 on the clock.' }],
+          ] },
+          { title: 'Days of the week', words: [
+            ['星期一', 'xīngqīyī', 'Monday', '📅', { note: '星期 + number: 星期二 is Tuesday, 星期三 Wednesday… Monday is 1.' }],
+            ['星期五', 'xīngqīwǔ', 'Friday', '📅'],
+            ['星期天', 'xīngqītiān', 'Sunday', '📅', { note: 'Sunday is the odd one out: 星期天 or 星期日, not "星期七".' }],
+            ['今天', 'jīntiān', 'today', '☀️'],
+            ['明天', 'míngtiān', 'tomorrow', '🌄'],
+          ] },
+          { title: 'Months & dates', words: [
+            ['月', 'yuè', 'month / moon', '🌙', { note: 'Months are just numbers: 一月 January, 十一月 November. The word for "moon" is the same.' }],
+            ['号', 'hào', 'day of the month', '📍', { note: 'Spoken for dates: 二十号 = the 20th. In writing you will also see 日.' }],
+            ['十一月', 'shíyīyuè', 'November', '📅', { note: 'On 11/11 China holds Singles\' Day, the biggest shopping day of the year.' }],
+            ['昨天', 'zuótiān', 'yesterday', '⏭️'],
+          ] },
+          { title: 'When?', grammar: 'time', sentences: [
+            { jp: ['我', '七', '点', '半', '吃', '早饭'], romaji: 'wǒ qī diǎn bàn chī zǎofàn', en: 'I eat breakfast at 7:30', alt: ['I have breakfast at half past seven', 'I eat breakfast at half past seven', 'I have breakfast at 7:30'] },
+            { jp: ['星期一', '我', '去', '北京'], romaji: 'xīngqīyī wǒ qù Běijīng', en: 'On Monday I go to Beijing', alt: ['I go to Beijing on Monday', 'I\'m going to Beijing on Monday'] },
+            { jp: ['今天', '几', '号'], romaji: 'jīntiān jǐ hào', en: 'What is the date today', alt: ['What date is it today', 'What\'s the date today', 'Which day of the month is it today'] },
+            { jp: ['明天', '我', '三', '点', '来'], romaji: 'míngtiān wǒ sān diǎn lái', en: 'Tomorrow I come at three', alt: ['I\'ll come at three tomorrow', 'I am coming at three tomorrow', 'I will come tomorrow at three'] },
+            { jp: ['十一月', '二十', '号'], romaji: 'shíyīyuè èrshí hào', en: 'It is November 20th', alt: ['November 20th', 'The 20th of November', 'It\'s November 20th'] },
+          ] },
+        ],
+      },
+      {
+        id: 'no-and-past',
+        title: 'No, not & did',
+        desc: 'Say what you don\'t do, don\'t have — and what you already did',
+        facts: [FACT.language, FACT.modern],
+        dialogues: ['d-negative-2'],
+        lessons: [
+          { title: 'Not', words: [
+            ['不', 'bù', 'not (before a verb or adjective)', '🙅', { note: 'Says what you don\'t, won\'t or aren\'t. Changes to bú before a 4th tone: 不是 búshì.' }],
+            ['没', 'méi', 'did not / have not', '❌', { note: 'The "not" for the past: 没去 = didn\'t go. Never 不 for a past event.' }],
+            ['没有', 'méiyǒu', 'don\'t have / there isn\'t', '🤷', { note: 'The negative of 有: 我没有票 = I don\'t have a ticket.' }],
+          ] },
+          { title: 'Done!', words: [
+            ['了', 'le', '(it happened / now changed)', '🏁', { note: 'Small word after the verb: 我吃了 = I ate. It marks "done", not a tense.' }],
+            ['已经', 'yǐjīng', 'already', '⏱️', { note: '我已经吃了 = I\'ve already eaten.' }],
+            ['还没', 'háiméi', 'not yet', '⏭️', { note: 'A great short answer: 吃了吗? → 还没. = Eaten yet? Not yet.' }],
+            ['刚才', 'gāngcái', 'just now', '⌚'],
+          ] },
+          { title: 'I don\'t…', grammar: 'bu', sentences: [
+            { jp: ['我', '不', '去'], romaji: 'wǒ bú qù', en: 'I am not going', alt: ['I\'m not going', 'I won\'t go', 'I don\'t go'] },
+            { jp: ['我', '不', '喝', '咖啡'], romaji: 'wǒ bù hē kāfēi', en: 'I don\'t drink coffee', alt: ['I do not drink coffee', 'I am not drinking coffee'] },
+            { jp: ['我', '不', '想', '去'], romaji: 'wǒ bù xiǎng qù', en: 'I don\'t want to go', alt: ['I do not want to go'] },
+            { jp: ['我', '不', '懂'], romaji: 'wǒ bù dǒng', en: 'I don\'t understand', alt: ['I do not understand', 'I don\'t get it'] },
+            { jp: ['他', '不', '是', '老师'], romaji: 'tā bú shì lǎoshī', en: 'He is not a teacher', alt: ['He\'s not a teacher', 'She is not a teacher', 'She\'s not a teacher'] },
+          ] },
+          { title: 'I didn\'t…', grammar: 'mei', sentences: [
+            { jp: ['我', '没有', '票'], romaji: 'wǒ méiyǒu piào', en: 'I don\'t have a ticket', alt: ['I have no ticket', 'I do not have a ticket'] },
+            { jp: ['我', '没', '去', '北京'], romaji: 'wǒ méi qù Běijīng', en: 'I didn\'t go to Beijing', alt: ['I did not go to Beijing', 'I haven\'t been to Beijing', 'I have not been to Beijing'] },
+            { jp: ['他', '没', '来'], romaji: 'tā méi lái', en: 'He didn\'t come', alt: ['He did not come', 'She didn\'t come', 'She did not come', 'He hasn\'t come', 'He has not come'] },
+            { jp: ['我', '还没', '吃', '早饭'], romaji: 'wǒ háiméi chī zǎofàn', en: 'I haven\'t eaten breakfast yet', alt: ['I have not had breakfast yet', 'I haven\'t had breakfast yet', 'I have not eaten breakfast yet'] },
+          ] },
+          { title: 'I did!', grammar: 'le', sentences: [
+            { jp: ['我', '吃', '了'], romaji: 'wǒ chī le', en: 'I ate', alt: ['I have eaten', 'I\'ve eaten', 'I already ate', 'I have eaten it'] },
+            { jp: ['我', '买', '了', '票'], romaji: 'wǒ mǎi le piào', en: 'I bought a ticket', alt: ['I bought the ticket', 'I have bought a ticket', 'I\'ve bought a ticket'] },
+            { jp: ['我', '去', '了', '北京'], romaji: 'wǒ qù le Běijīng', en: 'I went to Beijing', alt: ['I have been to Beijing', 'I\'ve gone to Beijing'] },
+            { jp: ['他', '来', '了'], romaji: 'tā lái le', en: 'He came', alt: ['He has come', 'He is here', 'She came', 'She has come', 'She is here', 'He\'s here', 'She\'s here'] },
+            { jp: ['我', '看', '了', '熊猫'], romaji: 'wǒ kàn le xióngmāo', en: 'I saw the pandas', alt: ['I saw pandas', 'I saw a panda', 'I saw the panda', 'I have seen the pandas', 'I watched the pandas'] },
+          ] },
+        ],
+      },
+      {
+        id: 'questions',
+        title: 'Asking questions',
+        desc: 'Who, when, why, which one, how much — ask anyone anything',
+        facts: [FACT.language, FACT.modern],
+        dialogues: ['d-questions-2'],
+        lessons: [
+          { title: 'Who, when, why', words: [
+            ['谁', 'shéi', 'who', '🧍', { note: 'Also pronounced shuí. Stays where the answer goes: 他是谁? → 他是我的朋友.', alt: ['shui'] }],
+            ['什么时候', 'shénme shíhou', 'when', '🕐', { note: 'Literally "what time" — goes before the verb: 你什么时候去?' }],
+            ['为什么', 'wèishénme', 'why', '🤷', { note: 'Before the verb as well: 你为什么不去? = why aren\'t you going?' }],
+          ] },
+          { title: 'Which, how much', words: [
+            ['哪个', 'nǎge', 'which one', '🎯', { note: '哪 (nǎ, 3rd tone) = which; 那 (nà, 4th tone) = that. Don\'t mix them up!' }],
+            ['多少', 'duōshao', 'how much / how many', '💯', { note: 'For big or unknown amounts: 多少人? Prices use 多少钱.' }],
+            ['怎么', 'zěnme', 'how', '🛣️', { note: '你怎么去? = how do you get there? 怎么了? = what\'s wrong?' }],
+            ['几', 'jǐ', 'how many (small number)', '🔟', { note: 'For numbers under about ten: 几点, 几号, 几个.' }],
+          ] },
+          { title: 'Ask anything', grammar: 'qwords', sentences: [
+            { jp: ['他', '是', '谁'], romaji: 'tā shì shéi', en: 'Who is he', alt: ['Who is she', 'Who are they', 'Who is that'] },
+            { jp: ['你', '什么时候', '去'], romaji: 'nǐ shénmeshíhou qù', en: 'When are you going', alt: ['When do you go', 'When will you go'] },
+            { jp: ['你', '为什么', '不', '去'], romaji: 'nǐ wèishénme bú qù', en: 'Why aren\'t you going', alt: ['Why are you not going', 'Why don\'t you go', 'Why do you not go'] },
+            { jp: ['你', '要', '哪个'], romaji: 'nǐ yào nǎge', en: 'Which one do you want', alt: ['Which do you want', 'Which one would you like'] },
+            { jp: ['你', '怎么', '去'], romaji: 'nǐ zěnme qù', en: 'How are you going', alt: ['How do you go', 'How do you get there', 'How will you go'] },
+          ] },
+          { title: 'More questions', sentences: [
+            { jp: ['你', '喝', '什么'], romaji: 'nǐ hē shénme', en: 'What do you drink', alt: ['What are you drinking', 'What will you drink', 'What would you like to drink'] },
+            { jp: ['苹果', '多少', '钱'], romaji: 'píngguǒ duōshao qián', en: 'How much are the apples', alt: ['How much is the apple', 'How much is an apple', 'How much are apples'] },
+            { jp: ['你', '想', '吃', '什么'], romaji: 'nǐ xiǎng chī shénme', en: 'What do you want to eat', alt: ['What would you like to eat', 'What do you feel like eating'] },
+          ] },
+        ],
+      },
     ],
   },
   {
@@ -500,7 +672,7 @@ export const SECTIONS_DATA = [
         title: 'Casual & slang',
         desc: 'What friends really say — and what you\'ll see online',
         facts: [FACT.modern, FACT.language],
-        dialogues: ['d-niu'],
+        dialogues: ['d-niu', 'd-casual-2'],
         lessons: [
           { title: 'Okay!', words: [
             ['好的', 'hǎo de', 'okay', '👌', { note: 'The everyday "okay / sure".' }],
@@ -636,5 +808,275 @@ export const DIALOGUES = {
     ],
     question: 'What is the news?',
     options: ['She is going to Beijing to see pandas', 'She lost her ticket', 'She does not like pandas'],
+  },
+
+  // second dialogue of each unit
+  'd-hello-2': {
+    title: 'Good morning, neighbour',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '早上好！', en: 'Good morning!' },
+      { who: 1, jp: '早上好，你好吗？', en: 'Good morning, how are you?' },
+      { who: 0, jp: '我很好，谢谢。你呢？', en: 'I\'m fine, thanks. And you?' },
+      { who: 1, jp: '我也很好。', en: 'I\'m fine too.' },
+    ],
+    question: 'What time of day is it?',
+    options: ['Morning', 'Evening', 'Night'],
+    questions: [
+      { question: 'What time of day is it?', options: ['Morning', 'Evening', 'Night'] },
+      { question: 'How are they?', options: ['Both are fine', 'One is ill', 'Both are sorry'] },
+    ],
+  },
+  'd-around-2': {
+    title: 'Where is the restroom?',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '请问，洗手间在哪里？', en: 'Excuse me, where is the restroom?' },
+      { who: 1, jp: '在左边。', en: 'It\'s on the left.' },
+      { who: 0, jp: '谢谢！', en: 'Thank you!' },
+      { who: 1, jp: '不客气。', en: 'You\'re welcome.' },
+    ],
+    question: 'Where is the restroom?',
+    options: ['On the left', 'On the right', 'Straight ahead'],
+    questions: [
+      { question: 'Where is the restroom?', options: ['On the left', 'On the right', 'Straight ahead'] },
+      { question: 'How does the first speaker begin?', options: ['With "excuse me"', 'With "goodbye"', 'With "sorry"'] },
+    ],
+  },
+  'd-numbers-2': {
+    title: 'What time is it?',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '请问，现在几点？', en: 'Excuse me, what time is it now?' },
+      { who: 1, jp: '现在三点半。', en: 'It\'s half past three.' },
+      { who: 0, jp: '火车几点？', en: 'What time is the train?' },
+      { who: 1, jp: '四点。', en: 'At four.' },
+    ],
+    question: 'What time is it now?',
+    options: ['3:30', '4:00', '3:00'],
+    questions: [
+      { question: 'What time is it now?', options: ['3:30', '4:00', '3:00'] },
+      { question: 'When is the train?', options: ['At 4:00', 'At 3:30', 'At 5:00'] },
+    ],
+  },
+  'd-food-2': {
+    title: 'Not spicy',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '服务员，我要饺子。', en: 'Waiter, I\'d like dumplings.' },
+      { who: 1, jp: '好的，要辣吗？', en: 'Okay, spicy?' },
+      { who: 0, jp: '不要辣，谢谢。', en: 'Not spicy, thanks.' },
+      { who: 1, jp: '好嘞！', en: 'You got it!' },
+    ],
+    question: 'What does the customer order?',
+    options: ['Dumplings', 'Noodles', 'Rice'],
+    questions: [
+      { question: 'What does the customer order?', options: ['Dumplings', 'Noodles', 'Rice'] },
+      { question: 'How does the customer want it?', options: ['Not spicy', 'Very spicy', 'Cold'] },
+    ],
+  },
+  'd-shopping-2': {
+    title: 'A bit cheaper?',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '这个多少钱？', en: 'How much is this?' },
+      { who: 1, jp: '五十块。', en: '50 yuan.' },
+      { who: 0, jp: '太贵了！便宜一点吧。', en: 'Too expensive! A bit cheaper, please.' },
+      { who: 1, jp: '好的，四十块。', en: 'Okay, 40 yuan.' },
+    ],
+    question: 'What is the first price?',
+    options: ['50 yuan', '40 yuan', '100 yuan'],
+    questions: [
+      { question: 'What is the first price?', options: ['50 yuan', '40 yuan', '100 yuan'] },
+      { question: 'What is the final price?', options: ['40 yuan', '50 yuan', '30 yuan'] },
+    ],
+  },
+  'd-hotel-2': {
+    title: 'The Wi-Fi password',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '请问，无线网密码是多少？', en: 'Excuse me, what is the Wi-Fi password?' },
+      { who: 1, jp: '密码是八八八八。', en: 'The password is 8888.' },
+      { who: 0, jp: '谢谢。我的房间在哪里？', en: 'Thanks. Where is my room?' },
+      { who: 1, jp: '在右边。', en: 'On the right.' },
+    ],
+    question: 'What does the guest ask about first?',
+    options: ['The Wi-Fi password', 'Breakfast time', 'A taxi'],
+    questions: [
+      { question: 'What does the guest ask about first?', options: ['The Wi-Fi password', 'Breakfast time', 'A taxi'] },
+      { question: 'Where is the room?', options: ['On the right', 'On the left', 'Straight ahead'] },
+    ],
+  },
+  'd-eating-2': {
+    title: 'An allergy',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '你好，我对花生过敏。', en: 'Hello, I\'m allergic to peanuts.' },
+      { who: 1, jp: '没问题，不要花生。', en: 'No problem, no peanuts.' },
+      { who: 0, jp: '谢谢！再来一瓶啤酒。', en: 'Thanks! One more beer, please.' },
+    ],
+    question: 'What is the customer allergic to?',
+    options: ['Peanuts', 'Fish', 'Meat'],
+    questions: [
+      { question: 'What is the customer allergic to?', options: ['Peanuts', 'Fish', 'Meat'] },
+      { question: 'What does she ask for at the end?', options: ['Another beer', 'Another tea', 'The bill'] },
+    ],
+  },
+  'd-trains-2': {
+    title: 'Is this the right train?',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '请问，这是去上海的吗？', en: 'Excuse me, is this the one to Shanghai?' },
+      { who: 1, jp: '是的，三号站台。', en: 'Yes, platform 3.' },
+      { who: 0, jp: '谢谢！', en: 'Thank you!' },
+    ],
+    question: 'Where is the train going?',
+    options: ['Shanghai', 'Beijing', 'Nanjing'],
+    questions: [
+      { question: 'Where is the train going?', options: ['Shanghai', 'Beijing', 'Nanjing'] },
+      { question: 'Which platform is it?', options: ['Platform 3', 'Platform 5', 'Platform 1'] },
+    ],
+  },
+  'd-help-2': {
+    title: 'At the pharmacy',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '你好，你怎么了？', en: 'Hello, what\'s wrong?' },
+      { who: 1, jp: '我这里疼。', en: 'It hurts here.' },
+      { who: 0, jp: '请等一下，这是药。', en: 'Please wait a moment — here is some medicine.' },
+      { who: 1, jp: '谢谢！', en: 'Thank you!' },
+    ],
+    question: 'What is the customer\'s problem?',
+    options: ['Something hurts', 'She is lost', 'She is hungry'],
+    questions: [
+      { question: 'What is the customer\'s problem?', options: ['Something hurts', 'She is lost', 'She is hungry'] },
+      { question: 'What does the pharmacist give her?', options: ['Medicine', 'A ticket', 'Some tea'] },
+    ],
+  },
+  'd-people-2': {
+    title: 'My friend',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '这是我的朋友，她叫丽丽。', en: 'This is my friend, her name is Lili.' },
+      { who: 1, jp: '你好，我叫安娜。', en: 'Hello, my name is Anna.' },
+      { who: 0, jp: '你是学生吗？', en: 'Are you a student?' },
+      { who: 1, jp: '是的，我是学生。', en: 'Yes, I\'m a student.' },
+    ],
+    question: 'Who is Lili?',
+    options: ['The speaker\'s friend', 'A teacher', 'A driver'],
+    questions: [
+      { question: 'Who is Lili?', options: ['The speaker\'s friend', 'A teacher', 'A driver'] },
+      { question: 'What is Anna?', options: ['A student', 'A teacher', 'A doctor'] },
+    ],
+  },
+  'd-meals-2': {
+    title: 'What do you like?',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '你喜欢吃什么？', en: 'What do you like to eat?' },
+      { who: 1, jp: '我喜欢面条。你呢？', en: 'I like noodles. And you?' },
+      { who: 0, jp: '我不吃肉，我喜欢鱼。', en: 'I don\'t eat meat, I like fish.' },
+      { who: 1, jp: '好，我们吃鱼。', en: 'Okay, let\'s eat fish.' },
+    ],
+    question: 'What does the second speaker like?',
+    options: ['Noodles', 'Fish', 'Dumplings'],
+    questions: [
+      { question: 'What does the second speaker like?', options: ['Noodles', 'Fish', 'Dumplings'] },
+      { question: 'Who does not eat meat?', options: ['The one who asked first', 'The one who answered first', 'Both of them'] },
+    ],
+  },
+  'd-world-2': {
+    title: 'At the zoo',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '看！那是熊猫！', en: 'Look! That\'s a panda!' },
+      { who: 1, jp: '太可爱了！你喜欢猫吗？', en: 'So cute! Do you like cats?' },
+      { who: 0, jp: '我有一只猫，我也喜欢熊猫。', en: 'I have a cat, and I like pandas too.' },
+    ],
+    question: 'What do they see?',
+    options: ['A panda', 'A bird', 'A dog'],
+    questions: [
+      { question: 'What do they see?', options: ['A panda', 'A bird', 'A dog'] },
+      { question: 'What pet does the first speaker have?', options: ['A cat', 'A dog', 'A bird'] },
+    ],
+  },
+  'd-casual-2': {
+    title: 'Good luck!',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '明天我有考试。', en: 'I have an exam tomorrow.' },
+      { who: 1, jp: '加油！', en: 'Go for it!' },
+      { who: 0, jp: '谢谢！', en: 'Thanks!' },
+      { who: 1, jp: '没事，你太厉害了！', en: 'No worries, you\'re amazing!' },
+    ],
+    question: 'What does the first speaker have tomorrow?',
+    options: ['An exam', 'A trip', 'A birthday'],
+    questions: [
+      { question: 'What does the first speaker have tomorrow?', options: ['An exam', 'A trip', 'A birthday'] },
+      { question: 'How does the friend cheer her on?', options: ['"Go for it!"', '"Good night!"', '"Sorry!"'] },
+    ],
+  },
+  'd-verbs-2': {
+    title: 'Lunch order',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '你想吃什么？', en: 'What do you want to eat?' },
+      { who: 1, jp: '我想吃饺子，也想喝茶。', en: 'I want dumplings, and I want tea too.' },
+      { who: 0, jp: '我也想喝茶。', en: 'I want tea too.' },
+    ],
+    question: 'What does the second speaker want to eat?',
+    options: ['Dumplings', 'Noodles', 'Rice'],
+    questions: [
+      { question: 'What does the second speaker want to eat?', options: ['Dumplings', 'Noodles', 'Rice'] },
+      { question: 'What do they both want to drink?', options: ['Tea', 'Beer', 'Water'] },
+    ],
+  },
+  'd-calendar-2': {
+    title: 'Making plans',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '星期五你去哪里？', en: 'Where are you going on Friday?' },
+      { who: 1, jp: '我去北京。你呢？', en: 'I\'m going to Beijing. And you?' },
+      { who: 0, jp: '我星期天去。', en: 'I\'m going on Sunday.' },
+      { who: 1, jp: '好，星期一见！', en: 'Okay, see you on Monday!' },
+    ],
+    question: 'Where is the second speaker going on Friday?',
+    options: ['Beijing', 'Shanghai', 'Nanjing'],
+    questions: [
+      { question: 'Where is the second speaker going on Friday?', options: ['Beijing', 'Shanghai', 'Nanjing'] },
+      { question: 'When will they meet?', options: ['Monday', 'Friday', 'Sunday'] },
+    ],
+  },
+  'd-negative-2': {
+    title: 'Not yet',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '你吃早饭了吗？', en: 'Have you had breakfast?' },
+      { who: 1, jp: '还没，我不饿。', en: 'Not yet, I\'m not hungry.' },
+      { who: 0, jp: '我吃了。你想喝茶吗？', en: 'I have. Would you like tea?' },
+      { who: 1, jp: '好，我想喝茶。', en: 'Yes, I\'d like tea.' },
+    ],
+    question: 'Has the second speaker had breakfast?',
+    options: ['Not yet', 'Yes', 'Only tea'],
+    questions: [
+      { question: 'Has the second speaker had breakfast?', options: ['Not yet', 'Yes', 'Only tea'] },
+      { question: 'What does the second speaker want?', options: ['Tea', 'Rice', 'Coffee'] },
+    ],
+  },
+  'd-questions-2': {
+    title: 'Who is that?',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '他是谁？', en: 'Who is he?' },
+      { who: 1, jp: '他是我的老师。', en: 'He is my teacher.' },
+      { who: 0, jp: '他什么时候来？', en: 'When is he coming?' },
+      { who: 1, jp: '星期五。', en: 'On Friday.' },
+    ],
+    question: 'Who is he?',
+    options: ['The speaker\'s teacher', 'A taxi driver', 'A friend'],
+    questions: [
+      { question: 'Who is he?', options: ['The speaker\'s teacher', 'A taxi driver', 'A friend'] },
+      { question: 'When is he coming?', options: ['On Friday', 'On Monday', 'On Sunday'] },
+    ],
   },
 };

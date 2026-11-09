@@ -28,8 +28,8 @@ export function decorFor(i) {
 }
 
 // The trail as a polyline of its cubic segments, so points along it come from arithmetic instead of the
-// browser's getPointAtLength (which cost ~350 ms per redraw). 24 samples per segment is well under a pixel off.
-const SAMPLES = 24;
+// browser's getPointAtLength (which cost ~350 ms per redraw). 64 samples per segment keeps it within about a pixel.
+const SAMPLES = 64;
 function trailCurve(pts) {
   const xs = [pts[0].x];
   const ys = [pts[0].y];

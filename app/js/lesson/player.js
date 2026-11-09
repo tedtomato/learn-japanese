@@ -13,7 +13,9 @@ import { person, nameOf } from '../characters.js';
 import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
 import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds, romajiOfChunk, romajiMatch } from './generate.js';
-import { completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey, buyHearts, HEARTS_PRICE } from '../progress.js';
+import {
+  completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey, buyHearts, HEARTS_PRICE, costsHeart, retryAgain, testOutUnit, TESTOUT_PASS, unitIsLocked, speedOn,
+} from '../progress.js';
 import { nextTidbit, tidbitCard, readings } from '../tidbits.js';
 import { GRAMMAR } from '../content/pack.js';
 import { jpItem, jpChunk, speechOf, kanaExample, LANG_ATTR } from './text.js';
@@ -57,10 +59,13 @@ const needsListening = (ex) => ex.prompt === 'audio' || ['audio', 'fast', 'dicta
 export function startSession(root, { nodeId, itemIds, demo, kanjiOnly, kanaScript } = {}) {
   const now = app.now();
   const node = nodeId ? NODE_BY_ID.get(nodeId) : null;
-  if (nodeId && (!node || node.kind === 'chest' || (!isNodeUnlocked(app.state, node) && !app.testMode))) return app.go('#/learn');
+  // "Test out" (#/lesson/<unit review>/testout): play the review of a locked unit; 85% or better skips its lessons.
+  const testOut = !!node && node.kind === 'review' && location.hash.endsWith('/testout') && unitIsLocked(app.state, node.unit);
+  if (nodeId && (!node || node.kind === 'chest' || (!isNodeUnlocked(app.state, node) && !app.testMode && !testOut))) return app.go('#/learn');
   const mode = node ? 'lesson' : 'practice';
   if (demo && !app.testMode) return app.go('#/profile'); // demos only ever touch test progress
-  if (mode === 'lesson' && currentHearts(app.state, now) <= 0) return app.go('#/practice');
+  // Hearts only matter when replaying a finished node: a node's first play never costs any.
+  if (mode === 'lesson' && !testOut && nodeLevel(app.state, node) > 0 && currentHearts(app.state, now) <= 0) return app.go('#/practice');
 
   const opts = {
     now,
@@ -81,7 +86,9 @@ export function startSession(root, { nodeId, itemIds, demo, kanjiOnly, kanaScrip
   }
 
   const s = {
-    node, mode, opts,
+    node, mode, opts, testOut,
+    level: node ? nodeLevel(app.state, node) : 0, // hearts are only at stake when replaying a finished node
+    retryMisses: new Map(), passAnswered: 0, passWrong: 0,
     queue: [...session.exercises],
     total: session.exercises.length,
     done: 0, mistakes: 0, answered: 0, speedBonus: 0, timedCount: 0,
@@ -100,24 +107,24 @@ export function startSession(root, { nodeId, itemIds, demo, kanjiOnly, kanaScrip
 
 function renderShell(root, s) {
   const level = s.node ? nodeLevel(app.state, s.node) : 0;
-  const timed = app.state.settings.speed !== false;
+  const timed = speedOn(app.state);
   mount(root, html`<div class="lesson">
     <header class="lesson-top">
-      <button class="icon-btn quit" aria-label="Quit">${icon('close', 26)}</button>
+      <button class="icon-btn quit" aria-label="${t('Quit')}">${icon('close', 26)}</button>
       <div class="bar bar-lg"><div class="bar-fill" style="width:0%"></div></div>
       ${s.mode === 'lesson' ? html`<span class="stat stat-hearts">${icon('heart', 24)}<b class="hearts-n">${currentHearts(app.state, app.now())}</b></span>`
         : html`<span class="pill pill-blue">${t('Practice')}</span>`}
     </header>
     <div class="timer ${timed ? '' : 'off'}" aria-live="off"><span class="timer-n"></span><div class="timer-bar"><i></i></div></div>
-    ${s.node ? html`<div class="lesson-meta"><b>Section ${s.node.sectionIndex + 1} – Unit ${s.node.unitIndex + 1}</b> · ${s.node.title}${s.node.kind === 'lesson' ? ` · Level ${Math.min(level + 1, MAX_LEVEL)}` : ''}</div>` : ''}
+    ${s.node ? html`<div class="lesson-meta"><b>${t('Section {n} – Unit {m}', { n: s.node.sectionIndex + 1, m: s.node.unitIndex + 1 })}</b> · ${s.node.title}${s.node.kind === 'lesson' ? ` · ${t('Level {n}', { n: Math.min(level + 1, MAX_LEVEL) })}` : ''}</div>` : ''}
     <main class="lesson-body"></main>
     <footer class="lesson-foot"></footer>
     <div class="explain-sheet" hidden></div>
   </div>`);
   $('.quit', root).addEventListener('click', () =>
-    modal(html`<div class="center">${mascot('sad', 96)}<h2>Wait, don't go!</h2><p class="muted">You'll lose your progress in this lesson.</p></div>`, [
-      { label: 'Keep learning' },
-      { label: 'End session', kind: 'danger-ghost', onClick: () => quit(s) },
+    modal(html`<div class="center">${mascot('sad', 96)}<h2>${t('Wait, don\'t go!')}</h2><p class="muted">${t('You\'ll lose your progress in this lesson.')}</p></div>`, [
+      { label: t('Keep learning') },
+      { label: t('End session'), kind: 'danger-ghost', onClick: () => quit(s) },
     ]),
   );
 }
@@ -143,7 +150,7 @@ function updateProgress(root, s) {
 function startTimer(root, s, seconds) {
   stopTimer(s);
   const box = $('.timer', root);
-  if (!seconds || app.state.settings.speed === false) {
+  if (!seconds || !speedOn(app.state)) {
     box.classList.add('idle');
     return;
   }
@@ -166,7 +173,7 @@ function startTimer(root, s, seconds) {
       tm.late = true;
       box.classList.add('late');
       sfx('timeup');
-      n.textContent = "Time's up";
+      n.textContent = t("Time's up");
     }
   };
   tick();
@@ -192,7 +199,7 @@ function next(root, s) {
   s.checked = false;
   s.keyHandler = null;
   if (!s.current) {
-    if (s.missed.size && !s.retryRound) return retryIntro(root, s);
+    if (s.missed.size && !s.retryRound && !s.testOut) return retryIntro(root, s);
     return finish(root, s);
   }
   if (needsListening(s.current) && ((s.current.type === 'speak' && speakOff()) || listenOff())) {
@@ -276,6 +283,10 @@ function result(root, s, ok, opts = {}) {
   // The speed bonus is for answers in under half the time, and a session pays at most SPEED_BONUS_MAX of it.
   const onTime = ok && timing && !timing.late && timing.ratio < 0.5 && s.speedBonus < SPEED_BONUS_MAX;
   if (timing) s.timedCount += 1;
+  if (!s.retryRound) {
+    s.passAnswered += 1;
+    if (!ok) s.passWrong += 1;
+  }
   if (onTime) s.speedBonus += 1;
 
   if (ok) {
@@ -299,9 +310,17 @@ function result(root, s, ok, opts = {}) {
     ids.forEach((id) => s.missed.add(id));
     sfx('wrong');
     buzz();
-    if (s.retryRound) s.queue.push({ ...ex }); // in the retry round, keep going until it is right
-    else s.done += 1; // it comes back in the retry round instead
-    if (s.mode === 'lesson' && !opts.noHeart) {
+    // In the retry round a missed task comes back once more; after the second miss the answer is on screen
+    // below and we move on. Otherwise it comes back in the retry round instead.
+    if (s.retryRound) {
+      const key = ids.join('+') || ex.type;
+      const misses = (s.retryMisses.get(key) || 0) + 1;
+      s.retryMisses.set(key, misses);
+      if (retryAgain(misses)) s.queue.push({ ...ex });
+      else s.done += 1;
+    } else s.done += 1;
+    // No hearts in a node's first play, in the retry round, or for speech misses (see costsHeart).
+    if (costsHeart({ mode: s.mode, level: s.level, retryRound: s.retryRound, noHeart: opts.noHeart })) {
       loseHeart(app.state, app.now());
       app.save();
     }
@@ -349,7 +368,7 @@ function result(root, s, ok, opts = {}) {
     $$('.fb-badges .pill-orange', foot).forEach((p) => p.remove());
     e.currentTarget.replaceWith(Object.assign(document.createElement('span'), {
       className: 'pill pill-orange',
-      textContent: knew ? '👍 No extra practice' : '👍 It will come back soon',
+      textContent: knew ? `👍 ${t('No extra practice')}` : `👍 ${t('It will come back soon')}`,
     }));
   });
   $('.explain', foot)?.addEventListener('click', () => {
@@ -361,10 +380,10 @@ function showExplain(root, s, item, chosenLabel, go) {
   const cards = explainCards(item, { chosenLabel });
   const sheet = $('.explain-sheet', root);
   sheet.hidden = false;
-  const render = (i) => mount(sheet, html`<div class="ex-head"><button class="icon-btn back" aria-label="Back">${icon('arrow', 24)}</button><h2>Explain my answer</h2></div>
+  const render = (i) => mount(sheet, html`<div class="ex-head"><button class="icon-btn back" aria-label="${t('Back')}">${icon('arrow', 24)}</button><h2>${t('Explain my answer')}</h2></div>
     <div class="ex-chips">${cards.map((c, j) => html`<button class="tile ex-chip jp ${j === i ? 'on' : ''}" data-i="${j}">${c.chip}</button>`)}</div>
     <div class="card ex-card">${cards[i].body}</div>
-    <button class="btn btn-secondary btn-block ex-continue">Continue lesson</button>`);
+    <button class="btn btn-secondary btn-block ex-continue">${t('Continue lesson')}</button>`);
   const wire = (i) => {
     render(i);
     $$('.ex-chip', sheet).forEach((b) => b.addEventListener('click', () => wire(Number(b.dataset.i))));
@@ -380,17 +399,17 @@ function showExplain(root, s, item, chosenLabel, go) {
 function noHearts(root, s) {
   cleanup(s);
   const canBuy = app.state.gems >= HEARTS_PRICE;
-  modal(html`<div class="center">${mascot('sad', 100)}<h2>Out of hearts</h2><p class="muted">Hearts refill over time. A practice session earns one back right away — and practice never costs hearts.${canBuy ? '' : ` A full refill costs ${HEARTS_PRICE} gems (you have ${app.state.gems}).`}</p></div>`, [
+  modal(html`<div class="center">${mascot('sad', 100)}<h2>${t('Out of hearts')}</h2><p class="muted">${t('Hearts refill over time. A practice session earns one back right away — and practice never costs hearts.')}${canBuy ? '' : ` ${t('A full refill costs {price} gems (you have {n}). Earn gems from lessons, chests, missions and your daily goal.', { price: HEARTS_PRICE, n: app.state.gems })}`}</p></div>`, [
     // Gems refill every heart and the lesson carries on where it stopped.
-    ...(canBuy ? [{ label: html`Refill hearts · ${icon('gem', 16)} ${HEARTS_PRICE}`, onClick: () => {
+    ...(canBuy ? [{ label: html`${t('Refill hearts')} · ${icon('gem', 16)} ${HEARTS_PRICE}`, onClick: () => {
       buyHearts(app.state, app.now());
       app.save();
       sfx('bonus');
       updateProgress(root, s);
       next(root, s);
     } }] : []),
-    { label: 'Practice to earn hearts', kind: canBuy ? 'secondary' : 'primary', onClick: () => { app.inLesson = false; app.go('#/practice/go'); } },
-    { label: 'End lesson', kind: 'danger-ghost', onClick: () => quit(s) },
+    { label: t('Practice to earn hearts'), kind: canBuy ? 'secondary' : 'primary', onClick: () => { app.inLesson = false; app.go('#/practice/go'); } },
+    { label: t('End lesson'), kind: 'danger-ghost', onClick: () => quit(s) },
   ], { dismissable: false });
 }
 
@@ -506,8 +525,8 @@ function karaoke(root, text, el) {
 
 function playButtons(text, { slow = true } = {}) {
   return html`<div class="speakers">
-    <button class="speaker" data-play="${text}" aria-label="Play">${icon('speaker', 36)}</button>
-    ${slow ? html`<button class="speaker slow" data-play="${text}" data-slow="1" aria-label="Play slowly">${icon('turtle', 28)}</button>` : ''}</div>`;
+    <button class="speaker" data-play="${text}" aria-label="${t('Play')}">${icon('speaker', 36)}</button>
+    ${slow ? html`<button class="speaker slow" data-play="${text}" data-slow="1" aria-label="${t('Play slowly')}">${icon('turtle', 28)}</button>` : ''}</div>`;
 }
 
 function wirePlay(root, s, extra = {}) {
@@ -521,19 +540,19 @@ function wirePlay(root, s, extra = {}) {
 // slow answer, so the word comes back sooner).
 function memoryHint(item, show) {
   if (!show || item.type !== 'word' || !item.memory) return '';
-  return html`<div class="kana-hint"><button class="link hint-btn">💡 Hint</button><div class="hint-body" hidden><p class="intro-clue">🧠 ${item.memory}</p></div></div>`;
+  return html`<div class="kana-hint"><button class="link hint-btn">💡 ${t('Hint')}</button><div class="hint-body" hidden><p class="intro-clue">🧠 ${item.memory}</p></div></div>`;
 }
 
 function introHtml(item, hint) {
   switch (item.type) {
     case 'kana':
       return html`<div class="jp jp-giant">${item.jp}</div><div class="intro-romaji">${item.romaji}</div>
-        <p class="pill pill-blue">${item.script === 'katakana' ? 'Katakana' : 'Hiragana'}</p>${kanaExample(item)}${item.hint ? html`<p class="intro-hint">💡 ${item.hint}</p>` : ''}`;
+        <p class="pill pill-blue">${item.script === 'katakana' ? t('Katakana') : t('Hiragana')}</p>${kanaExample(item)}${item.hint ? html`<p class="intro-hint">💡 ${item.hint}</p>` : ''}`;
     case 'kanji':
     case 'radical':
       return html`<div class="jp jp-giant">${item.jp}</div><div class="intro-en">${item.en}</div>
         ${item.parts?.length > 1 ? html`<p class="parts">${item.parts.map(([p, m], i) => html`${i ? html`<b class="op">+</b>` : ''}<span class="part"><b class="jp">${p}</b><small>${m}</small></span>`)}<b class="op">=</b><span class="part"><b class="jp">${item.jp}</b><small>${item.en}</small></span></p>` : ''}
-        <p class="intro-clue">💡 <b>Remember it:</b> ${item.story}</p>
+        <p class="intro-clue">💡 <b>${t('Remember it:')}</b> ${item.story}</p>
         ${readings(item.on, item.kun)}
         ${item.words?.length ? html`<div class="jukugo">${item.words.map((id) => { const w = ITEMS.get(id); return html`<button class="jukugo-row" data-say="${w.kana}"><span class="jp">${jpItem(w, true)}</span><span>${w.en}</span></button>`; })}</div>` : ''}`;
     case 'kword':
@@ -546,7 +565,7 @@ function introHtml(item, hint) {
         <div class="${size} fit">${jpItem(item, hint)}</div>
         ${!hint && !L.latin ? html`<div class="intro-romaji">${item.romaji}</div>` : ''}
         <div class="intro-en">${item.en}</div>
-        ${item.memory ? html`<p class="intro-clue">🧠 <b>Memory trick:</b> ${item.memory}</p>` : ''}
+        ${item.memory ? html`<p class="intro-clue">🧠 <b>${t('Memory trick:')}</b> ${item.memory}</p>` : ''}
         ${item.note ? html`<p class="intro-hint">💡 ${item.note}</p>` : ''}`;
     }
   }
@@ -557,8 +576,8 @@ function renderIntro(root, s) {
   const kindLabel = t({ kana: 'New character', word: 'New word', sentence: 'New phrase', kanji: 'New kanji', kword: 'New kanji word', radical: 'New radical' }[item.type]);
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-gold">${icon('star', 14)} ${kindLabel}</span></p>
     ${speakerBubble(s, html`<div class="intro-card">${introHtml(item, s.current.hint)}
-      <div class="intro-play"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 24)}</button>
-      <button class="speaker small-speaker slow" data-play="${speechOf(item)}" data-slow="1" aria-label="Play slowly">${icon('turtle', 22)}</button></div></div>`, { stacked: true })}`);
+      <div class="intro-play"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="${t('Play')}">${icon('speaker', 24)}</button>
+      <button class="speaker small-speaker slow" data-play="${speechOf(item)}" data-slow="1" aria-label="${t('Play slowly')}">${icon('turtle', 22)}</button></div></div>`, { stacked: true })}`);
   wirePlay(root, s);
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   sayAs(root, s.speaker, speechOf(item));
@@ -568,23 +587,23 @@ function renderIntro(root, s) {
 function renderTrace(root, s) {
   const item = ITEMS.get(s.current.itemId);
   const kana = item.type === 'kana';
-  mount($('.lesson-body', root), html`<p class="instruction">Trace the character</p>
-    <div class="trace-head"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 26)}</button>
+  mount($('.lesson-body', root), html`<p class="instruction">${t('Trace the character')}</p>
+    <div class="trace-head"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="${t('Play')}">${icon('speaker', 26)}</button>
       <div><b class="jp">${item.jp}</b><small>${item.romaji || item.en}</small></div>
-      <button class="link replay">${icon('play', 14)} Watch again</button></div>
-    <div class="trace-stage"><p class="trace-status">Watch the strokes…</p><div class="trace-host"></div></div>`);
+      <button class="link replay">${icon('play', 14)} ${t('Watch again')}</button></div>
+    <div class="trace-stage"><p class="trace-status">${t('Watch the strokes…')}</p><div class="trace-host"></div></div>`);
   wirePlay(root, s);
   sayAs(root, s.speaker, speechOf(item));
   const status = $('.trace-status', root);
   const tracer = mountTrace($('.trace-host', root), item.jp, {
     rounds: kana ? 2 : 1,
     onProgress: ({ round, rounds, index, total }) => {
-      status.textContent = `${round === 1 ? 'Follow the arrow' : 'Now from memory'} · stroke ${Math.min(index + 1, total)} of ${total}${rounds > 1 ? ` · round ${round}/${rounds}` : ''}`;
+      status.textContent = `${t(round === 1 ? 'Follow the arrow' : 'Now from memory')} · ${t('stroke {a} of {b}', { a: Math.min(index + 1, total), b: total })}${rounds > 1 ? ` · ${t('round {a}/{b}', { a: round, b: rounds })}` : ''}`;
     },
     onDone: () => result(root, s, true, { meaning: `${item.jp} = ${item.romaji || item.en}`, timing: null }),
   });
   $('.replay', root).addEventListener('click', () => tracer.replay());
-  footer(root, s, { canCheck: false, text: 'Continue', skip: { label: 'Skip', onSkip: () => { s.done += 1; next(root, s); } } });
+  footer(root, s, { canCheck: false, text: t('Continue'), skip: { label: t('Skip'), onSkip: () => { s.done += 1; next(root, s); } } });
 }
 
 function promptFor(root, s, ex, item) {
@@ -593,7 +612,7 @@ function promptFor(root, s, ex, item) {
   if (ex.prompt === 'en') return speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`);
   if (ex.prompt === 'kanji') {
     return html`<div class="kanji-prompt"><div class="jp kanji-big-q">${item.jp}</div>
-      ${ex.clue ? html`<button class="link clue-btn">💡 Show a clue</button><p class="clue" hidden>${ex.clue}</p>` : ''}</div>`;
+      ${ex.clue ? html`<button class="link clue-btn">💡 ${t('Show a clue')}</button><p class="clue" hidden>${ex.clue}</p>` : ''}</div>`;
   }
   const big = item.type === 'kana';
   // No play button when the task is to read it — hearing it would give the answer away.
@@ -601,7 +620,7 @@ function promptFor(root, s, ex, item) {
   const canPeek = !L.latin && !big && !ex.hint && ex.kind !== 'read' && ['word', 'sentence'].includes(item.type);
   // Reading tests (a word, or a kana asked for its sound) have no play button: hearing it is the answer.
   const isReading = ex.kind === 'read' || (item.type === 'kana' && ex.answerKind === 'romaji');
-  return speakerBubble(s, html`${isReading ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 22)}</button>`}
+  return speakerBubble(s, html`${isReading ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="${t('Play')}">${icon('speaker', 22)}</button>`}
     <div class="jp-prompt-wrap"><div class="${big ? 'jp-huge' : 'jp-lg fit'} ${canPeek ? 'rt-hidden' : ''}">${big ? html`<span class="jp">${item.jp}</span>` : jpItem(item, ex.hint || canPeek)}</div>
     ${canPeek ? html`<button class="show-romaji">Show ${L.roman}</button>` : ''}</div>`);
 }
@@ -625,23 +644,23 @@ function renderRecall(root, s) {
   const item = ITEMS.get(ex.itemId);
   const target = item.type === 'sentence' ? joinChunks(item.jp) : item.jp; // what is typed in dictation
   const answers = [item.en, ...(item.accept || [])]; // what is accepted when translating
-  const help = L.latin ? 'Accents and capitals don\'t matter.' : L.code === 'zh' ? 'Tone marks and spaces don\'t matter.' : 'Spaces and long vowels (ou / o) don\'t matter.';
+  const help = t(L.latin ? 'Accents and capitals don\'t matter.' : L.code === 'zh' ? 'Tone marks and spaces don\'t matter.' : 'Spaces and long vowels (ou / o) don\'t matter.');
   const mode = ex.mode;
   let prompt = speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`);
   let placeholder = t('Type it in {lang}…', { lang: langName() });
   let instruction = t('How do you say this in {lang}?', { lang: langName() });
-  let intro = 'From memory — no choices this time!';
+  let intro = t('From memory — no choices this time!');
   if (mode === 'dictation') {
     prompt = speakerBubble(s, playButtons(speechOf(item)));
-    [placeholder, instruction, intro] = [t('Type what you hear…'), ex.instruction, 'Listen, then type what you hear.'];
+    [placeholder, instruction, intro] = [t('Type what you hear…'), ex.instruction, t('Listen, then type what you hear.')];
   } else if (mode === 'translate') {
     prompt = promptFor(root, s, { ...ex, prompt: 'jp' }, item);
-    [placeholder, instruction, intro] = [t('Type the meaning…'), ex.instruction, 'Type it in your own words.'];
+    [placeholder, instruction, intro] = [t('Type the meaning…'), ex.instruction, t('Type it in your own words.')];
   }
   mount($('.lesson-body', root), html`<p class="instruction">${instruction}</p>
     ${prompt}
     <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${placeholder}" aria-label="${t('Your answer')}" ${mode === 'translate' ? '' : html`lang="${LANG_ATTR}"`}>
-    <p class="muted small recall-help">${intro} ${mode === 'translate' ? 'Capitals and punctuation don\'t matter.' : help}</p>
+    <p class="muted small recall-help">${intro} ${mode === 'translate' ? t('Capitals and punctuation don\'t matter.') : help}</p>
     ${mode ? '' : memoryHint(item, true)}`);
   wirePlay(root, s);
   $('.hint-btn', root)?.addEventListener('click', (e) => {
@@ -662,7 +681,7 @@ function renderRecall(root, s) {
     input.classList.add(match ? 'right' : 'wrong');
     if (mode !== 'translate') sayAs(root, s.speaker, speechOf(item));
     result(root, s, !!match, { answerText, close: match === 'close',
-      meaning: match === 'close' ? `Almost! It's spelled ${L.latin ? target : `${item.romaji} (${item.jp})`}` : match || mode ? said : `means "${item.en}"`,
+      meaning: match === 'close' ? t('Almost! It\'s spelled {w}', { w: L.latin ? target : `${item.romaji} (${item.jp})` }) : match || mode ? said : t('means “{en}”', { en: item.en }),
       chosenLabel: input.value, noHeart: true, timing: null });
   };
   input.addEventListener('input', () => setCheckEnabled(root, !!input.value.trim()));
@@ -680,7 +699,7 @@ function renderRecall(root, s) {
         if (s.checked) return;
         input.disabled = true;
         sayAs(root, s.speaker, speechOf(item));
-        result(root, s, false, { answerText, meaning: mode ? said : `means "${item.en}"`, noHeart: true, timing: null });
+        result(root, s, false, { answerText, meaning: mode ? said : t('means “{en}”', { en: item.en }), noHeart: true, timing: null });
       } },
   });
   setTimeout(() => input.focus(), 250);
@@ -692,8 +711,8 @@ function renderGuess(root, s) {
   const item = ITEMS.get(ex.itemId);
   startTimer(root, s, null);
   mount($('.lesson-body', root), html`<p class="instruction">${t('New word — have a guess!')}</p>
-    ${speakerBubble(s, html`<button class="say-inline" aria-label="Play">${icon('speaker', 22)}</button><span class="jp-lg guess-word">${jpItem(item, true)}</span>`)}
-    <p class="muted small guess-help">No pressure: guessing first, even wrong, helps you remember it.</p>
+    ${speakerBubble(s, html`<button class="say-inline" aria-label="${t('Play')}">${icon('speaker', 22)}</button><span class="jp-lg guess-word">${jpItem(item, true)}</span>`)}
+    <p class="muted small guess-help">${t('No pressure: guessing first, even wrong, helps you remember it.')}</p>
     <div class="options list">${ex.options.map((en, i) => html`<button class="option" data-i="${i}"><span class="key">${i + 1}</span><span class="opt-label">${en}</span></button>`)}</div>`);
   const say = () => sayAs(root, s.speaker, speechOf(item));
   $('.say-inline', root).addEventListener('click', say);
@@ -729,7 +748,7 @@ function renderChoice(root, s) {
   const grid = ['kana', 'romaji'].includes(ex.answerKind) || (ex.answerKind === 'jp' && ['kanji', 'radical'].includes(item.type));
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
     ${promptFor(root, s, ex, item)}
-    ${item.type === 'kana' && item.example ? html`<div class="kana-hint"><button class="link hint-btn">💡 Hint</button><div class="hint-body" hidden>${kanaExample(item, { asHint: true })}</div></div>` : ''}
+    ${item.type === 'kana' && item.example ? html`<div class="kana-hint"><button class="link hint-btn">💡 ${t('Hint')}</button><div class="hint-body" hidden>${kanaExample(item, { asHint: true })}</div></div>` : ''}
     ${memoryHint(item, ex.kind === 'en2jp' || ex.kind === 'jp2en')}
     <div class="options ${grid ? 'grid' : 'list'}">${ex.options.map((id, i) => html`<button class="option" data-id="${id}"><span class="key">${i + 1}</span>${optionHtml(optionItem(ex, id), ex)}</button>`)}</div>`);
   wirePlay(root, s);
@@ -792,13 +811,13 @@ function renderBuild(root, s) {
   let prompt;
   if (ex.mode === 'jp2en') prompt = promptFor(root, s, { ...ex, prompt: 'jp' }, item);
   else if (ex.mode === 'audio') prompt = speakerBubble(s, playButtons(speechOf(item)));
-  else if (ex.mode === 'fast') prompt = speakerBubble(s, html`${playButtons(speechOf(item), { slow: false })}<p class="muted small">Natural speed — no slow mode!</p>`);
+  else if (ex.mode === 'fast') prompt = speakerBubble(s, html`${playButtons(speechOf(item), { slow: false })}<p class="muted small">${t('Natural speed — no slow mode!')}</p>`);
   else prompt = speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span>
     ${ex.mode === 'spell' && ex.hint ? html`<div class="romaji-hint">${item.romaji}</div>` : ''}</div>`);
 
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
     ${prompt}
-    <div class="answer-line" aria-label="Your answer"></div>
+    <div class="answer-line" aria-label="${t('Your answer')}"></div>
     <div class="bank">${ex.tiles.map((t, i) => tileButton(ex, i, jpTiles))}</div>`);
   wirePlay(root, s, ex.mode === 'fast' ? { fast: true } : {});
   if (ex.mode === 'audio' || ex.mode === 'jp2en') sayAs(root, s.speaker, speechOf(item));
@@ -892,7 +911,7 @@ function renderMatch(root, s) {
             }
           }
           s.current = { ...ex, itemIds: left.filter((id) => !wrongIds.has(id)) };
-          result(root, s, true, { meaning: wrongIds.size ? `${wrongIds.size} mix-up${wrongIds.size > 1 ? 's' : ''} — they'll come back at the end` : 'All matched!' });
+          result(root, s, true, { meaning: wrongIds.size ? t(wrongIds.size > 1 ? '{n} mix-ups — they\'ll come back at the end' : '{n} mix-up — it\'ll come back at the end', { n: wrongIds.size }) : t('All matched!') });
         }
       } else {
         wrongIds.add(l.dataset.id);
@@ -908,10 +927,10 @@ function renderMatch(root, s) {
 function renderSpeak(root, s) {
   const ex = s.current;
   const item = ITEMS.get(ex.itemId);
-  mount($('.lesson-body', root), html`<p class="instruction">Listen, then say it out loud</p>
-    ${speakerBubble(s, html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="Play">${icon('speaker', 22)}</button>
+  mount($('.lesson-body', root), html`<p class="instruction">${t('Listen, then say it out loud')}</p>
+    ${speakerBubble(s, html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="${t('Play')}">${icon('speaker', 22)}</button>
       <div class="speak-text"><div class="jp-lg fit">${jpItem(item, true)}</div><div class="muted">${item.en}</div></div>`)}
-    <div class="mic-area"><button class="mic" aria-label="Start speaking">${icon('mic', 40)}</button><p class="mic-status">Tap the microphone and repeat.</p></div>`);
+    <div class="mic-area"><button class="mic" aria-label="${t('Start speaking')}">${icon('mic', 40)}</button><p class="mic-status">${t('Tap the microphone and repeat.')}</p></div>`);
   wirePlay(root, s);
   sayAs(root, s.speaker, speechOf(item));
   let tries = 0;
@@ -922,16 +941,16 @@ function renderSpeak(root, s) {
     stopSpeaking();
     if (!s.timer) startTimer(root, s, timeLimit(ex));
     mic.classList.add('listening');
-    status.textContent = 'Listening…';
+    status.textContent = t('Listening…');
     const heard = await listen();
     mic.classList.remove('listening');
     const targets = [item.text || item.jp, ...(item.alt || [])];
     if (speechMatches(heard, targets)) {
-      status.textContent = `You said: ${heard[0]}`;
+      status.textContent = t('You said: {w}', { w: heard[0] });
       result(root, s, true, { meaning: `${item.text || item.jp} — ${item.en}` });
     } else if (++tries < 2) {
       sfx('wrong');
-      status.textContent = heard.length ? `I heard “${heard[0]}”. Try again!` : "I didn't catch that. Try again!";
+      status.textContent = heard.length ? t('I heard “{w}”. Try again!', { w: heard[0] }) : t('I didn\'t catch that. Try again!');
     } else {
       result(root, s, false, { answerText: item.text || item.jp, meaning: L.latin ? item.en : item.romaji, noHeart: true });
     }
@@ -942,15 +961,15 @@ function renderSpeak(root, s) {
 function renderGrammar(root, s) {
   const g = GRAMMAR[s.current.grammarId];
   const blocks = html`<div class="g-blocks">${g.blocks.map((b) => html`<div class="g-block g-${b.role}"><span class="jp" lang="${LANG_ATTR}">${jpChunk(b.jp, true)}</span><small>${b.en}</small></div>`)}</div>`;
-  mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">Grammar in 15 seconds</span></p>
+  mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">${t('Grammar in 15 seconds')}</span></p>
     <div class="card grammar-card"><h2>${g.title}</h2>${blocks}<p class="g-en">= ${g.en}</p><p>${g.rule}</p><p class="muted small">💡 ${g.tip}</p></div>`);
   speak(joinChunks(g.blocks.map((b) => b.jp)), { speaker: s.speaker });
-  footer(root, s, { canCheck: true, text: 'Test me (15 s)', onCheck: () => grammarCheck(root, s, g) });
+  footer(root, s, { canCheck: true, text: t('Test me (15 s)'), onCheck: () => grammarCheck(root, s, g) });
 }
 
 function grammarCheck(root, s, g) {
   const { check } = g;
-  mount($('.lesson-body', root), html`<p class="instruction">Fill the gap — ${check.en}</p>
+  mount($('.lesson-body', root), html`<p class="instruction">${t('Fill the gap — {en}', { en: check.en })}</p>
     <div class="g-blocks g-quiz">${check.prompt.map((c) => (c ? html`<div class="g-block g-noun"><span class="jp" lang="${LANG_ATTR}">${jpChunk(c, true)}</span></div>` : html`<div class="g-block g-gap">?</div>`))}</div>
     <div class="options grid">${check.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key">${i + 1}</span><span class="jp jp-lg" lang="${LANG_ATTR}">${jpChunk(o, true)}</span></button>`)}</div>`);
   startTimer(root, s, 15);
@@ -1011,7 +1030,7 @@ function renderDialogue(root, s) {
       <div class="dl-cast"><div class="person-wrap" data-who="${a}">${person(a, 84)}<span class="person-name">${nameOf(a)}</span></div>
         <div class="person-wrap" data-who="${b}">${person(b, 84)}<span class="person-name">${nameOf(b)}</span></div></div>
       <div class="dl-lines">${d.lines.map((l, i) => html`<div class="dl-line side-${l.who}" data-i="${i}" hidden><span class="dl-who">${nameOf(d.cast[l.who])}</span><span class="jp dl-jp">…</span><small class="dl-en" hidden>${l.en}</small></div>`)}</div>
-      <button class="link replay-dl" hidden>${icon('play', 14)} Listen again</button>
+      <button class="link replay-dl" hidden>${icon('play', 14)} ${t('Listen again')}</button>
     </div>
     <div class="dl-question" hidden><p class="instruction">${ex.instruction}</p>
       <div class="options list">${ex.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key">${i + 1}</span><span class="opt-label">${o}</span></button>`)}</div></div>`);
@@ -1055,7 +1074,7 @@ function renderDialogue(root, s) {
     const btn = $$('.dl-question .option', root)[Number(key) - 1];
     if (btn && !$('.dl-question', root).hidden) pickIt(btn);
   };
-  footer(root, s, { canCheck: false, text: 'Listen…', onCheck: () => {}, skip: { label: t("Can't listen now"), onSkip: () => skipListening(root, s, 'listen') } });
+  footer(root, s, { canCheck: false, text: t('Listen…'), onCheck: () => {}, skip: { label: t("Can't listen now"), onSkip: () => skipListening(root, s, 'listen') } });
 }
 
 function renderTidbit(root, s) {
@@ -1063,8 +1082,8 @@ function renderTidbit(root, s) {
   // Mostly a fun fact about the country; about one break in four shows a kanji to spot (it then comes back in Practice).
   const tid = nextTidbit(app.state, Math.random, ['fact', 'kanji'], { facts: unit?.facts });
   app.save();
-  mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">Quick break</span></p>
-    ${speakerBubble(s, tid.kind === 'kanji' ? `Here's a ${L.charOne} you'll see in ${L.country}…` : `Did you know? A fun fact about ${L.country}…`)}
+  mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">${t('Quick break')}</span></p>
+    ${speakerBubble(s, tid.kind === 'kanji' ? t('Here\'s a {thing} you\'ll see in {country}…', { thing: L.charOne, country: L.country }) : t('Did you know? A fun fact about {country}…', { country: L.country }))}
     ${tidbitCard(tid.kind, tid.item)}`);
   $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   wireShare($('.lesson-body', root));
@@ -1092,19 +1111,25 @@ function finish(root, s) {
   app.inLesson = false;
   const now = app.now();
   const bonusXp = Math.min(SPEED_BONUS_MAX, s.speedBonus);
-  const summary = completeSession(app.state, { node: s.node, mode: s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp });
+  // Testing out of a unit: first-pass accuracy decides; passing marks the unit's lessons as played once.
+  const passed = s.testOut && s.passAnswered > 0 && 1 - s.passWrong / s.passAnswered >= TESTOUT_PASS;
+  const summary = completeSession(app.state, { node: s.testOut ? null : s.node, mode: s.testOut ? 'test' : s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp });
+  const skipped = passed ? testOutUnit(app.state, s.node.unit) : 0;
   app.save();
   sfx('complete');
   const secs = Math.round((now - s.startedAt) / 1000);
   const accuracy = s.answered ? Math.round(((s.answered - s.mistakes) / s.answered) * 100) : 100;
-  const title = t(s.mode === 'practice' ? 'Practice complete!' : s.node?.kind === 'story' ? 'Story complete!' : summary.perfect ? 'Perfect lesson!' : 'Lesson complete!');
+  const title = s.testOut ? t(passed ? 'Unit skipped — nice!' : 'Not quite yet')
+    : t(s.mode === 'practice' ? 'Practice complete!' : s.node?.kind === 'story' ? 'Story complete!' : summary.perfect ? 'Perfect lesson!' : 'Lesson complete!');
   const extras = [];
-  if (summary.streakExtended) extras.push(html`<p class="pill pill-orange">${icon('flame', 16)} ${summary.streak} day streak!</p>`);
+  if (s.testOut) extras.push(html`<p class="pill ${passed ? 'pill-green' : 'pill-orange'}">${passed ? t('{n} lessons unlocked as played', { n: skipped }) : t('You need {n}% to skip — the lessons will get you there', { n: Math.round(TESTOUT_PASS * 100) })}</p>`);
+  if (summary.streakExtended) extras.push(html`<p class="pill pill-orange">${icon('flame', 16)} ${t('{n} day streak!', { n: summary.streak })}</p>`);
+  if (summary.milestone) extras.push(html`<p class="pill pill-gold">${icon('flame', 16)} ${t('{n}-day streak milestone!', { n: summary.milestone })}</p>`);
   if (bonusXp) extras.push(html`<p class="pill pill-gold">${icon('bolt', 16)} ${t('Speed bonus +{n} XP', { n: bonusXp })}</p>`);
-  if (summary.goalReached) extras.push(html`<p class="pill pill-gold">${icon('star', 16)} Daily goal reached! +5 gems</p>`);
-  if (summary.mistakesCleared) extras.push(html`<p class="pill pill-green">${icon('check', 16)} All mistakes fixed! +5 gems</p>`);
-  if (s.mode === 'practice') extras.push(html`<p class="pill pill-red">${icon('heart', 16)} +1 heart</p>`);
-  if (summary.levelUp && s.node?.kind !== 'review') extras.push(html`<p class="pill pill-green">${icon('star', 16)} Level ${summary.levelUp} of ${MAX_LEVEL}</p>`);
+  if (summary.goalReached) extras.push(html`<p class="pill pill-gold">${icon('star', 16)} ${t('Daily goal reached! +5 gems')}</p>`);
+  if (summary.mistakesCleared) extras.push(html`<p class="pill pill-green">${icon('check', 16)} ${t('All mistakes fixed! +5 gems')}</p>`);
+  if (s.mode === 'practice') extras.push(html`<p class="pill pill-red">${icon('heart', 16)} ${t('+1 heart')}</p>`);
+  if (summary.levelUp && s.node?.kind !== 'review') extras.push(html`<p class="pill pill-green">${icon('star', 16)} ${t('Level {a} of {b}', { a: summary.levelUp, b: MAX_LEVEL })}</p>`);
 
   mount(root, html`<div class="complete">
     <div class="petals" aria-hidden="true">${raw(Array.from({ length: 28 }, (_, i) => `<i style="--i:${i};--x:${(i * 37) % 100}"></i>`).join(''))}</div>
@@ -1112,19 +1137,22 @@ function finish(root, s) {
     <h1>${title}</h1>
     <div class="extras">${extras}</div>
     <div class="result-tiles">
-      <div class="result gold"><span>Total XP</span><b>${icon('bolt', 20)} ${summary.xp}</b></div>
-      <div class="result green"><span>${accuracy === 100 ? 'Amazing' : 'Accuracy'}</span><b>${icon('check', 20)} ${accuracy}%</b></div>
-      <div class="result blue"><span>Time</span><b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b></div>
+      <div class="result gold"><span>${t('Total XP')}</span><b>${icon('bolt', 20)} ${summary.xp}</b></div>
+      <div class="result green"><span>${t(accuracy === 100 ? 'Amazing' : 'Accuracy')}</span><b>${icon('check', 20)} ${accuracy}%</b></div>
+      <div class="result blue"><span>${t('Time')}</span><b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b></div>
     </div>
     ${weekStrip(now)}
-    ${s.node?.kind === 'review' ? html`<div class="trophy-share">${art('🏆', 'art-lg')}<div><b>${s.node.unit.title} trophy earned!</b>${shareButton(`🏆 I earned the "${s.node.unit.title}" trophy learning ${L.name} with Hajime! ${summary.streak > 1 ? `🔥 ${summary.streak} day streak.` : ''}`, 'Share on WhatsApp')}</div></div>` : ''}
+    ${s.node?.kind === 'review' && !s.testOut ? html`<div class="trophy-share">${art('🏆', 'art-lg')}<div><b>${t('{unit} trophy earned!', { unit: s.node.unit.title })}</b>${shareButton(`🏆 I earned the "${s.node.unit.title}" trophy learning ${L.name} with Hajime! ${summary.streak > 1 ? `🔥 ${summary.streak} day streak.` : ''}`, t('Share on WhatsApp'))}</div></div>` : ''}
     <button class="btn btn-primary btn-block continue">${t('Continue')}</button>
   </div>`);
   wireShare(root);
   $('.continue', root).addEventListener('click', () => {
     const go = () => app.go(location.hash.startsWith('#/lab') ? '#/lab' : s.mode === 'practice' ? '#/practice' : '#/learn');
-    if (summary.goalReached) rewardPopup({ kind: 'bonus', title: 'Daily goal reached!', reward: html`${icon('gem', 30)} +5 gems`, text: 'Come back tomorrow to keep your streak going.', onDone: go });
-    else go();
+    const afterGoal = () => (summary.milestone
+      ? rewardPopup({ kind: 'bonus', title: t('{n}-day streak!', { n: summary.milestone }), reward: html`${icon('flame', 30)} ${summary.milestone}`, text: t(summary.milestone >= 100 ? 'A hundred days in a row. Legendary!' : summary.milestone >= 30 ? 'A whole month without missing a day. Amazing!' : 'A full week in a row. Keep it going!'), onDone: go })
+      : go());
+    if (summary.goalReached) rewardPopup({ kind: 'bonus', title: t('Daily goal reached!'), reward: html`${icon('gem', 30)} +5 gems`, text: t('Come back tomorrow to keep your streak going.'), onDone: afterGoal });
+    else afterGoal();
   });
 }
 

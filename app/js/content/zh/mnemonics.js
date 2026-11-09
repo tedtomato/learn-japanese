@@ -182,4 +182,52 @@ export const MNEMONICS = {
   'w-ha1ha1': '“Hah-hah” — the same laugh in every language 😂',
   'w-zhen1de-ma': '“Jun duh mah?” — “June, the ma?” Really?! 😮',
   'w-jia1you2': '“Jyah-yo!” — add fuel (jiā yóu): go for it! ⛽💪',
+  // everyday verbs, calendar, negation, questions, pronouns
+  'w-lai2': '“Lie!” — a cat lies down and you call it: come here! 🐈', // 来
+  'w-chi1': '“Chir!” — the sound of slurping noodles as you eat 🍜', // 吃
+  'w-he1': '“Huh!” — gulp, gasp, “huh!” after a big drink 🥤', // 喝
+  'w-xiang3': '“Shyang!” — a bulb over your head: you think and want a thing 💡', // 想
+  'w-you3': '“Yo!” — “Yo, I have it!” you shout, holding up your prize 🤲', // 有
+  'w-xu1yao4': '“Shoo-yow!” — a yowling cat says shoo, I need food NOW 😾', // 需要
+  'w-shi4': '“Shir” — like “sure”: yes, that is so ✅', // 是
+  'w-shuo1': '“Shwo!” — “show” your voice: you speak 🗣️', // 说
+  'w-dong3': '“Dong!” — a bell goes dong in your head: I understand! 🔔', // 懂
+  'w-mai3': '“My!” — “My, my, I will buy that!” 🛍️', // 买
+  'w-kan4': '“Kahn” — “can” you see it? look! 👀', // 看
+  'w-hui2': '“Hway” — you whey-hey back home, returning 🔁', // 回
+  'w-shi2yi1': '“Shir-ee” — ten, then one more: eleven 🔢', // 十一
+  'w-er4shi2': '“Are-shir” — “are sure” there are twenty? two tens 🔢', // 二十
+  'w-wu3shi2': '“Woo-shir” — five tens, “woo” for a full hand ✋ fifty', // 五十
+  'w-jiu3shi2jiu3': '“Jyo-shir-jyo” — nine tens and nine, one short of a hundred 🔢', // 九十九
+  'w-yi4bai3': '“Ee-buy” — “E, buy!” one hundred of them 💯', // 一百
+  'w-fen1': '“Fun” — a minute is a tiny slice of fun time 🕐', // 分
+  'w-fen1zhong1': '“Fun-jong” — a minute of fun that goes “dong!” on the clock ⏱️', // 分钟
+  'w-yi2ke4': '“Ee-kuh” — a quarter of the clock face, one slice of a cake 🍰', // 一刻
+  'w-xing1qi1yi1': '“Shing-chee-ee” — Monday is star-day number one ⭐', // 星期一
+  'w-xing1qi1wu3': '“Shing-chee-woo” — Friday is star-day five: “woo-hoo!” weekend near 🎉', // 星期五
+  'w-xing1qi1tian1': '“Shing-chee-tyen” — star-day sky: the lazy Sunday sky ☀️', // 星期天
+  'w-jin1tian1': '“Jin-tyen” — gin and a tiny sky: today’s sunny ☀️', // 今天
+  'w-ming2tian1': '“Ming-tyen” — “meaning of tomorrow” bright in the sky 🌄', // 明天
+  'w-yue4': '“Yweh” — a wet “you-eh?” at the moon: what month? 🌙', // 月
+  'w-hao4': '“How!” — “How many?” the day number on the calendar 📍', // 号
+  'w-shi2yi1yue4': '“Shir-ee-yweh” — the moon after ten: month eleven 🌙', // 十一月
+  'w-zuo2tian1': '“Zwaw-tyen” — “swore” yesterday’s sky was grey ⏭️', // 昨天
+  'w-bu4': '“Boo!” — a ghost says no, never, not! 👻', // 不
+  'w-mei2': '“May” — “may I?” — “no, you did not!” ❌', // 没
+  'w-mei2you3': '“May-yo” — “May? Yo!” — nope, none to have 🤷', // 没有
+  'w-le': '“Luh” — a little full stop: done, finished! 🏁', // 了
+  'w-yi3jing1': '“Ee-jing” — the bell goes “ding” already, it’s over ⏱️', // 已经
+  'w-hai2mei2': '“Hi may” — you wave “hi, may I?” — not yet! ⏭️', // 还没
+  'w-gang1cai2': '“Gahng-tsai” — gone, “tie” cut: it happened just now ⌚', // 刚才
+  'w-shei2': '“Shay?” — “Shay, who’s there?” 🧍', // 谁
+  'w-shen2me-shi2hou': '“Shun-muh shir-ho” — “shun my sure ho”: when will it be? 🕐', // 什么时候
+  'w-wei4shen2me': '“Way-shun-muh” — “way, shun, mum?” Why?! 🤷', // 为什么
+  'w-na3ge': '“Nah-guh” — “nah, guh”: which one? I can’t pick 🎯', // 哪个
+  'w-duo1shao': '“Dwaw-shaow” — “dough, shall I?” how much dough? 💯', // 多少
+  'w-zen3me': '“Dzun-muh” — “zoom mom!” how did you get there? 🛣️', // 怎么
+  'w-ji3': '“Jee” — a small “gee, how many?” — just a few 🔟', // 几
+  'w-wo3men': '“Waw-mun” — “wow, men!” all of us together 🧑‍🤝‍🧑', // 我们
+  'w-ni3men': '“Nee-mun” — “knee men”: you whole group 👫', // 你们
+  'w-ta1men': '“Tah-mun” — “ta-ma-men”: them, over there 🧍', // 他们
+  'w-na4ge': '“Nah-guh” — pointing far away: nah, that one over there 👇', // 那个
 };

@@ -116,6 +116,47 @@ export const GRAMMAR = {
     tip: '太贵了 = too expensive! The tone of voice tells which.',
     check: { prompt: ['太', '牛', null], en: 'So awesome!', options: ['了', '吗', '的'], answer: '了' },
   },
+  svo: {
+    title: 'Subject + verb + object',
+    rule: 'Word order is just like English: who + does + what. The verb never changes: 我吃, 你吃, 他吃.',
+    blocks: [{ jp: '我', role: 'noun', en: 'I' }, { jp: '吃', role: 'verb', en: 'eat' }, { jp: '饺子', role: 'noun', en: 'dumplings' }],
+    en: 'I eat dumplings.',
+    tip: 'Want to do something? Put 想 before the second verb: 我想吃 = I want to eat.',
+    check: { prompt: ['我', null, '饺子'], en: 'I eat dumplings', options: ['吃', '是', '很'], answer: '吃' },
+  },
+  time: {
+    title: 'When? Time goes before the verb',
+    rule: 'Put the time first or right after the subject. There is no word for "at" or "on": 七点 = at seven, 星期一 = on Monday.',
+    blocks: [{ jp: '星期五', role: 'noun', en: 'on Friday' }, { jp: '我', role: 'noun', en: 'I' }, { jp: '去', role: 'verb', en: 'go' }, { jp: '北京', role: 'noun', en: 'Beijing' }],
+    en: 'On Friday I go to Beijing.',
+    tip: 'Big to small: 十一月二十号 (month, then day), 星期五三点 (day, then hour). Dates read from big to small.',
+    check: { prompt: ['星期五', '我', null, '北京'], en: 'On Friday I go to Beijing', options: ['去', '在', '很'], answer: '去' },
+  },
+  mei: {
+    title: '没 — "didn\'t / haven\'t"',
+    rule: 'Put 没 before the verb to say something did not happen. "Don\'t have" is 没有. 不 is for habits, wishes and the future.',
+    blocks: [{ jp: '我', role: 'noun', en: 'I' }, { jp: '没', role: 'particle', en: 'didn\'t' }, { jp: '去', role: 'verb', en: 'go' }, { jp: '北京', role: 'noun', en: 'Beijing' }],
+    en: 'I didn\'t go to Beijing.',
+    tip: 'After 没 the 了 disappears: 我去了 (I went) but 我没去 (I didn\'t go) — never 没去了.',
+    check: { prompt: ['他', null, '来'], en: 'He didn\'t come', options: ['没', '很', '吗'], answer: '没' },
+  },
+  men: {
+    title: '们 — making "we / you all / they"',
+    rule: 'Add 们 after a person word to make it plural: 我们 = we, 你们 = you (all), 他们 = they.',
+    blocks: [{ jp: '我', role: 'noun', en: 'I' }, { jp: '们', role: 'particle', en: '(plural)' }, { jp: '是', role: 'verb', en: 'are' }, { jp: '朋友', role: 'noun', en: 'friends' }],
+    en: 'We are friends.',
+    tip: 'Only for people (and pets): two friends is 两个朋友 — don\'t add 们 after a number.',
+    check: { prompt: ['我', null, '是', '学生'], en: 'We are students', options: ['们', '的', '了'], answer: '们' },
+  },
+  qwords: {
+    title: '谁 / 什么 / 哪个 — question words',
+    rule: 'A question word simply takes the place of the answer. The word order doesn\'t change, and you don\'t add 吗.',
+    blocks: [{ jp: '他', role: 'noun', en: 'he' }, { jp: '是', role: 'verb', en: 'is' }, { jp: '谁', role: 'noun', en: 'who' }],
+    en: 'Who is he?',
+    tip: 'When? and why? go before the verb: 你什么时候去? 你为什么不去? Never 吗 with a question word.',
+    check: { prompt: ['他', '是', null], en: 'Who is he?', options: ['谁', '吗', '很'], answer: '谁' },
+  },
+
 };
 
 // Particles and small words, for "Explain my answer".
@@ -156,4 +197,31 @@ export const GLOSSARY = {
   叫: { en: 'be called / call', note: '我叫安娜 = my name is Anna. 叫医生 = call a doctor.' },
   安娜: { en: 'Anna (a name)', note: 'Foreign names are written with characters for their sounds.' },
   可爱: { en: 'cute', note: 'Pronounced kě\'ài.' },
+  们: { en: '(plural of people)', note: 'After a person word: 我们 = we, 你们 = you all, 他们 = they.' },
+  她: { en: 'she / her', note: 'Sounds exactly like 他 (tā). Only the written character shows who: 女 = a woman.' },
+  它: { en: 'it', note: 'Also tā! For animals and things; the plural is 它们.' },
 };
+
+// Verb forms: the verb itself never changes — 不 and 没 go in front, 了 comes after.
+// forms: label → Chinese; formsRomaji: the same in pinyin (one syllable per character, 不 written as spoken).
+export const CONJUGATIONS = [
+  { id: 'qu', verb: '去', meaning: 'to go', forms: { 'affirmative': '去', 'negative (不)': '不去', 'completed (了)': '去了', 'did not (没)': '没去' },
+    formsRomaji: { 'affirmative': 'qù', 'negative (不)': 'bú qù', 'completed (了)': 'qù le', 'did not (没)': 'méi qù' }, example: { jp: '我去了北京', romaji: 'wǒ qù le Běijīng', en: 'I went to Beijing' } },
+  { id: 'lai', verb: '来', meaning: 'to come', forms: { 'affirmative': '来', 'negative (不)': '不来', 'completed (了)': '来了', 'did not (没)': '没来' },
+    formsRomaji: { 'affirmative': 'lái', 'negative (不)': 'bù lái', 'completed (了)': 'lái le', 'did not (没)': 'méi lái' }, example: { jp: '他没来', romaji: 'tā méi lái', en: 'He didn\'t come' } },
+  { id: 'chi', verb: '吃', meaning: 'to eat', forms: { 'affirmative': '吃', 'negative (不)': '不吃', 'completed (了)': '吃了', 'did not (没)': '没吃' },
+    formsRomaji: { 'affirmative': 'chī', 'negative (不)': 'bù chī', 'completed (了)': 'chī le', 'did not (没)': 'méi chī' }, example: { jp: '我不吃肉', romaji: 'wǒ bù chī ròu', en: 'I don\'t eat meat' } },
+  { id: 'he', verb: '喝', meaning: 'to drink', forms: { 'affirmative': '喝', 'negative (不)': '不喝', 'completed (了)': '喝了', 'did not (没)': '没喝' },
+    formsRomaji: { 'affirmative': 'hē', 'negative (不)': 'bù hē', 'completed (了)': 'hē le', 'did not (没)': 'méi hē' }, example: { jp: '我不喝咖啡', romaji: 'wǒ bù hē kāfēi', en: 'I don\'t drink coffee' } },
+  { id: 'mai', verb: '买', meaning: 'to buy', forms: { 'affirmative': '买', 'negative (不)': '不买', 'completed (了)': '买了', 'did not (没)': '没买' },
+    formsRomaji: { 'affirmative': 'mǎi', 'negative (不)': 'bù mǎi', 'completed (了)': 'mǎi le', 'did not (没)': 'méi mǎi' }, example: { jp: '我买了票', romaji: 'wǒ mǎi le piào', en: 'I bought a ticket' } },
+  { id: 'kan', verb: '看', meaning: 'to look / watch', forms: { 'affirmative': '看', 'negative (不)': '不看', 'completed (了)': '看了', 'did not (没)': '没看' },
+    formsRomaji: { 'affirmative': 'kàn', 'negative (不)': 'bú kàn', 'completed (了)': 'kàn le', 'did not (没)': 'méi kàn' }, example: { jp: '我看了熊猫', romaji: 'wǒ kàn le xióngmāo', en: 'I saw the pandas' } },
+  { id: 'shuo', verb: '说', meaning: 'to speak', forms: { 'affirmative': '说', 'negative (不)': '不说', 'completed (了)': '说了', 'did not (没)': '没说' },
+    formsRomaji: { 'affirmative': 'shuō', 'negative (不)': 'bù shuō', 'completed (了)': 'shuō le', 'did not (没)': 'méi shuō' }, example: { jp: '你说英语吗', romaji: 'nǐ shuō Yīngyǔ ma', en: 'Do you speak English?' } },
+  { id: 'dong', verb: '懂', meaning: 'to understand', forms: { 'affirmative': '懂', 'negative (不)': '不懂', 'completed (了)': '懂了', 'did not (没)': '没懂' },
+    formsRomaji: { 'affirmative': 'dǒng', 'negative (不)': 'bù dǒng', 'completed (了)': 'dǒng le', 'did not (没)': 'méi dǒng' }, example: { jp: '我不懂', romaji: 'wǒ bù dǒng', en: 'I don\'t understand' } },
+  { id: 'hui', verb: '回', meaning: 'to go back', forms: { 'affirmative': '回', 'negative (不)': '不回', 'completed (了)': '回了', 'did not (没)': '没回' },
+    formsRomaji: { 'affirmative': 'huí', 'negative (不)': 'bù huí', 'completed (了)': 'huí le', 'did not (没)': 'méi huí' }, example: { jp: '你想回酒店吗', romaji: 'nǐ xiǎng huí jiǔdiàn ma', en: 'Do you want to go back to the hotel?' } },
+];
+

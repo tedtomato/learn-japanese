@@ -4,6 +4,7 @@ import { app, modal } from '../app.js';
 import { html, $ } from '../dom.js';
 import { icon } from '../icons.js';
 import { dayKey, displayStreak, studiedToday } from '../progress.js';
+import { t } from '../strings.js';
 
 const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
 
@@ -33,13 +34,13 @@ export function showStreakCalendar() {
 
   modal(html`<div class="streak-cal">
     <div class="streak-head"><span class="streak-flame ${studiedToday(state, now) ? 'on' : ''}">${icon('flame', 40)}</span>
-      <div><b>${streak} day streak</b><small>${studiedToday(state, now) ? 'You studied today. See you tomorrow!' : streak ? 'Do a lesson today to keep it going.' : 'Do a lesson today to start a streak.'}</small></div></div>
-    <div class="cal-nav"><button class="icon-btn cal-prev" aria-label="Previous month">‹</button><b class="cal-title"></b><button class="icon-btn cal-next" aria-label="Next month">›</button></div>
+      <div><b>${t('{n} day streak', { n: streak })}</b><small>${t(studiedToday(state, now) ? 'You studied today. See you tomorrow!' : streak ? 'Do a lesson today to keep it going.' : 'Do a lesson today to start a streak.')}</small></div></div>
+    <div class="cal-nav"><button class="icon-btn cal-prev" aria-label="${t('Previous month')}">‹</button><b class="cal-title"></b><button class="icon-btn cal-next" aria-label="${t('Next month')}">›</button></div>
     <div class="cal-grid cal-weekdays">${WEEKDAYS.map((w) => html`<span>${w}</span>`)}</div>
     <div class="cal-grid cal-days"></div>
-    <div class="streak-stats"><div><b>${Math.max(state.streak.best, streak)}</b><small>Best streak</small></div><div><b>${daysStudied}</b><small>Days studied</small></div><div><b>${state.streak.freezes}</b><small>Streak freezes</small></div></div>
-    <p class="muted small cal-legend"><i class="dot studied"></i>Studied <i class="dot goal"></i>Daily goal reached</p>
-  </div>`, [{ label: 'Close', kind: 'secondary' }]);
+    <div class="streak-stats"><div><b>${Math.max(state.streak.best, streak)}</b><small>${t('Best streak')}</small></div><div><b>${daysStudied}</b><small>${t('Days studied')}</small></div><div><b>${state.streak.freezes}</b><small>${t('Streak freezes')}</small></div></div>
+    <p class="muted small cal-legend"><i class="dot studied"></i>${t('Studied')} <i class="dot goal"></i>${t('Daily goal reached')}</p>
+  </div>`, [{ label: t('Close'), kind: 'secondary' }]);
 
   const render = () => {
     const root = $('#modal');

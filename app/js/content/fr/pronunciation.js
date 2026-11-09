@@ -1,0 +1,25 @@
+// Pronunciation tips for the French course, shown as small lessons between exercises.
+// `example` is French (spoken aloud); `say` respells it for English speakers, with the
+// stressed syllable in capitals. `icon` is a name from the tidbits emoji set (app/js/tidbits.js).
+export const PRONUNCIATION = [
+  { id: 'liaison', title: 'Liaison: a hidden consonant', text: 'A normally silent final consonant is pronounced when the next word starts with a vowel, and it joins that word. Les is "lay", but les amis is "lay-za-MEE". The s sounds like z.', example: 'les amis', say: 'lay-zah-MEE', icon: 'speech' },
+  { id: 'nasal-an', title: 'Nasal vowels: an, en', text: 'Say "ah" but let the air come out through your nose, and do not pronounce the n. An and en sound the same: enfant, dans, vent.', example: 'enfant', say: 'ahn-FAHN', icon: 'speech' },
+  { id: 'nasal-on', title: 'Nasal vowels: on', text: 'Round your lips as for "oh" and send the sound through your nose. The n is not pronounced as a separate letter.', example: 'bonjour', say: 'bohn-ZHOOR', icon: 'speech' },
+  { id: 'nasal-in', title: 'Nasal vowels: in, ain, un', text: 'In, ain, ein and un are close to the vowel in "can" said through the nose, with no n at the end.', example: 'le pain', say: 'luh PAN', icon: 'bread' },
+  { id: 'silent-final', title: 'Silent final letters', text: 'Most final consonants are not pronounced: petit, Paris, trop, vous, beaucoup. A few (c, r, f, l, as in "careful") often are: sac, bonjour, neuf, hôtel.', example: 'Paris', say: 'pa-REE', icon: 'city' },
+  { id: 'r', title: 'The French r', text: 'It is made at the back of the throat, like a soft gargle or the sound when you clear your throat gently. Never roll it with the tongue tip.', example: 'rue', say: 'rew (r at the back of the throat)', icon: 'speech' },
+  { id: 'u-ou', title: 'u versus ou', text: 'For u, say "ee" and then round your lips as if to whistle. Ou is simply "oo" as in "food". Tu (you) and tout (all) are different words.', example: 'tu', say: 'tew', icon: 'speech' },
+  { id: 'accents-e', title: 'é, è, ê: three kinds of e', text: 'É sounds like "ay" in "day" without gliding. È and ê are more open, like the "e" in "bed". Accents change the sound, so they are part of the spelling.', example: 'été', say: 'ay-TAY', icon: 'sun' },
+  { id: 'eu', title: 'eu and œu', text: 'Say "ay" with your lips rounded, close to the "u" in "fur". It appears in peu, deux, heure and sœur.', example: 'sœur', say: 'suhr', icon: 'flower' },
+  { id: 'oi', title: 'oi sounds like "wa"', text: 'Oi is always "wah", never "oy": moi, toi, voir, au revoir, bonsoir.', example: 'au revoir', say: 'oh ruh-VWAHR', icon: 'bowing' },
+  { id: 'ch', title: 'ch is "sh"', text: 'Ch is the "sh" of "shop" in French, not the "ch" of "chair". It appears in chat, chaud and chambre.', example: 'chat', say: 'shah', icon: 'cat' },
+  { id: 'j-g', title: 'j and soft g are "zh"', text: 'J, and g before e or i, sound like the "s" in "measure". Je, jour, rouge, manger. G before a, o or u is hard, as in "go": gare, gâteau.', example: 'je mange', say: 'zhuh MAHNZH', icon: 'food' },
+  { id: 'gn', title: 'gn sounds like "ny"', text: 'Gn is like the "ni" in "onion": one smooth sound, as in montagne, champagne and agneau.', example: 'la montagne', say: 'lah mohn-TAN-yuh', icon: 'mountain' },
+  { id: 'h-silent', title: 'The silent h', text: 'H is never pronounced, so words with h act as if they start with a vowel: l\'hôtel, l\'hiver, j\'habite. The article is shortened and liaison is made.', example: 'l\'hôtel', say: 'lo-TEL', icon: 'hotel' },
+  { id: 'cedilla', title: 'ç: the soft c', text: 'C is "k" before a, o or u, and "s" before e or i. The cedilla under ç tells you it is an "s" even before a, o or u.', example: 'ça va', say: 'sah VAH', icon: 'star' },
+  { id: 'stress', title: 'The stress falls on the last syllable', text: 'French gives equal weight to each syllable, and the last one of a phrase is slightly longer. Do not stress the first syllable as in English: chocolat, restaurant, hôtel.', example: 'chocolat', say: 'sho-ko-LAH', icon: 'music' },
+  { id: 'ill', title: 'ille: usually "ee-yuh"', text: 'In most words -ille sounds like "ee-yuh": fille, famille, gentille. A few common ones say "eel": ville, mille, tranquille.', example: 'la famille', say: 'lah fa-MEE-yuh', icon: 'house' },
+  { id: 'qu', title: 'qu is just "k"', text: 'Qu is a plain "k", without the "w" of English: qui, quatre, quand, que, musique.', example: 'quatre', say: 'KA-truh', icon: 'speech' },
+  { id: 'e-muet', title: 'The faint final e', text: 'The e at the end of a word is silent, but it makes the consonant before it sound: petit is "puh-TEE" while petite is "puh-TEET". A final e inside a word can be a light "uh" or disappear.', example: 'petite', say: 'puh-TEET', icon: 'flower' },
+  { id: 'intonation', title: 'Questions go up', text: 'Questions with no question word rise at the end: Tu viens? Statements fall. Questions with où, quand or comment fall too.', example: 'Tu viens?', say: 'tew VYAN?', icon: 'speech' },
+];

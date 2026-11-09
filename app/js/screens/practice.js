@@ -11,7 +11,7 @@ import { art } from '../art.js';
 import { speak } from '../audio.js';
 import { strength } from '../srs.js';
 import { learnedItemIds, dueItemIds, mistakeIds, backupStale } from '../progress.js';
-import { KINDS, emojiFor, phraseSpeech, tidbitCard } from '../tidbits.js';
+import { KINDS, phraseSpeech, tidbitCard } from '../tidbits.js';
 import { wireShare } from '../share.js';
 import { QUIZ_MIN_FACTS, seenFacts } from './factquiz.js';
 import { signScenes, SIGNS_MIN } from './signs.js';
@@ -19,6 +19,7 @@ import { missionCards } from './mission.js';
 import { toneChart } from './tones.js';
 import { drillCards } from './drill.js';
 import { jpItem, speechOf } from '../lesson/text.js';
+import { t } from '../strings.js';
 
 const level = (st) => (st === 0 ? 'none' : st < 0.34 ? 'weak' : st < 0.67 ? 'mid' : 'strong');
 
@@ -49,6 +50,12 @@ let lastTab = 'words';
 // (collections and everything learned).
 let lastSection = 'today';
 const SECTIONS = [['today', 'Today', '🔁'], ['games', 'Games', '🎮'], ['library', 'Library', '📚']];
+// A word's picture, for phrasebook rows whose phrase is also a taught word.
+let artByText = null;
+const phraseArt = (p) => {
+  artByText ||= new Map([...ITEMS.values()].filter((i) => i.art && i.jp).map((i) => [i.jp, i.art]));
+  return artByText.get(p.jp.replace(/[～~]/g, '')) || '';
+};
 
 const LEVEL_NAME = { strong: 'Strong', mid: 'Okay', weak: 'Fading', none: 'Not learned' };
 const DAY = 24 * 60 * 60 * 1000;
@@ -59,17 +66,17 @@ function explainMeter(item, state, now) {
   const st = strength(rec, now);
   const answers = (rec.right || 0) + (rec.wrong || 0);
   const days = Math.round(((rec.due || now) - now) / DAY);
-  const next = !rec.seen ? 'after your first answer' : days <= 0 ? (now - rec.due > DAY ? 'overdue — practise it soon' : 'today') : days === 1 ? 'tomorrow' : `in ${days} days`;
+  const next = !rec.seen ? t('after your first answer') : days <= 0 ? (now - rec.due > DAY ? t('overdue — practise it soon') : t('today')) : days === 1 ? t('tomorrow') : t('in {n} days', { n: days });
   modal(html`<div class="meter-help">
     <p class="meter-word"><span class="jp">${item.jp}</span> · ${item.en}</p>
     <span class="meter meter-lg s-${level(st)}"><i style="width:${Math.round(st * 100)}%"></i></span>
-    <p><b>${LEVEL_NAME[level(st)]}</b> — ${Math.round(st * 100)}% known</p>
+    <p><b>${t(LEVEL_NAME[level(st)])}</b> — ${t('{n}% known', { n: Math.round(st * 100) })}</p>
     <ul>
-      <li>Right <b>${rec.right || 0}</b> of <b>${answers}</b> times</li>
-      <li>Next review: <b>${next}</b></li>
+      <li>${t('Right {a} of {b} times', { a: rec.right || 0, b: answers })}</li>
+      <li>${t('Next review:')} <b>${next}</b></li>
     </ul>
-    <p class="muted small">The bar shows how well you know it: mostly how often you answer it right, plus how well it has stuck between reviews (full once you remember it after a few days). Reviews then space out — 1 day, 3 days, a week, 2 weeks, 5 weeks — and the bar fades if one is overdue. <b>Green</b> strong · <b>yellow</b> okay · <b>orange</b> fading.</p>
-  </div>`, [{ label: 'Got it', kind: 'secondary' }]);
+    <p class="muted small">${t('The bar shows how well you know it: mostly how often you answer it right, plus how well it has stuck between reviews (full once you remember it after a few days). Reviews then space out — 1 day, 3 days, a week, 2 weeks, 5 weeks — and the bar fades if one is overdue. Green strong · yellow okay · orange fading.')}</p>
+  </div>`, [{ label: t('Got it'), kind: 'secondary' }]);
 }
 
 // Travel situations answered with real-looking signs, from the first kanji learned.
@@ -77,20 +84,20 @@ function signsCard(state) {
   const n = signScenes(state).length;
   if (!Object.keys(state.items).some((id) => id.startsWith('kj-'))) return '';
   return html`<a class="card kanji-practice" href="${n >= SIGNS_MIN ? '#/signs' : '#/practice'}"><span class="kanji-chip">${art('🪧', 'art-row')}</span>
-    <div><b>Sign spotter</b><small>${n >= SIGNS_MIN ? 'Exits, toilets, station signs — tap the right one · +1 gem each' : `Learn a few more travel ${L.chars} (exits, toilets…) to unlock`}</small></div>
-    <span class="btn btn-secondary" ${n >= SIGNS_MIN ? '' : 'aria-disabled="true"'}>${n >= SIGNS_MIN ? 'Play' : '🔒'}</span></a>`;
+    <div><b>${t('Sign spotter')}</b><small>${n >= SIGNS_MIN ? t('Exits, toilets, station signs — tap the right one · +1 gem each') : t('Learn a few more travel {what} (exits, toilets…) to unlock', { what: L.chars })}</small></div>
+    <span class="btn btn-secondary" ${n >= SIGNS_MIN ? '' : 'aria-disabled="true"'}>${n >= SIGNS_MIN ? t('Play') : '🔒'}</span></a>`;
 }
 
 // Words got wrong lately, until answered right again; fixing them all earns 5 gems.
 function mistakesCard(state) {
   const ids = mistakeIds(state);
   if (!ids.length) return Object.values(state.items).some((r) => r.wrong)
-    ? html`<section class="card kanji-practice mistakes-card done"><span class="kanji-chip">${art('✨', 'art-row')}</span><div><b>No mistakes to fix</b><small>Everything you got wrong has been put right</small></div></section>`
+    ? html`<section class="card kanji-practice mistakes-card done"><span class="kanji-chip">${art('✨', 'art-row')}</span><div><b>${t('No mistakes to fix')}</b><small>${t('Everything you got wrong has been put right')}</small></div></section>`
     : '';
   const preview = ids.slice(0, 3).map((id) => ITEMS.get(id).en).join(' · ');
   return html`<section class="card kanji-practice mistakes-card"><span class="kanji-chip">${art('🎯', 'art-row')}</span>
-    <div><b>Fix your mistakes (${ids.length})</b><small>${preview}${ids.length > 3 ? ' …' : ''}</small><small>Fix them all: +5 gems</small></div>
-    <button class="btn btn-secondary start-mistakes">Start</button></section>`;
+    <div><b class="title-count">${t('Fix your mistakes')} <span class="pill pill-orange">${ids.length}</span></b><small>${preview}${ids.length > 3 ? ' …' : ''}</small><small>${t('Fix them all: +5 gems')}</small></div>
+    <button class="btn btn-secondary start-mistakes">${t('Start')}</button></section>`;
 }
 
 export function renderPractice(root, focus) {
@@ -106,7 +113,7 @@ export function renderPractice(root, focus) {
     .map((it) => ({ it, st: strength(state.items[it.id], now) })).sort((x, y) => x.st - y.st);
   const kanji = uniqueKanji(learned.map((id) => ITEMS.get(id)).filter((i) => ['kanji', 'radical', 'kword'].includes(i.type)), state, now);
   // The bar sits in a bigger tap area that explains it.
-  const meter = (st, id) => html`<span class="meter-hit" data-meter="${id}" role="button" aria-label="What this bar means"><span class="meter s-${level(st)}"><i style="width:${Math.round(st * 100)}%"></i></span></span>`;
+  const meter = (st, id) => html`<span class="meter-hit" data-meter="${id}" role="button" aria-label="${t('What this bar means')}"><span class="meter s-${level(st)}"><i style="width:${Math.round(st * 100)}%"></i></span></span>`;
   const reading = (k) => (k.type === 'kword' ? `${k.kana} · ${k.romaji}` : [k.kun, k.on].filter(Boolean)[0] || '');
 
   const lists = {
@@ -114,19 +121,19 @@ export function renderPractice(root, focus) {
         ${w.art ? art(w.art, 'art-row') : html`<span class="art-row"></span>`}
         <span class="word-main"><span class="word-jp">${jpItem(w, false)}</span><small>${L.latin ? w.en : `${w.romaji} · ${w.en}`}</small></span>
         ${meter(st, w.id)}</button>`)}</div>`
-      : html`<p class="muted">Words you learn will be listed here, weakest first.</p>`),
+      : html`<p class="muted">${t('Words you learn will be listed here, weakest first.')}</p>`),
     kanji: () => (kanji.length ? html`<section class="card kanji-practice">
         <span class="kanji-chip jp">${L.glyph}</span>
-        <div><b>Kanji practice</b><small>${kanji.length >= 3 ? 'Only kanji, weakest first — about 2 min' : 'Learn 3 kanji to unlock'}</small></div>
-        <button class="btn btn-secondary start-kanji" ${kanji.length >= 3 ? '' : 'disabled'}>Start</button>
+        <div><b>${t('Kanji practice')}</b><small>${kanji.length >= 3 ? t('Only kanji, weakest first — about 2 min') : t('Learn 3 kanji to unlock')}</small></div>
+        <button class="btn btn-secondary start-kanji" ${kanji.length >= 3 ? '' : 'disabled'}>${t('Start')}</button>
       </section>
       <div class="word-list">${kanji.map(({ it: k, st }) => html`<button class="word-row" data-say="${speechOf(k)}">
         <span class="kanji-chip jp ${[...k.jp].length > 1 ? 'wide' : ''} ${[...k.jp].length > 2 ? 'xwide' : ''}">${k.jp}</span>
         <span class="word-main"><b>${k.en}</b><small>${reading(k)}</small></span>
         ${meter(st, k.id)}</button>`)}</div>`
-      : html`<p class="muted">${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} lessons appear along the path from the first unit.</p>`),
+      : html`<p class="muted">${t('{what} lessons appear along the path from the first unit.', { what: L.Chars === 'Kanji' ? 'Kanji' : t('Character') })}</p>`),
     tones: () => html`${toneCard()}${toneChart()}`,
-    kana: () => html`${kanaCard('hiragana', 'あ', 'Hiragana practice')}${kanaCard('katakana', 'ア', 'Katakana practice')}<p class="muted legend"><i class="dot strong"></i>Strong <i class="dot mid"></i>Okay <i class="dot weak"></i>Fading <i class="dot none"></i>Not learned</p>
+    kana: () => html`${kanaCard('hiragana', 'あ', t('Hiragana practice'))}${kanaCard('katakana', 'ア', t('Katakana practice'))}<p class="muted legend"><i class="dot strong"></i>${t('Strong')} <i class="dot mid"></i>${t('Okay')} <i class="dot weak"></i>${t('Fading')} <i class="dot none"></i>${t('Not learned')}</p>
       <h3 class="sub-title small-title">Hiragana</h3>${chart(HIRAGANA_ROWS, state, now)}
       ${kanaCount('katakana') ? html`<h3 class="sub-title small-title">Katakana</h3>${chart(KATAKANA_ROWS, state, now)}` : ''}`,
   };
@@ -136,62 +143,63 @@ export function renderPractice(root, focus) {
     const n = kanaCount(script);
     if (!n) return '';
     return html`<section class="card kanji-practice"><span class="kanji-chip jp">${ch}</span>
-      <div><b>${title}</b><small>${n >= 3 ? 'Your weakest characters, with hints — no rush' : 'Learn 3 characters to unlock'}</small></div>
-      <button class="btn btn-secondary start-kana" data-script="${script}" ${n >= 3 ? '' : 'disabled'}>Start</button></section>`;
+      <div><b>${title}</b><small>${n >= 3 ? t('Your weakest characters, with hints — no rush') : t('Learn 3 characters to unlock')}</small></div>
+      <button class="btn btn-secondary start-kana" data-script="${script}" ${n >= 3 ? '' : 'disabled'}>${t('Start')}</button></section>`;
   };
   // Chinese: the tone trainer, from the first words learned.
   const toneCard = () => html`<a class="card kanji-practice" href="#/tones"><span class="kanji-chip">${raw('<svg width="28" height="26" viewBox="0 0 52 48"><path d="M6 24 Q20 46 30 42 T46 14" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round"/></svg>')}</span>
-    <div><b>Tone trainer</b><small>Hear a syllable, pick its tone · +1 gem each</small></div><span class="btn btn-secondary">Play</span></a>`;
+    <div><b>${t('Tone trainer')}</b><small>${t('Hear a syllable, pick its tone · +1 gem each')}</small></div><span class="btn btn-secondary">${t('Play')}</span></a>`;
   // Latin-alphabet courses only have words to list.
-  const TABS = L.latin ? [['words', 'Words', words.length]]
-    : [['words', 'Words', words.length], ['kanji', L.Chars, kanji.length], ...(L.hasKana ? [['kana', 'Kana', null]] : [['tones', 'Tones', null]])];
+  const TABS = L.latin ? [['words', t('Words'), words.length]]
+    : [['words', t('Words'), words.length], ['kanji', L.Chars, kanji.length], ...(L.hasKana ? [['kana', 'Kana', null]] : [['tones', t('Tones'), null]])];
+  // Quick games: shown only when there is at least one to show (fr / es / en have none until a quiz unlocks).
+  const quickGames = [signsCard(state), seenFacts(state).length >= QUIZ_MIN_FACTS ? html`<a class="card kanji-practice" href="#/quiz"><span class="kanji-chip">${art('❓', 'art-row')}</span>
+      <div><b>${t('Fun facts quiz')}</b><small>${t('5 questions about facts you\'ve read · +1 gem each')}</small></div><span class="btn btn-secondary">${t('Play')}</span></a>` : ''].filter(Boolean);
   if (!TABS.some(([id]) => id === tab)) tab = 'words';
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page">
-    <h1 class="page-title">Practice</h1>
-    <div class="seg practice-sections" role="tablist">${SECTIONS.map(([id, label, emo]) => html`<button role="tab" class="${id === section ? 'on' : ''}" data-section="${id}">${emo} ${label}</button>`)}</div>
+    <h1 class="page-title">${t('Practice')}</h1>
+    <div class="seg practice-sections" role="tablist">${SECTIONS.map(([id, label, emo]) => html`<button role="tab" aria-selected="${id === section}" class="${id === section ? 'on' : ''}" data-section="${id}">${emo} ${t(label)}</button>`)}</div>
 
     ${section === 'today' ? html`<section class="card practice-hero">
       ${mascot(due.length ? 'happy' : 'cheer', 84)}
       <div>
-        <h2>${learned.length ? (due.length ? `${due.length} to review` : 'All fresh!') : 'Nothing to review yet'}</h2>
+        <h2>${learned.length ? (due.length ? t('{n} to review', { n: due.length }) : t('All fresh!')) : t('Nothing to review yet')}</h2>
         <p class="muted">${learned.length
-          ? 'A quick mix of what you are close to forgetting. No hearts lost, and you earn one back.'
-          : 'Finish your first lesson and your reviews will show up here.'}</p>
-        <button class="btn btn-secondary start-practice" ${learned.length ? '' : 'disabled'}>${icon('refresh', 18)} Start practice</button>
+          ? t('A quick mix of what you are close to forgetting. No hearts lost, and you earn one back.')
+          : t('Finish your first lesson and your reviews will show up here.')}</p>
+        <button class="btn btn-secondary start-practice" ${learned.length ? '' : 'disabled'}>${icon('refresh', 18)} ${t('Start practice')}</button>
       </div>
     </section>
     ${mistakesCard(state)}
     ${backupStale(state, now) ? html`<a class="card kanji-practice backup-nudge" href="#/profile/backup"><span class="kanji-chip">${art('💾', 'art-row')}</span>
-      <div><b>Back up your progress</b><small>${state.backupAt ? 'Your last backup is over 2 weeks old' : 'Keep it safe in Google Drive — takes 10 seconds'}</small></div><span class="btn btn-secondary">Back up</span></a>` : ''}
+      <div><b>${t('Back up your progress')}</b><small>${state.backupAt ? t('Your last backup is over 2 weeks old') : t('Keep it safe in Google Drive — takes 10 seconds')}</small></div><span class="btn btn-secondary">${t('Back up')}</span></a>` : ''}
     ${words.length >= 3 ? html`<a class="card kanji-practice listen-entry" href="#/listen"><span class="kanji-chip">${art('🎧', 'art-row')}</span>
-      <div><b>Listening mode</b><small>Hands-free for walks: hear it, say it, repeat</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
+      <div><b>${t('Listening mode')}</b><small>${t('Hands-free for walks: hear it, say it, repeat')}</small></div><span class="btn btn-secondary">${t('Play')}</span></a>` : ''}
     ${L.code === 'zh' ? toneCard() : ''}
     ${kanji.length >= 3 ? html`<a class="card kanji-practice" href="#/practice/kanji-go"><span class="kanji-chip jp">${L.glyph}</span>
-      <div><b>${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} practice</b><small>Only ${L.chars}, weakest first — about 2 min</small></div><span class="btn btn-secondary">Start</span></a>` : ''}
-    <p class="muted small section-more">More to play in <button class="link" data-section="games">🎮 Games</button></p>` : ''}
+      <div><b>${t('{what} practice', { what: L.Chars === 'Kanji' ? 'Kanji' : t('Character') })}</b><small>${t('Only {what}, weakest first — about 2 min', { what: L.chars })}</small></div><span class="btn btn-secondary">${t('Start')}</span></a>` : ''}
+    <p class="muted small section-more">${t('More to play in')} <button class="link" data-section="games">🎮 ${t('Games')}</button></p>` : ''}
 
-    ${section === 'games' ? html`${MISSIONS.length ? html`<h2 class="sub-title">Missions</h2>
-    <p class="muted small list-help">Real situations in ${L.country} — one after each unit.</p>
+    ${section === 'games' ? html`${MISSIONS.length ? html`<h2 class="sub-title">${t('Missions')}</h2>
+    <p class="muted small list-help">${t('Real situations in {country} — one after each unit.', { country: L.country })}</p>
     ${missionCards(state)}` : ''}
-    <h2 class="sub-title">Quick games</h2>
-    ${signsCard(state)}
-    ${seenFacts(state).length >= QUIZ_MIN_FACTS ? html`<a class="card kanji-practice" href="#/quiz"><span class="kanji-chip">${art('❓', 'art-row')}</span>
-      <div><b>Fun facts quiz</b><small>5 questions about facts you've read · +1 gem each</small></div><span class="btn btn-secondary">Play</span></a>` : ''}
-    ${PATTERNS.length ? html`<h2 class="sub-title">Pattern drills</h2>
-    <p class="muted small list-help">One sentence, many words: swap words in until it's automatic.</p>
+    ${quickGames.length ? html`<h2 class="sub-title">${t('Quick games')}</h2>${quickGames}` : ''}
+    ${PATTERNS.length ? html`<h2 class="sub-title">${t('Pattern drills')}</h2>
+    <p class="muted small list-help">${t('One sentence, many words: swap words in until it\'s automatic.')}</p>
     ${drillCards(state)}` : ''}` : ''}
 
-    ${section === 'library' ? html`<div class="collections">
-      <a class="card collection" href="#/collection/phrase">${art('💬', 'art-col')}<b>Phrasebook</b><small>${KINDS.phrase.list.length} phrases</small></a>
-      <a class="card collection" href="#/collection/fact">${art(L.flagEmoji || '🗾', 'art-col')}<b>Fun facts</b><small>${state.seen.fact.length} / ${KINDS.fact.list.length}</small></a>
-      ${KINDS.kanji.list.length ? html`<a class="card collection" href="#/collection/kanji"><span class="col-emoji jp">${L.glyph}</span><b>${L.Chars} spotted</b><small>${state.seen.kanji.length} / ${KINDS.kanji.list.length}</small></a>` : ''}
+    ${section === 'library' ? html`<div class="collections ${KINDS.kanji.list.length ? '' : 'two'}">
+      <a class="card collection" href="#/collection/phrase">${art('💬', 'art-col')}<b>${t('Phrasebook')}</b><small>${t('{n} phrases', { n: KINDS.phrase.list.length })}</small></a>
+      <a class="card collection" href="#/collection/fact">${art(L.flagEmoji || '🗾', 'art-col')}<b>${t('Fun facts')}</b><small>${state.seen.fact.length} / ${KINDS.fact.list.length}</small></a>
+      ${KINDS.kanji.list.length ? html`<a class="card collection" href="#/collection/kanji"><span class="col-emoji jp">${L.glyph}</span><b>${t('{what} spotted', { what: L.Chars })}</b><small>${state.seen.kanji.length} / ${KINDS.kanji.list.length}</small></a>` : ''}
     </div>
 
-    <h2 class="sub-title" id="sec-learned">What you've learned</h2>
-    <div class="seg practice-tabs" role="tablist">${TABS.map(([id, label, n]) => html`<button role="tab" class="${id === tab ? 'on' : ''}" data-tab="${id}">${label}${n != null ? html` <small>${n}</small>` : ''}</button>`)}</div>
-    ${tab !== 'kana' ? html`<p class="muted small list-help">Weakest first. Tap a bar to see what it means.</p>` : ''}
+    <h2 class="sub-title" id="sec-learned">${t('What you\'ve learned')}</h2>
+    ${TABS.length > 1 ? html`<div class="seg practice-tabs" role="tablist">${TABS.map(([id, label, n]) => html`<button role="tab" aria-selected="${id === tab}" class="${id === tab ? 'on' : ''}" data-tab="${id}">${label}${n != null ? html` <small>${n}</small>` : ''}</button>`)}</div>`
+      : html`<h3 class="sub-title small-title">${TABS[0][1]} <small class="muted">${TABS[0][2]}</small></h3>`}
+    ${tab !== 'kana' ? html`<p class="muted small list-help">${t('Weakest first. Tap a bar to see what it means.')}</p>` : ''}
     <div class="practice-list">${lists[tab]()}</div>` : ''}
   </main>`);
 
@@ -231,16 +239,16 @@ export function renderCollection(root, kind) {
   });
   const locked = info.list.length - items.length;
 
-  mount(root, html`<header class="topbar topbar-back"><a class="icon-btn" href="#/practice" aria-label="Back">${icon('close', 24)}</a><h1>${info.collection}</h1></header>
+  mount(root, html`<header class="topbar topbar-back"><a class="icon-btn" href="#/practice" aria-label="${t('Back')}">${icon('close', 24)}</a><h1>${t(info.collection)}</h1></header>
   <main class="page">
     ${kind === 'fact' ? (items.length >= QUIZ_MIN_FACTS
-      ? html`<a class="card kanji-practice" href="#/quiz"><span class="kanji-chip">${art('❓', 'art-row')}</span><div><b>Quiz me</b><small>5 questions about facts you have read · +1 gem each</small></div><span class="btn btn-secondary">Start</span></a>`
-      : html`<p class="muted small">Discover ${QUIZ_MIN_FACTS} facts to unlock the quiz.</p>`) : ''}
-    ${kind !== 'phrase' ? html`<p class="muted">${items.length ? `${items.length} of ${info.list.length} found.` : 'Nothing found yet.'} ${locked ? 'Keep doing lessons to discover more — they pop up on your path and during lessons.' : 'You found them all!'}${kind === 'kanji' ? ' Spotted kanji also come back in practice, with their tip as a clue.' : ''}</p>` : html`<p class="muted">Tap a phrase to hear it.</p>`}
+      ? html`<a class="card kanji-practice" href="#/quiz"><span class="kanji-chip">${art('❓', 'art-row')}</span><div><b>${t('Quiz me')}</b><small>${t('5 questions about facts you have read · +1 gem each')}</small></div><span class="btn btn-secondary">${t('Start')}</span></a>`
+      : html`<p class="muted small">${t('Discover {n} facts to unlock the quiz.', { n: QUIZ_MIN_FACTS })}</p>`) : ''}
+    ${kind !== 'phrase' ? html`<p class="muted">${items.length ? t('{a} of {b} found.', { a: items.length, b: info.list.length }) : t('Nothing found yet.')} ${locked ? t('Keep doing lessons to discover more — they pop up on your path and during lessons.') : t('You found them all!')}${kind === 'kanji' ? ` ${t('Spotted kanji also come back in practice, with their tip as a clue.')}` : ''}</p>` : html`<p class="muted">${t('Tap a phrase to hear it.')}</p>`}
     ${[...groups].map(([g, list]) => html`${g && g !== 'Basic kanji' ? html`<h2 class="sub-title">${g}</h2>` : ''}
       ${kind === 'phrase'
         ? html`<div class="word-list">${list.map((p) => html`<button class="word-row phrase-row" data-say="${phraseSpeech(p)}">
-            ${art(emojiFor(p.icon), 'art-row')}
+            ${phraseArt(p) ? art(phraseArt(p), 'art-row') : ''}
             <span class="phrase-main"><span class="jp word-jp">${p.jp}</span><small>${p.romaji ? `${p.romaji} · ${p.en}` : `${p.say} · ${p.en}`}</small></span></button>`)}</div>`
         : html`<div class="tidbit-list">${list.map((x) => tidbitCard(kind, x))}</div>`}`)}
   </main>`);

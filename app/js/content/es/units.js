@@ -32,7 +32,7 @@ export const SECTIONS_DATA = [
         desc: 'Greet people, thank them and say sorry',
         facts: [FACT.language, FACT.life],
         phrases: ['Polite Basics'],
-        dialogues: ['d-hola'],
+        dialogues: ['d-hola', 'd-breakfast'],
         lessons: [
           { title: 'Hello', words: [
             ['hola', 'hello', '👋', { note: 'Any time of day, to anyone. The h is always silent: "OH-lah".' }],
@@ -89,7 +89,7 @@ export const SECTIONS_DATA = [
         desc: 'Stations, the metro, taxis and finding the toilet',
         facts: [FACT.city, FACT.history],
         phrases: ['Getting Around'],
-        dialogues: ['d-metro'],
+        dialogues: ['d-metro', 'd-taxi'],
         lessons: [
           { title: 'Stations', words: [
             ['la estación', 'station', '🚉', { note: 'Words ending in -ción are always feminine: la estación, la habitación.' }],
@@ -142,7 +142,7 @@ export const SECTIONS_DATA = [
         desc: 'Order tapas, say cheers and ask for the bill',
         facts: [FACT.food],
         phrases: ['Eating Out'],
-        dialogues: ['d-tapas'],
+        dialogues: ['d-tapas', 'd-lunch'],
         lessons: [
           { title: 'Ordering', words: [
             ['quiero', 'I want', '🙋', { note: 'Fine for ordering, especially with por favor. In bars people also say ¿me pones…? (will you give me…?).' }],
@@ -197,7 +197,7 @@ export const SECTIONS_DATA = [
         desc: 'Ask prices, pay by card and buy clothes',
         facts: [FACT.life, FACT.city],
         phrases: ['Shopping & Paying'],
-        dialogues: ['d-market'],
+        dialogues: ['d-market', 'd-shoes'],
         lessons: [
           { title: 'Shops', words: [
             ['la tienda', 'shop', '🏪'],
@@ -259,7 +259,7 @@ export const SECTIONS_DATA = [
         desc: 'Count, tell the time and name the days',
         facts: [FACT.life, FACT.festivals],
         phrases: ['Hotel & Practical'],
-        dialogues: ['d-time'],
+        dialogues: ['d-time', 'd-tickets'],
         lessons: [
           { title: '1 to 4', words: [
             ['uno', 'one', '1⃣', { note: 'Before a masculine noun it becomes un: un café. Feminine: una.' }],
@@ -288,6 +288,19 @@ export const SECTIONS_DATA = [
             ['catorce', 'fourteen', '🔢'],
             ['quince', 'fifteen', '🔢'],
           ] },
+          { title: '16 to 19', words: [
+            ['dieciséis', 'sixteen', '🔢', { note: 'One word: diez + y + seis squashed together. 17 to 19 work the same way.' }],
+            ['diecisiete', 'seventeen', '🔢'],
+            ['dieciocho', 'eighteen', '🔢'],
+            ['diecinueve', 'nineteen', '🔢'],
+          ] },
+          { title: 'Tens', words: [
+            ['cuarenta', 'forty', '🔢', { note: 'From 31 on, numbers are three words: cuarenta y cinco = 45.' }],
+            ['sesenta', 'sixty', '🔢'],
+            ['setenta', 'seventy', '🔢'],
+            ['ochenta', 'eighty', '🔢'],
+            ['noventa', 'ninety', '🔢', { note: 'Noventa y nueve = 99. Then cien = 100.' }],
+          ] },
           { title: 'Time', words: [
             ['la hora', 'hour / time', '⌚', { note: '¿Qué hora es? = what time is it?' }],
             ['y media', 'half past', '🕧', { note: 'Son las siete y media = it\'s half past seven. Y cuarto = quarter past.' }],
@@ -295,11 +308,27 @@ export const SECTIONS_DATA = [
             ['hoy', 'today', '📅'],
             ['mañana', 'tomorrow', '⏭', { note: 'La mañana = the morning. Mañana por la mañana = tomorrow morning.' }],
           ] },
+          { title: 'Quarter hours', words: [
+            ['y cuarto', 'quarter past', '🕐', { note: 'Son las ocho y cuarto = it\'s 8:15.' }],
+            ['menos cuarto', 'quarter to', '🕒', { note: 'Literally "minus a quarter": las nueve menos cuarto = 8:45.' }],
+            ['en punto', 'on the dot / sharp', '⏱', { note: 'Son las diez en punto = it\'s ten o\'clock exactly.' }],
+          ] },
           { title: 'Days', words: [
             ['el lunes', 'Monday', '🗒', { note: 'Days are not capitalised in Spanish. On Monday = el lunes.' }],
             ['el viernes', 'Friday', '🍻'],
             ['el sábado', 'Saturday', '🎭'],
             ['el domingo', 'Sunday', '☀', { note: 'Many shops in Spain close on Sundays.' }],
+          ] },
+          { title: 'Tuesday to Thursday', words: [
+            ['el martes', 'Tuesday', '📅', { note: 'There is a saying: en martes, ni te cases ni te embarques (on Tuesday, don\'t marry or set sail).' }],
+            ['el miércoles', 'Wednesday', '📅'],
+            ['el jueves', 'Thursday', '📅'],
+          ] },
+          { title: 'Days & dates', words: [
+            ['el día', 'day', '☀', { note: 'Masculine, despite ending in -a: el día. Buenos días = good morning.' }],
+            ['la semana', 'week', '📅', { note: 'La semana pasada = last week. La semana que viene = next week.' }],
+            ['el mes', 'month', '🌙', { note: 'Months are not capitalised: enero, mayo, diciembre.' }],
+            ['el año', 'year', '⭐', { note: 'Careful with the ñ — it is ny, as in "canyon". Without it, ano is something very different.' }],
           ] },
           { title: 'What time is it?', sentences: [
             { jp: ['qué', 'hora', 'es'], en: 'What time is it', alt: ['What\'s the time', 'What is the time'] },
@@ -313,6 +342,31 @@ export const SECTIONS_DATA = [
             { jp: ['el', 'tren', 'sale', 'a las', 'ocho'], en: 'The train leaves at eight', alt: ['The train leaves at eight o\'clock', 'The train departs at eight'] },
             { jp: ['hoy', 'es', 'sábado'], en: 'Today is Saturday', alt: ['It is Saturday today', 'It\'s Saturday today'] },
           ] },
+          { title: 'At what time?', grammar: 'time', sentences: [
+            { jp: ['a qué hora', 'sale', 'el', 'tren'], en: 'What time does the train leave', alt: ['At what time does the train leave', 'What time does the train depart', 'When does the train leave'] },
+            { jp: ['son', 'las', 'siete', 'y media'], en: 'It is half past seven', alt: ['It\'s half past seven', 'It is seven thirty', 'It\'s seven thirty', 'It is 7:30', 'It\'s 7:30'] },
+            { jp: ['el', 'tren', 'sale', 'a las', 'ocho', 'y cuarto'], en: 'The train leaves at a quarter past eight', alt: ['The train leaves at quarter past eight', 'The train leaves at 8:15', 'The train departs at a quarter past eight'] },
+            { jp: ['quedamos', 'a las', 'nueve', 'menos cuarto'], en: 'We meet at a quarter to nine', alt: ['We meet at quarter to nine', 'We\'re meeting at a quarter to nine', 'Let\'s meet at a quarter to nine', 'We meet at 8:45'] },
+            { jp: ['la', 'cena', 'es', 'a las', 'diez', 'en punto'], en: 'Dinner is at ten o\'clock sharp', alt: ['Dinner is at ten sharp', 'Dinner is at ten o\'clock', 'Dinner is at ten on the dot', 'Dinner is at 10 sharp'] },
+          ] },
+          { title: 'On Monday', sentences: [
+            { jp: ['el lunes', 'voy a', 'Madrid'], en: 'On Monday I am going to Madrid', alt: ['On Monday I\'m going to Madrid', 'I am going to Madrid on Monday', 'I\'m going to Madrid on Monday'] },
+            { jp: ['los', 'sábados', 'como', 'en', 'casa'], en: 'On Saturdays I eat at home', alt: ['I eat at home on Saturdays', 'On Saturdays I have lunch at home', 'On Saturdays I eat at home'] },
+            { jp: ['hoy', 'es', 'martes'], en: 'Today is Tuesday', alt: ['It is Tuesday today', 'It\'s Tuesday today'] },
+            { jp: ['mañana', 'es', 'miércoles'], en: 'Tomorrow is Wednesday', alt: ['Tomorrow it is Wednesday', 'Tomorrow it\'s Wednesday'] },
+          ] },
+          { title: 'Dates', sentences: [
+            { jp: ['hoy', 'es', 'cinco', 'de', 'mayo'], en: 'Today is the fifth of May', alt: ['Today is May 5th', 'Today is 5 May', 'Today is May the fifth', 'It is the fifth of May today'] },
+            { jp: ['mi', 'cumpleaños', 'es', 'el', 'diez', 'de', 'junio'], en: 'My birthday is on the tenth of June', alt: ['My birthday is the tenth of June', 'My birthday is on June 10th', 'My birthday is June 10th', 'My birthday is on 10 June'] },
+            { jp: ['una', 'semana', 'tiene', 'siete', 'días'], en: 'A week has seven days', alt: ['There are seven days in a week', 'A week has 7 days'] },
+            { jp: ['nos vemos', 'el', 'veinte', 'de', 'agosto'], en: 'See you on the twentieth of August', alt: ['See you on August 20th', 'See you on 20 August', 'See you on the 20th of August'] },
+          ] },
+          { title: 'Big numbers', sentences: [
+            { jp: ['tiene', 'sesenta', 'y', 'cinco', 'años'], en: 'He is sixty-five years old', alt: ['She is sixty-five years old', 'He is sixty-five', 'She is sixty-five', 'He\'s sixty-five', 'She\'s sixty-five', 'He is 65', 'She is 65'] },
+            { jp: ['cuesta', 'noventa', 'y', 'nueve', 'euros'], en: 'It costs ninety-nine euros', alt: ['It costs 99 euros', 'It is ninety-nine euros', 'It\'s ninety-nine euros'] },
+            { jp: ['hay', 'ochenta', 'personas'], en: 'There are eighty people', alt: ['There are 80 people'] },
+            { jp: ['dieciséis', 'más', 'cuatro', 'son', 'veinte'], en: 'Sixteen plus four is twenty', alt: ['Sixteen and four make twenty', 'Sixteen plus four equals twenty', 'Sixteen plus four are twenty'] },
+          ] },
         ],
       },
       {
@@ -321,7 +375,7 @@ export const SECTIONS_DATA = [
         desc: 'Talk about your family, friends and jobs',
         facts: [FACT.life, FACT.history],
         phrases: ['Polite Basics'],
-        dialogues: ['d-family'],
+        dialogues: ['d-family', 'd-siblings'],
         lessons: [
           { title: 'Family', words: [
             ['la familia', 'family', '🧑‍🤝‍🧑'],
@@ -353,6 +407,25 @@ export const SECTIONS_DATA = [
             ['joven', 'young', '🧑'],
             ['mayor', 'older / elderly', '🧓', { note: 'Polite for "old" about people. Mi hermano mayor = my older brother.' }],
           ] },
+          { title: 'I & you', words: [
+            ['yo', 'I', '🙋', { note: 'Usually left out: the verb ending already says who. Add it to stress "me": yo no, tú sí.' }],
+            ['tú', 'you (friendly)', '🫵', { note: 'For friends, family, people your age. In Argentina and parts of Central America: vos.' }],
+            ['usted', 'you (polite)', '🙇', { note: 'For older people and formal situations. Takes the he / she verb: ¿cómo está usted?' }],
+          ] },
+          { title: 'He, she, we, they', words: [
+            ['él', 'he', '🧑', { note: 'With an accent it means "he"; el without one is "the".' }],
+            ['ella', 'she', '🧓', { note: 'Pronounced EH-yah (EH-zhah in Argentina).' }],
+            ['nosotros', 'we', '🧑‍🤝‍🧑', { note: 'An all-women group says nosotras.' }],
+            ['vosotros', 'you all (friendly)', '🤝', { note: 'Spain only. Latin America uses ustedes for every "you all".' }],
+            ['ellos', 'they', '🧑‍🤝‍🧑', { note: 'A group of women says ellas.' }],
+          ] },
+          { title: 'Who is it?', grammar: 'pronouns', sentences: [
+            { jp: ['él', 'es', 'mi', 'hermano'], en: 'He is my brother', alt: ['He\'s my brother'] },
+            { jp: ['ella', 'es', 'mi', 'madre'], en: 'She is my mother', alt: ['She\'s my mother'] },
+            { jp: ['nosotros', 'somos', 'amigos'], en: 'We are friends', alt: ['We\'re friends'] },
+            { jp: ['ellos', 'son', 'médicos'], en: 'They are doctors', alt: ['They\'re doctors'] },
+            { jp: ['vosotros', 'sois', 'de', 'Londres'], en: 'You are from London', alt: ['You all are from London', 'You guys are from London', 'You\'re from London', 'You are all from London'] },
+          ] },
           { title: 'My family', grammar: 'possessives', sentences: [
             { jp: ['mi', 'madre', 'es', 'profesora'], en: 'My mother is a teacher', alt: ['My mum is a teacher', 'My mom is a teacher'] },
             { jp: ['mi', 'hermano', 'es', 'alto'], en: 'My brother is tall' },
@@ -373,7 +446,7 @@ export const SECTIONS_DATA = [
         desc: 'Your flat, your things and everyday verbs',
         facts: [FACT.life, FACT.city],
         phrases: ['Hotel & Practical'],
-        dialogues: ['d-flat'],
+        dialogues: ['d-flat', 'd-rent'],
         lessons: [
           { title: 'Home', words: [
             ['la casa', 'house / home', '🏠', { note: 'En casa = at home. Voy a casa = I\'m going home.' }],
@@ -406,6 +479,19 @@ export const SECTIONS_DATA = [
             ['leer', 'to read', '📚'],
             ['ir', 'to go', '🏃', { note: 'Very irregular: voy (I go), vas (you go), va (he/she goes).' }],
           ] },
+          { title: 'Be, have, want', words: [
+            ['ser', 'to be (who / what)', '🧑', { note: 'Soy, eres, es. For identity, job, origin and the time: soy médico, son las tres.' }],
+            ['estar', 'to be (how / where)', '📍', { note: 'Estoy, estás, está. For feelings and places: estoy cansado, está cerca.' }],
+            ['tener', 'to have', '🎁', { note: 'Tengo, tienes, tiene. Also age, hunger and thirst: tengo veinte años, tengo hambre.' }],
+            ['querer', 'to want / to love', '❤', { note: 'Quiero, quieres, quiere. Te quiero = I love you, said to friends and family too.' }],
+          ] },
+          { title: 'Come, buy, understand', words: [
+            ['venir', 'to come', '🫵', { note: 'Vengo, vienes, viene. ¿Vienes? = are you coming?' }],
+            ['comprar', 'to buy', '🛍', { note: 'Regular: compro, compras, compra.' }],
+            ['entender', 'to understand', '👌', { note: 'Entiendo, entiendes. No entiendo = I don\'t understand — a lifesaver.' }],
+            ['hacer', 'to do / to make', '🍳', { note: 'Hago, haces, hace. Also weather: hace sol. ¿Qué haces? = what are you doing?' }],
+            ['gustar', 'to please (me gusta = I like)', '😍', { note: 'The thing liked is the subject: me gusta el café, me gustan los gatos.' }],
+          ] },
           { title: 'Daily life', grammar: 'present', sentences: [
             { jp: ['vivo', 'en', 'Madrid'], en: 'I live in Madrid' },
             { jp: ['hablo', 'un poco', 'de', 'español'], en: 'I speak a little Spanish', alt: ['I speak a bit of Spanish', 'I speak a little bit of Spanish', 'I speak some Spanish'] },
@@ -418,6 +504,20 @@ export const SECTIONS_DATA = [
             { jp: ['hay', 'un', 'sofá', 'en', 'la', 'habitación'], en: 'There is a sofa in the room', alt: ['There\'s a sofa in the room', 'There is a sofa in the bedroom', 'There\'s a sofa in the bedroom'] },
             { jp: ['dónde', 'está', 'la', 'llave'], en: 'Where is the key', alt: ['Where\'s the key'] },
           ] },
+          { title: 'Who does what?', grammar: 'endings', sentences: [
+            { jp: ['tú', 'hablas', 'inglés'], en: 'You speak English', alt: ['You are speaking English'] },
+            { jp: ['ella', 'vive', 'en', 'Valencia'], en: 'She lives in Valencia', alt: ['She is living in Valencia'] },
+            { jp: ['él', 'come', 'jamón'], en: 'He eats ham', alt: ['He is eating ham', 'He\'s eating ham', 'He eats cured ham'] },
+            { jp: ['yo', 'compro', 'el', 'pan'], en: 'I buy the bread', alt: ['I am buying the bread', 'I\'m buying the bread'] },
+            { jp: ['tú', 'quieres', 'un', 'café'], en: 'You want a coffee', alt: ['Do you want a coffee', 'You would like a coffee'] },
+          ] },
+          { title: 'I don\'t…', grammar: 'noverb', sentences: [
+            { jp: ['no', 'hablo', 'francés'], en: 'I don\'t speak French', alt: ['I do not speak French'] },
+            { jp: ['no', 'entiendo'], en: 'I don\'t understand', alt: ['I do not understand'] },
+            { jp: ['no', 'tengo', 'hermanos'], en: 'I don\'t have any brothers or sisters', alt: ['I have no brothers or sisters', 'I don\'t have siblings', 'I have no siblings', 'I don\'t have brothers', 'I don\'t have any siblings'] },
+            { jp: ['no', 'trabajo', 'los', 'domingos'], en: 'I don\'t work on Sundays', alt: ['I do not work on Sundays', 'I don\'t work Sundays'] },
+            { jp: ['no', 'quiero', 'ir', 'a', 'casa'], en: 'I don\'t want to go home', alt: ['I do not want to go home'] },
+          ] },
         ],
       },
       {
@@ -426,7 +526,7 @@ export const SECTIONS_DATA = [
         desc: 'Sun, rain, the seasons and weekend plans',
         facts: [FACT.nature],
         phrases: ['Polite Basics'],
-        dialogues: ['d-weather'],
+        dialogues: ['d-weather', 'd-forecast'],
         lessons: [
           { title: 'Weather', words: [
             ['el sol', 'sun', '☀'],
@@ -463,6 +563,19 @@ export const SECTIONS_DATA = [
             { jp: ['voy a', 'la', 'playa'], en: 'I am going to the beach', alt: ['I\'m going to the beach', 'I go to the beach'] },
             { jp: ['vamos a', 'la', 'montaña'], en: 'We are going to the mountains', alt: ['We\'re going to the mountains', 'Let\'s go to the mountains', 'We are going to the mountain', 'We\'re going to the mountain'] },
           ] },
+          { title: 'Past times', words: [
+            ['ayer', 'yesterday', '📅', { note: 'Ayer por la noche or anoche = last night.' }],
+            ['anoche', 'last night', '🌙'],
+            ['la semana pasada', 'last week', '📅', { note: 'Pasado/a = past. El año pasado = last year.' }],
+            ['ya', 'already', '✅', { note: 'Ya he comido = I\'ve already eaten. On its own, ¡ya! can mean "okay, I get it".' }],
+          ] },
+          { title: 'Yesterday', grammar: 'past', sentences: [
+            { jp: ['ayer', 'comí', 'paella'], en: 'Yesterday I ate paella', alt: ['I ate paella yesterday', 'Yesterday I had paella', 'I had paella yesterday'] },
+            { jp: ['anoche', 'fui', 'a', 'una', 'fiesta'], en: 'Last night I went to a party', alt: ['I went to a party last night'] },
+            { jp: ['ayer', 'hablé', 'con', 'mi', 'madre'], en: 'Yesterday I spoke with my mother', alt: ['Yesterday I talked with my mother', 'Yesterday I talked to my mother', 'Yesterday I spoke to my mother', 'I spoke with my mother yesterday', 'I talked to my mother yesterday'] },
+            { jp: ['la semana pasada', 'compré', 'una', 'camiseta'], en: 'Last week I bought a T-shirt', alt: ['I bought a T-shirt last week', 'Last week I bought a shirt'] },
+            { jp: ['ayer', 'no', 'trabajé'], en: 'Yesterday I did not work', alt: ['Yesterday I didn\'t work', 'I did not work yesterday', 'I didn\'t work yesterday'] },
+          ] },
         ],
       },
     ],
@@ -477,7 +590,7 @@ export const SECTIONS_DATA = [
         desc: 'Say how you feel, what you like and keep a chat going',
         facts: [FACT.festivals, FACT.sport],
         phrases: ['Polite Basics'],
-        dialogues: ['d-party'],
+        dialogues: ['d-party', 'd-birthday'],
         lessons: [
           { title: 'Feelings', words: [
             ['contento', 'happy', '😄', { note: 'Feminine: contenta. Feelings use estar: estoy contento.' }],
@@ -509,6 +622,24 @@ export const SECTIONS_DATA = [
             ['¿en serio?', 'really?', '😲', { alt: ['en serio'] }],
             ['¡genial!', 'great!', '✨', { alt: ['genial'] }],
           ] },
+          { title: 'Question words', words: [
+            ['¿qué?', 'what?', '❓', { note: 'Always with an accent in questions: ¿qué haces? Also in exclamations: ¡qué bien!' }],
+            ['¿quién?', 'who?', '🧑', { note: 'Plural: ¿quiénes? ¿Quién es? = who is it?' }],
+            ['¿cuándo?', 'when?', '📅'],
+            ['¿cuál?', 'which? / which one?', '👉', { note: '¿Cuál prefieres? = which do you prefer? Plural: ¿cuáles?' }],
+          ] },
+          { title: 'Why, how, how much', words: [
+            ['¿por qué?', 'why?', '❔', { note: 'Two words, with an accent on qué. The answer is porque (one word, no accent): because.' }],
+            ['¿cómo?', 'how?', '🤷', { note: '¿Cómo? alone can also mean "sorry, what did you say?".' }],
+            ['¿cuánto?', 'how much?', '💰', { note: 'Changes with the noun: ¿cuánta agua? ¿cuántos años? ¿cuántas personas?' }],
+          ] },
+          { title: 'Asking questions', grammar: 'qwords', sentences: [
+            { jp: ['quién', 'es', 'ella'], en: 'Who is she', alt: ['Who is that woman', 'Who is that girl'] },
+            { jp: ['cuándo', 'sale', 'el', 'tren'], en: 'When does the train leave', alt: ['When does the train depart', 'When is the train leaving'] },
+            { jp: ['por qué', 'estás', 'triste'], en: 'Why are you sad', alt: ['Why are you upset', 'Why are you unhappy'] },
+            { jp: ['cuánto', 'cuesta', 'el', 'billete'], en: 'How much is the ticket', alt: ['How much does the ticket cost', 'How much is the train ticket'] },
+            { jp: ['cómo', 'estás'], en: 'How are you', alt: ['How are you doing', 'How are you today'] },
+          ] },
           { title: 'I like it', grammar: 'gustar', sentences: [
             { jp: ['me gusta', 'el', 'café'], en: 'I like coffee', alt: ['I like the coffee'] },
             { jp: ['me encanta', 'España'], en: 'I love Spain' },
@@ -529,7 +660,7 @@ export const SECTIONS_DATA = [
         desc: 'Get help, see a doctor and deal with lost things',
         facts: [FACT.nature, FACT.language],
         phrases: ['Help & Emergency'],
-        dialogues: ['d-pharmacy'],
+        dialogues: ['d-pharmacy', 'd-doctor'],
         lessons: [
           { title: 'Help!', words: [
             ['¡socorro!', 'help! (emergency)', '🆘', { note: 'In an emergency in Spain (and the rest of the EU) call 112.', alt: ['socorro'] }],
@@ -585,7 +716,7 @@ export const SECTIONS_DATA = [
         desc: 'Talk like a local with friends in Spain',
         facts: [FACT.language, FACT.food],
         phrases: ['Eating Out'],
-        dialogues: ['d-quedar'],
+        dialogues: ['d-quedar', 'd-cinema'],
         lessons: [
           { title: 'Spain slang', words: [
             ['guay', 'cool', '😎', { note: 'Very Spain. Mexico: padre or chido; Argentina: copado; Colombia and Venezuela: chévere.' }],
@@ -766,5 +897,182 @@ export const DIALOGUES = {
     ],
     question: 'When and where will they meet?',
     options: ['Friday at nine, at their usual bar', 'Saturday at nine, at the beach', 'Friday at noon, at the station'],
+  },  'd-breakfast': {
+    title: 'Breakfast at the hotel',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '¡Buenos días! ¿Qué tal?', en: 'Good morning! How are you?' },
+      { who: 1, jp: 'Muy bien, gracias. ¿Y tú?', en: 'Very well, thanks. And you?' },
+      { who: 0, jp: 'Bien, bien. ¿Quieres un café?', en: 'Fine, fine. Do you want a coffee?' },
+      { who: 1, jp: 'No, gracias. Un agua, por favor.', en: 'No, thanks. A water, please.' },
+    ],
+    question: 'What does she want to drink?',
+    options: ['Water', 'Coffee', 'Orange juice'],
+    questions: [
+      { question: 'What does she want to drink?', options: ['Water', 'Coffee', 'Orange juice'] },
+      { question: 'What time of day is it?', options: ['Morning', 'Evening', 'Night'] },
+    ],
+  },
+  'd-taxi': {
+    title: 'In a taxi',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Buenas tardes. Al aeropuerto, por favor.', en: 'Good afternoon. To the airport, please.' },
+      { who: 1, jp: 'Claro. ¿Terminal uno o dos?', en: 'Of course. Terminal one or two?' },
+      { who: 0, jp: 'Terminal dos. ¿Cuánto cuesta?', en: 'Terminal two. How much is it?' },
+      { who: 1, jp: 'Unos treinta euros.', en: 'About thirty euros.' },
+    ],
+    question: 'Where does she want to go?',
+    options: ['The airport', 'The station', 'The hotel'],
+    questions: [
+      { question: 'Where does she want to go?', options: ['The airport', 'The station', 'The hotel'] },
+      { question: 'About how much will it cost?', options: ['Thirty euros', 'Fifty euros', 'Thirteen euros'] },
+    ],
+  },
+  'd-lunch': {
+    title: 'Ordering lunch',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Buenas tardes. ¿Qué van a tomar?', en: 'Good afternoon. What will you have?' },
+      { who: 1, jp: 'Yo quiero la paella y un agua, por favor.', en: 'I\'d like the paella and a water, please.' },
+      { who: 0, jp: 'Muy bien. ¿Y de postre?', en: 'Very good. And for dessert?' },
+      { who: 1, jp: 'Nada, gracias. Solo la cuenta luego.', en: 'Nothing, thanks. Just the bill later.' },
+    ],
+    question: 'What does the customer order to eat?',
+    options: ['Paella', 'Fish', 'A salad'],
+    questions: [
+      { question: 'What does the customer order to eat?', options: ['Paella', 'Fish', 'A salad'] },
+      { question: 'Does she want dessert?', options: ['No', 'Yes, ice cream', 'Yes, a coffee'] },
+    ],
+  },
+  'd-shoes': {
+    title: 'Buying shoes',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Hola, ¿tiene estos zapatos en el cuarenta?', en: 'Hi, do you have these shoes in a size forty?' },
+      { who: 1, jp: 'Sí, aquí tiene. Son cincuenta euros.', en: 'Yes, here you are. They are fifty euros.' },
+      { who: 0, jp: 'Un poco caros. ¿Hay algo más barato?', en: 'A bit expensive. Is there anything cheaper?' },
+      { who: 1, jp: 'Estos son treinta euros.', en: 'These are thirty euros.' },
+    ],
+    question: 'How much are the first shoes?',
+    options: ['50 euros', '40 euros', '30 euros'],
+    questions: [
+      { question: 'How much are the first shoes?', options: ['50 euros', '40 euros', '30 euros'] },
+      { question: 'What does the customer ask for?', options: ['Something cheaper', 'A bigger size', 'A bag'] },
+    ],
+  },
+  'd-tickets': {
+    title: 'At the ticket office',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Dos billetes para Valencia, por favor.', en: 'Two tickets for Valencia, please.' },
+      { who: 1, jp: '¿Para qué día?', en: 'For which day?' },
+      { who: 0, jp: 'Para el viernes, a las ocho y media.', en: 'For Friday, at half past eight.' },
+      { who: 1, jp: 'Vale. Son sesenta euros.', en: 'Okay. That is sixty euros.' },
+    ],
+    question: 'Which day is the trip?',
+    options: ['Friday', 'Monday', 'Sunday'],
+    questions: [
+      { question: 'Which day is the trip?', options: ['Friday', 'Monday', 'Sunday'] },
+      { question: 'At what time?', options: ['8:30', '8:15', '7:30'] },
+      { question: 'How many tickets?', options: ['Two', 'Four', 'One'] },
+    ],
+  },
+  'd-siblings': {
+    title: 'Brothers and sisters',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '¿Tienes hermanos?', en: 'Do you have brothers or sisters?' },
+      { who: 1, jp: 'Sí, tengo una hermana y un hermano.', en: 'Yes, I have a sister and a brother.' },
+      { who: 0, jp: '¿Cuántos años tienen?', en: 'How old are they?' },
+      { who: 1, jp: 'Mi hermana tiene veinte y mi hermano, quince.', en: 'My sister is twenty and my brother, fifteen.' },
+    ],
+    question: 'What does she have?',
+    options: ['A sister and a brother', 'Two sisters', 'Only a brother'],
+    questions: [
+      { question: 'What does she have?', options: ['A sister and a brother', 'Two sisters', 'Only a brother'] },
+      { question: 'How old is her sister?', options: ['Twenty', 'Fifteen', 'Twelve'] },
+    ],
+  },
+  'd-rent': {
+    title: 'Renting a room',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Hola, llamo por la habitación.', en: 'Hi, I\'m calling about the room.' },
+      { who: 1, jp: 'Sí, es una habitación pequeña con cama y mesa.', en: 'Yes, it is a small room with a bed and a table.' },
+      { who: 0, jp: '¿Cuánto cuesta al mes?', en: 'How much is it per month?' },
+      { who: 1, jp: 'Trescientos euros. ¿Quieres verla el sábado?', en: 'Three hundred euros. Do you want to see it on Saturday?' },
+    ],
+    question: 'What is the room like?',
+    options: ['Small, with a bed and a table', 'Big, with a kitchen', 'Small, with a sofa'],
+    questions: [
+      { question: 'What is the room like?', options: ['Small, with a bed and a table', 'Big, with a kitchen', 'Small, with a sofa'] },
+      { question: 'When can she see it?', options: ['Saturday', 'Friday', 'Sunday'] },
+    ],
+  },
+  'd-forecast': {
+    title: 'Checking the forecast',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '¿Qué tiempo hace hoy?', en: 'What\'s the weather like today?' },
+      { who: 1, jp: 'Hace frío y llueve.', en: 'It\'s cold and it\'s raining.' },
+      { who: 0, jp: '¿Y mañana?', en: 'And tomorrow?' },
+      { who: 1, jp: 'Mañana hace sol, pero hace mucho viento.', en: 'Tomorrow it\'s sunny, but very windy.' },
+    ],
+    question: 'What is the weather today?',
+    options: ['Cold and rainy', 'Hot and sunny', 'Snowy'],
+    questions: [
+      { question: 'What is the weather today?', options: ['Cold and rainy', 'Hot and sunny', 'Snowy'] },
+      { question: 'What about tomorrow?', options: ['Sunny but windy', 'Rainy', 'Hot'] },
+    ],
+  },
+  'd-birthday': {
+    title: 'A birthday',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: '¡Feliz cumpleaños, Ana!', en: 'Happy birthday, Ana!' },
+      { who: 1, jp: '¡Gracias! ¿Cuántos años crees que tengo?', en: 'Thanks! How old do you think I am?' },
+      { who: 0, jp: '¿Treinta?', en: 'Thirty?' },
+      { who: 1, jp: 'Casi: ¡treinta y cinco!', en: 'Nearly: thirty-five!' },
+    ],
+    question: 'How old is Ana?',
+    options: ['35', '30', '25'],
+    questions: [
+      { question: 'How old is Ana?', options: ['35', '30', '25'] },
+      { question: 'What is the occasion?', options: ['A birthday', 'A wedding', 'A holiday'] },
+    ],
+  },
+  'd-doctor': {
+    title: 'At the doctor\'s',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Buenos días. ¿Qué le duele?', en: 'Good morning. What hurts?' },
+      { who: 1, jp: 'Me duele la espalda desde ayer.', en: 'My back has hurt since yesterday.' },
+      { who: 0, jp: '¿Tiene fiebre?', en: 'Do you have a fever?' },
+      { who: 1, jp: 'No, pero estoy muy cansada.', en: 'No, but I\'m very tired.' },
+    ],
+    question: 'What hurts?',
+    options: ['Her back', 'Her head', 'Her stomach'],
+    questions: [
+      { question: 'What hurts?', options: ['Her back', 'Her head', 'Her stomach'] },
+      { question: 'Does she have a fever?', options: ['No', 'Yes', 'The doctor does not ask'] },
+    ],
+  },
+  'd-cinema': {
+    title: 'Going to the cinema',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: '¿Vamos al cine esta noche?', en: 'Shall we go to the cinema tonight?' },
+      { who: 1, jp: '¡Venga! ¿A qué hora?', en: 'Sure! What time?' },
+      { who: 0, jp: 'A las siete y media.', en: 'At half past seven.' },
+      { who: 1, jp: 'Guay. Nos vemos en la puerta.', en: 'Cool. See you at the door.' },
+    ],
+    question: 'What do they plan to do?',
+    options: ['Go to the cinema', 'Go to a party', 'Eat out'],
+    questions: [
+      { question: 'What do they plan to do?', options: ['Go to the cinema', 'Go to a party', 'Eat out'] },
+      { question: 'What time?', options: ['7:30', '7:00', '9:30'] },
+      { question: 'Where do they meet?', options: ['At the door', 'At the bar', 'At the station'] },
+    ],
   },
 };

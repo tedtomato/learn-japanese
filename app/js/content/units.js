@@ -32,6 +32,7 @@ export const SECTIONS_DATA = [
         desc: 'Greet people and thank them the right way',
         facts: [FACT.society, FACT.wellness],
         phrases: ['Key Polite Basics'],
+        dialogues: ['d-morning', 'd-farewell'],
         lessons: [
           { title: 'Hello', words: [
             ['こんにちは', 'konnichiwa', 'hello', '👋', { note: 'The everyday hello, from late morning to evening.' }],
@@ -80,7 +81,7 @@ export const SECTIONS_DATA = [
         desc: 'Stations, trains and finding the toilet',
         facts: [FACT.transport, FACT.city],
         phrases: ['Getting Around & Transit'],
-        dialogues: ['d-station'],
+        dialogues: ['d-station', 'd-taxi'],
         lessons: [
           { title: 'Trains', words: [
             ['えき', 'eki', 'station', '🚉', { alt: ['駅'] }],
@@ -118,7 +119,7 @@ export const SECTIONS_DATA = [
         desc: 'Order, say cheers and pay the bill',
         facts: [FACT.food],
         phrases: ['Dining & Food'],
-        dialogues: ['d-coffee'],
+        dialogues: ['d-coffee', 'd-bill'],
         lessons: [
           { title: 'Ordering', words: [
             ['これ', 'kore', 'this', '👇'],
@@ -193,10 +194,17 @@ export const SECTIONS_DATA = [
         title: 'Numbers, prices & time',
         desc: 'Count, read prices in yen and tell the time',
         facts: [FACT.society, FACT.festivals],
+        dialogues: ['d-time', 'd-yen'],
         lessons: [
           { title: '1 to 3', words: [['いち', 'ichi', 'one', '1️⃣'], ['に', 'ni', 'two', '2️⃣'], ['さん', 'san', 'three', '3️⃣']] },
           { title: '4 to 6', words: [['よん', 'yon', 'four', '4️⃣', { note: 'Also し, but よん is safer — し sounds like "death".' }], ['ご', 'go', 'five', '5️⃣'], ['ろく', 'roku', 'six', '6️⃣']] },
           { title: '7 to 10', words: [['なな', 'nana', 'seven', '7️⃣', { note: 'Also しち (shichi), as in しちじ = 7 o\'clock.' }], ['はち', 'hachi', 'eight', '8️⃣'], ['きゅう', 'kyuu', 'nine', '9️⃣', { note: 'Also く (ku), as in くじ = 9 o\'clock.' }], ['じゅう', 'juu', 'ten', '🔟']] },
+          { title: 'Tens', words: [
+            ['じゅう', 'juu', 'ten', '🔟', { note: 'Numbers are built like Lego: 11 = じゅういち (10 + 1), 25 = にじゅうご (2 × 10 + 5).', alt: ['十'] }],
+            ['にじゅう', 'nijuu', 'twenty', '🔢', { note: 'に (2) + じゅう (10). 21 is にじゅういち.', alt: ['二十'] }],
+            ['さんじゅう', 'sanjuu', 'thirty', '🔢', { note: 'さん (3) + じゅう (10). 99 is きゅうじゅうきゅう (9 × 10 + 9).', alt: ['三十'] }],
+            ['ごじゅう', 'gojuu', 'fifty', '🔢', { note: 'ご (5) + じゅう (10). 100 is ひゃく.', alt: ['五十'] }],
+          ] },
           { title: 'Big numbers', words: [
             ['ひゃく', 'hyaku', 'hundred', '💯', { note: '500 = ごひゃく (five hundred). 300 is さんびゃく — the sound softens.', alt: ['百'] }],
             ['せん', 'sen', 'thousand', '🪙', { note: '2,000 = にせん. 3,000 is さんぜん.', alt: ['千'] }],
@@ -208,11 +216,23 @@ export const SECTIONS_DATA = [
             ['はん', 'han', 'half past', '🕧', { note: 'After the hour: さんじはん = half past three.', alt: ['半'] }],
             ['いま', 'ima', 'now', '⌚', { alt: ['今'] }],
           ] },
+          { title: 'Minutes, a.m. & p.m.', words: [
+            ['ふん', 'fun', 'minute', '⏱️', { note: 'After a number: ごふん = 5 minutes. After 1, 3, 4, 6, 8 and 10 it sounds like ぷん: いっぷん, さんぷん, よんぷん, ろっぷん, はっぷん, じゅっぷん.', alt: ['分', 'ぷん'] }],
+            ['ごぜん', 'gozen', 'a.m. (morning)', '🌄', { note: 'Before the hour: ごぜん しちじ = 7 a.m.', alt: ['午前'] }],
+            ['ごご', 'gogo', 'p.m. (afternoon)', '🌉', { note: 'Before the hour: ごご さんじ = 3 p.m.', alt: ['午後'] }],
+          ] },
           { title: 'How much? What time?', grammar: 'desu', sentences: [
             { jp: ['ごひゃく', 'えん', 'です'], romaji: 'gohyaku en desu', en: 'It is 500 yen', alt: ['It\'s 500 yen', '500 yen'] },
             { jp: ['せん', 'えん', 'です'], romaji: 'sen en desu', en: 'It is 1,000 yen', alt: ['It\'s 1000 yen', 'It is 1000 yen', '1000 yen'] },
             { jp: ['いま', 'なんじ', 'です', 'か'], romaji: 'ima nanji desu ka', en: 'What time is it now', alt: ['What time is it'] },
             { jp: ['さんじ', 'はん', 'です'], romaji: 'sanji han desu', en: 'It is half past three', alt: ['It\'s half past three', 'It is 3:30', 'It\'s 3:30'] },
+          ] },
+          { title: 'Counting on', sentences: [
+            { jp: ['ごじゅう', 'えん', 'です'], romaji: 'gojuu en desu', en: 'It is 50 yen', alt: ['It\'s 50 yen', '50 yen'] },
+            { jp: ['ひゃく', 'ごじゅう', 'えん', 'です'], romaji: 'hyaku gojuu en desu', en: 'It is 150 yen', alt: ['It\'s 150 yen', '150 yen'] },
+            { jp: ['いま', 'ごご', 'さんじ', 'です'], romaji: 'ima gogo sanji desu', en: 'It is 3 p.m. now', alt: ['It\'s 3 p.m. now', 'It is 3 pm now', 'It\'s 3 pm now', 'It is 3 p.m.', 'It is 3 pm'] },
+            { jp: ['ごぜん', 'しちじ', 'はん', 'です'], romaji: 'gozen shichiji han desu', en: 'It is 7:30 a.m.', alt: ['It\'s 7:30 a.m.', 'It is 7:30 am', 'It\'s 7:30 am', 'It is half past seven in the morning'] },
+            { jp: ['いま', 'さんじ', 'じゅうごふん', 'です'], romaji: 'ima sanji juugofun desu', en: 'It is 3:15 now', alt: ['It\'s 3:15 now', 'It is 3:15', 'It\'s 3:15', 'It is a quarter past three'] },
           ] },
         ],
       },
@@ -222,6 +242,7 @@ export const SECTIONS_DATA = [
         desc: 'Check in, find your room, Wi-Fi and breakfast',
         facts: [FACT.daily, FACT.wellness],
         phrases: ['Practical Everyday Questions & Phrases'],
+        dialogues: ['d-checkin', 'd-breakfast'],
         lessons: [
           { title: 'Checking in', words: [
             ['よやく', 'yoyaku', 'reservation', '📋', { alt: ['予約'] }],
@@ -237,7 +258,9 @@ export const SECTIONS_DATA = [
             ['パスワード', 'pasuwaado', 'password', '🔐'],
             ['にもつ', 'nimotsu', 'luggage', '🧳', { alt: ['荷物'] }],
           ] },
-          { title: 'At the front desk', grammar: 'subj', sentences: [
+          { title: 'At the front desk', grammar: 'subj', words: [
+            ['あります', 'arimasu', 'there is / I have', '📋', { note: 'Polite "there is / have" for things (not people or animals — those use います).' }],
+          ], sentences: [
             { jp: ['よやく', 'が', 'あります'], romaji: 'yoyaku ga arimasu', en: 'I have a reservation', alt: ['I have a booking', 'I\'ve got a reservation'] },
             { jp: ['チェックイン', 'を', 'おねがいします'], romaji: 'chekkuin o onegaishimasu', en: 'Check-in please', alt: ['I would like to check in', 'Check in please'] },
             { jp: ['ワイファイ', 'の', 'パスワード', 'は'], romaji: 'waifai no pasuwaado wa', en: 'What is the Wi-Fi password', alt: ['The Wi-Fi password?', 'What\'s the Wi-Fi password'] },
@@ -255,6 +278,7 @@ export const SECTIONS_DATA = [
         desc: 'A table for two, recommendations, allergies and one more drink',
         facts: [FACT.food],
         phrases: ['Dining & Food'],
+        dialogues: ['d-table', 'd-allergy'],
         lessons: [
           { title: 'Table for…', words: [
             ['ひとり', 'hitori', 'one person', '🧍', { note: 'Counting people: ひとり, ふたり, then さんにん (3)…', alt: ['一人'] }],
@@ -286,6 +310,7 @@ export const SECTIONS_DATA = [
         desc: 'Platforms, changing trains, the next stop and taxis',
         facts: [FACT.transport],
         phrases: ['Getting Around & Transit'],
+        dialogues: ['d-platform', 'd-transfer'],
         lessons: [
           { title: 'On the platform', words: [
             ['ホーム', 'hoomu', 'platform', '🚉', { note: 'From the English "platform" — Japanese uses only the end.' }],
@@ -295,6 +320,7 @@ export const SECTIONS_DATA = [
           ] },
           { title: 'Going places', words: [
             ['いきます', 'ikimasu', 'go / goes (polite)', '➡️', { note: 'The polite form of "to go".', alt: ['行きます'] }],
+            ['きます', 'kimasu', 'come / comes (polite)', '🫵', { note: 'いきます goes away from here, きます comes toward you.', alt: ['来ます'] }],
             ['まで', 'made', 'to / until', '🏁', { note: 'After a place: ホテル まで = to the hotel.' }],
             ['きょうと', 'kyouto', 'Kyoto', '⛩️', { alt: ['京都'] }],
           ] },
@@ -316,6 +342,7 @@ export const SECTIONS_DATA = [
         desc: 'Pharmacy, doctor, police and "I\'m lost"',
         facts: [FACT.daily, FACT.wellness],
         phrases: ['Important Locations & Emergency'],
+        dialogues: ['d-pharmacy', 'd-doctor'],
         lessons: [
           { title: 'Feeling ill', words: [
             ['いたい', 'itai', 'it hurts', '🤕', { alt: ['痛い'] }],
@@ -356,7 +383,7 @@ export const SECTIONS_DATA = [
         title: 'People & jobs',
         desc: 'Introduce yourself and say what you do',
         facts: [FACT.society],
-        dialogues: ['d-meet'],
+        dialogues: ['d-meet', 'd-friend'],
         lessons: [
           { title: 'Me and you', words: [
             ['わたし', 'watashi', 'I / me', '🙋', { alt: ['私'] }],
@@ -386,6 +413,24 @@ export const SECTIONS_DATA = [
             { jp: ['わたし', 'の', 'なまえ', 'は', 'ゆき', 'です'], romaji: 'watashi no namae wa yuki desu', en: 'My name is Yuki' },
             { jp: ['たなか', 'さん', 'は', 'せんせい', 'です', 'か'], romaji: 'tanaka san wa sensei desu ka', en: 'Is Mr Tanaka a teacher', alt: ['Is Ms Tanaka a teacher', 'Is Tanaka a teacher'] },
           ] },
+          { title: 'He, she, we', words: [
+            ['かれ', 'kare', 'he / boyfriend', '🧍', { note: 'Also "boyfriend". Japanese often uses the name + さん instead of "he".', alt: ['彼'] }],
+            ['かのじょ', 'kanojo', 'she / girlfriend', '🧍', { note: 'Also "girlfriend". Like かれ, it is used less than "she" in English.', alt: ['彼女'] }],
+            ['わたしたち', 'watashitachi', 'we / us', '🧑‍🤝‍🧑', { note: 'たち makes a group: わたし → わたしたち. "They" is かれら.', alt: ['私たち', '私達'] }],
+            ['みなさん', 'minasan', 'everyone / all of you', '👫', { note: 'The polite way to address a group: みなさん、こんにちは！', alt: ['皆さん'] }],
+          ] },
+          { title: 'This, that, over there', words: [
+            ['それ', 'sore', 'that (near you)', '👉', { note: 'Three distances: これ (near me), それ (near you), あれ (far from both).' }],
+            ['あれ', 'are', 'that (over there)', '🗼', { note: 'Far from both of you: あれ は えき です = that over there is the station.' }],
+            ['そこ', 'soko', 'there (near you)', '📍', { note: 'ここ (here), そこ (there), あそこ (over there).' }],
+            ['あそこ', 'asoko', 'over there', '🏯', { note: 'Pointing far away: あそこ に トイレ が あります.' }],
+          ] },
+          { title: 'Who is who?', sentences: [
+            { jp: ['かれ', 'は', 'せんせい', 'です'], romaji: 'kare wa sensei desu', en: 'He is a teacher', alt: ['He\'s a teacher', 'My boyfriend is a teacher'] },
+            { jp: ['かのじょ', 'は', 'いしゃ', 'です'], romaji: 'kanojo wa isha desu', en: 'She is a doctor', alt: ['She\'s a doctor', 'My girlfriend is a doctor'] },
+            { jp: ['わたしたち', 'は', 'がくせい', 'です'], romaji: 'watashitachi wa gakusei desu', en: 'We are students', alt: ['We\'re students'] },
+            { jp: ['あれ', 'は', 'えき', 'です'], romaji: 'are wa eki desu', en: 'That over there is the station', alt: ['That is the station', 'That\'s the station', 'Over there is the station'] },
+          ] },
         ],
       },
       {
@@ -393,6 +438,7 @@ export const SECTIONS_DATA = [
         title: 'Food words',
         desc: 'What you eat, and what you like',
         facts: [FACT.food],
+        dialogues: ['d-lunch', 'd-like'],
         lessons: [
           { title: 'Meals', words: [
             ['ごはん', 'gohan', 'rice / meal', '🍚', { alt: ['ご飯'] }],
@@ -418,10 +464,152 @@ export const SECTIONS_DATA = [
         ],
       },
       {
+        id: 'verbs',
+        title: 'Verbs: do and don\'t',
+        desc: 'Say what you eat, drink and buy — and what you don\'t or did',
+        facts: [FACT.society, FACT.food],
+        dialogues: ['d-drinks', 'd-yesterday'],
+        lessons: [
+          { title: 'Eat, drink, buy', words: [
+            ['たべます', 'tabemasu', 'eat / will eat (polite)', '🍽️', { note: 'The polite form of たべる. The same form means "I eat" and "I will eat".', alt: ['食べます'] }],
+            ['のみます', 'nomimasu', 'drink / will drink (polite)', '🥤', { note: 'Used for any drink — and even for soup and medicine!', alt: ['飲みます'] }],
+            ['かいます', 'kaimasu', 'buy / will buy (polite)', '🛍️', { alt: ['買います'] }],
+            ['みます', 'mimasu', 'see / watch (polite)', '📺', { note: 'Also "look at": ほん を みます.', alt: ['見ます'] }],
+          ] },
+          { title: 'Talk and understand', words: [
+            ['はなします', 'hanashimasu', 'speak / talk (polite)', '🗣️', { note: 'えいご を はなします = I speak English. "Can speak" is はなせます.', alt: ['話します'] }],
+            ['わかります', 'wakarimasu', 'understand (polite)', '✅', { note: 'The opposite is わかりません; "I understood" is わかりました.', alt: ['分かります'] }],
+            ['します', 'shimasu', 'do (polite)', '🎯', { note: 'The most flexible verb. Add it to a noun to make an action: しゅくだい します = do homework.' }],
+          ] },
+          { title: 'There is, I want', words: [
+            ['あります', 'arimasu', 'there is / I have', '📋', { note: 'Polite "there is / have" for things (not people or animals — those use います).' }],
+            ['います', 'imasu', 'there is (a person / animal)', '🧍', { note: 'For living things: ともだち が います = I have a friend.', alt: ['居ます'] }],
+            ['ほしい', 'hoshii', 'want (a thing)', '🙏', { note: 'みず が ほしい です = I want water. For wanting to do something, the ending is たい (たべたい).', alt: ['欲しい'] }],
+          ] },
+          { title: 'I eat, I drink', grammar: 'masu', sentences: [
+            { jp: ['すし', 'を', 'たべます'], romaji: 'sushi o tabemasu', en: 'I eat sushi', alt: ['I will eat sushi', 'I\'ll eat sushi', 'I am eating sushi', 'I\'m eating sushi'] },
+            { jp: ['おちゃ', 'を', 'のみます'], romaji: 'ocha o nomimasu', en: 'I drink tea', alt: ['I will drink tea', 'I\'ll drink tea', 'I drink green tea', 'I will drink green tea'] },
+            { jp: ['ほん', 'を', 'かいます'], romaji: 'hon o kaimasu', en: 'I buy a book', alt: ['I will buy a book', 'I\'ll buy a book', 'I am buying a book'] },
+            { jp: ['えいご', 'を', 'はなします'], romaji: 'eigo o hanashimasu', en: 'I speak English', alt: ['I will speak English', 'I\'ll speak English'] },
+          ] },
+          { title: 'I don\'t…', grammar: 'masen', sentences: [
+            { jp: ['にく', 'を', 'たべません'], romaji: 'niku o tabemasen', en: 'I do not eat meat', alt: ['I don\'t eat meat', 'I will not eat meat', 'I won\'t eat meat'] },
+            { jp: ['ビール', 'を', 'のみません'], romaji: 'biiru o nomimasen', en: 'I do not drink beer', alt: ['I don\'t drink beer', 'I will not drink beer', 'I won\'t drink beer'] },
+            { jp: ['さかな', 'を', 'たべません'], romaji: 'sakana o tabemasen', en: 'I do not eat fish', alt: ['I don\'t eat fish', 'I will not eat fish', 'I won\'t eat fish'] },
+            { jp: ['これ', 'は', 'わかりません'], romaji: 'kore wa wakarimasen', en: 'I do not understand this', alt: ['I don\'t understand this', 'I do not understand it', 'I don\'t understand it'] },
+          ] },
+          { title: 'Yesterday', grammar: 'mashita', words: [
+            ['きのう', 'kinou', 'yesterday', '🌙', { note: 'No particle needed: きのう ラーメン を たべました.', alt: ['昨日'] }],
+          ], sentences: [
+            { jp: ['きのう', 'ラーメン', 'を', 'たべました'], romaji: 'kinou raamen o tabemashita', en: 'I ate ramen yesterday', alt: ['Yesterday I ate ramen', 'I had ramen yesterday', 'Yesterday I had ramen'] },
+            { jp: ['きのう', 'ビール', 'を', 'のみました'], romaji: 'kinou biiru o nomimashita', en: 'I drank beer yesterday', alt: ['Yesterday I drank beer', 'I had beer yesterday'] },
+            { jp: ['きのう', 'にく', 'を', 'たべませんでした'], romaji: 'kinou niku o tabemasen deshita', en: 'I did not eat meat yesterday', alt: ['I didn\'t eat meat yesterday', 'Yesterday I did not eat meat', 'Yesterday I didn\'t eat meat'] },
+            { jp: ['きのう', 'ほん', 'を', 'かいませんでした'], romaji: 'kinou hon o kaimasen deshita', en: 'I did not buy a book yesterday', alt: ['I didn\'t buy a book yesterday', 'Yesterday I did not buy a book', 'Yesterday I didn\'t buy a book'] },
+          ] },
+          { title: 'I want, I have', sentences: [
+            { jp: ['みず', 'が', 'ほしい', 'です'], romaji: 'mizu ga hoshii desu', en: 'I want water', alt: ['I would like water', 'I\'d like water'] },
+            { jp: ['ともだち', 'が', 'います'], romaji: 'tomodachi ga imasu', en: 'I have a friend', alt: ['There is a friend', 'I have friends', 'A friend is here'] },
+            { jp: ['ワイファイ', 'が', 'あります'], romaji: 'waifai ga arimasu', en: 'There is Wi-Fi', alt: ['There\'s Wi-Fi', 'There is wifi', 'We have Wi-Fi', 'It has Wi-Fi'] },
+            { jp: ['ねこ', 'が', 'います'], romaji: 'neko ga imasu', en: 'There is a cat', alt: ['There\'s a cat', 'I have a cat', 'We have a cat'] },
+          ] },
+          { title: 'It is not…', grammar: 'janai', words: [
+            ['じゃない', 'janai', 'is not (add です to be polite)', '❌', { note: 'せんせい じゃない です = "is not a teacher". Also written じゃありません.' }],
+            ['ちがいます', 'chigaimasu', 'that is wrong / no', '🙅', { note: 'A soft "no, that is not right": polite correction of a mistake.', alt: ['違います'] }],
+          ], sentences: [
+            { jp: ['わたし', 'は', 'せんせい', 'じゃない', 'です'], romaji: 'watashi wa sensei janai desu', en: 'I am not a teacher', alt: ['I\'m not a teacher'] },
+            { jp: ['これ', 'は', 'ビール', 'じゃない', 'です'], romaji: 'kore wa biiru janai desu', en: 'This is not beer', alt: ['This isn\'t beer', 'It is not beer', 'It\'s not beer'] },
+            { jp: ['ここ', 'は', 'えき', 'じゃない', 'です'], romaji: 'koko wa eki janai desu', en: 'This is not the station', alt: ['Here is not the station', 'This isn\'t the station', 'Here isn\'t the station'] },
+          ] },
+        ],
+      },
+      {
+        id: 'calendar',
+        title: 'Days, dates & time',
+        desc: 'Days of the week, months and dates — and "on Monday" and "at seven"',
+        facts: [FACT.festivals, FACT.society],
+        dialogues: ['d-day', 'd-date'],
+        lessons: [
+          { title: 'Today and tomorrow', words: [
+            ['きょう', 'kyou', 'today', '☀️', { alt: ['今日'] }],
+            ['あした', 'ashita', 'tomorrow', '🌅', { alt: ['明日'] }],
+            ['きのう', 'kinou', 'yesterday', '🌙', { note: 'No particle needed: きのう ラーメン を たべました.', alt: ['昨日'] }],
+            ['まいにち', 'mainichi', 'every day', '🔁', { alt: ['毎日'] }],
+          ] },
+          { title: 'Monday to Thursday', words: [
+            ['げつようび', 'getsuyoubi', 'Monday', '🌙', { note: 'Days are named after the moon, fire, water, wood, gold, earth and sun — and end in ようび.', alt: ['月曜日'] }],
+            ['かようび', 'kayoubi', 'Tuesday', '🔥', { note: 'か = fire.', alt: ['火曜日'] }],
+            ['すいようび', 'suiyoubi', 'Wednesday', '💧', { note: 'すい = water.', alt: ['水曜日'] }],
+            ['もくようび', 'mokuyoubi', 'Thursday', '🌳', { note: 'もく = wood.', alt: ['木曜日'] }],
+          ] },
+          { title: 'Friday to Sunday', words: [
+            ['きんようび', 'kinyoubi', 'Friday', '💰', { note: 'きん = gold (money).', alt: ['金曜日'] }],
+            ['どようび', 'doyoubi', 'Saturday', '🪨', { note: 'ど = earth.', alt: ['土曜日'] }],
+            ['にちようび', 'nichiyoubi', 'Sunday', '☀️', { note: 'にち = sun.', alt: ['日曜日'] }],
+            ['なんようび', 'nanyoubi', 'which day of the week', '❓', { note: 'なん + ようび: きょう は なんようび です か.', alt: ['何曜日'] }],
+          ] },
+          { title: 'Months', words: [
+            ['しがつ', 'shigatsu', 'April', '🌸', { note: 'Month = number + がつ: いちがつ (January), にがつ, さんがつ… but April is しがつ, not よんがつ.', alt: ['四月'] }],
+            ['しちがつ', 'shichigatsu', 'July', '🌊', { note: 'July is しちがつ (not なながつ). The other irregular one is くがつ.', alt: ['七月'] }],
+            ['くがつ', 'kugatsu', 'September', '🍃', { note: 'く, not きゅう: くがつ.', alt: ['九月'] }],
+            ['じゅうにがつ', 'juunigatsu', 'December', '❄️', { note: 'じゅう (10) + に (2) + がつ. November is じゅういちがつ.', alt: ['十二月'] }],
+            ['なんがつ', 'nangatsu', 'which month', '❓', { alt: ['何月'] }],
+          ] },
+          { title: 'Dates', words: [
+            ['にち', 'nichi', 'day of the month', '📅', { note: 'Number + にち: じゅうごにち = the 15th. The first days are special: ついたち, ふつか…', alt: ['日'] }],
+            ['ついたち', 'tsuitachi', 'the 1st', '1️⃣', { alt: ['一日', '1日'] }],
+            ['ふつか', 'futsuka', 'the 2nd', '2️⃣', { note: 'Also "two days".', alt: ['二日', '2日'] }],
+            ['はつか', 'hatsuka', 'the 20th', '🔢', { note: 'The 20th is special too. 21st is にじゅういちにち.', alt: ['二十日', '20日'] }],
+            ['なんにち', 'nannichi', 'what date', '❓', { alt: ['何日'] }],
+          ] },
+          { title: 'On Monday, at seven', grammar: 'time', sentences: [
+            { jp: ['げつようび', 'に', 'いきます'], romaji: 'getsuyoubi ni ikimasu', en: 'I go on Monday', alt: ['I will go on Monday', 'I\'ll go on Monday', 'I am going on Monday', 'I\'m going on Monday'] },
+            { jp: ['ごぜん', 'しちじ', 'はん', 'に', 'たべます'], romaji: 'gozen shichiji han ni tabemasu', en: 'I eat at 7:30 a.m.', alt: ['I eat at 7:30 am', 'I will eat at 7:30 a.m.', 'I eat at half past seven in the morning'] },
+            { jp: ['あした', 'ごご', 'さんじ', 'に', 'きます'], romaji: 'ashita gogo sanji ni kimasu', en: 'I will come at 3 p.m. tomorrow', alt: ['I\'ll come at 3 p.m. tomorrow', 'I will come at 3 pm tomorrow', 'Tomorrow I will come at 3 p.m.', 'I am coming at 3 pm tomorrow'] },
+            { jp: ['まいにち', 'しちじ', 'に', 'たべます'], romaji: 'mainichi shichiji ni tabemasu', en: 'I eat at seven every day', alt: ['Every day I eat at seven', 'I eat at 7 every day', 'I eat at 7 o\'clock every day'] },
+          ] },
+          { title: 'Which day? What date?', sentences: [
+            { jp: ['きょう', 'は', 'なんようび', 'です', 'か'], romaji: 'kyou wa nanyoubi desu ka', en: 'What day is it today', alt: ['What day of the week is it today', 'What day is today'] },
+            { jp: ['あした', 'は', 'かようび', 'です'], romaji: 'ashita wa kayoubi desu', en: 'Tomorrow is Tuesday', alt: ['It is Tuesday tomorrow'] },
+            { jp: ['きょう', 'は', 'なんがつ', 'なんにち', 'です', 'か'], romaji: 'kyou wa nangatsu nannichi desu ka', en: 'What is the date today', alt: ['What date is it today', 'What is today\'s date', 'What month and day is it today'] },
+            { jp: ['しがつ', 'ついたち', 'です'], romaji: 'shigatsu tsuitachi desu', en: 'It is April 1st', alt: ['It\'s April 1st', 'April 1st', 'It is the 1st of April'] },
+          ] },
+        ],
+      },
+      {
+        id: 'asking',
+        title: 'Asking questions',
+        desc: 'Who, what, when, why, which and how',
+        facts: [FACT.society],
+        dialogues: ['d-who', 'd-why'],
+        lessons: [
+          { title: 'Who? What? When?', words: [
+            ['だれ', 'dare', 'who', '🧑', { note: 'Polite: どなた. だれ の ほん = whose book.', alt: ['誰'] }],
+            ['なに', 'nani', 'what', '❔', { note: 'Before です or の it shortens to なん: なん です か.', alt: ['何'] }],
+            ['いつ', 'itsu', 'when', '⌚', { note: 'No particle: いつ いきます か = when do you go?' }],
+          ] },
+          { title: 'Why? Which? How?', words: [
+            ['どうして', 'doushite', 'why', '❓', { note: 'どうして です か = why is that? Answer with から (because).' }],
+            ['どれ', 'dore', 'which one (of three or more)', '👉', { note: 'Same family as どこ (where): これ, それ, あれ, どれ.' }],
+            ['どう', 'dou', 'how', '🤷', { note: 'ラーメン は どう です か = how is the ramen?' }],
+          ] },
+          { title: 'Ask away', grammar: 'qwords', sentences: [
+            { jp: ['なに', 'を', 'たべます', 'か'], romaji: 'nani o tabemasu ka', en: 'What do you eat', alt: ['What will you eat', 'What are you eating', 'What will you have'] },
+            { jp: ['だれ', 'が', 'きます', 'か'], romaji: 'dare ga kimasu ka', en: 'Who is coming', alt: ['Who will come', 'Who comes'] },
+            { jp: ['いつ', 'きょうと', 'に', 'いきます', 'か'], romaji: 'itsu kyouto ni ikimasu ka', en: 'When do you go to Kyoto', alt: ['When will you go to Kyoto', 'When are you going to Kyoto'] },
+          ] },
+          { title: 'More questions', sentences: [
+            { jp: ['どれ', 'が', 'おいしい', 'です', 'か'], romaji: 'dore ga oishii desu ka', en: 'Which one is delicious', alt: ['Which one is good', 'Which is delicious'] },
+            { jp: ['どうして', 'です', 'か'], romaji: 'doushite desu ka', en: 'Why is that', alt: ['Why', 'Why is it', 'Why is it so'] },
+            { jp: ['ラーメン', 'は', 'どう', 'です', 'か'], romaji: 'raamen wa dou desu ka', en: 'How is the ramen', alt: ['How is ramen', 'How about the ramen'] },
+          ] },
+        ],
+      },
+      {
         id: 'world',
         title: 'Around you',
         desc: 'Animals, nature and things',
         facts: [FACT.nature],
+        dialogues: ['d-pets', 'd-sea'],
         lessons: [
           { title: 'Animals', words: [['ねこ', 'neko', 'cat', '🐈', { alt: ['猫'] }], ['いぬ', 'inu', 'dog', '🐕', { alt: ['犬'] }], ['とり', 'tori', 'bird', '🐦', { alt: ['鳥'] }]] },
           { title: 'Nature', words: [['やま', 'yama', 'mountain', '⛰️', { alt: ['山'] }], ['うみ', 'umi', 'sea', '🌊', { alt: ['海'] }], ['そら', 'sora', 'sky', '☁️', { alt: ['空'] }]] },
@@ -470,6 +658,13 @@ export const SECTIONS_DATA = [
 ];
 
 // Two-person dialogues for listening comprehension. Speakers are cast characters.
+// Newer dialogues use dlg(): lines are [who, jp, en], and `questions` holds one or more
+// { question, options } (first option is the right one); the first also stays in `question`/`options`.
+const Q = (question, ...options) => ({ question, options });
+const dlg = (title, cast, lines, ...questions) => ({
+  title, cast, lines: lines.map(([who, jp, en]) => ({ who, jp, en })), question: questions[0].question, options: questions[0].options, questions,
+});
+
 export const DIALOGUES = {
   'd-station': {
     title: 'At the station',
@@ -548,4 +743,132 @@ export const DIALOGUES = {
     question: 'What is the news?',
     options: ['She is going to Japan tomorrow', 'She lost her ticket', 'She does not like sushi'],
   },
+  'd-morning': dlg('Good morning', ['woman', 'woman2'], [
+    [0, 'おはようございます！', 'Good morning!'],
+    [1, 'おはようございます。おげんきですか。', 'Good morning. How are you?'],
+    [0, 'はい、げんきです。ありがとうございます。', 'I am well, thank you.'],
+  ], Q('How is she?', 'She is well', 'She is sick', 'She is lost'), Q('What time of day is it?', 'Morning', 'Evening', 'Night')),
+  'd-farewell': dlg('Saying goodbye', ['woman2', 'woman'], [
+    [0, 'ありがとうございました。', 'Thank you very much.'],
+    [1, 'いいえ。またね！', 'Not at all. See you!'],
+    [0, 'はい、またね。おやすみなさい。', 'Yes, see you. Good night.'],
+  ], Q('What do they say at the end?', 'See you, good night', 'Nice to meet you', 'Excuse me, sorry'), Q('Who says thank you first?', 'The first speaker', 'The second speaker', 'Nobody')),
+  'd-taxi': dlg('In a taxi', ['woman', 'woman2'], [
+    [0, 'ホテルまでおねがいします。', 'To the hotel please.'],
+    [1, 'わかりました。', 'Understood.'],
+    [1, 'ここですか。', 'Is it here?'],
+    [0, 'はい、ありがとうございます。', 'Yes, thank you.'],
+  ], Q('Where does she want to go?', 'To the hotel', 'To the station', 'To the sea'), Q('Do they arrive?', 'Yes, it is the right place', 'No, they are lost', 'She gets out at the station')),
+  'd-bill': dlg('The bill', ['woman2', 'woman'], [
+    [0, 'おかいけいをおねがいします。', 'The bill please.'],
+    [1, 'カードですか、げんきんですか。', 'Card or cash?'],
+    [0, 'カードでおねがいします。', 'By card please.'],
+    [1, 'ありがとうございました。', 'Thank you very much.'],
+  ], Q('How does she pay?', 'By card', 'In cash', 'She does not pay'), Q('Where are they?', 'In a restaurant', 'At a station', 'At a hotel')),
+  'd-time': dlg('What time is it?', ['woman', 'woman2'], [
+    [0, 'すみません、いまなんじですか。', 'Excuse me, what time is it now?'],
+    [1, 'さんじはんです。', 'It is half past three.'],
+    [0, 'ありがとうございます。', 'Thank you.'],
+  ], Q('What time is it?', '3:30', '3:00', '7:30'), Q('What does the first speaker want to know?', 'The time', 'The price', 'The way to the station')),
+  'd-yen': dlg('Is it 500 yen?', ['woman2', 'woman'], [
+    [0, 'これはごひゃくえんですか。', 'Is this 500 yen?'],
+    [1, 'いいえ、ひゃくごじゅうえんです。', 'No, it is 150 yen.'],
+    [0, 'わかりました。これをください。', 'I see. This please.'],
+  ], Q('How much is it really?', '150 yen', '500 yen', '50 yen'), Q('What does she do in the end?', 'She buys it', 'She leaves', 'She asks for the bill')),
+  'd-checkin': dlg('Checking in', ['woman', 'woman2'], [
+    [0, 'チェックインをおねがいします。', 'Check-in please.'],
+    [1, 'パスポートをおねがいします。', 'Your passport please.'],
+    [0, 'はい、どうぞ。よやくがあります。', 'Here you are. I have a reservation.'],
+  ], Q('What does the clerk ask for?', 'The passport', 'The key', 'The card'), Q('What does the guest have?', 'A reservation', 'A ticket', 'An allergy')),
+  'd-breakfast': dlg('Breakfast time', ['woman2', 'woman'], [
+    [0, 'あさごはんはなんじですか。', 'What time is breakfast?'],
+    [1, 'ごぜんしちじはんです。', 'It is 7:30 a.m.'],
+    [0, 'ありがとうございます。', 'Thank you.'],
+  ], Q('When is breakfast?', 'At 7:30 in the morning', 'At 7:30 in the evening', 'At 3:30'), Q('What is she asking about?', 'Breakfast', 'The Wi-Fi', 'Her room')),
+  'd-table': dlg('A table for two', ['woman', 'woman2'], [
+    [0, 'ふたりです。', 'Two people.'],
+    [1, 'どうぞ。', 'This way please.'],
+    [0, 'メニューをおねがいします。', 'The menu please.'],
+  ], Q('How many are they?', 'Two', 'One', 'Three'), Q('What does she ask for?', 'The menu', 'The bill', 'A taxi')),
+  'd-allergy': dlg('An allergy', ['woman2', 'woman'], [
+    [0, 'たまごアレルギーがあります。', 'I have an egg allergy.'],
+    [1, 'わかりました。たまごはいりませんね。', 'Understood. No eggs, right?'],
+    [0, 'はい、だいじょうぶです。ありがとうございます。', 'Yes, that is fine. Thank you.'],
+  ], Q('What is she allergic to?', 'Eggs', 'Fish', 'Meat'), Q('How does she feel at the end?', 'It is okay now', 'Angry', 'Confused')),
+  'd-platform': dlg('Which platform?', ['woman', 'woman2'], [
+    [0, 'すみません、きょうとはなんばんせんですか。', 'Excuse me, which platform is Kyoto?'],
+    [1, 'さんばんせんです。', 'Platform 3.'],
+    [0, 'ありがとうございます。', 'Thank you.'],
+  ], Q('Which platform?', 'Platform 3', 'Platform 1', 'Platform 5'), Q('Where does she want to go?', 'Kyoto', 'The hotel', 'The sea')),
+  'd-transfer': dlg('Changing trains', ['woman2', 'woman'], [
+    [0, 'のりかえはどこですか。', 'Where do I change trains?'],
+    [1, 'つぎのえきです。', 'At the next station.'],
+    [0, 'わかりました。', 'Understood.'],
+  ], Q('Where does she change?', 'At the next station', 'Right here', 'At the hotel'), Q('What is she asking about?', 'Transferring', 'The price', 'A taxi')),
+  'd-pharmacy': dlg('Looking for a pharmacy', ['woman', 'woman2'], [
+    [0, 'すみません、やっきょくはどこですか。', 'Excuse me, where is the pharmacy?'],
+    [1, 'まっすぐです。みぎです。', 'Straight ahead. On the right.'],
+    [0, 'ありがとうございます！', 'Thank you!'],
+  ], Q('Where is the pharmacy?', 'Straight ahead, on the right', 'On the left', 'At the station'), Q('What does she need?', 'A pharmacy', 'A hotel', 'A taxi')),
+  'd-doctor': dlg('At the clinic', ['woman2', 'woman'], [
+    [0, 'ここがいたいです。', 'It hurts here.'],
+    [1, 'だいじょうぶですか。いしゃをよびます。', 'Are you okay? I will call a doctor.'],
+    [0, 'おねがいします。', 'Please do.'],
+  ], Q('What will the second speaker do?', 'Call a doctor', 'Call a taxi', 'Bring tea'), Q('What is wrong?', 'Something hurts', 'She lost her key', 'She is hungry')),
+  'd-friend': dlg('My friend', ['woman2', 'woman'], [
+    [0, 'こちらはともだちです。かれはせんせいです。', 'This is my friend. He is a teacher.'],
+    [1, 'はじめまして。', 'Nice to meet you.'],
+    [0, 'わたしたちはがくせいです。', 'We are students.'],
+  ], Q('What is the friend\'s job?', 'Teacher', 'Doctor', 'Chef'), Q('What are the speakers?', 'Students', 'Doctors', 'Engineers')),
+  'd-lunch': dlg('Lunch', ['woman', 'woman2'], [
+    [0, 'いただきます！', 'Let\'s eat!'],
+    [1, 'ごはんとさかなです。', 'It is rice and fish.'],
+    [0, 'とてもおいしいです。', 'It is very good.'],
+  ], Q('What are they eating?', 'Rice and fish', 'Ramen', 'Sushi and beer'), Q('What does she think of it?', 'It is very good', 'It is too spicy', 'It is cold')),
+  'd-like': dlg('Do you like fish?', ['woman2', 'woman'], [
+    [0, 'さかながすきですか。', 'Do you like fish?'],
+    [1, 'はい、すきです。にくはたべません。', 'Yes, I do. I do not eat meat.'],
+    [0, 'わかりました。', 'Understood.'],
+  ], Q('What does she not eat?', 'Meat', 'Fish', 'Vegetables'), Q('Does she like fish?', 'Yes', 'No', 'She does not know')),
+  'd-drinks': dlg('Drinks', ['woman', 'woman2'], [
+    [0, 'ビールをのみますか。', 'Do you drink beer?'],
+    [1, 'いいえ、のみません。おちゃをのみます。', 'No, I don\'t. I drink tea.'],
+    [0, 'じゃあ、おちゃをください。', 'Then, tea please.'],
+  ], Q('What does the second speaker drink?', 'Tea', 'Beer', 'Water'), Q('Does she drink beer?', 'No', 'Yes', 'Only on Fridays')),
+  'd-yesterday': dlg('Yesterday', ['woman2', 'woman'], [
+    [0, 'きのうラーメンをたべました。', 'I ate ramen yesterday.'],
+    [1, 'いいですね！わたしはたべませんでした。', 'Nice! I did not.'],
+    [0, 'きょうたべますか。', 'Will you eat it today?'],
+  ], Q('What did the first speaker eat yesterday?', 'Ramen', 'Sushi', 'Nothing'), Q('Did the second speaker eat ramen yesterday?', 'No', 'Yes', 'She ate two bowls')),
+  'd-day': dlg('What day is it?', ['woman', 'woman2'], [
+    [0, 'きょうはなんようびですか。', 'What day is it today?'],
+    [1, 'きんようびです。', 'It is Friday.'],
+    [0, 'じゃあ、あしたはどようびですね。', 'Then tomorrow is Saturday.'],
+  ], Q('What day is it today?', 'Friday', 'Monday', 'Sunday'), Q('What day is tomorrow?', 'Saturday', 'Sunday', 'Thursday')),
+  'd-date': dlg('A date', ['woman2', 'woman'], [
+    [0, 'きょうはなんがつなんにちですか。', 'What is the date today?'],
+    [1, 'しがつふつかです。', 'It is April 2nd.'],
+    [0, 'ありがとうございます。', 'Thank you.'],
+  ], Q('What is the date?', 'April 2nd', 'April 1st', 'July 2nd'), Q('What month is it?', 'April', 'July', 'September')),
+  'd-who': dlg('Who is that?', ['woman', 'woman2'], [
+    [0, 'あれはだれですか。', 'Who is that over there?'],
+    [1, 'かのじょはせんせいです。', 'She is a teacher.'],
+    [0, 'そうですか。', 'I see.'],
+  ], Q('Who is that person?', 'A teacher', 'A doctor', 'A student'), Q('What does the first speaker ask?', 'Who someone is', 'What time it is', 'Where the station is')),
+  'd-why': dlg('Why the station?', ['woman2', 'woman'], [
+    [0, 'どうしてえきにいきますか。', 'Why are you going to the station?'],
+    [1, 'ともだちがきます。', 'A friend is coming.'],
+    [0, 'いつきますか。', 'When is she coming?'],
+    [1, 'ごごさんじにきます。', 'At 3 p.m.'],
+  ], Q('Why is she going to the station?', 'A friend is coming', 'She is buying a ticket', 'She is lost'), Q('When does the friend come?', 'At 3 p.m.', 'At 3 a.m.', 'At 7:30')),
+  'd-pets': dlg('Pets', ['woman', 'woman2'], [
+    [0, 'ねこがいますか。', 'Do you have a cat?'],
+    [1, 'はい、ねこといぬがいます。', 'Yes, I have a cat and a dog.'],
+    [0, 'いいですね！', 'Lovely!'],
+  ], Q('What pets does she have?', 'A cat and a dog', 'A bird', 'A cat only'), Q('What does the first speaker ask?', 'If she has a cat', 'If she likes fish', 'If she has a car')),
+  'd-sea': dlg('A day out', ['woman2', 'woman'], [
+    [0, 'うみはきれいです。', 'The sea is beautiful.'],
+    [1, 'はい、とてもきれいです。くるまでいきますか。', 'Yes, very. Shall we go by car?'],
+    [0, 'いいえ、でんしゃでいきます。', 'No, we go by train.'],
+  ], Q('How do they go?', 'By train', 'By car', 'By taxi'), Q('What is pretty?', 'The sea', 'The mountain', 'The sky')),
 };

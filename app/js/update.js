@@ -1,11 +1,13 @@
 // Keeps the installed app up to date. On open, and whenever the app comes back to the foreground,
 // it asks GitHub Pages for version.json (bypassing every cache). If a newer version is published,
 // the service worker downloads it and the app reloads into it — straight away if the app was just
-// opened, otherwise via an "Update" button (never mid-lesson). If the browser's own service worker
-// update gets stuck (some phones hold on to old files), the app clears its cached files and reloads.
-// Progress lives in localStorage, which none of this touches.
+// opened, otherwise via an "Update" button (never mid-lesson). A slow download is simply waited for. If the
+// download fails the old version keeps running (offline copy included) and the next time the app comes to
+// the foreground it tries again; only after repeated failures does the app say so and offer the last resort:
+// clearing its cached files and reloading. Progress lives in localStorage, which none of this touches.
 import { app, toast } from './app.js';
 import { VERSION } from './version.js';
+import { LANG } from './lang.js';
 
 // Lessons and other screens that run a session (missions, drills, quiz…) must never be reloaded under the learner.
 const busy = () => app.inLesson || app.busy;
@@ -14,7 +16,9 @@ let registration = null;
 let openedAt = Date.now();
 let checking = null;
 const FRESH_MS = 15000;
-const INSTALL_TIMEOUT_MS = 20000;
+// How long an automatic update waits for the download before leaving it to finish in the background.
+const INSTALL_WAIT_MS = 20000;
+const FAILS_BEFORE_TOAST = 3;
 const isDev = VERSION.startsWith('__');
 
 export async function latestVersion() {
@@ -54,13 +58,11 @@ function offer(worker, { force = false } = {}) {
   toast('A new version of Hajime is ready.', { action: 'Update', onAction: () => apply(worker), ms: 0 });
 }
 
-// Re-downloads every app file so the browser's own HTTP cache (GitHub Pages allows 10 minutes)
-// cannot hand back old copies after the reload. The file list is read from the published sw.js.
+// Re-downloads the few unversioned files (page, worker, manifests) so the browser's own HTTP cache (GitHub
+// Pages allows 10 minutes) cannot hand back old copies after the reload. Scripts and styles are addressed
+// by version (?v=…), so the new page asks for new addresses anyway.
 async function refreshHttpCache() {
-  const text = await (await fetch(`./sw.js?t=${Date.now()}`, { cache: 'no-store' })).text();
-  const match = text.match(/const FILES = (\[[\s\S]*?\]);/);
-  const files = match ? JSON.parse(match[1]) : ['./', 'index.html'];
-  await Promise.all([...files, 'sw.js'].map((f) => fetch(f, { cache: 'reload' }).catch(() => {})));
+  await Promise.all(['./', 'index.html', 'sw.js', 'files.json'].map((f) => fetch(f, { cache: 'reload' }).catch(() => {})));
 }
 
 // Last resort: drop the cached app files and the service worker, then load fresh from GitHub.
@@ -83,18 +85,59 @@ export async function hardRefresh() {
   location.reload();
 }
 
-// Resolves with the waiting worker once the new version is downloaded, or null if it never arrives.
-function waitForWaiting(reg) {
-  if (reg.waiting) return Promise.resolve(reg.waiting);
+// How the new version's download ended: { worker } when it is ready, { failed: true } when the install failed
+// (the worker became redundant) or no new worker showed up at all. Never resolves while it is still downloading.
+function installOutcome(reg) {
+  if (reg.waiting) return Promise.resolve({ worker: reg.waiting });
   return new Promise((resolve) => {
-    const timer = setTimeout(() => resolve(reg.waiting || null), INSTALL_TIMEOUT_MS);
-    const track = (worker) => worker?.addEventListener('statechange', () => {
-      if (worker.state === 'installed') { clearTimeout(timer); resolve(worker); }
-      if (worker.state === 'redundant') { clearTimeout(timer); resolve(null); }
-    });
-    track(reg.installing);
+    let tracked = null;
+    const track = (worker) => {
+      if (!worker || worker === tracked) return;
+      tracked = worker;
+      worker.addEventListener('statechange', () => {
+        if (worker.state === 'installed') resolve({ worker });
+        if (worker.state === 'redundant') resolve({ failed: true });
+      });
+      tellCourse(worker);
+    };
+    if (reg.installing) track(reg.installing);
+    else resolve({ failed: true }); // update() found no new worker: the site is still serving the old files
     reg.addEventListener('updatefound', () => track(reg.installing), { once: true });
   });
+}
+
+// Failed downloads of this version in a row, kept across restarts so "try again later" really adds up.
+const FAIL_KEY = 'hajime.updateFails';
+function noteFailure(version) {
+  let n = 1;
+  try {
+    const last = JSON.parse(localStorage.getItem(FAIL_KEY) || 'null');
+    if (last?.version === version) n = last.n + 1;
+    localStorage.setItem(FAIL_KEY, JSON.stringify({ version, n }));
+  } catch {
+    /* ignore */
+  }
+  return n;
+}
+function clearFailures() {
+  try {
+    localStorage.removeItem(FAIL_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+// The download ended: install it (or offer to), or keep running the old version and try again later.
+function settle(outcome, { force }) {
+  if (outcome.worker) {
+    clearFailures();
+    offer(outcome.worker, { force: force && !busy() });
+    return;
+  }
+  const n = noteFailure(latestSeen);
+  if (n >= FAILS_BEFORE_TOAST && !busy()) {
+    toast('The new version could not be downloaded. Hajime keeps working as it is.', { action: 'Update anyway', onAction: () => apply(null), ms: 0 });
+  }
 }
 
 // Returns 'latest' | 'updating' | 'offline'.
@@ -106,7 +149,10 @@ async function check({ manual = false } = {}) {
   } catch {
     return 'offline';
   }
-  if (latest === VERSION) return 'latest';
+  if (latest === VERSION) {
+    clearFailures();
+    return 'latest';
+  }
   latestSeen = latest;
   // Decide now whether to update without asking: downloading can outlast the "just opened" window.
   const force = manual || (!busy() && Date.now() - openedAt < FRESH_MS);
@@ -118,10 +164,16 @@ async function check({ manual = false } = {}) {
   try {
     await registration.update();
   } catch {
-    /* fall through to the wait / hard refresh */
+    /* offline or the file is not published yet: the outcome below says so */
   }
-  const worker = await waitForWaiting(registration);
-  offer(worker, { force: force && !busy() });
+  const outcome = installOutcome(registration);
+  const first = await Promise.race([outcome, new Promise((r) => setTimeout(r, INSTALL_WAIT_MS, null))]);
+  if (first) settle(first, { force });
+  else {
+    // A slow connection: leave the download to finish in the background and offer the update when it does.
+    if (manual) toast('Still downloading… the update will be offered when it is ready.', { ms: 6000 });
+    outcome.then((late) => settle(late, { force: false }));
+  }
   return 'updating';
 }
 
@@ -130,10 +182,22 @@ function checkOnce(opts) {
   return checking;
 }
 
+// Lets a service worker know the active course (the worker caches that course's content for offline use).
+function tellCourse(worker) {
+  try {
+    worker?.postMessage({ course: LANG });
+  } catch {
+    /* the worker is going away */
+  }
+}
+
 export function initUpdates() {
   if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
   navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
     registration = reg;
+    // Tell the worker which course is showing, so it keeps that course's files for offline use.
+    [reg.installing, reg.waiting, reg.active].forEach(tellCourse);
+    reg.addEventListener('updatefound', () => tellCourse(reg.installing));
     // A new version may have finished downloading during the last visit.
     if (reg.waiting && navigator.serviceWorker.controller) offer(reg.waiting);
     checkOnce();

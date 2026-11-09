@@ -8,3 +8,8 @@ export function versionLabel(v = VERSION) {
   const date = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3])).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
   return `${date} · ${m[4]}:${m[5]} · ${m[6]}`;
 }
+
+// The release shown on the start screen and in Profile. Keep in step with the newest entry of CHANGELOG
+// (content/changelog.js, loaded only by the version list); tests/perf.test.mjs checks they agree.
+export const APP_RELEASE = '0.94';
+export const APP_RELEASE_DATE = 'Nov 26'; // "Nov 26" = November 2026

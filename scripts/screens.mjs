@@ -94,6 +94,7 @@ try {
   await page.goto(`http://localhost:${PORT}/`);
   await page.evaluate(() => localStorage.clear());
   await page.reload();
+  await page.waitForSelector('.splash[data-ready]');
   await page.waitForTimeout(500);
   await page.tap('.splash');
   await page.waitForTimeout(500);
@@ -103,6 +104,7 @@ try {
     await page.goto(`http://localhost:${PORT}/`);
     await page.evaluate((code) => { localStorage.clear(); localStorage.setItem('hajime.test-mode', '1'); localStorage.setItem('hajime.course', code); }, course.code);
     await page.reload();
+    await page.waitForSelector('.splash[data-ready]');
     await page.waitForTimeout(500);
     await page.tap('.splash');
     await page.waitForTimeout(500);

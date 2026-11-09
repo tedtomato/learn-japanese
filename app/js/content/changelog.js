@@ -1,6 +1,12 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.94', date: '9 Nov 2026', changes: [
+    'Faster start: the app only downloads the language you are learning, and the learning path draws instantly',
+    'Smaller updates: a new version only downloads the files that changed, and a slow connection no longer wipes the offline copy',
+    'The start screen appears at once, and picking a language no longer shows it twice',
+    'The road-works sign at the end of the path is in the language you are learning',
+  ] },
   { version: '0.93', date: '9 Nov 2026', changes: [
     'Fixed: the "Quick break" fun-fact card in a lesson crashed the lesson since 0.92',
   ] },
@@ -372,6 +378,5 @@ export const CHANGELOG = [
   ] },
 ];
 
-export const APP_RELEASE = CHANGELOG[0].version;
-// "5 Nov 2026" → "Nov 26": the release date shown on the start screen.
-export const APP_RELEASE_DATE = CHANGELOG[0].date.replace(/^\d+ (\w+) \d\d(\d\d)$/, '$1 $2');
+// The release number lives in version.js (so this big list stays out of the start-up path); kept here for older imports.
+export { APP_RELEASE, APP_RELEASE_DATE } from '../version.js';

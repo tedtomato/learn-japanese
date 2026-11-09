@@ -13,8 +13,9 @@ import { askOpenLab } from './lab.js';
 import { showStreakCalendar } from './streak.js';
 import { enableReminders, disableReminders } from '../reminders.js';
 import { shareButton, wireShare } from '../share.js';
+import { t, langName } from '../strings.js';
 import {
-  displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, backupStale, defaultState, FREEZE_PRICE, MAX_FREEZES,
+  displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, backupStale, defaultState, FREEZE_PRICE, MAX_FREEZES, speedOn,
 } from '../progress.js';
 
 function achievements(state, now) {
@@ -24,29 +25,29 @@ function achievements(state, now) {
   const unitsDone = NODES.filter((n) => n.kind === 'review' && isNodeDone(state, n)).length;
   const best = Math.max(state.streak.best, displayStreak(state, now));
   return [
-    { icon: '🌱', title: 'First steps', desc: 'Finish your first lesson', value: state.stats.lessons, goal: 1 },
+    { icon: '🌱', title: t('First steps'), desc: t('Finish your first lesson'), value: state.stats.lessons, goal: 1 },
     ...(L.hasKana ? [
-      { icon: 'あ', title: 'Kana collector', desc: 'Learn 25 hiragana', value: kana, goal: 25 },
-      { icon: '🏆', title: 'Hiragana master', desc: 'Learn all 71 hiragana', value: kana, goal: 71 },
+      { icon: 'あ', title: t('Kana collector'), desc: t('Learn 25 hiragana'), value: kana, goal: 25 },
+      { icon: '🏆', title: t('Hiragana master'), desc: t('Learn all 71 hiragana'), value: kana, goal: 71 },
     ] : []),
-    { icon: '💬', title: 'Wordsmith', desc: 'Learn 50 words and phrases', value: words, goal: 50 },
-    ...(L.latin ? [{ icon: '📖', title: 'Bookworm', desc: 'Learn 150 words and phrases', value: words, goal: 150 }]
-      : [{ icon: L.glyph, title: `${L.Chars === 'Kanji' ? 'Kanji' : 'Character'} explorer`, desc: `Learn 10 ${L.chars}`, value: learned.filter((i) => i.type === 'kanji' && !i.peek).length, goal: 10 }]),
-    { icon: '🔥', title: 'On fire', desc: 'Reach a 7 day streak', value: best, goal: 7 },
-    { icon: '🎯', title: 'Sharpshooter', desc: '10 perfect lessons', value: state.stats.perfect, goal: 10 },
-    { icon: '⚡', title: 'XP hunter', desc: 'Earn 500 XP', value: state.xp, goal: 500 },
-    { icon: L.flagEmoji || '🗾', title: 'Explorer', desc: 'Complete 5 units', value: unitsDone, goal: 5 },
-    { icon: '📚', title: 'Curious mind', desc: 'Discover 50 fun facts', value: state.seen.fact.length, goal: 50 },
+    { icon: '💬', title: t('Wordsmith'), desc: t('Learn 50 words and phrases'), value: words, goal: 50 },
+    ...(L.latin ? [{ icon: '📖', title: t('Bookworm'), desc: t('Learn 150 words and phrases'), value: words, goal: 150 }]
+      : [{ icon: L.glyph, title: t(L.Chars === 'Kanji' ? 'Kanji explorer' : 'Character explorer'), desc: t('Learn 10 {what}', { what: L.chars }), value: learned.filter((i) => i.type === 'kanji' && !i.peek).length, goal: 10 }]),
+    { icon: '🔥', title: t('On fire'), desc: t('Reach a 7 day streak'), value: best, goal: 7 },
+    { icon: '🎯', title: t('Sharpshooter'), desc: t('10 perfect lessons'), value: state.stats.perfect, goal: 10 },
+    { icon: '⚡', title: t('XP hunter'), desc: t('Earn 500 XP'), value: state.xp, goal: 500 },
+    { icon: L.flagEmoji || '🗾', title: t('Explorer'), desc: t('Complete 5 units'), value: unitsDone, goal: 5 },
+    { icon: '📚', title: t('Curious mind'), desc: t('Discover 50 fun facts'), value: state.seen.fact.length, goal: 50 },
   ];
 }
 
-const VOICE_TEXT = {
-  yes: `${L.name} voice ready.`,
-  unknown: 'Your device has not listed its voices yet. Tap test to check.',
-  no: `No ${L.name} voice found. Install one in your phone settings (Accessibility → Spoken content / Text-to-speech) to hear audio.`,
-};
+const voiceText = () => ({
+  yes: t('{lang} voice ready.', { lang: langName() }),
+  unknown: t('Your device has not listed its voices yet. Tap test to check.'),
+  no: t('No {lang} voice found. Install one in your phone settings (Accessibility → Spoken content / Text-to-speech) to hear audio.', { lang: langName() }),
+});
 
-const fmtDate = (t) => new Date(t).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+const fmtDate = (time) => new Date(time).toLocaleDateString(L.gloss === 'French' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 
 // Backups go through the phone's share menu (→ Drive: Save) where it can share files, else to
 // Downloads. Shared as .txt: Android only shares a short list of file types, and JSON isn't one.
@@ -76,9 +77,9 @@ async function saveBackup(state) {
   return 'downloaded';
 }
 function backupAgeText(state, now) {
-  if (!state.backupAt) return 'No backup yet';
+  if (!state.backupAt) return t('No backup yet');
   const days = Math.floor((now - state.backupAt) / 86400000);
-  return `Last backup: ${days === 0 ? 'today' : days === 1 ? 'yesterday' : `${days} days ago`}`;
+  return t('Last backup: {when}', { when: days === 0 ? t('today') : days === 1 ? t('yesterday') : t('{n} days ago', { n: days }) });
 }
 
 export function renderProfile(root, focus) {
@@ -95,19 +96,19 @@ export function renderProfile(root, focus) {
     ${app.testMode ? html`<a class="card test-banner" href="#/lab"><b>🧪 Test mode is on</b><span>Open the test lab ›</span></a>` : ''}
     <section class="profile-head">
       <div class="avatar">${mascot('happy', 92)}</div>
-      <div><h1>My progress</h1><p class="muted">Learning since ${fmtDate(state.createdAt)}</p><p class="app-ver">Hajime v${APP_RELEASE}</p></div>
+      <div><h1>${t('My progress')}</h1><p class="muted">${t('Learning since {date}', { date: fmtDate(state.createdAt) })}</p><p class="app-ver">Hajime v${APP_RELEASE}</p></div>
     </section>
 
     <div class="stat-grid">
-      <button class="card stat-card link-card streak-tile"><span class="c-orange">${icon('flame', 26)}</span><b>${displayStreak(state, now)}</b><small>Day streak ›</small></button>
-      <div class="card stat-card"><span class="c-gold">${icon('bolt', 26)}</span><b>${state.xp}</b><small>Total XP</small></div>
-      ${L.hasKana ? html`<a class="card stat-card link-card" href="#/practice/kana"><span class="c-blue">${icon('kana', 26)}</span><b>${count('kana')}</b><small>Kana learned ›</small></a>` : ''}
-      <a class="card stat-card link-card" href="#/practice/words"><span class="c-green">${icon('word', 26)}</span><b>${count('word', 'sentence')}</b><small>Words & phrases ›</small></a>
-      ${L.latin ? '' : html`<a class="card stat-card link-card" href="#/practice/kanji"><span class="c-purple">${raw(`<b class="jp" style="font-size:22px">${L.glyph}</b>`)}</span><b>${count('kanji', 'kword', 'radical')}</b><small>${L.code === 'zh' ? 'Characters' : 'Kanji & radicals'} ›</small></a>`}
-      <a class="card stat-card link-card" href="#/collection/fact"><span class="c-orange">${icon('book', 26)}</span><b>${state.seen.fact.length}</b><small>Fun facts ›</small></a>
+      <button class="card stat-card link-card streak-tile"><span class="c-orange">${icon('flame', 26)}</span><b>${displayStreak(state, now)}</b><small>${t('Day streak')} ›</small></button>
+      <div class="card stat-card"><span class="c-gold">${icon('bolt', 26)}</span><b>${state.xp}</b><small>${t('Total XP')}</small></div>
+      ${L.hasKana ? html`<a class="card stat-card link-card" href="#/practice/kana"><span class="c-blue">${icon('kana', 26)}</span><b>${count('kana')}</b><small>${t('Kana learned')} ›</small></a>` : ''}
+      <a class="card stat-card link-card" href="#/practice/words"><span class="c-green">${icon('word', 26)}</span><b>${count('word', 'sentence')}</b><small>${t('Words & phrases')} ›</small></a>
+      ${L.latin ? '' : html`<a class="card stat-card link-card" href="#/practice/kanji"><span class="c-purple">${raw(`<b class="jp" style="font-size:22px">${L.glyph}</b>`)}</span><b>${count('kanji', 'kword', 'radical')}</b><small>${t(L.code === 'zh' ? 'Characters' : 'Kanji & radicals')} ›</small></a>`}
+      <a class="card stat-card link-card" href="#/collection/fact"><span class="c-orange">${icon('book', 26)}</span><b>${state.seen.fact.length}</b><small>${t('Fun facts')} ›</small></a>
     </div>
 
-    <h2 class="sub-title">Achievements</h2>
+    <h2 class="sub-title">${t('Achievements')}</h2>
     <div class="card achievements">${achievements(state, now).map((a) => {
       const done = a.value >= a.goal;
       return html`<div class="ach ${done ? 'done' : ''}"><span class="ach-icon jp">${a.icon}</span>
@@ -116,50 +117,50 @@ export function renderProfile(root, focus) {
         ${done ? shareButton(`🏆 I unlocked "${a.title}" (${a.desc}) learning ${L.name} with Hajime!`, '') : html`<span class="ach-count">${Math.min(a.value, a.goal)}/${a.goal}</span>`}</div>`;
     })}</div>
 
-    <h2 class="sub-title">Shop</h2>
+    <h2 class="sub-title">${t('Shop')}</h2>
     <div class="card shop-row">
       <span class="shop-icon">🧊</span>
-      <div><b>Streak freeze</b><small class="muted">Keeps your streak if you miss a day. You have ${state.streak.freezes}/${MAX_FREEZES}.</small></div>
+      <div><b>${t('Streak freeze')}</b><small class="muted">${t('Keeps your streak if you miss a day. You have {a}/{b}.', { a: state.streak.freezes, b: MAX_FREEZES })}</small></div>
       <button class="btn btn-white buy-freeze" ${state.gems < FREEZE_PRICE || state.streak.freezes >= MAX_FREEZES ? 'disabled' : ''}>${icon('gem', 16)} ${FREEZE_PRICE}</button>
     </div>
 
-    <h2 class="sub-title">Settings</h2>
+    <h2 class="sub-title">${t('Settings')}</h2>
     <div class="card settings">
-      <div class="setting"><span>Appearance</span>${seg('theme', s.theme, [['system', 'Auto'], ['light', 'Light'], ['dark', 'Dark']])}</div>
-      <div class="setting"><span>Daily goal</span>${seg('dailyGoal', state.dailyGoal, [[10, 'Casual'], [20, 'Regular'], [30, 'Serious'], [50, 'Intense']])}</div>
-      <div class="setting"><span>Speed challenge</span>${seg('speed', s.speed !== false, [[true, 'On'], [false, 'Off']])}</div>
-      <div class="setting"><span>Speaking tasks</span>${seg('speaking', s.speaking !== false, [[true, 'On'], [false, 'Off']])}</div>
-      <div class="setting"><span>Sound effects</span>${seg('sfx', s.sfx, [[true, 'On'], [false, 'Off']])}</div>
-      <div class="setting"><span>Daily reminder<small class="muted setting-note">${s.reminders ? 'A nudge once a day if you have not studied' : 'Off'}</small></span>
-        <button class="btn btn-white btn-small reminder-btn">${s.reminders ? 'Turn off' : 'Turn on'}</button></div>
-      ${L.latin ? '' : html`<div class="setting"><span>Romaji help</span>${seg('romaji', s.romaji || 'auto', [['auto', 'Auto'], ['always', 'Always']])}</div>`}
-      <div class="setting"><span>Voice speed</span>${seg('voiceRate', s.voiceRate, [[0.7, 'Slow'], [0.85, 'Normal'], [1, 'Fast']])}</div>
-      <div class="setting column"><span>${L.name} voice</span><small class="muted voice-status">${VOICE_TEXT[voiceStatus()]}</small>
-        <button class="btn btn-white test-voice">${icon('speaker', 18)} Test: ${L.voiceTest}</button></div>
+      <div class="setting"><span>${t('Appearance')}</span>${seg('theme', s.theme, [['system', t('Auto')], ['light', t('Light')], ['dark', t('Dark')]])}</div>
+      <div class="setting"><span>${t('Daily goal')}</span>${seg('dailyGoal', state.dailyGoal, [[10, t('Casual')], [20, t('Regular')], [30, t('Serious')], [50, t('Intense')]])}</div>
+      <div class="setting"><span>${t('Speed challenge')}<small class="muted setting-note">${s.speed === undefined ? t('Starts after your second lesson') : ''}</small></span>${seg('speed', speedOn(state), [[true, t('On')], [false, t('Off')]])}</div>
+      <div class="setting"><span>${t('Speaking tasks')}</span>${seg('speaking', s.speaking !== false, [[true, t('On')], [false, t('Off')]])}</div>
+      <div class="setting"><span>${t('Sound effects')}</span>${seg('sfx', s.sfx, [[true, t('On')], [false, t('Off')]])}</div>
+      <div class="setting"><span>${t('Daily reminder')}<small class="muted setting-note">${s.reminders ? t('A nudge once a day if you have not studied') : t('Off')}</small></span>
+        <button class="btn btn-white btn-small reminder-btn">${s.reminders ? t('Turn off') : t('Turn on')}</button></div>
+      ${L.latin ? '' : html`<div class="setting"><span>${t('Romaji help')}</span>${seg('romaji', s.romaji || 'auto', [['auto', t('Auto')], ['always', t('Always')]])}</div>`}
+      <div class="setting"><span>${t('Voice speed')}</span>${seg('voiceRate', s.voiceRate, [[0.7, t('Slow')], [0.85, t('Normal')], [1, t('Fast')]])}</div>
+      <div class="setting column"><span>${t('{lang} voice', { lang: langName() })}</span><small class="muted voice-status">${voiceText()[voiceStatus()]}</small>
+        <button class="btn btn-white test-voice">${icon('speaker', 18)} ${t('Test:')} ${L.voiceTest}</button></div>
     </div>
 
-    <h2 class="sub-title" id="sec-backup">Backup</h2>
+    <h2 class="sub-title" id="sec-backup">${t('Backup')}</h2>
     <div class="card settings">
-      <p class="muted small">Your progress is saved on this phone only. Save a backup to Google Drive now and then, so you can restore it on a new phone.</p>
+      <p class="muted small">${t('Your progress is saved on this phone only. Save a backup to Google Drive now and then, so you can restore it on a new phone.')}</p>
       <p class="backup-age ${backupStale(state, now) ? 'stale' : ''}">${backupAgeText(state, now)}</p>
       <div class="row-btns">
-        <button class="btn btn-white export">${icon('upload', 18)} ${canShareFiles() ? 'Save to Drive' : 'Save backup'}</button>
-        <label class="btn btn-white import">${icon('download', 18)} Restore<input type="file" accept="application/json,.json,text/plain,.txt" hidden></label>
+        <button class="btn btn-white export">${icon('upload', 18)} ${t(canShareFiles() ? 'Save to Drive' : 'Save backup')}</button>
+        <label class="btn btn-white import">${icon('download', 18)} ${t('Restore')}<input type="file" accept="application/json,.json,text/plain,.txt" hidden></label>
       </div>
       <p class="muted small">${canShareFiles()
-        ? html`<b>Save to Drive</b> opens your phone's share menu: pick <b>Drive</b> → Save. To restore, tap <b>Restore</b>, open the menu ☰ in the file picker, choose <b>Drive</b> and pick the newest <i>hajime-backup</i> file.`
-        : 'The backup file goes to your Downloads. Keep a copy in Google Drive or iCloud.'}</p>
+        ? t('Save to Drive opens your phone\'s share menu: pick Drive → Save. To restore, tap Restore, open the menu ☰ in the file picker, choose Drive and pick the newest hajime-backup file.')
+        : t('The backup file goes to your Downloads. Keep a copy in Google Drive or iCloud.')}</p>
     </div>
 
-    <h2 class="sub-title">About</h2>
+    <h2 class="sub-title">${t('About')}</h2>
     <div class="card settings">
-      <button class="setting version-row"><span>App version</span><span class="version">v${APP_RELEASE} · ${versionLabel()} ›</span></button>
-      <button class="btn btn-white check-update">${icon('refresh', 18)} Check for updates</button>
-      <button class="btn btn-ghost hard-refresh">Reload latest version</button>
-      <p class="muted small">Not seeing an update? “Reload latest version” clears the app's cached files and loads it fresh from GitHub. Your progress is kept.</p>
-      <button class="btn btn-danger-ghost reset">Reset all progress</button>
+      <button class="setting version-row"><span>${t('App version')}</span><span class="version">v${APP_RELEASE} · ${versionLabel()} ›</span></button>
+      <button class="btn btn-white check-update">${icon('refresh', 18)} ${t('Check for updates')}</button>
+      <button class="btn btn-ghost hard-refresh">${t('Reload latest version')}</button>
+      <p class="muted small">${t('Not seeing an update? “Reload latest version” clears the app\'s cached files and loads it fresh from GitHub. Your progress is kept.')}</p>
+      <button class="btn btn-danger-ghost reset">${t('Reset all progress')}</button>
     </div>
-    <p class="muted small center">Hajime — はじめ — means “beginning”${L.code === 'zh' ? ' (in Chinese: 开始, kāishǐ)' : ''}.</p>
+    <p class="muted small center">${t('Hajime — はじめ — means “beginning”')}${L.code === 'zh' ? ' (in Chinese: 开始, kāishǐ)' : ''}.</p>
     <p class="muted small center credits">${L.latin ? '' : 'Stroke order data: '}${L.latin ? '' : L.code === 'zh' ? html`<a href="https://github.com/skishore/makemeahanzi" target="_blank" rel="noopener">Make Me a Hanzi</a> (Arphic Public License)` : html`<a href="https://kanjivg.tagaini.net" target="_blank" rel="noopener">KanjiVG</a> (CC BY-SA 3.0)`}${L.latin ? '' : '. '}Illustrations: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a> (CC BY 4.0).</p>
   </main>`);
 
@@ -186,23 +187,23 @@ export function renderProfile(root, focus) {
       return renderProfile(root);
     }
     const result = await enableReminders();
-    if (result === 'denied') return toast('Notifications are blocked — allow them for Hajime in your phone settings.');
+    if (result === 'denied') return toast(t('Notifications are blocked — allow them for Hajime in your phone settings.'));
     if (result === 'unsupported') {
       return modal(html`<div class="center"><h2>Daily reminder</h2><p class="muted">Reminders need the app on your home screen in Chrome on Android. Open the browser menu → <b>Add to Home screen</b> (or Install app), then open Hajime from its icon and turn this on again.</p></div>`, [{ label: 'OK', kind: 'secondary' }]);
     }
     state.settings.reminders = true;
     app.save();
-    toast('Daily reminder on 🔔');
+    toast(`${t('Daily reminder on')} 🔔`);
     renderProfile(root);
   });
   $('.test-voice', root).addEventListener('click', () => {
     speak(L.voiceTest);
-    setTimeout(() => ($('.voice-status', root).textContent = VOICE_TEXT[voiceStatus()]), 600);
+    setTimeout(() => ($('.voice-status', root).textContent = voiceText()[voiceStatus()]), 600);
   });
   $('.buy-freeze', root).addEventListener('click', () => {
     if (buyFreeze(state)) {
       app.save();
-      toast('Streak freeze equipped 🧊');
+      toast(`${t('Streak freeze equipped')} 🧊`);
       renderProfile(root);
     }
   });
@@ -211,7 +212,7 @@ export function renderProfile(root, focus) {
     if (!saved) return;
     state.backupAt = Date.now();
     app.save();
-    toast(saved === 'shared' ? 'Backup sent ✅ — check it arrived in Drive' : 'Backup saved to Downloads ✅');
+    toast(t(saved === 'shared' ? 'Backup sent ✅ — check it arrived in Drive' : 'Backup saved to Downloads ✅'));
     renderProfile(root, 'backup');
   });
   $('.import input', root).addEventListener('change', async (e) => {
@@ -219,9 +220,9 @@ export function renderProfile(root, focus) {
     if (!file) return;
     try {
       const next = importBackup(await file.text());
-      modal(html`<h2>Restore this backup?</h2><p class="muted">It has ${next.xp} XP and replaces the progress on this device.</p>`, [
-        { label: 'Restore', onClick: () => { app.replaceState(next); toast('Progress restored ✅'); renderProfile(root); } },
-        { label: 'Cancel', kind: 'secondary' },
+      modal(html`<h2>${t('Restore this backup?')}</h2><p class="muted">${t('It has {n} XP and replaces the progress on this device.', { n: next.xp })}</p>`, [
+        { label: t('Restore'), onClick: () => { app.replaceState(next); toast(t('Progress restored ✅')); renderProfile(root); } },
+        { label: t('Cancel'), kind: 'secondary' },
       ]);
     } catch (err) {
       toast(err.message || 'Could not read that file.');
@@ -232,20 +233,20 @@ export function renderProfile(root, focus) {
   // Hidden: a double tap on the avatar opens the test lab.
   let lastTap = 0;
   $('.avatar', root).addEventListener('click', () => {
-    const t = Date.now();
-    if (t - lastTap < 400) askOpenLab();
-    lastTap = t;
+    const tapAt = Date.now();
+    if (tapAt - lastTap < 400) askOpenLab();
+    lastTap = tapAt;
   });
   $('.check-update', root).addEventListener('click', () => checkForUpdate());
   $('.version-row', root).addEventListener('click', () =>
-    modal(html`<h2>What's new</h2>
+    modal(html`<h2>${t('What\'s new')}</h2>
       <div class="changelog">${CHANGELOG.map((r) => html`<section><h3>v${r.version} <small>${r.date}</small></h3>
-        <ul>${r.changes.map((c) => html`<li>${c}</li>`)}</ul></section>`)}</div>`, [{ label: 'Close', kind: 'secondary' }]));
+        <ul>${r.changes.map((c) => html`<li>${c}</li>`)}</ul></section>`)}</div>`, [{ label: t('Close'), kind: 'secondary' }]));
   $('.hard-refresh', root).addEventListener('click', () => hardRefresh());
   $('.reset', root).addEventListener('click', () =>
-    modal(html`<div class="center">${mascot('sad', 90)}<h2>Reset everything?</h2><p class="muted">All XP, streaks and lessons on this device will be erased. This cannot be undone.</p></div>`, [
-      { label: 'Keep my progress' },
-      { label: 'Erase progress', kind: 'danger-ghost', onClick: () => { app.replaceState(defaultState()); app.go('#/learn'); } },
+    modal(html`<div class="center">${mascot('sad', 90)}<h2>${t('Reset everything?')}</h2><p class="muted">${t('All XP, streaks and lessons on this device will be erased. This cannot be undone.')}</p></div>`, [
+      { label: t('Keep my progress') },
+      { label: t('Erase progress'), kind: 'danger-ghost', onClick: () => { app.replaceState(defaultState()); app.go('#/learn'); } },
     ]),
   );
 }

@@ -12,6 +12,8 @@ import { speak, sfx, buzz } from '../audio.js';
 import { MISSIONS } from '../content/pack.js';
 import { completeMission, unitLessonsDone } from '../progress.js';
 import { shuffle } from '../lesson/generate.js';
+import { t } from '../strings.js';
+import { hideNav } from './activity.js';
 
 export const missionUnit = (m) => SECTIONS.flatMap((s) => s.units).find((u) => u.id === m.unit);
 export const missionOpen = (state, m) => app.testMode || unitLessonsDone(state, missionUnit(m));
@@ -23,8 +25,9 @@ export function renderMission(root, id) {
   if (!m || !missionOpen(app.state, m)) return app.go('#/practice');
   let step = 0;
   let mistakes = 0;
+  hideNav();
 
-  mount(root, html`<header class="topbar topbar-back"><a class="icon-btn" href="#/practice" aria-label="Close">${icon('close', 24)}</a><h1>${m.title}</h1></header>
+  mount(root, html`<header class="topbar topbar-back"><a class="icon-btn" href="#/practice" aria-label="${t('Close')}">${icon('close', 24)}</a><h1>${m.title}</h1></header>
   <main class="page mission">
     <section class="mission-scene">${art(m.art, 'art-lg')}<p>${m.setting}</p></section>
     <div class="chat"></div>
@@ -39,7 +42,7 @@ export function renderMission(root, id) {
     el.className = `chat-line ${mine ? 'mine' : ''}`;
     mount(el, html`${mine ? '' : html`<div class="chat-who">${person(who, 56)}<small>${nameOf(who)}</small></div>`}
       <button class="chat-bubble">${line.jp ? html`<span class="jp">${line.jp}</span>${L.latin ? '' : html`<small class="chat-romaji">${line.romaji}</small>`}` : ''}
-        <small class="chat-en" ${mine || !line.jp ? '' : 'hidden'}>${line.en}</small>${line.jp && !mine ? html`<small class="chat-tap">Tap for English</small>` : ''}</button>`);
+        <small class="chat-en" ${mine || !line.jp ? '' : 'hidden'}>${line.en}</small>${line.jp && !mine ? html`<small class="chat-tap">${t('Tap for translation')}</small>` : ''}</button>`);
     chat.append(el);
     $('.chat-bubble', el).addEventListener('click', () => {
       $('.chat-en', el).hidden = false;
@@ -56,7 +59,7 @@ export function renderMission(root, id) {
       speak(s.jp, { speaker: s.who });
     }
     const replies = shuffle(s.replies);
-    mount(act, html`<p class="mission-prompt">${s.prompt || 'What do you say?'}</p>
+    mount(act, html`<p class="mission-prompt">${s.prompt || t('What do you say?')}</p>
       <div class="options list">${replies.map((r, k) => html`<button class="option reply" data-k="${k}">
         ${r.jp ? html`<span class="opt-label"><span class="jp">${r.jp}</span>${L.latin ? '' : html`<small>${r.romaji}</small>`}</span>` : html`<span class="opt-label">${r.en}</span>`}</button>`)}</div>
       <p class="mission-note" hidden></p>`);
@@ -81,7 +84,7 @@ export function renderMission(root, id) {
     bubble('you', r, true);
     if (r.jp) speak(r.jp, { speaker: 'woman' });
     mount(act, html`${r.note ? html`<p class="mission-note good">${r.note}</p>` : ''}
-      <button class="btn btn-primary btn-block mission-next">${step + 1 < m.steps.length ? 'Continue' : 'Finish'}</button>`);
+      <button class="btn btn-primary btn-block mission-next">${step + 1 < m.steps.length ? t('Continue') : t('Finish')}</button>`);
     $('.mission-next', act).addEventListener('click', () => {
       step += 1;
       if (step < m.steps.length) show();
@@ -97,13 +100,13 @@ export function renderMission(root, id) {
     sfx('complete');
     mount(root, html`<main class="page mission-done">
       ${art(m.art, 'art-xl')}
-      <h1>Mission complete!</h1>
+      <h1>${t('Mission complete!')}</h1>
       ${starRow(stars)}
       <p>${m.reward}</p>
-      <div class="extras"><p class="pill pill-gold">${icon('bolt', 16)} +${res.xp} XP</p>${res.gems ? html`<p class="pill pill-blue">${icon('gem', 16)} +${res.gems} gems</p>` : ''}</div>
-      ${stars < 3 ? html`<p class="muted small">Play again with no mistakes for 3 stars.</p>` : ''}
-      <button class="btn btn-primary btn-block mission-again">Play again</button>
-      <a class="btn btn-white btn-block" href="#/practice">Back to practice</a>
+      <div class="extras"><p class="pill pill-gold">${icon('bolt', 16)} +${res.xp} XP</p>${res.gems ? html`<p class="pill pill-blue">${icon('gem', 16)} +${res.gems} ${t('gems')}</p>` : ''}</div>
+      ${stars < 3 ? html`<p class="muted small">${t('Play again with no mistakes for 3 stars.')}</p>` : ''}
+      <button class="btn btn-primary btn-block mission-again">${t('Play again')}</button>
+      <a class="btn btn-white btn-block" href="#/practice">${t('Back to practice')}</a>
     </main>`);
     $('.mission-again', root).addEventListener('click', () => renderMission(root, id));
   };
@@ -116,8 +119,8 @@ export function missionCards(state) {
   return html`<div class="missions">${MISSIONS.map((m) => {
     const open = missionOpen(state, m);
     const stars = state.missions[m.id] || 0;
-    return html`<a class="card mission-card ${open ? '' : 'locked'}" href="${open ? `#/mission/${m.id}` : '#/practice'}">
+    return html`<a class="card mission-card ${open ? (stars ? 'done' : 'ready') : 'locked'}" href="${open ? `#/mission/${m.id}` : '#/practice'}">
       ${art(m.art, 'art-col')}<b>${m.title}</b>
-      ${open ? (stars ? starRow(stars) : html`<small class="new">New!</small>`) : html`<small>🔒 Finish “${missionUnit(m).title}”</small>`}</a>`;
+      ${open ? (stars ? html`${starRow(stars)}<small class="done-tag">${t('Done · replay')}</small>` : html`<small class="new">${t('Ready to play')}</small>`) : html`<small>🔒 ${t('Finish “{unit}”', { unit: missionUnit(m).title })}</small>`}</a>`;
   })}</div>`;
 }

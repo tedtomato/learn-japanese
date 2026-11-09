@@ -40,13 +40,13 @@ export const SECTIONS_DATA = [
         desc: 'Greet people, thank them and say sorry',
         facts: [FACT.language, FACT.daily],
         phrases: [PHRASE.basics],
-        dialogues: ['d-bonjour'],
+        dialogues: ['d-bonjour', 'd-bonjour2'],
         lessons: [
           { title: 'Hello', words: [
             ['bonjour', 'hello / good morning', '👋', { note: 'Say it to everyone when you walk into a shop, a café or a bus. Skipping it sounds rude!' }],
             ['bonsoir', 'good evening', '🌙', { note: 'From late afternoon on, instead of bonjour.' }],
             ['salut', 'hi / bye (casual)', '😀', { note: 'Only with friends and people your age. It works for hello and for goodbye.' }],
-            ['madame', 'madam / Mrs', '👘', { note: 'Add it to a greeting to be polite: bonjour madame. Said on its own, it is how you address a woman.' }],
+            ['madame', 'madam / Mrs', '🪭', { note: 'Add it to a greeting to be polite: bonjour madame. Said on its own, it is how you address a woman.' }],
             ['monsieur', 'sir / Mr', '👔', { note: 'Bonjour monsieur. Never say "mademoiselle" anymore: madame is used for every adult woman.' }],
           ] },
           { title: 'Thank you', words: [
@@ -85,7 +85,7 @@ export const SECTIONS_DATA = [
         desc: 'Stations, the métro, tickets and finding the toilets',
         facts: [FACT.transport, FACT.city],
         phrases: [PHRASE.around],
-        dialogues: ['d-metro'],
+        dialogues: ['d-metro', 'd-metro2'],
         lessons: [
           { title: 'Stations', words: [
             ['la gare', 'train station', '🚉', { note: 'Paris has several big stations: Gare du Nord, Gare de Lyon, Gare Montparnasse…' }],
@@ -104,6 +104,11 @@ export const SECTIONS_DATA = [
             ['le musée', 'museum', '🏺'],
             ['la rue', 'street', '🛣️'],
           ] },
+          { title: 'Moving about', words: [
+            ['aller', 'to go', '🏃', { note: 'Irregular: je vais, tu vas, il va, nous allons, vous allez, ils vont. Ça va? literally asks "does it go?"' }],
+            ['venir', 'to come', '🫵', { note: 'Je viens, tu viens, il vient. Je viens de Londres = I come from London.' }],
+            ['prendre', 'to take', '🤏', { note: 'Used for transport and food: je prends le métro, je prends un café.' }],
+          ] },
           { title: 'Which way?', words: [
             ['où', 'where', '❓', { note: 'With an accent! Without it, ou means "or".' }],
             ['à gauche', 'on the left / to the left', '⬅️'],
@@ -121,6 +126,12 @@ export const SECTIONS_DATA = [
             { jp: ['c\'est', 'à gauche'], en: 'It is on the left', alt: ['It\'s on the left', 'It\'s to the left', 'On the left'] },
             { jp: ['allez', 'tout droit'], en: 'Go straight ahead', alt: ['Go straight on', 'Go straight', 'Straight ahead'] },
           ] },
+          { title: 'I\'m going…', sentences: [
+            { jp: ['je', 'vais', 'à', 'la', 'gare'], en: 'I am going to the train station', alt: ['I\'m going to the train station', 'I am going to the station', 'I\'m going to the station', 'I go to the station'] },
+            { jp: ['je', 'prends', 'le', 'métro'], en: 'I take the metro', alt: ['I\'m taking the metro', 'I am taking the metro', 'I take the subway', 'I\'m taking the subway'] },
+            { jp: ['tu', 'viens', 'avec', 'nous'], en: 'Are you coming with us', alt: ['You are coming with us', 'You\'re coming with us', 'Are you coming along', 'Do you come with us'] },
+            { jp: ['on', 'prend', 'un', 'taxi'], en: 'We are taking a taxi', alt: ['We\'re taking a taxi', 'Let\'s take a taxi', 'We take a taxi', 'Shall we take a taxi'] },
+          ] },
         ],
       },
       {
@@ -129,7 +140,7 @@ export const SECTIONS_DATA = [
         desc: 'Order at a café, say cheers and ask for the bill',
         facts: [FACT.food],
         phrases: [PHRASE.cafe],
-        dialogues: ['d-cafe'],
+        dialogues: ['d-cafe', 'd-cafe2'],
         lessons: [
           { title: 'At the café', words: [
             ['le café', 'coffee / café', '☕', { note: 'Un café is a small black espresso. With milk: un café crème. Le café is also the place.' }],
@@ -179,7 +190,7 @@ export const SECTIONS_DATA = [
         desc: 'Count to ten, prices, paying by card, markets and the bakery',
         facts: [FACT.daily, FACT.city],
         phrases: [PHRASE.shopping],
-        dialogues: ['d-market'],
+        dialogues: ['d-market', 'd-market2'],
         lessons: [
           { title: 'How much?', words: [
             ['combien', 'how much / how many', '💰', { note: 'C\'est combien? = how much is it?' }],
@@ -219,6 +230,11 @@ export const SECTIONS_DATA = [
             ['la carte postale', 'postcard', '📮'],
             ['le cadeau', 'gift / present', '🎁', { note: 'C\'est pour offrir? = Is it a gift? Shops may wrap it for you.' }],
           ] },
+          { title: 'Buying', words: [
+            ['acheter', 'to buy', '🛍️', { note: 'J\'achète, tu achètes, nous achetons. Note the accent change: achète.' }],
+            ['vouloir', 'to want', '🎯', { note: 'Je veux, tu veux, il veut, nous voulons. Je voudrais is the polite form of je veux.' }],
+            ['avoir besoin de', 'to need', '🤲', { note: 'Literally "to have need of": j\'ai besoin d\'un sac. Before le or les it becomes du or des: j\'ai besoin du sac.' }],
+          ] },
           { title: 'How much is it?', sentences: [
             { jp: ['c\'est', 'combien'], en: 'How much is it', alt: ['How much is this', 'How much does it cost', 'How much is that'] },
             { jp: ['c\'est', 'trop', 'cher'], en: 'It is too expensive', alt: ['It\'s too expensive', 'That\'s too expensive', 'Too expensive'] },
@@ -230,6 +246,11 @@ export const SECTIONS_DATA = [
             { jp: ['je', 'ne', 'sais', 'pas'], en: 'I do not know', alt: ['I don\'t know'] },
             { jp: ['je', 'regarde', 'seulement'], en: 'I am just looking', alt: ['I\'m just looking', 'Just looking', 'I\'m only looking'] },
             { jp: ['vous', 'parlez', 'anglais'], en: 'Do you speak English', alt: ['You speak English', 'Can you speak English'] },
+          ] },
+          { title: 'I want, I need', sentences: [
+            { jp: ['je', 'veux', 'acheter', 'un', 'cadeau'], en: 'I want to buy a gift', alt: ['I want to buy a present', 'I\'d like to buy a gift'] },
+            { jp: ['j\'ai', 'besoin', 'd\'un', 'sac'], en: 'I need a bag', alt: ['I have need of a bag', 'I\'m in need of a bag'] },
+            { jp: ['elle', 'achète', 'du', 'pain'], en: 'She buys some bread', alt: ['She is buying some bread', 'She\'s buying bread', 'She buys bread', 'She is buying bread'] },
           ] },
         ],
       },
@@ -245,8 +266,28 @@ export const SECTIONS_DATA = [
         desc: 'Bigger numbers, days and telling the time',
         facts: [FACT.language, FACT.history],
         phrases: [PHRASE.hotel],
-        dialogues: ['d-train'],
+        dialogues: ['d-train', 'd-train2'],
         lessons: [
+          { title: 'Eleven to fifteen', words: [
+            ['onze', 'eleven', '🔢', { note: 'No elision: le onze, not l\'onze.', alt: ['11'] }],
+            ['douze', 'twelve', '🔢', { alt: ['12'] }],
+            ['treize', 'thirteen', '🔢', { alt: ['13'] }],
+            ['quatorze', 'fourteen', '🔢', { alt: ['14'] }],
+            ['quinze', 'fifteen', '🔢', { alt: ['15'] }],
+          ] },
+          { title: 'Sixteen to nineteen', words: [
+            ['seize', 'sixteen', '🔢', { alt: ['16'] }],
+            ['dix-sept', 'seventeen', '🔢', { note: 'Literally "ten-seven". From here on, the numbers are built like this.', alt: ['17'] }],
+            ['dix-huit', 'eighteen', '🔢', { alt: ['18'] }],
+            ['dix-neuf', 'nineteen', '🔢', { alt: ['19'] }],
+          ] },
+          { title: 'Tens', words: [
+            ['trente', 'thirty', '🔢', { alt: ['30'] }],
+            ['quarante', 'forty', '🔢', { alt: ['40'] }],
+            ['soixante', 'sixty', '🔢', { alt: ['60'] }],
+            ['quatre-vingts', 'eighty', '🔢', { note: 'Literally "four twenties". It loses its s before another number: quatre-vingt-un (81). Belgium and Switzerland say huitante or octante instead.', alt: ['80', 'quatre-vingt'] }],
+            ['quatre-vingt-dix', 'ninety', '🔢', { note: 'Literally "four-twenty-ten". 91 is quatre-vingt-onze.', alt: ['90'] }],
+          ] },
           { title: 'Bigger numbers', words: [
             ['vingt', 'twenty', '🔢', { note: 'The g and t are silent: "van".', alt: ['20'] }],
             ['cinquante', 'fifty', '🔢', { alt: ['50'] }],
@@ -265,10 +306,39 @@ export const SECTIONS_DATA = [
             ['samedi', 'Saturday', '📅'],
             ['dimanche', 'Sunday', '📅', { note: 'Many shops are closed on Sunday, especially in small towns.' }],
           ] },
+          { title: 'More days', words: [
+            ['mercredi', 'Wednesday', '📅', { note: 'Mercredi is the traditional day off school for younger children.' }],
+            ['jeudi', 'Thursday', '📅'],
+            ['vendredi', 'Friday', '📅'],
+          ] },
           { title: 'Weekend & day', words: [
             ['le week-end', 'weekend', '😎'],
             ['le matin', 'morning', '🌅'],
             ['le soir', 'evening', '🌃'],
+          ] },
+          { title: 'Half past', words: [
+            ['midi', 'noon', '🕐', { note: 'Also means "south" — le Midi is the south of France.' }],
+            ['minuit', 'midnight', '🌙'],
+            ['et demie', 'half past', '🕧', { note: 'Il est sept heures et demie = 7:30. Demie is feminine because heure is: but midi et demi is masculine.', alt: ['et demi'] }],
+            ['et quart', 'quarter past', '🕒', { note: 'Quarter to is moins le quart: huit heures moins le quart = 7:45.' }],
+          ] },
+          { title: 'Months (1)', words: [
+            ['janvier', 'January', '📅', { note: 'Months take no capital letter. In January = en janvier.' }],
+            ['février', 'February', '📅'],
+            ['mars', 'March', '📅', { note: 'The s is pronounced: "marss".' }],
+            ['avril', 'April', '📅'],
+          ] },
+          { title: 'Months (2)', words: [
+            ['mai', 'May', '📅', { note: 'Au mois de mai, or en mai.' }],
+            ['juin', 'June', '📅'],
+            ['juillet', 'July', '📅', { note: 'The 14th of July is the national day.' }],
+            ['août', 'August', '📅', { note: 'Said "oot". Many French people go on holiday in August.' }],
+          ] },
+          { title: 'Months (3)', words: [
+            ['septembre', 'September', '📅', { note: 'September is la rentrée: back to school and work.' }],
+            ['octobre', 'October', '📅'],
+            ['novembre', 'November', '📅'],
+            ['décembre', 'December', '📅'],
           ] },
           { title: 'Two, please', grammar: 'plural', sentences: [
             { jp: ['deux', 'cafés', 's\'il vous plaît'], en: 'Two coffees please', alt: ['Two coffees, please'] },
@@ -281,6 +351,24 @@ export const SECTIONS_DATA = [
             { jp: ['le', 'train', 'part', 'maintenant'], en: 'The train is leaving now', alt: ['The train leaves now', 'The train\'s leaving now'] },
             { jp: ['à', 'demain'], en: 'See you tomorrow', alt: ['Until tomorrow', 'Till tomorrow'] },
           ] },
+          { title: 'At what time?', grammar: 'time', sentences: [
+            { jp: ['il', 'est', 'sept', 'heures', 'et demie'], en: 'It is half past seven', alt: ['It\'s half past seven', 'It is seven thirty', 'It\'s seven thirty', 'It\'s 7:30', 'It is 7:30', 'It\'s seven-thirty'] },
+            { jp: ['le', 'train', 'part', 'à', 'huit', 'heures'], en: 'The train leaves at eight o\'clock', alt: ['The train leaves at eight', 'The train departs at eight o\'clock', 'The train leaves at 8 o\'clock', 'The train leaves at 8'] },
+            { jp: ['à', 'quelle', 'heure', 'part', 'le', 'train'], en: 'What time does the train leave', alt: ['At what time does the train leave', 'What time is the train leaving', 'When does the train leave'] },
+            { jp: ['je', 'travaille', 'lundi'], en: 'I work on Monday', alt: ['I am working on Monday', 'I\'m working on Monday', 'I work Monday', 'I\'m working Monday'] },
+            { jp: ['rendez-vous', 'à', 'midi'], en: 'See you at noon', alt: ['Let\'s meet at noon', 'Meet at noon', 'See you at midday', 'Let\'s meet at midday'] },
+          ] },
+          { title: 'Dates', sentences: [
+            { jp: ['aujourd\'hui', 'c\'est', 'lundi'], en: 'Today is Monday', alt: ['Today it is Monday', 'It\'s Monday today', 'Today it\'s Monday'] },
+            { jp: ['c\'est', 'le', 'quinze', 'mai'], en: 'It is the fifteenth of May', alt: ['It\'s the fifteenth of May', 'It is May fifteenth', 'It\'s May fifteenth', 'It\'s the 15th of May', 'It is the 15th of May', 'It\'s May 15th', 'It is May 15th'] },
+            { jp: ['il', 'fait', 'chaud', 'en', 'juillet'], en: 'It is hot in July', alt: ['It\'s hot in July', 'It is warm in July', 'It\'s warm in July'] },
+            { jp: ['mon', 'anniversaire', 'est', 'en', 'décembre'], en: 'My birthday is in December', alt: ['My birthday\'s in December'] },
+          ] },
+          { title: 'Numbers in use', sentences: [
+            { jp: ['ça', 'fait', 'douze', 'euros'], en: 'That is twelve euros', alt: ['That\'s twelve euros', 'That comes to twelve euros', 'It is twelve euros', 'It\'s twelve euros', 'That makes twelve euros', 'That\'s 12 euros'] },
+            { jp: ['j\'ai', 'trente', 'ans'], en: 'I am thirty years old', alt: ['I\'m thirty years old', 'I\'m thirty', 'I am thirty', 'I\'m 30', 'I am 30', 'I\'m 30 years old'] },
+            { jp: ['le', 'billet', 'coûte', 'soixante', 'euros'], en: 'The ticket costs sixty euros', alt: ['The ticket is sixty euros', 'The ticket costs 60 euros', 'The ticket is 60 euros'] },
+          ] },
         ],
       },
       {
@@ -289,7 +377,7 @@ export const SECTIONS_DATA = [
         desc: 'Introduce yourself, your family and your job',
         facts: [FACT.history, FACT.culture],
         phrases: [PHRASE.basics],
-        dialogues: ['d-meet'],
+        dialogues: ['d-meet', 'd-meet2'],
         lessons: [
           { title: 'Family', words: [
             ['la famille', 'family', '👫'],
@@ -319,6 +407,18 @@ export const SECTIONS_DATA = [
             ['américain', 'American', '🇺🇸', { note: 'A woman says américaine.', alt: ['américaine'] }],
             ['français', 'French', '🇫🇷', { note: 'A woman says française. The language is le français.', alt: ['française'] }],
           ] },
+          { title: 'He, she, they', words: [
+            ['il', 'he / it', '🧑', { note: 'Il is also "it" for masculine things: le train? Il part à huit heures.' }],
+            ['elle', 'she / it', '💐', { note: 'Elle is also "it" for feminine things: la gare? Elle est à gauche.' }],
+            ['ils', 'they (masculine or mixed)', '🧑‍🤝‍🧑', { note: 'Use ils for a group with at least one man or boy, even among a hundred women.' }],
+            ['elles', 'they (all feminine)', '👫', { note: 'Only for groups with no men or boys. It sounds the same as elle.' }],
+          ] },
+          { title: 'I, you, we', words: [
+            ['je', 'I', '🙋', { note: 'Becomes j\' before a vowel: j\'ai, j\'aime. Never a capital letter inside a sentence.' }],
+            ['tu', 'you (friendly)', '👉', { note: 'For friends, family, children and pets.' }],
+            ['nous', 'we', '🤝', { note: 'Nous sommes… sounds formal: in conversation, people say on est…' }],
+            ['vous', 'you (polite or several people)', '🫵'],
+          ] },
           { title: 'Who are you?', sentences: [
             { jp: ['je', 'm\'appelle', 'Camille'], en: 'My name is Camille', alt: ['I\'m Camille', 'I am Camille', 'I am called Camille', 'My name\'s Camille'] },
             { jp: ['comment', 'vous', 'appelez-vous'], en: 'What is your name', alt: ['What\'s your name'] },
@@ -331,6 +431,13 @@ export const SECTIONS_DATA = [
             { jp: ['ma', 'sœur', 'est', 'professeur'], en: 'My sister is a teacher', alt: ['My sister\'s a teacher'] },
             { jp: ['mes', 'enfants', 'sont', 'à', 'Paris'], en: 'My children are in Paris', alt: ['My kids are in Paris'] },
           ] },
+          { title: 'Who is who?', grammar: 'pronouns', sentences: [
+            { jp: ['il', 'est', 'médecin'], en: 'He is a doctor', alt: ['He\'s a doctor'] },
+            { jp: ['elle', 'est', 'professeur'], en: 'She is a teacher', alt: ['She\'s a teacher'] },
+            { jp: ['nous', 'sommes', 'amis'], en: 'We are friends', alt: ['We\'re friends'] },
+            { jp: ['ils', 'sont', 'étudiants'], en: 'They are students', alt: ['They\'re students'] },
+            { jp: ['elles', 'sont', 'à', 'Paris'], en: 'They are in Paris', alt: ['They\'re in Paris'] },
+          ] },
         ],
       },
       {
@@ -339,7 +446,7 @@ export const SECTIONS_DATA = [
         desc: 'Rooms, things at home and everyday verbs',
         facts: [FACT.daily, FACT.culture],
         phrases: [PHRASE.hotel],
-        dialogues: ['d-flat'],
+        dialogues: ['d-flat', 'd-flat2'],
         lessons: [
           { title: 'At home', words: [
             ['la maison', 'house / home', '🏠', { note: 'À la maison = at home.' }],
@@ -370,6 +477,11 @@ export const SECTIONS_DATA = [
             ['parler', 'to speak', '🗣️'],
             ['habiter', 'to live (somewhere)', '🏠', { note: 'The h is silent: j\'habite.' }],
           ] },
+          { title: 'Be, have, do', words: [
+            ['être', 'to be', '🧍', { note: 'Je suis, tu es, il est, nous sommes, vous êtes, ils sont. The most important verb in French.' }],
+            ['avoir', 'to have', '🎒', { note: 'J\'ai, tu as, il a, nous avons, vous avez, ils ont. Also used for hunger, thirst and age.' }],
+            ['faire', 'to do / to make', '✍️', { note: 'Je fais, tu fais, il fait, nous faisons, vous faites, ils font. Il fait beau uses it too.' }],
+          ] },
           { title: 'There is…', grammar: 'il-y-a', sentences: [
             { jp: ['il', 'y', 'a', 'un', 'lit'], en: 'There is a bed', alt: ['There\'s a bed'] },
             { jp: ['il', 'y', 'a', 'du', 'pain'], en: 'There is some bread', alt: ['There\'s some bread', 'There is bread', 'There\'s bread'] },
@@ -381,6 +493,13 @@ export const SECTIONS_DATA = [
             { jp: ['j\'habite', 'à', 'Paris'], en: 'I live in Paris' },
             { jp: ['je', 'parle', 'anglais'], en: 'I speak English', alt: ['I can speak English'] },
           ] },
+          { title: 'I don\'t…', grammar: 'pas-de', sentences: [
+            { jp: ['je', 'ne', 'mange', 'pas', 'de', 'viande'], en: 'I do not eat meat', alt: ['I don\'t eat meat'] },
+            { jp: ['nous', 'n\'avons', 'pas', 'de', 'chien'], en: 'We do not have a dog', alt: ['We don\'t have a dog', 'We have no dog', 'We haven\'t got a dog'] },
+            { jp: ['il', 'ne', 'dort', 'pas'], en: 'He is not sleeping', alt: ['He isn\'t sleeping', 'He does not sleep', 'He doesn\'t sleep', 'He\'s not sleeping'] },
+            { jp: ['elle', 'ne', 'travaille', 'pas', 'dimanche'], en: 'She does not work on Sunday', alt: ['She doesn\'t work on Sunday', 'She does not work on Sundays', 'She doesn\'t work on Sundays', 'She isn\'t working on Sunday'] },
+            { jp: ['je', 'ne', 'parle', 'pas', 'français'], en: 'I do not speak French', alt: ['I don\'t speak French'] },
+          ] },
         ],
       },
       {
@@ -389,7 +508,7 @@ export const SECTIONS_DATA = [
         desc: 'Sun, rain, the four seasons and what to wear',
         facts: [FACT.nature],
         phrases: [PHRASE.around],
-        dialogues: ['d-weather'],
+        dialogues: ['d-weather', 'd-weather2'],
         lessons: [
           { title: 'Weather', words: [
             ['le soleil', 'sun', '☀️'],
@@ -445,7 +564,7 @@ export const SECTIONS_DATA = [
         desc: 'Say how you feel, chat and react like a local',
         facts: [FACT.culture, FACT.language],
         phrases: [PHRASE.basics],
-        dialogues: ['d-hungry'],
+        dialogues: ['d-hungry', 'd-hungry2'],
         lessons: [
           { title: 'Feelings', words: [
             ['content', 'happy / glad', '😊', { note: 'A woman says contente.', alt: ['contente'] }],
@@ -475,6 +594,28 @@ export const SECTIONS_DATA = [
             ['qui', 'who', '🔎'],
             ['comment', 'how', '❓'],
           ] },
+          { title: 'What & which', words: [
+            ['qu\'est-ce que', 'what (starting a question)', '❓', { note: 'Qu\'est-ce que c\'est? = what is it? Literally "what is it that…".' }],
+            ['est-ce que', 'is it that… (makes a question)', '💬', { note: 'Put it before any statement to turn it into a yes/no question: est-ce que tu viens?' }],
+            ['quel', 'which / what', '❔', { note: 'It agrees with the noun: quel train, quelle heure, quels billets, quelles toilettes.', alt: ['quelle', 'quels', 'quelles'] }],
+          ] },
+          { title: 'Ask anything', grammar: 'qwords', sentences: [
+            { jp: ['qui', 'est-ce'], en: 'Who is it', alt: ['Who is that', 'Who\'s that', 'Who\'s it'] },
+            { jp: ['qu\'est-ce que', 'c\'est'], en: 'What is it', alt: ['What is that', 'What\'s that', 'What\'s it'] },
+            { jp: ['quand', 'part', 'le', 'train'], en: 'When does the train leave', alt: ['When is the train leaving', 'When does the train depart', 'When is the train leaving'] },
+            { jp: ['où', 'habitez-vous'], en: 'Where do you live', alt: ['Where are you living'] },
+            { jp: ['combien', 'coûte', 'le', 'billet'], en: 'How much is the ticket', alt: ['How much does the ticket cost', 'How much is a ticket'] },
+          ] },
+          { title: 'Know & understand', words: [
+            ['comprendre', 'to understand', '👌', { note: 'Je comprends, tu comprends, il comprend. Also: to include.' }],
+            ['savoir', 'to know (a fact)', '📚', { note: 'Je sais, tu sais, il sait. Connaître is for knowing a person or a place.' }],
+            ['voir', 'to see', '🔎', { note: 'Je vois, tu vois, il voit. On se voit demain? = see you tomorrow?' }],
+          ] },
+          { title: 'Yesterday', words: [
+            ['hier', 'yesterday', '📅', { note: 'The ie is said like "ye": "yair".' }],
+            ['hier soir', 'last night / yesterday evening', '🌃'],
+            ['déjà', 'already / ever', '✅', { note: 'Tu as déjà mangé? = have you already eaten?' }],
+          ] },
           { title: 'I\'m hungry', grammar: 'avoir', sentences: [
             { jp: ['j\'ai', 'faim'], en: 'I am hungry', alt: ['I\'m hungry'] },
             { jp: ['tu', 'as', 'soif'], en: 'Are you thirsty', alt: ['You are thirsty', 'You\'re thirsty'] },
@@ -487,6 +628,13 @@ export const SECTIONS_DATA = [
             { jp: ['c\'est', 'génial'], en: 'It is great', alt: ['It\'s great', 'That\'s great', 'That is great', 'It\'s brilliant', 'That\'s brilliant'] },
             { jp: ['pourquoi', 'tu', 'es', 'triste'], en: 'Why are you sad' },
           ] },
+          { title: 'What did you do?', grammar: 'passe-compose', sentences: [
+            { jp: ['hier', 'j\'ai', 'mangé', 'un', 'croissant'], en: 'Yesterday I ate a croissant', alt: ['I ate a croissant yesterday', 'Yesterday I had a croissant', 'Yesterday, I ate a croissant'] },
+            { jp: ['j\'ai', 'parlé', 'avec', 'ma', 'sœur'], en: 'I spoke with my sister', alt: ['I talked with my sister', 'I spoke to my sister', 'I talked to my sister', 'I have spoken with my sister'] },
+            { jp: ['nous', 'avons', 'bu', 'du', 'vin'], en: 'We drank some wine', alt: ['We drank wine', 'We had some wine', 'We have drunk wine'] },
+            { jp: ['je', 'suis', 'allé', 'à', 'Paris'], en: 'I went to Paris', alt: ['I have been to Paris', 'I\'ve been to Paris', 'I have gone to Paris', 'I\'ve gone to Paris'] },
+            { jp: ['elle', 'a', 'acheté', 'un', 'billet'], en: 'She bought a ticket', alt: ['She has bought a ticket', 'She\'s bought a ticket'] },
+          ] },
         ],
       },
       {
@@ -495,7 +643,7 @@ export const SECTIONS_DATA = [
         desc: 'Emergencies, the pharmacy and saying what hurts',
         facts: [FACT.daily, FACT.nature],
         phrases: [PHRASE.help],
-        dialogues: ['d-pharmacy'],
+        dialogues: ['d-pharmacy', 'd-pharmacy2'],
         lessons: [
           { title: 'Help!', words: [
             ['au secours', 'help!', '🆘', { note: 'Only in an emergency.' }],
@@ -540,7 +688,7 @@ export const SECTIONS_DATA = [
         desc: 'Talk like a French friend: slang, verlan and texting',
         facts: [FACT.language, FACT.food],
         phrases: [PHRASE.basics, PHRASE.cafe],
-        dialogues: ['d-weekend'],
+        dialogues: ['d-weekend', 'd-weekend2'],
         lessons: [
           { title: 'Hi & bye', words: [
             ['coucou', 'hi there!', '👋', { note: 'Very friendly — with family, close friends and in text messages.' }],
@@ -718,3 +866,184 @@ export const DIALOGUES = {
     options: ['She is tired from work; they will go to the cinema', 'She is sick; they will stay home', 'She is hungry; they will go to a café'],
   },
 };
+
+// Second dialogues, one per unit. `questions` holds every comprehension question (the first one is
+// also `question` / `options`, so older code keeps working); the first option is the right answer.
+Object.assign(DIALOGUES, {
+  'd-bonjour2': {
+    title: 'Excuse me!',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Pardon, madame! Excusez-moi.', en: 'Sorry, madam! Excuse me.' },
+      { who: 1, jp: 'Ce n\'est pas grave. Ça va?', en: 'It doesn\'t matter. Are you all right?' },
+      { who: 0, jp: 'Oui, merci. Bonne soirée!', en: 'Yes, thanks. Have a nice evening!' },
+      { who: 1, jp: 'Merci, bonne nuit!', en: 'Thanks, good night!' },
+    ],
+    question: 'What does the second woman say about the accident?',
+    options: ['It does not matter', 'She is angry', 'She wants some money'],
+    questions: [
+      { question: 'What does the second woman say about the accident?', options: ['It does not matter', 'She is angry', 'She wants some money'] },
+      { question: 'What time of day is it?', options: ['Evening', 'Morning', 'Midday'] },
+    ],
+  },
+  'd-metro2': {
+    title: 'A métro ticket',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Un billet pour la gare du Nord, s\'il vous plaît.', en: 'A ticket to the Gare du Nord, please.' },
+      { who: 1, jp: 'Ça fait deux euros.', en: 'That\'s two euros.' },
+      { who: 0, jp: 'Voici trois euros.', en: 'Here are three euros.' },
+      { who: 1, jp: 'Voici votre monnaie. Bon voyage!', en: 'Here is your change. Have a good trip!' },
+    ],
+    question: 'How much does the ticket cost?',
+    options: ['Two euros', 'Three euros', 'One euro'],
+    questions: [
+      { question: 'How much does the ticket cost?', options: ['Two euros', 'Three euros', 'One euro'] },
+      { question: 'What does the clerk give back?', options: ['Her change', 'A receipt', 'A map'] },
+    ],
+  },
+  'd-cafe2': {
+    title: 'The bill, please',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'L\'addition, s\'il vous plaît.', en: 'The bill, please.' },
+      { who: 1, jp: 'Voilà. Ça fait neuf euros.', en: 'Here you are. That\'s nine euros.' },
+      { who: 0, jp: 'Je peux payer par carte?', en: 'Can I pay by card?' },
+      { who: 1, jp: 'Oui, bien sûr!', en: 'Yes, of course!' },
+      { who: 0, jp: 'Merci, c\'était délicieux!', en: 'Thanks, it was delicious!' },
+    ],
+    question: 'How much is the bill?',
+    options: ['Nine euros', 'Eight euros', 'Nineteen euros'],
+    questions: [
+      { question: 'How much is the bill?', options: ['Nine euros', 'Eight euros', 'Nineteen euros'] },
+      { question: 'How does she pay?', options: ['By card', 'In cash', 'She does not pay'] },
+    ],
+  },
+  'd-market2': {
+    title: 'At the baker\'s',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Bonjour! Je voudrais deux baguettes, s\'il vous plaît.', en: 'Hello! I\'d like two baguettes, please.' },
+      { who: 1, jp: 'Voilà. Et avec ça?', en: 'Here you are. Anything else?' },
+      { who: 0, jp: 'C\'est tout, merci. Combien je vous dois?', en: 'That\'s all, thanks. How much do I owe you?' },
+      { who: 1, jp: 'Trois euros cinquante.', en: 'Three euros fifty.' },
+    ],
+    question: 'What does she buy?',
+    options: ['Two baguettes', 'One croissant', 'Some cheese'],
+    questions: [
+      { question: 'What does she buy?', options: ['Two baguettes', 'One croissant', 'Some cheese'] },
+      { question: 'How much does she owe?', options: ['3.50 euros', '5.30 euros', '13 euros'] },
+    ],
+  },
+  'd-train2': {
+    title: 'Train times',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Pardon, à quelle heure part le train pour Nice?', en: 'Excuse me, what time does the train to Nice leave?' },
+      { who: 1, jp: 'Il part à midi et demi.', en: 'It leaves at half past twelve.' },
+      { who: 0, jp: 'Et il arrive à quelle heure?', en: 'And what time does it arrive?' },
+      { who: 1, jp: 'À dix-huit heures.', en: 'At 18:00.' },
+    ],
+    question: 'When does the train leave?',
+    options: ['At half past twelve', 'At noon', 'At half past one'],
+    questions: [
+      { question: 'When does the train leave?', options: ['At half past twelve', 'At noon', 'At half past one'] },
+      { question: 'When does it arrive?', options: ['At 6 p.m.', 'At 8 a.m.', 'At midnight'] },
+    ],
+  },
+  'd-meet2': {
+    title: 'A family photo',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Qui est-ce, sur la photo?', en: 'Who is that in the photo?' },
+      { who: 1, jp: 'C\'est ma mère. Elle est médecin.', en: 'That\'s my mother. She is a doctor.' },
+      { who: 0, jp: 'Et lui, c\'est ton frère?', en: 'And him, is he your brother?' },
+      { who: 1, jp: 'Non, c\'est mon père! Mon frère est à Paris.', en: 'No, that\'s my father! My brother is in Paris.' },
+    ],
+    question: 'Who is the doctor?',
+    options: ['Her mother', 'Her sister', 'Her father'],
+    questions: [
+      { question: 'Who is the doctor?', options: ['Her mother', 'Her sister', 'Her father'] },
+      { question: 'Where is her brother?', options: ['In Paris', 'At home', 'At school'] },
+    ],
+  },
+  'd-flat2': {
+    title: 'Making coffee',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Tu veux un café?', en: 'Do you want a coffee?' },
+      { who: 1, jp: 'Oui, avec du lait. Où est la cuisine?', en: 'Yes, with milk. Where is the kitchen?' },
+      { who: 0, jp: 'Là-bas, à droite. Les tasses sont sur la table.', en: 'Over there, on the right. The cups are on the table.' },
+      { who: 1, jp: 'Merci! Tu es sympa.', en: 'Thanks! You\'re nice.' },
+    ],
+    question: 'What does she want?',
+    options: ['Coffee with milk', 'Tea', 'Water'],
+    questions: [
+      { question: 'What does she want?', options: ['Coffee with milk', 'Tea', 'Water'] },
+      { question: 'Where is the kitchen?', options: ['On the right', 'On the left', 'Upstairs'] },
+    ],
+  },
+  'd-weather2': {
+    title: 'Packing for tomorrow',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Il pleut demain. Tu prends un parapluie?', en: 'It\'s raining tomorrow. Are you taking an umbrella?' },
+      { who: 1, jp: 'Oui, et un manteau. Il fait froid le soir.', en: 'Yes, and a coat. It\'s cold in the evening.' },
+      { who: 0, jp: 'Moi, je prends un t-shirt. Il fait chaud à midi!', en: 'Me, I\'m taking a T-shirt. It\'s hot at noon!' },
+    ],
+    question: 'What will the weather be like tomorrow?',
+    options: ['Rainy', 'Snowy', 'Sunny all day'],
+    questions: [
+      { question: 'What will the weather be like tomorrow?', options: ['Rainy', 'Snowy', 'Sunny all day'] },
+      { question: 'Why is the second woman taking a coat?', options: ['It gets cold in the evening', 'It is snowing', 'It is windy'] },
+    ],
+  },
+  'd-hungry2': {
+    title: 'A bad day',
+    cast: ['woman2', 'woman'],
+    lines: [
+      { who: 0, jp: 'Pourquoi tu es triste aujourd\'hui?', en: 'Why are you sad today?' },
+      { who: 1, jp: 'Je suis fatiguée. J\'ai perdu mon portefeuille hier.', en: 'I\'m tired. I lost my wallet yesterday.' },
+      { who: 0, jp: 'Oh non! Tu veux un thé?', en: 'Oh no! Do you want a tea?' },
+      { who: 1, jp: 'Oui, merci. Tu es sympa.', en: 'Yes, thanks. You\'re kind.' },
+    ],
+    question: 'Why is she sad?',
+    options: ['She lost her wallet', 'She is hungry', 'She missed the train'],
+    questions: [
+      { question: 'Why is she sad?', options: ['She lost her wallet', 'She is hungry', 'She missed the train'] },
+      { question: 'What is she offered?', options: ['Tea', 'Coffee', 'Cake'] },
+    ],
+  },
+  'd-pharmacy2': {
+    title: 'An emergency',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Au secours! Mon ami est malade!', en: 'Help! My friend is ill!' },
+      { who: 1, jp: 'Appelez une ambulance. Où êtes-vous?', en: 'Call an ambulance. Where are you?' },
+      { who: 0, jp: 'Nous sommes devant la gare.', en: 'We are in front of the station.' },
+      { who: 1, jp: 'D\'accord, restez là. Les pompiers arrivent.', en: 'Okay, stay there. The firefighters are coming.' },
+    ],
+    question: 'Who is ill?',
+    options: ['Her friend', 'Her sister', 'The pharmacist'],
+    questions: [
+      { question: 'Who is ill?', options: ['Her friend', 'Her sister', 'The pharmacist'] },
+      { question: 'Where are they?', options: ['In front of the station', 'At the hospital', 'On the beach'] },
+    ],
+  },
+  'd-weekend2': {
+    title: 'A text message',
+    cast: ['woman', 'woman2'],
+    lines: [
+      { who: 0, jp: 'Salut! Tu fais quoi samedi?', en: 'Hi! What are you doing on Saturday?' },
+      { who: 1, jp: 'Rien de spécial. Pourquoi?', en: 'Nothing special. Why?' },
+      { who: 0, jp: 'Mon pote fait une fête. C\'est trop bien, tu viens?', en: 'My mate is having a party. It\'s going to be awesome, are you coming?' },
+      { who: 1, jp: 'Grave! C\'est à quelle heure?', en: 'Totally! What time is it?' },
+    ],
+    question: 'What is happening on Saturday?',
+    options: ['A party at a friend\'s', 'A trip to the beach', 'An exam'],
+    questions: [
+      { question: 'What is happening on Saturday?', options: ['A party at a friend\'s', 'A trip to the beach', 'An exam'] },
+      { question: 'What does the second woman ask at the end?', options: ['What time it starts', 'Where it is', 'Who is coming'] },
+    ],
+  },
+});

@@ -161,4 +161,25 @@ for (const [k, romaji, hint, say] of SMALL) {
 }
 KANA.set('ー', { romaji: 'long vowel', hint: 'The dash stretches the vowel before it: タクシー = ta-ku-shii', script: 'katakana', say: 'ター' });
 
-export const KATAKANA_ROWS = HIRAGANA_ROWS.map((row) => ({ ...row, kana: row.kana.map(([k, r]) => [toKatakana(k), r]) }));
+// Katakana: the whole hiragana chart again, plus the marks only katakana words need — the long-vowel
+// dash ー, small ッ ャ ュ ョ and the small vowels ァ ィ ゥ ェ ォ used for foreign sounds (ファン, チェック,
+// パーティー). Every katakana character used by a course word is in this list.
+export const KATAKANA_ROWS = [
+  ...HIRAGANA_ROWS.map((row) => ({ ...row, kana: row.kana.map(([k, r]) => [toKatakana(k), r]) })),
+  {
+    id: 'katakana-extra',
+    title: 'Long vowel & small kana',
+    kana: [
+      ['ー', 'long vowel', 'The dash stretches the vowel before it: タクシー = ta-ku-shii, コーヒー = koo-hii'],
+      ['ッ', 'small tsu', 'Small ッ doubles the next sound with a tiny pause: ホット = hot-to, ベッド = bed-do'],
+      ['ャ', 'small ya', 'Small ャ blends with the sound before it: シ + ャ = sha (シャツ shirt)'],
+      ['ュ', 'small yu', 'Small ュ blends with the sound before it: ジ + ュ = ju (ジュース juice)'],
+      ['ョ', 'small yo', 'Small ョ blends with the sound before it: ショ = sho (ショッピング shopping)'],
+      ['ァ', 'small a', 'Small ァ gives foreign sounds: フ + ァ = fa (ファン fan)'],
+      ['ィ', 'small i', 'Small ィ gives foreign sounds: パーティー = paa-tii (party)'],
+      ['ゥ', 'small u', 'Small ゥ gives foreign sounds: ト + ゥ = tu (トゥクトゥク tuk-tuk)'],
+      ['ェ', 'small e', 'Small ェ gives foreign sounds: チ + ェ = che (チェックイン check-in)'],
+      ['ォ', 'small o', 'Small ォ gives foreign sounds: フ + ォ = fo (フォーク fork)'],
+    ],
+  },
+];

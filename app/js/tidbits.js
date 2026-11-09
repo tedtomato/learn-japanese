@@ -65,7 +65,7 @@ export function tidbitBody(kind, item) {
   }
   if (kind === 'phrase') {
     return html`<div class="tidbit-phrase">
-      <button class="say-inline" data-say="${phraseSpeech(item)}" aria-label="${t('Play')}">${icon('speaker', 22)}</button>
+      <button class="say-inline" data-say="${phraseSpeech(item)}" aria-label="${t('Play sound')}">${icon('speaker', 22)}</button>
       <div><div class="jp jp-lg">${item.jp}</div><div class="tidbit-romaji">${item.romaji ? html`${item.romaji} <span class="muted">(${item.say})</span>` : html`<span class="muted">${t('Sounds like:')} ${item.say}</span>`}</div>
       <div class="tidbit-en">${art(emojiFor(item.icon), 'art-inline')} ${item.en}</div></div></div>`;
   }

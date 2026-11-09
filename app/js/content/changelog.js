@@ -6,6 +6,13 @@ export const CHANGELOG = [
     'Smaller updates: a new version only downloads the files that changed, and a slow connection no longer wipes the offline copy',
     'The start screen appears at once, and picking a language no longer shows it twice',
     'The road-works sign at the end of the path is in the language you are learning',
+    'Hearts: no hearts are lost the first time you play a lesson or in the correction round; after a second miss the answer is shown and you move on',
+    'New words are not "due" for review until a day after you learn them; the review card shows the real length of one session',
+    'Test out of a unit: tap "Jump here" on a locked unit and score 85% on its review to skip its lessons',
+    'Each unit shows its mission as a goal, and the mission appears on the path when the lessons are done',
+    'A weekly recap, 7 / 30 / 100 day streak celebrations, a "welcome back" reminder of words to review and a daily-goal suggestion',
+    'The speed timer starts after your second lesson; the tab bar steps aside in missions, drills and quizzes; the Explain button is easier to see',
+    'The English course for French speakers is translated throughout the app',
   ] },
   { version: '0.93', date: '9 Nov 2026', changes: [
     'Fixed: the "Quick break" fun-fact card in a lesson crashed the lesson since 0.92',

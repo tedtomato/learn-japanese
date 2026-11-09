@@ -525,7 +525,7 @@ function karaoke(root, text, el) {
 
 function playButtons(text, { slow = true } = {}) {
   return html`<div class="speakers">
-    <button class="speaker" data-play="${text}" aria-label="${t('Play')}">${icon('speaker', 36)}</button>
+    <button class="speaker" data-play="${text}" aria-label="${t('Play sound')}">${icon('speaker', 36)}</button>
     ${slow ? html`<button class="speaker slow" data-play="${text}" data-slow="1" aria-label="${t('Play slowly')}">${icon('turtle', 28)}</button>` : ''}</div>`;
 }
 
@@ -576,7 +576,7 @@ function renderIntro(root, s) {
   const kindLabel = t({ kana: 'New character', word: 'New word', sentence: 'New phrase', kanji: 'New kanji', kword: 'New kanji word', radical: 'New radical' }[item.type]);
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-gold">${icon('star', 14)} ${kindLabel}</span></p>
     ${speakerBubble(s, html`<div class="intro-card">${introHtml(item, s.current.hint)}
-      <div class="intro-play"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="${t('Play')}">${icon('speaker', 24)}</button>
+      <div class="intro-play"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="${t('Play sound')}">${icon('speaker', 24)}</button>
       <button class="speaker small-speaker slow" data-play="${speechOf(item)}" data-slow="1" aria-label="${t('Play slowly')}">${icon('turtle', 22)}</button></div></div>`, { stacked: true })}`);
   wirePlay(root, s);
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
@@ -588,7 +588,7 @@ function renderTrace(root, s) {
   const item = ITEMS.get(s.current.itemId);
   const kana = item.type === 'kana';
   mount($('.lesson-body', root), html`<p class="instruction">${t('Trace the character')}</p>
-    <div class="trace-head"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="${t('Play')}">${icon('speaker', 26)}</button>
+    <div class="trace-head"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="${t('Play sound')}">${icon('speaker', 26)}</button>
       <div><b class="jp">${item.jp}</b><small>${item.romaji || item.en}</small></div>
       <button class="link replay">${icon('play', 14)} ${t('Watch again')}</button></div>
     <div class="trace-stage"><p class="trace-status">${t('Watch the strokes…')}</p><div class="trace-host"></div></div>`);
@@ -620,7 +620,7 @@ function promptFor(root, s, ex, item) {
   const canPeek = !L.latin && !big && !ex.hint && ex.kind !== 'read' && ['word', 'sentence'].includes(item.type);
   // Reading tests (a word, or a kana asked for its sound) have no play button: hearing it is the answer.
   const isReading = ex.kind === 'read' || (item.type === 'kana' && ex.answerKind === 'romaji');
-  return speakerBubble(s, html`${isReading ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="${t('Play')}">${icon('speaker', 22)}</button>`}
+  return speakerBubble(s, html`${isReading ? '' : html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="${t('Play sound')}">${icon('speaker', 22)}</button>`}
     <div class="jp-prompt-wrap"><div class="${big ? 'jp-huge' : 'jp-lg fit'} ${canPeek ? 'rt-hidden' : ''}">${big ? html`<span class="jp">${item.jp}</span>` : jpItem(item, ex.hint || canPeek)}</div>
     ${canPeek ? html`<button class="show-romaji">Show ${L.roman}</button>` : ''}</div>`);
 }
@@ -711,7 +711,7 @@ function renderGuess(root, s) {
   const item = ITEMS.get(ex.itemId);
   startTimer(root, s, null);
   mount($('.lesson-body', root), html`<p class="instruction">${t('New word — have a guess!')}</p>
-    ${speakerBubble(s, html`<button class="say-inline" aria-label="${t('Play')}">${icon('speaker', 22)}</button><span class="jp-lg guess-word">${jpItem(item, true)}</span>`)}
+    ${speakerBubble(s, html`<button class="say-inline" aria-label="${t('Play sound')}">${icon('speaker', 22)}</button><span class="jp-lg guess-word">${jpItem(item, true)}</span>`)}
     <p class="muted small guess-help">${t('No pressure: guessing first, even wrong, helps you remember it.')}</p>
     <div class="options list">${ex.options.map((en, i) => html`<button class="option" data-i="${i}"><span class="key">${i + 1}</span><span class="opt-label">${en}</span></button>`)}</div>`);
   const say = () => sayAs(root, s.speaker, speechOf(item));
@@ -928,7 +928,7 @@ function renderSpeak(root, s) {
   const ex = s.current;
   const item = ITEMS.get(ex.itemId);
   mount($('.lesson-body', root), html`<p class="instruction">${t('Listen, then say it out loud')}</p>
-    ${speakerBubble(s, html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="${t('Play')}">${icon('speaker', 22)}</button>
+    ${speakerBubble(s, html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="${t('Play sound')}">${icon('speaker', 22)}</button>
       <div class="speak-text"><div class="jp-lg fit">${jpItem(item, true)}</div><div class="muted">${item.en}</div></div>`)}
     <div class="mic-area"><button class="mic" aria-label="${t('Start speaking')}">${icon('mic', 40)}</button><p class="mic-status">${t('Tap the microphone and repeat.')}</p></div>`);
   wirePlay(root, s);

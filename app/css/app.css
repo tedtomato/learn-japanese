@@ -89,7 +89,8 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0
 /* Two-tone ring: a gap in the page colour inside the outline keeps it visible on any fill (the 3-D buttons keep their own edge). */
 :where(a, .link, .icon-btn, .stat, .seg button, #nav a, input, [tabindex], summary):focus-visible { box-shadow: 0 0 0 2px var(--focus-gap); }
 .sr-only { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; border: 0; }
-.instruction:focus, .lesson-body:focus, .sheet:focus, [tabindex='-1']:focus { outline: none; }
+/* Headings and panels receive focus for screen readers after a route change; no visible ring for that. */
+.instruction:focus, .lesson-body:focus, .sheet:focus, [tabindex='-1']:focus, [tabindex='-1']:focus-visible, h1:focus-visible, h2:focus-visible { outline: none; box-shadow: none; }
 
 .screen { min-height: 100dvh; }
 .page { max-width: var(--page); margin: 0 auto; padding: 16px 16px calc(110px + var(--safe-bottom)); display: flex; flex-direction: column; gap: 16px; }
@@ -292,7 +293,7 @@ span.c-orange { color: var(--orange-text); } span.c-blue { color: var(--blue-tex
   border-radius: var(--radius); font-size: 1.125rem; font-weight: 700; color: var(--text-strong); transition: transform .06s;
 }
 .options.list .option { align-items: flex-start; text-align: left; }
-.options.grid .option { min-height: 88px; padding-left: 14px; }
+.options.grid .option { min-height: 88px; padding-left: 30px; padding-right: 30px; }
 .option:active:not(:disabled) { transform: translateY(2px); border-bottom-width: 2px; }
 .option .key { position: absolute; left: 10px; top: 10px; width: 24px; height: 24px; border-radius: 8px; border: 2px solid var(--border); color: var(--faint-ui); font-size: 0.75rem; display: grid; place-items: center; font-weight: 800; }
 .options.list .option .key { top: 50%; margin-top: -12px; }

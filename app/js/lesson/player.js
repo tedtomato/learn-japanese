@@ -1291,7 +1291,7 @@ function renderPick(root, s) {
   const labelBlock = html`<div class="g-block"><span>${ex.label}</span></div>`;
   let head;
   if (tone) head = speakerBubble(s, audioPrompt(item));
-  else if (ex.prompt) head = html`<div class="g-blocks g-quiz">${ex.prompt.map((c) => (c === null ? gap : html`<div class="g-block g-noun"><span class="jp" lang="${LANG_ATTR}">${c}</span></div>`))}</div>`;
+  else if (Array.isArray(ex.prompt)) head = html`<div class="g-blocks g-quiz">${ex.prompt.map((c) => (c === null ? gap : html`<div class="g-block g-noun"><span class="jp" lang="${LANG_ATTR}">${c}</span></div>`))}</div>`;
   else head = html`<div class="g-blocks g-quiz">${L.latin ? html`${labelBlock}${verb}` : html`${verb}${labelBlock}`}${gap}</div>
     <p class="muted small">${ex.meaning}</p>`;
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
@@ -1302,7 +1302,7 @@ function renderPick(root, s) {
   wirePlay(root, s);
   if (tone) sayAs(root, s.speaker, speechOf(item));
   startTimer(root, s, tone ? 20 : 25);
-  const filled = ex.prompt ? ex.prompt.map((c) => (c === null ? ex.answer : c)).join(L.latin || ex.prompt.some((c) => /\s/.test(c || '')) ? ' ' : '') : ex.answer;
+  const filled = Array.isArray(ex.prompt) ? ex.prompt.map((c) => (c === null ? ex.answer : c)).join(L.latin || ex.prompt.some((c) => /\s/.test(c || '')) ? ' ' : '') : ex.answer;
   const pickIt = (b) => {
     if (s.checked) return;
     const ok = b.dataset.o === ex.answer;

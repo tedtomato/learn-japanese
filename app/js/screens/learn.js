@@ -120,7 +120,7 @@ function renderNode(node, i, current, now, firstRun) {
       : html`<div class="decor-slot ${side}">${decorFor(i)}</div>`}
     <div class="node-wrap">
       ${st === 'current' ? html`<div class="start-bubble" aria-hidden="true">${t(node.kind === 'chest' ? 'OPEN' : 'START')}</div>` : ''}
-      <button class="node node-${node.kind} st-${st} c-${node.unit.color}" data-node="${node.id}" aria-label="${nodeLabel(node, st)}" ${st === 'locked' ? 'aria-disabled="true"' : ''} ${st === 'current' ? 'aria-current="step"' : ''}>
+      <button class="node node-${node.kind} st-${st} c-${node.unit.color}" data-node="${node.id}" aria-label="${nodeLabel(node, st)}" ${st === 'locked' ? raw('aria-disabled="true"') : ''} ${st === 'current' ? raw('aria-current="step"') : ''}>
         ${nodeIcon(node, st)}
         ${st === 'stale' ? html`<span class="node-badge" aria-hidden="true">${icon('refresh', 14)}</span>` : ''}
         ${st === 'done' && node.kind !== 'chest' ? html`<span class="node-check" aria-hidden="true">${icon('check', 14)}</span>` : ''}

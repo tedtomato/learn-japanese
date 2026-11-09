@@ -92,7 +92,7 @@ export function renderProfile(root, focus) {
   const s = state.settings;
   // A group of choices is a radio group: one is selected, arrow keys move between them.
   const seg = (name, value, options) => html`<div class="seg" role="radiogroup" aria-labelledby="set-${name}" data-setting="${name}">${options.map(([v, label]) =>
-    html`<button role="radio" aria-checked="${String(value) === String(v)}" class="${String(value) === String(v) ? 'on' : ''}" data-v="${v}">${label}</button>`)}</div>`;
+    html`<button role="radio" aria-checked="${String(String(value) === String(v))}" class="${String(value) === String(v) ? 'on' : ''}" data-v="${String(v)}">${label}</button>`)}</div>`;
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page profile">

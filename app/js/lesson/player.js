@@ -454,7 +454,7 @@ function showExplain(root, s, item, chosenLabel, go) {
   const sheet = $('.explain-sheet', root);
   sheetOpen(root, true);
   const render = (i) => mount(sheet, html`<div class="ex-head"><button class="icon-btn back" aria-label="${t('Back')}">${icon('arrow', 24)}</button><h2>${t('Explain my answer')}</h2></div>
-    <div class="ex-chips">${cards.map((c, j) => html`<button class="tile ex-chip jp ${j === i ? 'on' : ''}" aria-pressed="${j === i}" data-i="${j}">${c.chip}</button>`)}</div>
+    <div class="ex-chips">${cards.map((c, j) => html`<button class="tile ex-chip jp ${j === i ? 'on' : ''}" aria-pressed="${String(j === i)}" data-i="${j}">${c.chip}</button>`)}</div>
     <div class="card ex-card">${cards[i].body}</div>
     <button class="btn btn-secondary btn-block ex-continue">${t('Continue lesson')}</button>`);
   const wire = (i) => {

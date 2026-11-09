@@ -161,7 +161,7 @@ export function renderPractice(root, focus) {
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page">
     <h1 class="page-title">${t('Practice')}</h1>
-    <div class="seg practice-sections" role="tablist" aria-label="${t('Practice')}">${SECTIONS.map(([id, label, emo]) => html`<button role="tab" id="tab-${id}" aria-selected="${id === section}" aria-controls="practice-panel" class="${id === section ? 'on' : ''}" data-section="${id}"><span aria-hidden="true">${emo}</span> ${t(label)}</button>`)}</div>
+    <div class="seg practice-sections" role="tablist" aria-label="${t('Practice')}">${SECTIONS.map(([id, label, emo]) => html`<button role="tab" id="tab-${id}" aria-selected="${String(id === section)}" aria-controls="practice-panel" class="${id === section ? 'on' : ''}" data-section="${id}"><span aria-hidden="true">${emo}</span> ${t(label)}</button>`)}</div>
     <div role="tabpanel" id="practice-panel" aria-labelledby="tab-${section}">
 
     ${section === 'today' ? html`<section class="card practice-hero">
@@ -199,7 +199,7 @@ export function renderPractice(root, focus) {
     </div>
 
     <h2 class="sub-title" id="sec-learned">${t('What you\'ve learned')}</h2>
-    ${TABS.length > 1 ? html`<div class="seg practice-tabs" role="tablist">${TABS.map(([id, label, n]) => html`<button role="tab" id="tab-${id}-list" aria-selected="${id === tab}" aria-controls="library-panel" class="${id === tab ? 'on' : ''}" data-tab="${id}">${label}${n != null ? html` <small>${n}</small>` : ''}</button>`)}</div>`
+    ${TABS.length > 1 ? html`<div class="seg practice-tabs" role="tablist">${TABS.map(([id, label, n]) => html`<button role="tab" id="tab-${id}-list" aria-selected="${String(id === tab)}" aria-controls="library-panel" class="${id === tab ? 'on' : ''}" data-tab="${id}">${label}${n != null ? html` <small>${n}</small>` : ''}</button>`)}</div>`
       : html`<h3 class="sub-title small-title">${TABS[0][1]} <small class="muted">${TABS[0][2]}</small></h3>`}
     ${tab !== 'kana' ? html`<p class="muted small list-help">${t('Weakest first. Tap a bar to see what it means.')}</p>` : ''}
     <div class="practice-list" ${TABS.length > 1 ? html`role="tabpanel" id="library-panel" aria-labelledby="tab-${tab}-list"` : ''}>${lists[tab]()}</div>` : ''}

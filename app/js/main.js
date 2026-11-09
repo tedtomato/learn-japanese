@@ -1,6 +1,6 @@
 // Entry point: routing between screens and the bottom navigation.
 import { app, applySettings, closeLayer, toast } from './app.js';
-import { html, mount, $, fitText } from './dom.js';
+import { html, mount, raw, $, fitText } from './dom.js';
 import { icon } from './icons.js';
 import { renderLearn } from './screens/learn.js';
 import { renderPractice, renderCollection } from './screens/practice.js';
@@ -36,7 +36,7 @@ let lastTab = null;
 function renderNav(active) {
   const changed = active !== lastTab;
   lastTab = active;
-  mount($('#nav'), html`${TABS.map(([id, label, ic]) => html`<a href="#/${id}" ${active === id ? 'aria-current="page"' : ''} class="${active === id ? 'on' : ''} ${active === id && changed ? 'bounce' : ''}">${icon(ic, 26)}<span>${label}</span></a>`)}`);
+  mount($('#nav'), html`${TABS.map(([id, label, ic]) => html`<a href="#/${id}" ${active === id ? raw('aria-current="page"') : ''} class="${active === id ? 'on' : ''} ${active === id && changed ? 'bounce' : ''}">${icon(ic, 26)}<span>${label}</span></a>`)}`);
 }
 
 // Phones only: progress lives on one device and cannot be shared yet, so computers and tablets

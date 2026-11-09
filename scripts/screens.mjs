@@ -14,7 +14,7 @@ if (!playwright) throw new Error('Playwright not found: npm i --no-save playwrig
 
 const PORT = 4190;
 const MIN_TEXT = 13; // px, any text you read
-const MIN_RUBY = 10.5; // px, romaji above Japanese
+const MIN_RUBY = 12; // px, romaji above Japanese
 const shotsAt = process.argv.includes('--shots') ? process.argv[process.argv.indexOf('--shots') + 1] : null;
 if (shotsAt) mkdirSync(shotsAt, { recursive: true });
 

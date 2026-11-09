@@ -1138,7 +1138,7 @@ function finish(root, s) {
     <div class="extras">${extras}</div>
     <div class="result-tiles">
       <div class="result gold"><span>${t('Total XP')}</span><b>${icon('bolt', 20)} ${summary.xp}</b></div>
-      <div class="result green"><span>${t(accuracy === 100 ? 'Amazing' : 'Accuracy')}</span><b>${icon('check', 20)} ${accuracy}%</b></div>
+      <div class="result green ${accuracy < 70 ? 'low' : ''}"><span>${t(accuracy === 100 ? 'Amazing' : 'Accuracy')}</span><b>${icon('check', 20)} ${accuracy}%</b></div>
       <div class="result blue"><span>${t('Time')}</span><b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b></div>
     </div>
     ${weekStrip(now)}

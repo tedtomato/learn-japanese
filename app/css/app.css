@@ -21,6 +21,7 @@
   --red: #ff4b4b; --red-edge: #ea2b2b; --red-soft: #ffdfe0; --red-text: #ea2b2b;
   --purple: #ce82ff; --purple-edge: #a559e3; --purple-soft: #f7edff; --purple-text: #a559e3;
   --locked: #e5e5e5; --locked-edge: #cfcfcf; --locked-icon: #afafaf;
+  --trail-bed: color-mix(in srgb, var(--gold) 22%, var(--bg)); --trail-stones: color-mix(in srgb, var(--edge) 70%, var(--bg));
 
   --font: 'Nunito Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-jp: 'M PLUS Rounded 1c', 'Hiragino Maru Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
@@ -41,6 +42,7 @@
     --gold-soft: #3d3313; --gold-text: #ffd23f; --orange-soft: #3d2a12; --red-soft: #3d1f23; --red-text: #ff7878;
     --purple-soft: #2e2341; --purple-text: #d9a1ff;
     --locked: #37464f; --locked-edge: #2a3940; --locked-icon: #52656d;
+    --trail-bed: color-mix(in srgb, var(--text) 9%, var(--bg)); --trail-stones: color-mix(in srgb, var(--text) 20%, var(--bg));
     color-scheme: dark;
   }
 }
@@ -52,6 +54,7 @@
   --gold-soft: #3d3313; --gold-text: #ffd23f; --orange-soft: #3d2a12; --red-soft: #3d1f23; --red-text: #ff7878;
   --purple-soft: #2e2341; --purple-text: #d9a1ff;
   --locked: #37464f; --locked-edge: #2a3940; --locked-icon: #52656d;
+  --trail-bed: color-mix(in srgb, var(--text) 9%, var(--bg)); --trail-stones: color-mix(in srgb, var(--text) 20%, var(--bg));
   color-scheme: dark;
 }
 
@@ -459,11 +462,11 @@ span.c-orange { color: var(--orange); } span.c-blue { color: var(--blue); } span
 
 /* ---------- Japanese with romaji above each syllable ---------- */
 ruby { ruby-position: over; }
-rt { font-family: var(--font); font-size: 0.42em; font-weight: 700; color: var(--muted); letter-spacing: 0; padding-bottom: 1px; }
+rt { font-family: var(--font); font-size: max(12.5px, 0.42em); font-weight: 700; color: var(--muted); letter-spacing: 0; padding-bottom: 1px; }
 .ruby-on { line-height: 1.9; }
 .ruby-on ruby + ruby { margin-left: 1px; }
 .chunk + .chunk { margin-left: 6px; }
-.tile rt { font-size: 11px; }
+.tile rt { font-size: 12.5px; }
 
 /* ---------- Characters ---------- */
 .prompt-person { align-items: flex-end; }
@@ -711,8 +714,8 @@ body.test-mode::after { content: 'TEST MODE'; position: fixed; top: calc(4px + v
 /* ---------- Path scenery ---------- */
 .track { position: relative; }
 .trail { position: absolute; left: 0; top: 0; z-index: 0; pointer-events: none; overflow: visible; }
-.trail-bed { fill: none; stroke: color-mix(in srgb, var(--gold) 22%, var(--bg)); stroke-width: 34; stroke-linecap: round; }
-.trail-stones { fill: none; stroke: color-mix(in srgb, var(--edge) 70%, var(--bg)); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 2 20; }
+.trail-bed { fill: none; stroke: var(--trail-bed); stroke-width: 34; stroke-linecap: round; }
+.trail-stones { fill: none; stroke: var(--trail-stones); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 2 20; }
 .node-row { z-index: 1; }
 .node-row:has(.popover) { z-index: 12; }
 .decor-slot { position: absolute; top: 50%; transform: translateY(-50%); pointer-events: none; }
@@ -1227,3 +1230,65 @@ button.stat-card { text-align: left; font: inherit; color: inherit; width: 100%;
 .course-unit { font-size: 14px; color: var(--muted); font-weight: 700; }
 .course-unit b { color: var(--text); }
 .course-new { font-size: 14px; color: var(--muted); font-weight: 700; }
+
+/* ---------- v0.94: usability ---------- */
+/* Activity screens (missions, drills, quiz, listening…) have their own close button: no tab bar. */
+body.activity #nav { display: none; }
+body.activity .page { padding-bottom: calc(24px + var(--safe-bottom)); }
+
+/* "Explain" must look tappable on both feedback bars. */
+.fb-actions .explain { background: var(--card); color: var(--text-strong); border: 2px solid var(--border); box-shadow: 0 4px 0 var(--edge); }
+.fb-actions .explain::before { content: '💡'; margin-right: 2px; }
+.lesson-foot.good .fb-actions .explain { color: var(--green-text); border-color: var(--green); box-shadow: 0 4px 0 var(--green-edge); }
+.lesson-foot.bad .fb-actions .explain { color: var(--red-text); border-color: var(--red); box-shadow: 0 4px 0 var(--red-edge); }
+.fb-actions .explain:active { box-shadow: 0 0 0 transparent; }
+
+/* Accuracy below 70% is not a cause for green. */
+.result.green.low { --c: var(--muted); }
+
+/* "Fix your mistakes" with the count as a pill. */
+.title-count { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.title-count .pill { padding: 2px 10px; font-size: 13px; }
+
+/* Two library tiles fill the row. */
+.collections.two { grid-template-columns: repeat(2, 1fr); }
+
+/* First-run hint from Kuri. */
+.node-mascot.first-run .bubble { max-width: 150px; }
+.node-mascot.first-run .bubble b { font-size: 13px; line-height: 1.3; }
+
+/* Unit goal (its mission) in the banner, and the jump-ahead button. */
+.banner-btns { display: flex; flex-direction: column; gap: 8px; align-items: stretch; }
+.unit-goal { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 4px 10px; border-radius: 999px; background: rgba(255,255,255,.2); font-size: 13px; font-weight: 800; }
+.unit-goal.locked { opacity: .8; }
+.unit-goal.ready { background: #fff; color: var(--c); }
+.unit-goal.done b { color: #ffe066; letter-spacing: 1px; }
+.mission-path { display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin: 4px 0 8px; border-color: var(--gold); }
+.mission-path > div { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.mission-path b { color: var(--text-strong); font-size: 16px; }
+.mission-path small { color: var(--muted); font-size: 13px; }
+.mission-path .btn { flex: none; min-height: 44px; padding: 8px 16px; }
+.mission-card.ready { border-color: var(--green); }
+.mission-card .done-tag { color: var(--muted); }
+
+/* Review-first nudge in the node popover. */
+.popover .pop-nudge { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,.2); border-radius: 12px; padding: 6px 10px; font-weight: 800; font-size: 13px; opacity: 1; }
+.popover .btn-ghost { --t: #fff; border-color: rgba(255,255,255,.55); box-shadow: 0 4px 0 rgba(255,255,255,.3); min-height: 44px; }
+
+/* Weekly recap. */
+.recap-card { display: flex; flex-direction: column; gap: 10px; border-color: var(--gold); }
+.recap-head { display: flex; justify-content: space-between; align-items: center; }
+.recap-head b { display: flex; align-items: center; gap: 6px; color: var(--text-strong); font-size: 18px; }
+.recap-tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; text-align: center; }
+.recap-tiles b { display: block; font-size: 22px; color: var(--text-strong); }
+.recap-tiles small { color: var(--muted); font-size: 13px; }
+.recap-tiles .low b { color: var(--muted); }
+.recap-weak { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.recap-weak small, .recap-goal small { color: var(--muted); font-size: 13px; }
+.recap-weak .chip { padding: 2px 10px; border-radius: 10px; background: var(--card-2); border: 2px solid var(--border); color: var(--text-strong); font-size: 17px; }
+.recap-goal { display: flex; flex-direction: column; gap: 6px; align-items: flex-start; }
+.recap-goal .btn-small { min-height: 40px; padding: 6px 14px; font-size: 14px; }
+.goal-suggest { display: flex; gap: 6px; align-items: flex-start; background: var(--gold-soft); color: var(--text-strong); border-radius: 12px; padding: 8px 10px; font-size: 14px; }
+.goal-choice.suggested { border-color: var(--gold); }
+.hearts-earn { margin-top: 8px; }
+.setting-note { display: block; }

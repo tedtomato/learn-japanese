@@ -54,10 +54,12 @@ export const SECTIONS_DATA = [
           { title: 'Yes, no & sorry', words: [
             ['はい', 'hai', 'yes', '✅', { note: 'Also means "I\'m listening" or "here you go".' }],
             ['いいえ', 'iie', 'no', '❌', { note: 'Quite direct. People often soften a no with ちょっと… ("well, a bit…").' }],
+            ['けっこうです', 'kekkou desu', 'no thank you / that is fine', '🙅', { note: 'A polite way to decline an offer. Depending on the tone it can also mean "that is fine".', alt: ['結構です'] }],
+          ] },
+          { title: 'Sorry & understood', words: [
             ['すみません', 'sumimasen', 'excuse me / sorry', '🙋', { note: 'To get attention (even to call a waiter), to apologise, or as a light thank-you.' }],
             ['ごめんなさい', 'gomen nasai', 'I am sorry', '😔', { note: 'A more personal apology, for when you are really at fault.' }],
             ['わかりました', 'wakarimashita', 'understood', '✅', { note: 'Literally "I have understood". Polite: わかりません means "I don\'t understand".', alt: ['分かりました'] }],
-            ['けっこうです', 'kekkou desu', 'no thank you / that is fine', '🙅', { note: 'A polite way to decline an offer. Depending on the tone it can also mean "that is fine".', alt: ['結構です'] }],
           ] },
           { title: 'See you!', words: [
             ['じゃあね', 'jaa ne', 'bye (casual)', '🏃', { note: 'With friends and family. さようなら sounds like a long or final farewell, so it is rarely used.' }],
@@ -359,6 +361,7 @@ export const SECTIONS_DATA = [
           { title: 'Lost', words: [
             ['みち', 'michi', 'road / way', '🛣️', { alt: ['道'] }],
             ['ここ', 'koko', 'here', '📍'],
+            ['まよいました', 'mayoimashita', 'I got lost', '🗺️', { note: 'Past tense of まよいます (to lose your way): みち に まよいました.', alt: ['迷いました'] }],
           ] },
           { title: 'Call for help', grammar: 'subj', sentences: [
             { jp: ['ここ', 'が', 'いたい', 'です'], romaji: 'koko ga itai desu', en: 'It hurts here', alt: ['Here hurts', 'It hurts right here'] },
@@ -503,8 +506,8 @@ export const SECTIONS_DATA = [
           ], sentences: [
             { jp: ['きのう', 'ラーメン', 'を', 'たべました'], romaji: 'kinou raamen o tabemashita', en: 'I ate ramen yesterday', alt: ['Yesterday I ate ramen', 'I had ramen yesterday', 'Yesterday I had ramen'] },
             { jp: ['きのう', 'ビール', 'を', 'のみました'], romaji: 'kinou biiru o nomimashita', en: 'I drank beer yesterday', alt: ['Yesterday I drank beer', 'I had beer yesterday'] },
-            { jp: ['きのう', 'にく', 'を', 'たべませんでした'], romaji: 'kinou niku o tabemasen deshita', en: 'I did not eat meat yesterday', alt: ['I didn\'t eat meat yesterday', 'Yesterday I did not eat meat', 'Yesterday I didn\'t eat meat'] },
-            { jp: ['きのう', 'ほん', 'を', 'かいませんでした'], romaji: 'kinou hon o kaimasen deshita', en: 'I did not buy a book yesterday', alt: ['I didn\'t buy a book yesterday', 'Yesterday I did not buy a book', 'Yesterday I didn\'t buy a book'] },
+            { jp: ['きのう', 'にく', 'を', 'たべません', 'でした'], romaji: 'kinou niku o tabemasen deshita', en: 'I did not eat meat yesterday', alt: ['I didn\'t eat meat yesterday', 'Yesterday I did not eat meat', 'Yesterday I didn\'t eat meat'] },
+            { jp: ['きのう', 'ほん', 'を', 'かいません', 'でした'], romaji: 'kinou hon o kaimasen deshita', en: 'I did not buy a book yesterday', alt: ['I didn\'t buy a book yesterday', 'Yesterday I did not buy a book', 'Yesterday I didn\'t buy a book'] },
           ] },
           { title: 'I want, I have', sentences: [
             { jp: ['みず', 'が', 'ほしい', 'です'], romaji: 'mizu ga hoshii desu', en: 'I want water', alt: ['I would like water', 'I\'d like water'] },

@@ -3,7 +3,8 @@
 export { SECTIONS_DATA, DIALOGUES } from './units.js';
 export { FACTS, PHRASES } from './extras.js';
 export { FACT_QUIZ } from './fact-quiz.js';
-export { GRAMMAR, GLOSSARY } from './grammar.js';
+export { GRAMMAR, GLOSSARY, CONJUGATIONS } from './grammar.js';
+export { PRONUNCIATION } from './pronunciation.js';
 export { MISSIONS } from './missions.js';
 export { PATTERNS } from './patterns.js';
 export { FILLERS, GLOSS_FILLERS } from './fillers.js';

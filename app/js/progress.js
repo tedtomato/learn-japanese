@@ -19,7 +19,7 @@ export const MAX_FREEZES = 2;
 // Bumped when a course's path is rebuilt, so finished lessons are carried over. One number per course,
 // so rebuilding the Japanese path does not re-migrate the others.
 // Bumped per course when its path is rebuilt (lessons moved or added), so finished lessons carry over.
-export const COURSE_VERSIONS = { ja: 9, zh: 10, fr: 10, es: 10, en: 9 };
+export const COURSE_VERSIONS = { ja: 10, zh: 11, fr: 11, es: 11, en: 10 };
 export const COURSE_VERSION = COURSE_VERSIONS[L.code] ?? 9;
 
 export function defaultState(now = Date.now()) {
@@ -36,7 +36,7 @@ export function defaultState(now = Date.now()) {
     nodes: {},
     items: {},
     stats: { lessons: 0, perfect: 0 },
-    seen: { fact: [], phrase: [], kanji: [] },
+    seen: { fact: [], phrase: [], kanji: [], pron: [] },
     missions: {}, // mission id → best stars (1–3)
     answers: {}, // day → [right, wrong] answers that day (for the weekly recap)
     recapWeek: null, // the week (its Monday) whose recap card was dismissed
@@ -80,7 +80,8 @@ function carryOverNodes(state, old) {
     } else if (n.kind === 'story') {
       const lessonsDone = n.unit.nodes.filter((x) => x.kind === 'lesson').every((x) => nodes[x.id]);
       if (lessonsDone && Object.keys(old).some((k) => k.startsWith(`${unitId}-s`) && old[k]?.level > 0)) nodes[n.id] = { level: 1 };
-    } else if (unitStarted.has(unitId) && n.items.every((id) => state.items[id])) {
+    } else if ((unitStarted.has(unitId) || n.kind === 'kanji' || n.kind === 'read') && n.items.every((id) => state.items[id])) {
+      // Reading and kanji lessons may have moved to another unit: what was learned stays done wherever it now sits.
       nodes[n.id] = { level: Math.max(1, old[n.id]?.level || 0) };
     }
   }

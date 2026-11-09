@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { generateLesson, generatePractice, generateRetry, makeRng, knownChars, canRead, kanjiPracticeIds, romajiMatch } from '../app/js/lesson/generate.js';
+import { generateLesson, generatePractice, generateRetry, makeRng, knownChars, canRead, kanjiPracticeIds, romajiMatch, demoExercises, DEMO_KINDS, PRODUCTION_SHARE } from '../app/js/lesson/generate.js';
+import { playThrough, learnedState, productionShare } from './sim.mjs';
 import { NODES, ITEMS } from '../app/js/course.js';
 import { defaultState, completeSession } from '../app/js/progress.js';
 import { nextTidbit } from '../app/js/tidbits.js';
@@ -33,6 +34,14 @@ function checkExercise(ex, where) {
     assert.ok(ex.pairs.length >= 3, where);
   } else if (ex.type === 'recall') {
     assert.equal(ITEMS.get(ex.itemId).type, 'word', where);
+  } else if (ex.type === 'type-sentence') {
+    assert.equal(ITEMS.get(ex.itemId).type, 'sentence', where);
+  } else if (ex.type === 'conjugation') {
+    assert.ok(ex.options.includes(ex.answer), `${where}: answer missing from options`);
+    assert.equal(new Set(ex.options.map((o) => o.toLowerCase())).size, ex.options.length, `${where}: duplicate options`);
+    assert.ok(ex.options.length >= 3 && ex.options.length <= 4, `${where}: ${ex.options.length} options`);
+    if (ex.prompt) assert.equal(ex.prompt.filter((c) => c === null).length, 1, where);
+    assert.ok(ex.verb && ex.meaning && ex.label, where);
   } else if (ex.type === 'guess') {
     assert.ok(ex.options.includes(ITEMS.get(ex.itemId).en) && new Set(ex.options).size === ex.options.length, where);
   } else assert.fail(`${where}: unknown type ${ex.type}`);
@@ -249,4 +258,146 @@ test('recall: from level 1 a known word is typed from memory, with lenient romaj
   assert.equal(romajiMatch('kon nichi wa', 'konnichiwa'), 'exact');
   assert.equal(romajiMatch('konichiwa', 'konnichiwa'), 'close');
   assert.equal(romajiMatch('mizo', 'mizu'), false);
+});
+
+test('production weighting: from level 2, in reviews and in practice, at least 40% of scored tasks are typed or built', () => {
+  const { log, state, now } = playThrough({ levels: [0, 1, 2] });
+  const share = (levelOf, kinds) => productionShare(log.filter((l) => levelOf(l) && kinds.includes(l.node.kind)).flatMap((l) => l.exercises));
+  const l2 = share((l) => l.level === 2, ['lesson']);
+  assert.ok(l2.scored > 500 && l2.share >= PRODUCTION_SHARE, `level 2 lessons: ${(l2.share * 100).toFixed(1)}% of ${l2.scored}`);
+  const reviews = share((l) => l.level >= 1, ['review']);
+  assert.ok(reviews.share >= PRODUCTION_SHARE, `reviews: ${(reviews.share * 100).toFixed(1)}%`);
+  const gentle = share((l) => l.level === 0, ['lesson']);
+  assert.ok(gentle.share < PRODUCTION_SHARE, `level 0 stays gentle: ${(gentle.share * 100).toFixed(1)}%`);
+  // Practice over words and sentences (characters and kanji have no typed tasks).
+  const wordsOnly = learnedState(now);
+  for (const id of Object.keys(wordsOnly.items)) if (!['word', 'sentence'].includes(ITEMS.get(id).type)) delete wordsOnly.items[id];
+  let practiced = { scored: 0, production: 0 };
+  for (let seed = 1; seed <= 20; seed++) {
+    const p = productionShare(generatePractice(wordsOnly, { rng: makeRng(seed), now, size: 12 }).exercises);
+    practiced = { scored: practiced.scored + p.scored, production: practiced.production + p.production };
+  }
+  assert.ok(practiced.production / practiced.scored >= PRODUCTION_SHARE, `practice: ${practiced.production}/${practiced.scored}`);
+});
+
+test('recall can ask for a whole sentence, checked leniently', () => {
+  const state = learnedState(T0 + 9e8);
+  const sentence = [...ITEMS.values()].find((i) => i.type === 'sentence');
+  const { exercises } = generatePractice(state, { itemIds: [sentence.id], rng: makeRng(2), now: T0 + 9e8, size: 30 });
+  const typed = exercises.filter((e) => e.type === 'type-sentence');
+  assert.ok(typed.length >= 1, 'a sentence is typed from memory');
+  assert.equal(romajiMatch(sentence.romaji.toUpperCase().replace(/ /g, '  '), sentence.romaji), 'exact');
+});
+
+test('Japanese reading: kana from the second unit, katakana after ~16 hiragana, kanji after ~20 kana', () => {
+  const units = SECTIONS_OF(NODES);
+  const reads = (u) => u.nodes.filter((n) => n.kind === 'read');
+  assert.equal(reads(units[0]).length, 0, 'the first unit teaches no kana');
+  assert.ok(units.slice(1, 9).every((u) => reads(u).length === 1 && reads(u)[0].items.length === 4), 'one Read-it lesson of 4 kana per unit in section 1');
+  let taught = 0;
+  let hira = 0;
+  const firstKata = { at: null };
+  for (const u of units) {
+    for (const n of u.nodes) {
+      if (n.kind === 'kanji') assert.ok(taught >= 20, `${n.id}: kanji only after ~20 kana (${taught})`);
+      if (n.kind !== 'read' || u.id === 'kana-corner') continue;
+      for (const id of n.items) {
+        const k = ITEMS.get(id);
+        if (k.script === 'katakana') {
+          firstKata.at ??= hira;
+          assert.ok(/[ァ-ヶー]/.test(k.jp));
+        } else hira += 1;
+        taught += 1;
+      }
+    }
+  }
+  assert.ok(firstKata.at >= 16, `katakana after ${firstKata.at} hiragana`);
+  assert.ok(units.find((u) => u.id === 'tokyo-eating-out').nodes.some((n) => n.kind === 'kanji'), 'kanji lessons are spread over later units');
+  const sec1Kana = units.slice(0, 9).flatMap(reads).flatMap((n) => n.items).length;
+  assert.ok(sec1Kana >= 30, `${sec1Kana} kana taught in section 1`);
+  // Only characters that have stroke data are taught (the small ァィゥェォ are not in KANA).
+  for (const n of NODES.filter((x) => x.kind === 'read')) for (const id of n.items) assert.ok(STROKES[ITEMS.get(id).jp], n.id);
+});
+const SECTIONS_OF = (nodes) => [...new Map(nodes.map((n) => [n.unit.id, n.unit])).values()];
+
+test('reading tasks appear in section 1 and romaji fades once characters are known', () => {
+  const { log } = playThrough({ levels: [0, 1, 2], kinds: ['lesson', 'read'] });
+  const sec1 = log.filter((l) => l.node.sectionIndex === 0 && l.node.kind === 'lesson').flatMap((l) => l.exercises);
+  assert.ok(sec1.filter((e) => e.kind === 'read').length >= 5, 'read tasks in section 1');
+  assert.ok(sec1.filter((e) => e.kind === 'spell').length >= 5, 'spell tasks in section 1');
+  const hinted = (from) => log.filter((l) => l.node.index >= from && l.node.kind === 'lesson').flatMap((l) => l.exercises).filter((e) => ITEMS.get(e.itemId)?.type === 'word' && e.hint !== undefined);
+  const late = hinted(NODES.find((n) => n.sectionIndex === 1).index);
+  assert.ok(late.some((e) => e.hint === false), 'romaji hints fade for words made of known kana');
+  assert.ok(sec1.some((e) => e.hint === true), 'and stay for words with unknown kana');
+});
+
+test('verb forms: conjugation tasks name a form or fill a gap, never repeat an option', () => {
+  assert.ok(DEMO_KINDS.conjugation);
+  const state = defaultState(T0);
+  const seen = new Set();
+  for (let seed = 1; seed <= 8; seed++) {
+    for (const ex of demoExercises('conjugation', state, { rng: makeRng(seed) })) {
+      checkExercise(ex, `conj demo ${seed}`);
+      seen.add(ex.kind);
+    }
+  }
+  assert.deepEqual([...seen].sort(), ['conj-sentence', 'conjugation']);
+  // Asked in lessons and practice once the verb has been answered.
+  const learned = learnedState(T0);
+  let n = 0;
+  for (let seed = 1; seed <= 40; seed++) {
+    const { exercises } = generatePractice(learned, { rng: makeRng(seed), now: T0 + 1e6 });
+    n += exercises.filter((e) => e.type === 'conjugation').length;
+    exercises.forEach((e, i) => checkExercise(e, `practice ${seed} #${i}`));
+  }
+  assert.ok(n >= 20, `${n} conjugation tasks in 40 practice sessions`);
+  assert.equal(generatePractice(defaultState(T0), { now: T0 }).exercises.filter((e) => e.type === 'conjugation').length, 0, 'not before the verbs are met');
+});
+
+test('difficulty follows strength: shaky items get easy tasks, solid ones hard and typed tasks', () => {
+  const node = NODES.find((n) => n.kind === 'lesson' && n.items.filter((id) => ITEMS.get(id).type === 'word').length >= 3);
+  const ids = node.items.filter((id) => ITEMS.get(id).type === 'word');
+  const EASY = ['jp2en', 'audio2jp'];
+  const make = (record) => {
+    const state = defaultState(T0);
+    for (const id of node.items) state.items[id] = { ...record };
+    return generatePractice(state, { itemIds: ids, rng: makeRng(11), now: T0 + 1000, size: 12 }).exercises.filter((e) => ids.includes(e.itemId) && e.type === 'choice');
+  };
+  const shaky = make({ box: 1, seen: 6, right: 1, wrong: 5, last: T0, due: T0 + 1e9 });
+  assert.ok(shaky.length >= 3 && shaky.every((e) => EASY.includes(e.kind)), shaky.map((e) => e.kind).join());
+  const solid = make({ box: 4, seen: 8, right: 8, wrong: 0, last: T0, due: T0 + 1e9 });
+  assert.ok(solid.length >= 3 && solid.every((e) => e.kind !== 'jp2en'), solid.map((e) => e.kind).join());
+});
+
+test('dialogues with several questions ask different ones; story nodes ask two', () => {
+  const multi = [...ITEMS.values()].filter((i) => i.type === 'dialogue' && i.questions?.length >= 2);
+  assert.ok(multi.length >= 3);
+  const d = multi[0];
+  const asked = new Set();
+  for (let seed = 1; seed <= 40; seed++) {
+    const ex = demoExercises('dialogue', defaultState(T0), { rng: makeRng(seed) }).find((e) => e.itemId === d.id);
+    checkExercise(ex, d.id);
+    const q = d.questions.find((x) => x.question === ex.instruction);
+    assert.ok(q && ex.answer === q.options[0], 'the answer is the question\'s first option');
+    asked.add(ex.instruction);
+  }
+  assert.ok(asked.size >= 2, 'a random question each time');
+  const story = NODES.find((n) => n.kind === 'story' && n.items.some((id) => ITEMS.get(id).questions?.length >= 2));
+  const { exercises } = generateLesson(story, defaultState(T0), { rng: makeRng(3), now: T0 });
+  const first = story.items.find((id) => ITEMS.get(id).questions?.length >= 2);
+  const mine = exercises.filter((e) => e.itemId === first);
+  assert.equal(mine.length, 2);
+  assert.notEqual(mine[0].instruction, mine[1].instruction);
+});
+
+test('pronunciation tips are tidbits, collected in state.seen.pron', () => {
+  const state = defaultState(T0);
+  assert.deepEqual(state.seen.pron, []);
+  const rng = makeRng(4);
+  const kinds = new Set();
+  for (let i = 0; i < 80; i++) kinds.add(nextTidbit(state, rng).kind);
+  assert.ok(kinds.has('pron'));
+  assert.ok(state.seen.pron.length >= 3);
+  const { item } = nextTidbit(state, () => 0.99, ['pron']);
+  assert.ok(item.title && item.text && item.example && item.say);
 });

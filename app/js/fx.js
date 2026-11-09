@@ -2,7 +2,8 @@
 // chest that bursts open and gems flying out.
 import { L, COURSES, courseChosen, takeSkipSplash } from './lang.js';
 import { AVAILABLE } from './content/pack.js';
-import { flagSvg } from './app.js';
+import { flagSvg, announce, openLayer, closeLayer, inertBehind } from './app.js';
+import { t } from './strings.js';
 import { html, mount, raw, $ } from './dom.js';
 import { mascot } from './mascot.js';
 import { sfx, speak } from './audio.js';
@@ -30,10 +31,9 @@ export function rewardPopup({ kind = 'chest', title, reward, text = '', onDone }
       ${text ? html`<p class="muted">${text}</p>` : ''}
       <button class="btn btn-primary btn-block">Collect</button>
     </div>`);
-  root.classList.add('open');
+  openLayer(root, { focus: 'button' });
   root.querySelector('button').addEventListener('click', () => {
-    root.classList.remove('open');
-    root.innerHTML = '';
+    closeLayer(root);
     onDone?.();
   });
 }
@@ -64,7 +64,7 @@ export function splash() {
   const flags = AVAILABLE.map((code) => COURSES[code]).map((c) => html`<span class="${c.code === L.code && !first ? 'on' : ''}" title="${c.name}">${raw(flagSvg(c.flag, 34))}</span>`);
   const title = html`Hajime ${first ? '' : html`<span class="jp">${L.titleNative}</span>`}`;
   const tagline = `${first ? 'Japanese, Chinese, French, Spanish, English' : `Learn ${L.name}`}, one day at a time`;
-  const flagRow = html`<div class="splash-flags" aria-label="Languages: ${AVAILABLE.map((code) => COURSES[code].name).join(', ')}">${flags}</div>`;
+  const flagRow = html`<div class="splash-flags" role="img" aria-label="Languages: ${AVAILABLE.map((code) => COURSES[code].name).join(', ')}">${flags}</div>`;
   const inner = existing && el.querySelector('.splash-inner');
   if (inner) {
     // Keep the mascot and button in place (no flicker, the entrance animation is not replayed).
@@ -80,16 +80,37 @@ export function splash() {
       <span class="made">Created by Seb and Claude AI ${raw(CLAUDE_SPARK)}</span></div>`);
   }
   if (!existing) document.body.append(el);
+  // The start screen is a dialog over the app: what is behind it is out of reach until it is dismissed.
+  el.setAttribute('role', 'dialog');
+  el.setAttribute('aria-modal', 'true');
+  const heading = el.querySelector('h1');
+  if (heading) {
+    heading.id ||= 'splash-title';
+    el.setAttribute('aria-labelledby', heading.id);
+  }
+  inertBehind(true);
+  const go = el.querySelector('.splash-go');
+  go?.focus({ preventScroll: true });
   let closed = false;
   const close = () => {
     if (closed) return;
     closed = true;
     if (!first) speak(L.titleSay, { speaker: 'woman' });
     sfx('bonus');
+    inertBehind(false);
     el.classList.add('out');
     setTimeout(() => el.remove(), 450);
+    // Focus goes to the screen's heading, so a screen reader starts reading the app.
+    const head = document.querySelector('#view h1');
+    if (head) {
+      head.setAttribute('tabindex', '-1');
+      head.focus({ preventScroll: true });
+    }
   };
   el.addEventListener('click', close);
+  el.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') close();
+  });
 }
 
 // "5 in a row!" burst over the lesson: a flame, the count and a ring of sparks; gone after ~1.6 s.
@@ -97,10 +118,12 @@ export function comboBurst(count) {
   document.querySelector('.combo')?.remove();
   const el = document.createElement('div');
   el.className = 'combo';
-  el.setAttribute('aria-live', 'polite');
+  el.setAttribute('aria-hidden', 'true');
+  // Said through the shared live region (no extra element): the burst itself is only for the eyes.
+  announce(`${t('{n} in a row!', { n: count })} ${t(count >= 10 ? 'Unstoppable!' : 'On fire!')}`);
   const sparks = Array.from({ length: 12 }, (_, i) => `<i style="--a:${i * 30}deg"></i>`).join('');
   el.innerHTML = `<div class="combo-card"><div class="combo-sparks">${sparks}</div><div class="combo-flame">🔥</div>
-    <b>${count} in a row!</b><span>${count >= 10 ? 'Unstoppable!' : 'On fire!'}</span></div>`;
+    <b>${t('{n} in a row!', { n: count })}</b><span>${t(count >= 10 ? 'Unstoppable!' : 'On fire!')}</span></div>`;
   document.body.append(el);
   setTimeout(() => el.remove(), 1700);
 }

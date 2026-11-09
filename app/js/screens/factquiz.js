@@ -39,7 +39,7 @@ export function renderFactQuiz(root) {
     <main class="page quiz">
       <p class="muted quiz-count">${t('Question {a} of {b}', { a: i + 1, b: questions.length })}</p>
       <section class="card quiz-card"><p class="quiz-text">${q.q}</p></section>
-      <div class="options list">${q.options.map((o, k) => html`<button class="option" data-k="${k}"><span class="key">${k + 1}</span><span class="opt-label">${o}</span></button>`)}</div>
+      <div class="options list">${q.options.map((o, k) => html`<button class="option" data-k="${k}"><span class="key" aria-hidden="true">${k + 1}</span><span class="opt-label">${o}</span></button>`)}</div>
       <div class="quiz-after" hidden></div>
     </main>`);
     $$('.option', root).forEach((b) => b.addEventListener('click', () => answer(b)));
@@ -52,8 +52,11 @@ export function renderFactQuiz(root) {
     sfx(ok ? 'correct' : 'wrong');
     $$('.option', root).forEach((b) => {
       b.disabled = true;
-      if (q.options[Number(b.dataset.k)] === q.a) b.classList.add('right');
-      else if (b === btn) b.classList.add('wrong');
+      const right = q.options[Number(b.dataset.k)] === q.a;
+      if (right || b === btn) {
+        b.classList.add(right ? 'right' : 'wrong');
+        b.insertAdjacentHTML('beforeend', `<span class="sr-only">, ${right ? t('Correct') : t('Your answer, not correct')}</span>`);
+      }
     });
     const after = $('.quiz-after', root);
     after.hidden = false;

@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   defaultState, currentHearts, loseHeart, recordActivity, displayStreak, completeSession, migrate, exportBackup, importBackup,
-  streakAt, courseSummary, currentNodeIndex, mistakeIds, completeListening, completeMission, backupStale, HEART_REFILL_MS, MAX_HEARTS,
+  streakAt, courseSummary, currentNodeIndex, mistakeIds, completeListening, completeMission, backupStale, HEART_REFILL_MS, MAX_HEARTS, COURSE_VERSION,
 } from '../app/js/progress.js';
 import { review, INTERVALS, MAX_BOX } from '../app/js/srs.js';
 import { NODES } from '../app/js/course.js';
@@ -78,14 +78,14 @@ test('backups round-trip and old saves gain new fields', () => {
   assert.equal(back.xp, 123);
   assert.throws(() => importBackup('{"foo":1}'));
   const old = migrate({ xp: 5, settings: { theme: 'dark' } }, T0);
-  assert.deepEqual(old.seen, { fact: [], phrase: [], kanji: [] });
+  assert.deepEqual(old.seen, { fact: [], phrase: [], kanji: [], pron: [] });
   assert.equal(old.settings.theme, 'dark');
   assert.equal(old.settings.sfx, true);
 });
 
 test('after a course rebuild, lessons whose words were learned stay done', () => {
   const lesson = NODES.find((n) => n.kind === 'lesson');
-  const kanji = NODES.find((n) => n.kind === 'kanji' && n.unit === lesson.unit);
+  const kanji = NODES.find((n) => n.kind === 'kanji');
   const items = Object.fromEntries(lesson.items.map((id) => [id, { box: 2, seen: 1, right: 1, wrong: 0, last: 0, due: 0 }]));
   const state = migrate({ nodes: { [`${lesson.unit.id}-l9`]: { level: 2 }, [`${lesson.unit.id}-chest`]: { level: 1 } }, items });
   assert.ok(state.nodes[lesson.id]);
@@ -160,4 +160,32 @@ test('XP alone (listening, missions) counts as started', () => {
   const s = defaultState(T0);
   s.xp = 10;
   assert.equal(courseSummary(s, T0).started, true);
+});
+
+test('rebuilding the path keeps finished lessons, including kanji and reading lessons that moved to another unit', () => {
+  // A learner on the previous path: finished the first units' lessons, including the kanji lessons that
+  // used to sit in the first unit (now they come later), and has never opened the unit they moved to.
+  const doneNodes = NODES.filter((n) => n.sectionIndex === 0 && ['lesson', 'read', 'kanji'].includes(n.kind) && n.unit.id !== 'tokyo-hotel');
+  const items = {};
+  for (const n of NODES.filter((x) => ['lesson', 'read', 'kanji'].includes(x.kind) && x.index <= doneNodes.at(-1).index + 20)) {
+    for (const id of [...n.items, ...(n.readWords || [])]) items[id] = { box: 2, seen: 2, right: 2, wrong: 0, last: 0, due: 0 };
+  }
+  const old = {};
+  for (const n of NODES) if (['lesson', 'chest', 'review'].includes(n.kind) && n.sectionIndex === 0) old[n.id] = { level: 2 };
+  old['tokyo-hello-k1'] = { level: 1 };
+  const state = migrate({ course: COURSE_VERSION - 1, nodes: old, items }, T0);
+  assert.equal(state.course, COURSE_VERSION);
+  for (const n of doneNodes.filter((x) => x.kind === 'lesson')) assert.ok(state.nodes[n.id]?.level >= 1, `${n.id} stays done`);
+  // A kanji or reading lesson whose items were all learned counts as done wherever it now sits.
+  const kanji = NODES.find((n) => n.kind === 'kanji');
+  assert.ok(kanji.items.every((id) => items[id]) && state.nodes[kanji.id], 'the moved kanji lesson is still done');
+  // Nothing the learner has not learned is marked done, and a second migration changes nothing.
+  for (const n of NODES.filter((x) => ['lesson', 'read', 'kanji'].includes(x.kind) && state.nodes[x.id])) assert.ok(n.items.every((id) => items[id]), `${n.id} was not learned`);
+  assert.deepEqual(migrate(state, T0).nodes, state.nodes);
+});
+
+test('every course has its own bumped version, so rebuilt paths are migrated', async () => {
+  const { COURSE_VERSIONS } = await import('../app/js/progress.js');
+  assert.deepEqual(Object.keys(COURSE_VERSIONS).sort(), ['en', 'es', 'fr', 'ja', 'zh']);
+  assert.ok(COURSE_VERSIONS.ja >= 10 && COURSE_VERSIONS.zh >= 11 && COURSE_VERSIONS.fr >= 11 && COURSE_VERSIONS.es >= 11 && COURSE_VERSIONS.en >= 10);
 });

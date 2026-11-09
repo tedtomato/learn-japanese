@@ -13,6 +13,12 @@ export const CHANGELOG = [
     'A weekly recap, 7 / 30 / 100 day streak celebrations, a "welcome back" reminder of words to review and a daily-goal suggestion',
     'The speed timer starts after your second lesson; the tab bar steps aside in missions, drills and quizzes; the Explain button is easier to see',
     'The English course for French speakers is translated throughout the app',
+    'Japanese: you start reading kana from the second unit (4 per unit), katakana for the loanwords you meet joins after the first hiragana, and kanji lessons wait until you know about 20 kana',
+    'More typing and building: from the third level, in reviews and in practice at least 4 in 10 tasks are typed or built, and "type it" can ask for a whole sentence',
+    'Verb forms: pick the right form (tu → tu vas, ます → ません…) or fill the verb gap in a sentence',
+    'Chinese: hear a word and pick its tone',
+    'Tasks adapt to each word: shaky ones get easier questions, solid ones harder and typed ones',
+    'Conversations come with several questions, and pronunciation tips pop up in the short breaks',
   ] },
   { version: '0.93', date: '9 Nov 2026', changes: [
     'Fixed: the "Quick break" fun-fact card in a lesson crashed the lesson since 0.92',

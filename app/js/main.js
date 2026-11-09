@@ -1,6 +1,6 @@
 // Entry point: routing between screens and the bottom navigation.
-import { app, applySettings } from './app.js';
-import { html, mount, $ } from './dom.js';
+import { app, applySettings, closeLayer, toast } from './app.js';
+import { html, mount, $, fitText } from './dom.js';
 import { icon } from './icons.js';
 import { renderLearn } from './screens/learn.js';
 import { renderPractice, renderCollection } from './screens/practice.js';
@@ -21,6 +21,7 @@ import { renderMission } from './screens/mission.js';
 import { renderDrill } from './screens/drill.js';
 import { renderTones } from './screens/tones.js';
 import { mistakeIds } from './progress.js';
+import { t } from './strings.js';
 
 const TABS = [
   ['learn', 'Learn', 'learn'],
@@ -35,11 +36,22 @@ let lastTab = null;
 function renderNav(active) {
   const changed = active !== lastTab;
   lastTab = active;
-  mount($('#nav'), html`${TABS.map(([id, label, ic]) => html`<a href="#/${id}" class="${active === id ? 'on' : ''} ${active === id && changed ? 'bounce' : ''}">${icon(ic, 26)}<span>${label}</span></a>`)}`);
+  mount($('#nav'), html`${TABS.map(([id, label, ic]) => html`<a href="#/${id}" ${active === id ? 'aria-current="page"' : ''} class="${active === id ? 'on' : ''} ${active === id && changed ? 'bounce' : ''}">${icon(ic, 26)}<span>${label}</span></a>`)}`);
 }
 
 // Phones only: progress lives on one device and cannot be shared yet, so computers and tablets
 // get a friendly "open it on your phone" screen instead of the app.
+// Computers and tablets are let through by "Continue anyway" (screen-reader and keyboard users are mostly there);
+// the choice is remembered on this device.
+const DESKTOP_OK = 'hajime.desktop-ok';
+function desktopOk() {
+  try {
+    return localStorage.getItem(DESKTOP_OK) === '1';
+  } catch {
+    return false;
+  }
+}
+
 function isPhone() {
   const ua = navigator.userAgent;
   const mobile = /Android|iPhone|iPod|Mobile/i.test(ua);
@@ -58,7 +70,21 @@ function phoneOnly() {
     <p>Open this address on your phone:</p>
     <p class="gate-url">${url.replace(/^https?:\/\//, '')}</p>
     <p class="muted small">Then add it to your home screen to install it.</p>
+    <button class="btn btn-secondary gate-go">Continue anyway</button>
+    <p class="muted small">It works on a computer too — your progress just stays on this device.</p>
   </div>`);
+  $('.gate-go').addEventListener('click', () => {
+    try {
+      localStorage.setItem(DESKTOP_OK, '1');
+    } catch {
+      /* ignore: the choice then lasts until the page is reloaded */
+    }
+    document.body.classList.remove('desktop-gate');
+    // No start screen here: the tap just made is the one that unlocks sound. (index.html removes its static
+    // start screen on non-phones, and splash() builds its own when it is asked for on a later visit.)
+    start(false);
+  });
+  $('.gate-go').focus();
 }
 
 function route() {
@@ -68,7 +94,7 @@ function route() {
   const root = document.createElement('div');
   root.className = 'screen';
   view.replaceChildren(root);
-  $('#modal').classList.remove('open');
+  closeLayer($('#modal'));
   app.inLesson = false;
   app.busy = ACTIVITIES.includes(name);
 
@@ -95,6 +121,10 @@ function route() {
   if (!inSession) {
     renderNav(name === 'collection' || ACTIVITIES.includes(name) ? 'practice' : name === 'lab' ? 'profile' : TABS.some(([id]) => id === name) ? name : 'learn');
     window.scrollTo(0, 0);
+    // Focus moves to the new screen's heading, so a screen reader starts at the top of what changed.
+    const head = $('h1', root) || root;
+    head.setAttribute('tabindex', '-1');
+    head.focus({ preventScroll: true });
   }
 }
 
@@ -103,6 +133,7 @@ document.addEventListener('click', (e) => {
   if (e.target.closest('.stat-streak')) showStreakCalendar();
   if (e.target.closest('.stat-flag') && !document.body.classList.contains('in-lesson')) app.go('#/courses');
   if (e.target.closest('.stat-hearts') && !document.body.classList.contains('in-lesson')) showHearts();
+  if (e.target.closest('.stat-gems')) toast(t('You have {n} gems. Earn them from lessons, chests, missions and your daily goal.', { n: app.state.gems }));
 });
 
 document.addEventListener('keydown', (e) => {
@@ -110,13 +141,22 @@ document.addEventListener('keydown', (e) => {
   if (root?.__session) lessonKey(root, e);
 });
 window.matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change', applySettings);
+// A rotation or a resized window gives words more (or less) room.
+let resizing = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(resizing);
+  resizing = setTimeout(() => fitText(document), 150);
+});
 
-applySettings();
-if (isPhone()) {
+function start(withSplash = true) {
   window.addEventListener('hashchange', route);
   // Each start of the app opens on the language menu (links into a lesson or screen go straight there).
   if (!languagePicked() && /^#?(\/learn)?$/.test(location.hash)) history.replaceState(null, '', '#/courses');
-  splash();
+  if (withSplash) splash();
   route();
-} else phoneOnly();
+}
+
+applySettings();
+if (isPhone() || desktopOk()) start();
+else phoneOnly();
 initUpdates();

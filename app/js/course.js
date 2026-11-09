@@ -1,7 +1,8 @@
 // Builds the course tree (sections → units → path nodes) and the global item index from content.
-// Beginners focus on spoken words, phrases and travel kanji: section 1 teaches no kana, later
-// units get one short hiragana "Read it" lesson each, and the rest of hiragana comes in the
-// "Kana corner" at the end. Katakana is not taught for now.
+// Beginners learn to read from the second unit on: every unit gets one short "Read it" lesson (4 kana).
+// Hiragana comes first (the characters of that unit's words), katakana joins after ~16 hiragana
+// (only the characters of the loanwords the course uses), kanji lessons start once ~20 kana are
+// taught, and whatever is left comes in the "Kana corner" at the end.
 import { kanaId } from './content/kana.js';
 import { slug } from './normalise.js';
 import { L, joinChunks } from './lang.js';
@@ -10,9 +11,15 @@ import { KANA, KANA_WORDS, SECTIONS_DATA, DIALOGUES, KANJI, RADICALS, KANJI_LESS
 export const ITEMS = new Map();
 export const MAX_LEVEL = 5;
 const UNIT_COLORS = ['green', 'blue', 'purple', 'orange', 'red'];
-const READ_PER_UNIT = 4; // new hiragana per unit (one "Read it" lesson), from section 2 on
+const READ_PER_UNIT = 4; // new kana per unit (one "Read it" lesson), from the second unit on
 const READ_PER_LESSON = 4;
+const KATA_AFTER = 16; // katakana joins the reading lessons once this many hiragana are taught
+const KATA_PER_UNIT = 2; // at most; one when the unit has no katakana words of its own
+const KANJI_AFTER = 20; // kanji lessons start once this many kana are taught
+const KANJI_PER_UNIT = 2; // pinned kanji lessons held back are released at this pace
 const isHiragana = (c) => KANA.get(c).script === 'hiragana';
+const isKatakana = (c) => KANA.get(c).script === 'katakana';
+const HAS_KANA = [...KANA.keys()].some(isHiragana);
 
 function addItem(item) {
   if (ITEMS.has(item.id)) {
@@ -82,6 +89,24 @@ const taught = new Set();
 let carry = [];
 const kanjiQueue = KANJI_LESSONS.filter((l) => !l.unit);
 const kanjiPinned = KANJI_LESSONS.filter((l) => l.unit);
+let kanjiBacklog = []; // pinned kanji lessons whose unit came before the learner could read kana
+
+// Katakana the course's words and sentences actually use, most frequent first (small ァィゥェォ have no
+// stroke data and are not in KANA, so they are never taught).
+const KATAKANA_USED = (() => {
+  const freq = new Map();
+  let order = 0;
+  for (const s of SECTIONS_DATA) for (const u of s.units) for (const l of u.lessons) {
+    const texts = [...(l.words || []).map((w) => w[0]), ...(l.sentences || []).map((x) => x.jp.join(''))];
+    for (const c of texts.join('')) {
+      if (!KANA.has(c) || !isKatakana(c)) continue;
+      const f = freq.get(c) || { n: 0, first: order++ };
+      f.n += 1;
+      freq.set(c, f);
+    }
+  }
+  return [...freq].sort((a, b) => b[1].n - a[1].n || a[1].first - b[1].first).map(([c]) => c);
+})();
 
 // Marks words that every taught character can now spell, returning up to `max` of them.
 function newlyReadable(unitId, max = 6) {
@@ -94,15 +119,21 @@ function newlyReadable(unitId, max = 6) {
 function readLessons(unitItems, unitId, perUnit) {
   const freq = new Map();
   unitItems.forEach((id, i) => ITEMS.get(id).chars.forEach((c) => {
-    if (taught.has(c) || !isHiragana(c)) return;
+    if (taught.has(c)) return;
     const f = freq.get(c) || { n: 0, first: i };
     f.n += 1;
     freq.set(c, f);
   }));
-  const fromUnit = [...freq].sort((a, b) => b[1].n - a[1].n || a[1].first - b[1].first).map(([c]) => c);
-  const pool = [...new Set([...fromUnit, ...carry.filter((c) => !taught.has(c))])];
-  const now = pool.slice(0, perUnit);
-  carry = pool.slice(perUnit);
+  const byUnit = [...freq].sort((a, b) => b[1].n - a[1].n || a[1].first - b[1].first).map(([c]) => c);
+  const hiraPool = [...new Set([...byUnit.filter(isHiragana), ...carry.filter((c) => !taught.has(c))])];
+  // Katakana comes in once the first hiragana are known: this unit's loanword characters first.
+  const hiraganaTaught = [...taught].filter(isHiragana).length;
+  const kataPool = hiraganaTaught >= KATA_AFTER && perUnit
+    ? [...new Set([...byUnit.filter(isKatakana), ...KATAKANA_USED.filter((c) => !taught.has(c))])] : [];
+  const kata = kataPool.slice(0, Math.min(Math.max(1, Math.min(KATA_PER_UNIT, byUnit.filter(isKatakana).length)), perUnit));
+  const hira = hiraPool.slice(0, perUnit - kata.length);
+  const now = [...hira, ...kata];
+  carry = hiraPool.filter((c) => !hira.includes(c));
   const lessons = [];
   for (let i = 0; i < now.length; i += READ_PER_LESSON) {
     const chars = now.slice(i, i + READ_PER_LESSON);
@@ -126,7 +157,7 @@ function buildUnit(section, unit, u, unitIndex, totalUnits) {
     const items = [...words, ...sentences];
     return { kind: 'lesson', title: l.title, items, grammar: l.grammar, icon: sentences.length && !words.length ? 'chat' : 'art', art: ITEMS.get(items[0]).art };
   });
-  const reads = readLessons(vocab.flatMap((l) => l.items), unit.id, section === SECTIONS_DATA[0] ? 0 : READ_PER_UNIT);
+  const reads = readLessons(vocab.flatMap((l) => l.items), unit.id, unitIndex === 0 ? 0 : READ_PER_UNIT);
   // Interleave: two vocabulary lessons, then a reading lesson, and so on.
   const seq = [];
   vocab.forEach((l, i) => {
@@ -134,10 +165,13 @@ function buildUnit(section, unit, u, unitIndex, totalUnits) {
     if (i % 2 === 1 && reads.length) seq.push(reads.shift());
   });
   seq.push(...reads);
-  // Kanji: lessons pinned to this unit, then the rest spread over every unit, travel signs first.
-  const pinned = kanjiPinned.filter((spec) => spec.unit === unit.id);
+  // Kanji: lessons pinned to this unit, then the rest spread over every unit, travel signs first. They start
+  // once the learner has met ~20 kana; pinned lessons of earlier units wait and follow, two per unit.
+  const canKanji = !HAS_KANA || taught.size >= KANJI_AFTER;
+  kanjiBacklog.push(...kanjiPinned.filter((spec) => spec.unit === unit.id));
+  const pinned = canKanji ? kanjiBacklog.splice(0, HAS_KANA ? KANJI_PER_UNIT : kanjiBacklog.length) : [];
   pinned.forEach((spec) => seq.push(kanjiLesson(spec)));
-  const take = pinned.length ? 0 : Math.ceil(kanjiQueue.length / (totalUnits - unitIndex));
+  const take = !canKanji || kanjiBacklog.length || pinned.length ? 0 : Math.ceil(kanjiQueue.length / (totalUnits - unitIndex));
   kanjiQueue.splice(0, take).forEach((spec) => seq.push(kanjiLesson(spec)));
   if (unit.dialogues?.length) seq.push({ kind: 'story', title: 'Story time', items: unit.dialogues.map((d) => `dl-${d}`), icon: 'story' });
 
@@ -159,9 +193,16 @@ export const SECTIONS = SECTIONS_DATA.map((s) => ({
   units: s.units.map((u, i) => buildUnit(s, u, i, unitCounter++, allUnits.length)),
 }));
 
-// Hiragana still untaught (words' leftovers first, then the rest of the chart): a final
-// "Kana corner" so every hiragana word becomes readable and the full chart can be learned.
-const leftovers = [...new Set([...carry, ...[...KANA.keys()].filter(isHiragana)])].filter((c) => !taught.has(c));
+// Kana still untaught (words' leftovers first, then the rest of the hiragana chart, then the katakana the
+// words use): a final "Kana corner" so every word becomes readable and the full hiragana chart can be learned.
+// Kanji lessons still held back (a very short course) are added to their last unit.
+const leftovers = [...new Set([...carry, ...[...KANA.keys()].filter(isHiragana), ...KATAKANA_USED])].filter((c) => !taught.has(c));
+if (kanjiBacklog.length) {
+  const last = SECTIONS[SECTIONS.length - 1].units.at(-1);
+  const at = last.nodes.findIndex((n) => n.kind === 'review');
+  const ids = last.nodes.filter((n) => n.kind === 'kanji').length;
+  last.nodes.splice(at, 0, ...kanjiBacklog.map((spec, i) => ({ ...kanjiLesson(spec), id: `${last.id}-k${ids + i + 1}` })));
+}
 if (leftovers.length) {
   const nodes = [];
   for (let i = 0; i < leftovers.length; i += READ_PER_LESSON) {
@@ -170,7 +211,7 @@ if (leftovers.length) {
     nodes.push({ id: `kana-corner-r${nodes.length + 1}`, kind: 'read', title: `Read it: ${chars.join(' ')}`, items: chars.map(kanaItem), readWords: newlyReadable('kana-corner'), icon: 'kana' });
   }
   nodes.push({ id: 'kana-corner-review', kind: 'review', title: 'Kana review', items: nodes.flatMap((n) => n.items) });
-  SECTIONS[SECTIONS.length - 1].units.push({ id: 'kana-corner', title: 'Kana corner', desc: 'The rest of the hiragana chart', facts: [], phrases: [], dialogueIds: [], color: 'blue', nodes });
+  SECTIONS[SECTIONS.length - 1].units.push({ id: 'kana-corner', title: 'Kana corner', desc: 'The rest of the kana charts', facts: [], phrases: [], dialogueIds: [], color: 'blue', nodes });
 }
 
 export const NODES = [];

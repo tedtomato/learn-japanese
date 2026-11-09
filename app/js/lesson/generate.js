@@ -1,10 +1,12 @@
 // Turns a path node (or a practice request) into a list of exercises.
 import { FAMILIAR_IDS, ITEMS } from '../course.js';
-import { byUrgency } from '../srs.js';
+import { byUrgency, strength } from '../srs.js';
 import { L, LANG } from '../lang.js';
 import { romajiMatch, latinKey } from '../normalise.js';
+import { splitSyllables, toneNumbers } from '../pinyin.js';
 import { t, langName } from '../strings.js';
-import { GRAMMAR, STROKES, FILLERS as JP_FILLERS, FILLER_ROMAJI, GLOSS_FILLERS } from '../content/pack.js';
+import { GRAMMAR, STROKES, FILLERS as JP_FILLERS, FILLER_ROMAJI, GLOSS_FILLERS, CONJUGATIONS } from '../content/pack.js';
+import { syllables } from '../romaji.js';
 
 export function makeRng(seed = Date.now()) {
   let a = seed >>> 0;
@@ -31,8 +33,8 @@ const pick = (list, rng) => list[Math.floor(rng() * list.length)];
 const QUESTION_TYPES = {
   kana: { easy: ['kana2romaji', 'audio2kana'], hard: ['romaji2kana', 'audio2kana', 'kana2romaji'] },
   // Latin-alphabet courses have no spelling or reading tasks, so they get typing, gap and article tasks instead.
-  word: { easy: ['jp2en', 'audio2jp'], hard: ['en2jp', 'spell', 'audio2jp', 'read', 'speak', ...(L.latin ? ['dictation', 'article'] : [])] },
-  sentence: { easy: ['build-jp2en'], hard: ['build-en2jp', 'build-audio', 'fast', 'speak', ...(L.latin ? ['dictation', 'cloze', 'type-translate'] : [])] },
+  word: { easy: ['jp2en', 'audio2jp'], hard: ['en2jp', 'spell', 'audio2jp', 'read', 'speak', 'recall-word', 'conjugation', 'tone', ...(L.latin ? ['dictation', 'article'] : [])] },
+  sentence: { easy: ['build-jp2en'], hard: ['build-en2jp', 'build-audio', 'fast', 'speak', 'type-sentence', 'conj-sentence', ...(L.latin ? ['dictation', 'cloze', 'type-translate'] : [])] },
   kanji: { easy: ['kanji2meaning'], hard: ['meaning2kanji', 'kanji2meaning'] },
   kword: { easy: ['kword2meaning'], hard: ['kword2reading', 'kword2meaning'] },
   radical: { easy: ['radical2meaning'], hard: ['meaning2radical'] },
@@ -92,6 +94,12 @@ export function articleParts(item) {
 }
 
 function allowed(type, item, ctx) {
+  // Typed and verb-form tasks come from the third level on (and in reviews and practice).
+  if (['recall-word', 'type-sentence', 'conjugation', 'conj-sentence'].includes(type) && ctx.level < 2 && !ctx.review) return false;
+  if (type === 'recall-word') return item.type === 'word' && ctx.known(item.id) && recallable(item);
+  if (type === 'type-sentence') return item.type === 'sentence' && ctx.known(item.id) && item.romaji.replace(/[^a-z]/gi, '').length <= 40;
+  if (type === 'conjugation' || type === 'conj-sentence') return !!pickConjugation(item, type, ctx);
+  if (type === 'tone') return LANG === 'zh' && ctx.canListen && item.type === 'word' && ctx.known(item.id) && !!tonePattern(item);
   if (type.startsWith('audio') || type === 'build-audio' || type === 'fast' || type === 'dictation') return ctx.canListen && (type !== 'fast' || ctx.advanced);
   if (type === 'article') return !!articleParts(item);
   if (type === 'cloze') return item.type === 'sentence' && item.jp.length >= 2;
@@ -105,8 +113,20 @@ function allowed(type, item, ctx) {
   return true;
 }
 
+// Difficulty follows how well the item is known: shaky items get the easy tasks, solid ones the hard and
+// typed ones (not in gentle lessons or retries, which choose for themselves).
+export const EASY_BELOW = 0.34;
+export const HARD_ABOVE = 0.67;
+function adapted(item, difficulty, ctx) {
+  const rec = ctx.records?.[item.id];
+  if (ctx.adapt === false || ctx.gentle || !rec?.seen) return difficulty;
+  const st = strength(rec, ctx.now);
+  return st < EASY_BELOW ? 'easy' : st > HARD_ABOVE ? 'hard' : difficulty;
+}
+
 function questionType(item, difficulty, ctx) {
   const types = QUESTION_TYPES[item.type];
+  difficulty = adapted(item, difficulty, ctx);
   const list = difficulty === 'any' ? [...types.easy, ...types.hard] : types[difficulty];
   const ok = list.filter((t) => allowed(t, item, ctx));
   return ok.length ? pick(ok, ctx.rng) : types.easy[0];
@@ -199,6 +219,126 @@ function tileDistractors(answer, candidates, count, ctx, bySound = false) {
 
 const sentencePool = (ctx) => [...new Set([...ctx.sessionIds, ...ctx.knownIds])].map((id) => ITEMS.get(id)).filter((i) => i?.type === 'sentence');
 
+// ---- Typed tasks and verb forms ----
+const recallable = (item) => item.romaji.replace(/[^a-z]/g, '').length <= 14;
+
+// Tones of a Chinese word of one or two syllables, as digits ("3", "24"); null when a syllable is neutral,
+// the word has a third-tone pair (sandhi changes how it sounds) or contains 不 / 一 (they change too).
+export function tonePattern(item) {
+  if (LANG !== 'zh' || item.type !== 'word' || /[不一]/.test(item.jp)) return null;
+  const parts = splitSyllables(item.romaji.replace(/\s+/g, ''));
+  if (!parts || parts.length > 2) return null;
+  const digits = toneNumbers(parts.join('')).replace(/[^1-4]/g, '');
+  if (digits.length !== parts.length || digits === '33') return null;
+  return digits;
+}
+const TONE_NAMES = { 1: 'flat', 2: 'rising', 3: 'dipping', 4: 'falling' };
+export const toneLabel = (pattern) => (pattern.length === 1
+  ? `Tone ${pattern} · ${TONE_NAMES[pattern]}`
+  : `Tones ${pattern[0]} + ${pattern[1]} · ${[...pattern].map((d) => TONE_NAMES[d]).join(', ')}`);
+
+// Verb forms (CONJUGATIONS) are tied to the words that show them: the verb itself, a word that is one of its
+// forms, or its example sentence. A form is asked once one of those has been answered.
+let conjLinks;
+const looseKey = (text) => text.toLowerCase().replace(/[\s.,!?。！？，、'’]/g, '');
+function conjugationLinks() {
+  if (conjLinks) return conjLinks;
+  conjLinks = new Map();
+  for (const c of CONJUGATIONS) {
+    const forms = new Set(Object.values(c.forms));
+    const example = c.example && looseKey(c.example.jp);
+    for (const it of ITEMS.values()) {
+      const linked = (it.type === 'word' && (it.jp === c.verb || forms.has(it.jp))) || (it.type === 'sentence' && example && looseKey(it.text) === example);
+      if (linked) conjLinks.set(it.id, [...(conjLinks.get(it.id) || []), c]);
+    }
+  }
+  return conjLinks;
+}
+
+// The form of `forms` that appears in the sentence (longest match, on word boundaries for Latin text).
+function formInSentence(forms, sentence) {
+  const lower = sentence.toLowerCase();
+  let best = null;
+  for (const [label, form] of Object.entries(forms)) {
+    const at = lower.indexOf(form.toLowerCase());
+    if (at < 0) continue;
+    if (L.latin && (/\p{L}/u.test(lower[at - 1] || '') || /\p{L}/u.test(lower[at + form.length] || ''))) continue;
+    if (!best || form.length > best.form.length) best = { label, at, form, text: sentence.slice(at, at + form.length) };
+  }
+  return best;
+}
+
+// Wrong answers for a verb form: the verb's other forms (same tense first), never the same text twice.
+function formOptions(c, label, answer, ctx) {
+  const key = (x) => (L.latin ? latinKey(x) : x);
+  const group = (l) => /\(([^)]*)\)/.exec(l)?.[1] || '';
+  const seen = new Set([key(answer)]);
+  const others = Object.entries(c.forms).filter(([l]) => l !== label);
+  const same = shuffle(others.filter(([l]) => group(l) === group(label)), ctx.rng);
+  const rest = shuffle(others.filter(([l]) => group(l) !== group(label)), ctx.rng);
+  const out = [];
+  for (const [l, form] of [...same, ...rest]) {
+    if (seen.has(key(form))) continue;
+    seen.add(key(form));
+    out.push(l);
+    if (out.length === 3) break;
+  }
+  return out;
+}
+
+// A buildable verb-form task for this item, or null. variant: 'conjugation' (name the form) or 'conj-sentence'.
+function pickConjugation(item, variant, ctx) {
+  if (!CONJUGATIONS.length || !ctx.known(item.id)) return null;
+  const options = (conjugationLinks().get(item.id) || []).filter((c) => {
+    if (variant === 'conj-sentence' && !(c.example && formInSentence(c.forms, c.example.jp))) return false;
+    return new Set(Object.values(c.forms).map((f) => (L.latin ? latinKey(f) : f))).size >= 3;
+  });
+  return options.length ? pick(options, ctx.rng) : null;
+}
+
+// Reading aid under a form: pinyin (zh) or romaji (ja); none in Latin-alphabet courses.
+function formRomaji(c, form) {
+  if (L.latin) return null;
+  const label = Object.keys(c.forms).find((l) => c.forms[l] === form);
+  if (c.formsRomaji) return c.formsRomaji[label] || null;
+  return LANG === 'ja' ? syllables(form).map((x) => x.romaji).join('') : null;
+}
+
+function conjugationExercise(item, variant, ctx, base) {
+  const c = pickConjugation(item, variant, ctx);
+  let label;
+  let answer;
+  let prompt = null;
+  if (variant === 'conj-sentence') {
+    const m = formInSentence(c.forms, c.example.jp);
+    const before = c.example.jp.slice(0, m.at).trim();
+    const after = c.example.jp.slice(m.at + m.form.length).trim();
+    [label, answer] = [m.label, m.text];
+    prompt = [...(before ? [before] : []), null, ...(after ? [after] : [])];
+  } else {
+    label = pick(Object.keys(c.forms), ctx.rng);
+    answer = c.forms[label];
+  }
+  // A sentence-initial form is capitalised in the sentence: offer the others the same way.
+  const cap = (x) => (/^\p{Lu}/u.test(answer) ? x[0].toUpperCase() + x.slice(1) : x);
+  const options = shuffle([answer, ...formOptions(c, label, answer, ctx).map((l) => cap(c.forms[l]))], ctx.rng);
+  const romaji = Object.fromEntries(options.map((o) => [o, formRomaji(c, o) || formRomaji(c, o.toLowerCase())]).filter(([, r]) => r));
+  const verbRomaji = L.latin ? null : LANG === 'ja' ? syllables(c.verb).map((x) => x.romaji).join('') : [...ITEMS.values()].find((i) => i.type === 'word' && i.jp === c.verb)?.romaji;
+  return { ...base, type: 'conjugation', kind: variant, variant, verb: c.verb, verbRomaji,
+    meaning: c.meaning, label, answer, options, optionRomaji: romaji, prompt, en: c.example?.en,
+    instruction: variant === 'conj-sentence' ? t('Fill the gap — {en}', { en: c.example.en }) : t('Which form is it?') };
+}
+
+// Hear a Chinese word, pick its tone pattern from four.
+function toneExercise(item, ctx, base) {
+  const answer = tonePattern(item);
+  const all = answer.length === 1 ? ['1', '2', '3', '4'] : ['1', '2', '3', '4'].flatMap((a) => ['1', '2', '3', '4'].map((b) => a + b)).filter((x) => x !== '33');
+  const wrong = answer.length === 1 ? all.filter((x) => x !== answer) : shuffle(all.filter((x) => x !== answer), ctx.rng).slice(0, 3);
+  const options = shuffle([answer, ...wrong], ctx.rng).map(toneLabel);
+  return { ...base, type: 'tone', kind: 'tone', prompt: 'audio', answer: toneLabel(answer), options, hint: false,
+    instruction: t('Which tone do you hear?') };
+}
+
 function buildExercise(item, type, ctx) {
   const base = { itemIds: [item.id], itemId: item.id, hint: ctx.romajiHint(item), kind: type };
   // Gentle kana questions (first time through a "Read it" lesson) have no countdown.
@@ -262,6 +402,12 @@ function buildExercise(item, type, ctx) {
       return { ...base, type: 'cloze', prompt: item.jp.map((c, i) => (i === gap ? null : c)), answer, en: item.en,
         options: shuffle([answer, ...clozeDistractors(item, ctx)], ctx.rng), instruction: t('Fill the gap — {en}', { en: item.en }) };
     }
+    // Typed from the meaning: a word or a whole sentence, from memory.
+    case 'recall-word': return { ...base, type: 'recall', kind: 'recall' };
+    case 'type-sentence': return { ...base, type: 'type-sentence', kind: 'type-sentence', hint: false, instruction: t('Type it in {lang}…', { lang: langName() }) };
+    case 'conjugation':
+    case 'conj-sentence': return conjugationExercise(item, type, ctx, base);
+    case 'tone': return toneExercise(item, ctx, base);
     // Which article goes with this noun?
     case 'article': {
       const p = articleParts(item);
@@ -291,9 +437,11 @@ function matchExercise(ids, ctx) {
   return { type: 'match', untimed: !!ctx.gentle, itemIds: pairs, pairs, right, hint: type === 'word' && pairs.some((id) => ctx.romajiHint(ITEMS.get(id))), instruction: t('Tap the matching pairs') };
 }
 
-function dialogueExercise(id, ctx) {
+// A question about a conversation: one of its `questions` when it has several (the first option is the answer).
+function dialogueExercise(id, ctx, q = null) {
   const d = ITEMS.get(id);
-  return { type: 'dialogue', itemId: id, itemIds: [], options: shuffle(d.options, ctx.rng), answer: d.options[0], instruction: d.question };
+  const { question, options } = q || (d.questions?.length ? pick(d.questions, ctx.rng) : d);
+  return { type: 'dialogue', itemId: id, itemIds: [], options: shuffle(options, ctx.rng), answer: options[0], instruction: question };
 }
 
 // Spread exercises so the same item does not come up twice in a row when avoidable.
@@ -308,13 +456,17 @@ function spread(list, rng) {
   return out;
 }
 
-export function context({ state, sessionIds, level, rng, canListen = true, canSpeak = false, advanced = false, readMode = false }) {
+export function context({ state, sessionIds, level, rng, canListen = true, canSpeak = false, advanced = false, readMode = false, now = Date.now() }) {
   const knownIds = Object.keys(state.items).filter((id) => ITEMS.has(id));
   // Reading lessons count the characters they are teaching; other lessons only well-known ones.
   const chars = knownChars(state, readMode ? sessionIds : []);
   const always = state.settings?.romaji === 'always';
   return {
-    rng, level, canListen, canSpeak, advanced, sessionIds, knownIds, chars,
+    rng, level, canListen, canSpeak, advanced, sessionIds, knownIds, chars, now, records: state.items,
+    // Answered before (an item only introduced in this session does not count): typed tasks need it.
+    known: (id) => !isNew(state, id),
+    // Kana the learner has met, for tasks written in kana that are not tied to one word.
+    metKana: new Set(Object.keys(state.items).map((id) => ITEMS.get(id)).filter((i) => i?.type === 'kana').map((i) => i.jp)),
     // Romaji over Japanese: until the learner reads every character of the word well; sentences
     // keep it until the sentence itself is well known; "Always" in settings keeps it on.
     solid: (item) => state.items[item.id]?.box >= SOLID_BOX,
@@ -351,6 +503,47 @@ function recallExercises(ids, state, count, rng) {
   return shuffle(words, rng).slice(0, count).map((it) => ({ type: 'recall', itemId: it.id, itemIds: [it.id], kind: 'recall' }));
 }
 
+// ---- Production weighting ----
+// Typed or built-into-the-language tasks (not picked from options) make words stick: from the third level on,
+// in reviews and in practice at least 40% of the scored tasks are of that kind.
+export const PRODUCTION_SHARE = 0.4;
+export const PRODUCTION_KINDS = new Set(['recall', 'dictation', 'type-translate', 'type-sentence', 'build-en2jp', 'spell', 'cloze', 'conjugation', 'conj-sentence']);
+const SCORED_TYPES = new Set(['choice', 'build', 'recall', 'type-sentence', 'cloze', 'conjugation', 'tone']);
+export const isProduction = (ex) => PRODUCTION_KINDS.has(ex.kind);
+export const isScored = (ex) => SCORED_TYPES.has(ex.type);
+
+// A production task for an item the learner has answered before, or null.
+function productionFor(item, ctx) {
+  const options = item.type === 'word' ? ['recall-word', 'spell', 'conjugation', ...(L.latin ? ['dictation'] : [])]
+    : item.type === 'sentence' ? ['type-sentence', 'build-en2jp', 'conj-sentence', ...(L.latin ? ['cloze', 'type-translate'] : [])] : [];
+  const ok = options.filter((o) => allowed(o, item, ctx) && !(o === 'dictation' && !ctx.canListen));
+  return ok.length ? buildExercise(item, pick(ok, ctx.rng), ctx) : null;
+}
+
+// Japanese: once the characters of a word are well known, one task per lesson asks the learner to read it
+// (so the romaji over it fades and reading gets practised from the first units on).
+function ensureReading(list, ctx, state) {
+  if (list.some((e) => e.kind === 'read' && ITEMS.get(e.itemId)?.type === 'word')) return;
+  const at = list.findIndex((e) => e.type === 'choice' && !isNew(state, e.itemId) && ITEMS.get(e.itemId)?.type === 'word' && !['read', 'speak'].includes(e.kind)
+    && canRead(ITEMS.get(e.itemId), ctx.chars));
+  if (at >= 0) list[at] = buildExercise(ITEMS.get(list[at].itemId), 'read', ctx);
+}
+
+// Swaps choice tasks for production ones, in place, until the share is reached (as far as items allow).
+function raiseProduction(list, ctx, share = PRODUCTION_SHARE) {
+  const scored = () => list.filter(isScored).length;
+  const produced = () => list.filter((e) => isScored(e) && isProduction(e)).length;
+  const swappable = shuffle(list.map((e, i) => i).filter((i) => isScored(list[i]) && !isProduction(list[i]) && list[i].itemId && list[i].kind !== 'read' && !list[i].retry), ctx.rng);
+  for (const i of swappable) {
+    if (produced() >= Math.ceil(share * scored())) break;
+    const item = ITEMS.get(list[i].itemId);
+    if (!item || !ctx.known(item.id)) continue;
+    const alt = productionFor(item, ctx);
+    if (alt) list[i] = alt;
+  }
+  return list;
+}
+
 // Lenient check of typed answers lives with the other text normalisers.
 export { romajiMatch };
 
@@ -364,10 +557,11 @@ export function generateLesson(node, state, opts = {}) {
   const targets = isReview ? shuffle(node.items, rng).slice(0, 10) : node.items;
   const readWords = readMode ? node.readWords || [] : [];
   const reviewIds = pickReview(state, [...node.items, ...readWords], isReview ? 2 : Math.max(2, Math.round(targets.length * 0.6)), rng, now);
-  const ctx = context({ state, sessionIds: [...targets, ...readWords, ...reviewIds], level, rng, readMode,
+  const ctx = context({ state, sessionIds: [...targets, ...readWords, ...reviewIds], level, rng, readMode, now,
     canListen: opts.canListen !== false, canSpeak: !!opts.canSpeak, advanced: node.sectionIndex > 0 || level >= 2 });
   // First time through a "Read it" lesson: fewer choices, no look-alikes, no countdown.
   ctx.gentle = readMode && level === 0;
+  ctx.review = isReview;
   const goal = isReview ? 14 : 9 + Math.min(level, 4);
 
   const head = [];
@@ -443,13 +637,21 @@ export function generateLesson(node, state, opts = {}) {
   // From the second level on, units with conversations add one to listen to.
   const dialogues = node.unit?.dialogueIds || [];
   if (dialogues.length && level >= 1 && ctx.canListen) body.splice(Math.floor(body.length * 0.8), 0, dialogueExercise(pick(dialogues, rng), ctx));
-  return { exercises: [...head, ...body], itemIds: ctx.sessionIds };
+  const exercises = [...head, ...body];
+  if (LANG === 'ja' && level >= 1 && !readMode) ensureReading(exercises, ctx, state);
+  if ((level >= 2 || isReview) && !readMode) raiseProduction(exercises, ctx);
+  return { exercises, itemIds: ctx.sessionIds };
 }
 
 // Story node: listen to each conversation and answer a question about it.
 function generateStory(node, state, { rng = makeRng() } = {}) {
   const ctx = { rng };
-  return { exercises: node.items.map((id) => dialogueExercise(id, ctx)), itemIds: [] };
+  // Two different questions per conversation when it has them: the second after the first is answered.
+  const ask = (id) => {
+    const qs = ITEMS.get(id).questions;
+    return qs?.length > 1 ? shuffle(qs, rng).slice(0, 2).map((q) => dialogueExercise(id, ctx, q)) : [dialogueExercise(id, ctx)];
+  };
+  return { exercises: node.items.flatMap(ask), itemIds: [] };
 }
 
 // Kanji-only practice: the learner's kanji, kanji words, radicals and spotted kanji (one per character),
@@ -480,7 +682,7 @@ export function kanaPracticeIds(state, now, script = 'hiragana', count = 8) {
 export function generatePractice(state, { rng = makeRng(), now = Date.now(), itemIds = null, size = 10, canListen = true, canSpeak = false, gentle = false } = {}) {
   const ids = itemIds || pickReview(state, [], 8, rng, now, { peeks: true });
   if (!ids.length) return { exercises: [], itemIds: [] };
-  const ctx = context({ state, sessionIds: ids, level: gentle ? 0 : 3, rng, canListen, canSpeak, advanced: !gentle });
+  const ctx = context({ state, sessionIds: ids, level: gentle ? 0 : 3, rng, canListen, canSpeak, advanced: !gentle, now });
   ctx.gentle = gentle;
   const intros = ids.filter((id) => isNew(state, id)).map((id) => ({ type: 'intro', itemId: id, itemIds: [] }));
   const list = ids.map((id) => buildExercise(ITEMS.get(id), questionType(ITEMS.get(id), isNew(state, id) ? 'easy' : 'any', ctx), ctx));
@@ -491,6 +693,18 @@ export function generatePractice(state, { rng = makeRng(), now = Date.now(), ite
     n += 1;
   }
   if (!gentle) list.push(...recallExercises(ids, state, 1, rng));
+  if (!gentle && !itemIds && CONJUGATIONS.length) {
+    // One verb-form task per mixed session, about a verb the learner has met.
+    const known = shuffle([...conjugationLinks().keys()].filter((id) => ctx.known(id)), rng);
+    for (const id of known) {
+      const variant = pick(['conjugation', 'conj-sentence'].filter((v) => allowed(v, ITEMS.get(id), ctx)), rng);
+      if (variant) {
+        list.push(buildExercise(ITEMS.get(id), variant, ctx));
+        break;
+      }
+    }
+  }
+  if (!gentle) raiseProduction(list, ctx);
   const body = spread(list, rng);
   const match = matchExercise(ids, ctx);
   if (match) body.splice(Math.floor(body.length / 2), 0, match);
@@ -500,6 +714,7 @@ export function generatePractice(state, { rng = makeRng(), now = Date.now(), ite
 // Fresh questions for items the learner got wrong or hesitated on, for the end-of-lesson retry.
 export function generateRetry(itemIds, state, { rng = makeRng(), canListen = true } = {}) {
   const ctx = context({ state, sessionIds: itemIds, level: 1, rng, canListen });
+  ctx.adapt = false;
   return itemIds.map((id) => ITEMS.get(id)).filter((it) => QUESTION_TYPES[it?.type])
     .map((it) => ({ ...buildExercise(it, questionType(it, 'easy', ctx), ctx), retry: true }));
 }
@@ -510,6 +725,9 @@ export const DEMO_KINDS = {
   grammar: 'Grammar cards', dialogue: 'Dialogues', kanji: 'Kanji & clues', match: 'Match pairs',
   build: 'Build sentences', listen: 'Listening', intro: 'New word cards',
   ...(L.latin ? { dictation: 'Dictation', cloze: 'Fill the gap', translate: 'Type the meaning', article: 'Articles' } : {}),
+  ...(CONJUGATIONS.length ? { conjugation: 'Verb forms' } : {}),
+  ...(LANG === 'zh' ? { tone: 'Which tone?' } : {}),
+  typed: 'Type from memory',
 };
 
 export function demoExercises(kind, state, { rng = makeRng() } = {}) {
@@ -538,6 +756,19 @@ export function demoExercises(kind, state, { rng = makeRng() } = {}) {
     case 'cloze': return make(of('sentence', 4), 'cloze');
     case 'translate': return make(of('sentence', 4), 'type-translate');
     case 'article': return make(shuffle(all.filter((i) => articleParts(i)), rng).slice(0, 4), 'article');
+    case 'conjugation': {
+      // Pretend the verbs were answered, so every verb of the course can be tried.
+      const linked = shuffle([...conjugationLinks().keys()], rng);
+      const seenAll = { ...ctx, known: () => true };
+      return linked.flatMap((id) => ['conjugation', 'conj-sentence'].filter((v) => allowed(v, ITEMS.get(id), seenAll)).map((v) => buildExercise(ITEMS.get(id), v, seenAll))).slice(0, 6);
+    }
+    case 'tone': {
+      const seenAll = { ...ctx, known: () => true };
+      return shuffle(all.filter((i) => allowed('tone', i, seenAll)), rng).slice(0, 5).map((w) => buildExercise(w, 'tone', seenAll));
+    }
+    case 'typed': {
+      return [...make(shuffle(all.filter((i) => i.type === 'word' && recallable(i)), rng).slice(0, 3), 'recall-word'), ...make(of('sentence', 2), 'type-sentence')];
+    }
     case 'intro': return of('word', 4).map((w) => ({ type: 'intro', itemId: w.id, itemIds: [], hint: true }));
     default: return [];
   }

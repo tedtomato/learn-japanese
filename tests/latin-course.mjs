@@ -5,7 +5,8 @@ import assert from 'node:assert/strict';
 import { existsSync } from 'node:fs';
 
 const { ITEMS, NODES, SECTIONS } = await import('../app/js/course.js');
-const { generateLesson, generatePractice, makeRng, demoExercises, DEMO_KINDS, articleParts } = await import('../app/js/lesson/generate.js');
+const { generateLesson, generatePractice, makeRng, demoExercises, DEMO_KINDS, articleParts, PRODUCTION_SHARE } = await import('../app/js/lesson/generate.js');
+const { playThrough, learnedState, productionShare } = await import('./sim.mjs');
 const { latinKey } = await import('../app/js/normalise.js');
 const { defaultState } = await import('../app/js/progress.js');
 const { L } = await import('../app/js/lang.js');
@@ -200,5 +201,59 @@ export function latinCourseTests(code) {
       }
     }
     assert.ok(fakes > 0, 'some questions offer the wrong article');
+  });
+
+  test(`${code}: verb-form tasks name a form or fill a gap, with distinct options`, () => {
+    assert.ok(pack.CONJUGATIONS.length >= 8, 'conjugation tables');
+    for (const c of pack.CONJUGATIONS) {
+      assert.ok(Object.keys(c.forms).length >= 3 && c.verb && c.meaning, c.id);
+      assert.ok(ITEMS.get(`w-${latinKey(c.verb)}`) || [...ITEMS.values()].some((i) => i.type === 'word' && i.jp.toLowerCase().endsWith(c.verb)), `${c.id}: the verb is a word of the course`);
+    }
+    assert.ok(DEMO_KINDS.conjugation);
+    const kinds = new Set();
+    for (let seed = 1; seed <= 6; seed++) {
+      for (const ex of demoExercises('conjugation', defaultState(T0), { rng: makeRng(seed) })) {
+        kinds.add(ex.kind);
+        assert.equal(ex.type, 'conjugation');
+        assert.ok(ex.options.includes(ex.answer), 'answer among options');
+        assert.equal(new Set(ex.options.map(latinKey)).size, ex.options.length, 'no duplicate options');
+        assert.ok(ex.options.length >= 3 && ex.options.length <= 4);
+        if (ex.kind === 'conj-sentence') assert.equal(ex.prompt.filter((c) => c === null).length, 1);
+        else assert.ok(ex.verb && ex.label && ex.meaning);
+      }
+    }
+    assert.deepEqual([...kinds].sort(), ['conj-sentence', 'conjugation']);
+    // They show up in practice once a verb has been met.
+    let asked = 0;
+    for (let seed = 1; seed <= 30; seed++) asked += generatePractice(learnedState(T0), { rng: makeRng(seed), now: T0 + 1e6 }).exercises.filter((e) => e.type === 'conjugation').length;
+    assert.ok(asked >= 15, `${asked} verb-form tasks in 30 sessions`);
+  });
+
+  test(`${code}: from level 2 and in reviews, at least 40% of scored tasks are typed or built`, () => {
+    const { log } = playThrough({ levels: [0, 1, 2], kinds: ['lesson', 'review'] });
+    const mix = (pick) => productionShare(log.filter(pick).flatMap((l) => l.exercises));
+    const l2 = mix((l) => l.level === 2 && l.node.kind === 'lesson');
+    assert.ok(l2.share >= PRODUCTION_SHARE, `level 2: ${(l2.share * 100).toFixed(1)}%`);
+    const reviews = mix((l) => l.level >= 1 && l.node.kind === 'review');
+    assert.ok(reviews.share >= PRODUCTION_SHARE, `reviews: ${(reviews.share * 100).toFixed(1)}%`);
+  });
+
+  test(`${code}: dialogues with several questions give different questions with the answer first`, () => {
+    const multi = Object.values(pack.DIALOGUES).filter((d) => d.questions?.length);
+    assert.ok(multi.length >= 5, 'dialogues with questions');
+    for (const d of multi) for (const q of d.questions) assert.ok(q.question && q.options.length >= 3 && new Set(q.options).size === q.options.length);
+    const asked = new Set();
+    for (let seed = 1; seed <= 30; seed++) {
+      for (const ex of demoExercises('dialogue', defaultState(T0), { rng: makeRng(seed) })) {
+        assert.ok(ex.options.includes(ex.answer));
+        asked.add(ex.instruction);
+      }
+    }
+    assert.ok(asked.size > multi.length, 'more than one question per dialogue is asked');
+  });
+
+  test(`${code}: pronunciation tips are well formed`, () => {
+    assert.ok(pack.PRONUNCIATION.length >= 10);
+    for (const p of pack.PRONUNCIATION) assert.ok(p.id && p.title && p.text && p.example && p.say && p.icon, p.id);
   });
 }

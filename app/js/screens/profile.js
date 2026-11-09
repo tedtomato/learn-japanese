@@ -2,12 +2,12 @@
 import { L } from '../lang.js';
 import { ITEMS, NODES } from '../course.js';
 import { app, statsBar, toast, modal } from '../app.js';
-import { html, mount, raw, $, $$ } from '../dom.js';
+import { html, mount, raw, $, $$, wireArrows } from '../dom.js';
+import { listeningMode, shortcutsEnabled } from '../a11y.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { speak, voiceStatus } from '../audio.js';
-import { versionLabel } from '../version.js';
-import { CHANGELOG, APP_RELEASE } from '../content/changelog.js';
+import { versionLabel, APP_RELEASE } from '../version.js';
 import { checkForUpdate, hardRefresh } from '../update.js';
 import { askOpenLab } from './lab.js';
 import { showStreakCalendar } from './streak.js';
@@ -82,14 +82,17 @@ function backupAgeText(state, now) {
   return t('Last backup: {when}', { when: days === 0 ? t('today') : days === 1 ? t('yesterday') : t('{n} days ago', { n: days }) });
 }
 
+let pendingFocus = null; // the choice to focus after the screen is drawn again
+
 export function renderProfile(root, focus) {
   const { state } = app;
   const now = app.now();
   const learned = learnedItemIds(state);
   const count = (...types) => learned.filter((id) => types.includes(ITEMS.get(id).type)).length;
   const s = state.settings;
-  const seg = (name, value, options) => html`<div class="seg" data-setting="${name}">${options.map(([v, label]) =>
-    html`<button class="${String(value) === String(v) ? 'on' : ''}" data-v="${v}">${label}</button>`)}</div>`;
+  // A group of choices is a radio group: one is selected, arrow keys move between them.
+  const seg = (name, value, options) => html`<div class="seg" role="radiogroup" aria-labelledby="set-${name}" data-setting="${name}">${options.map(([v, label]) =>
+    html`<button role="radio" aria-checked="${String(value) === String(v)}" class="${String(value) === String(v) ? 'on' : ''}" data-v="${v}">${label}</button>`)}</div>`;
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page profile">
@@ -113,7 +116,7 @@ export function renderProfile(root, focus) {
       const done = a.value >= a.goal;
       return html`<div class="ach ${done ? 'done' : ''}"><span class="ach-icon jp">${a.icon}</span>
         <div class="ach-body"><b>${a.title}</b><small>${a.desc}</small>
-        <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (a.value / a.goal) * 100)}%"></div></div></div>
+        <div class="bar" role="progressbar" aria-label="${a.title}" aria-valuemin="0" aria-valuemax="${a.goal}" aria-valuenow="${Math.min(a.value, a.goal)}"><div class="bar-fill" style="width:${Math.min(100, (a.value / a.goal) * 100)}%"></div></div></div>
         ${done ? shareButton(`🏆 I unlocked "${a.title}" (${a.desc}) learning ${L.name} with Hajime!`, '') : html`<span class="ach-count">${Math.min(a.value, a.goal)}/${a.goal}</span>`}</div>`;
     })}</div>
 
@@ -126,15 +129,17 @@ export function renderProfile(root, focus) {
 
     <h2 class="sub-title">${t('Settings')}</h2>
     <div class="card settings">
-      <div class="setting"><span>${t('Appearance')}</span>${seg('theme', s.theme, [['system', t('Auto')], ['light', t('Light')], ['dark', t('Dark')]])}</div>
-      <div class="setting"><span>${t('Daily goal')}</span>${seg('dailyGoal', state.dailyGoal, [[10, t('Casual')], [20, t('Regular')], [30, t('Serious')], [50, t('Intense')]])}</div>
-      <div class="setting"><span>${t('Speed challenge')}<small class="muted setting-note">${s.speed === undefined ? t('Starts after your second lesson') : ''}</small></span>${seg('speed', speedOn(state), [[true, t('On')], [false, t('Off')]])}</div>
-      <div class="setting"><span>${t('Speaking tasks')}</span>${seg('speaking', s.speaking !== false, [[true, t('On')], [false, t('Off')]])}</div>
-      <div class="setting"><span>${t('Sound effects')}</span>${seg('sfx', s.sfx, [[true, t('On')], [false, t('Off')]])}</div>
+      <div class="setting"><span id="set-theme">${t('Appearance')}</span>${seg('theme', s.theme, [['system', t('Auto')], ['light', t('Light')], ['dark', t('Dark')]])}</div>
+      <div class="setting"><span id="set-dailyGoal">${t('Daily goal')}</span>${seg('dailyGoal', state.dailyGoal, [[10, t('Casual')], [20, t('Regular')], [30, t('Serious')], [50, t('Intense')]])}</div>
+      <div class="setting"><span id="set-speed">${t('Speed challenge')}<small class="muted setting-note">${s.speed === undefined ? t('Starts after your second lesson') : ''}</small></span>${seg('speed', speedOn(state), [[true, t('On')], [false, t('Off')]])}</div>
+      <div class="setting"><span id="set-speaking">${t('Speaking tasks')}</span>${seg('speaking', s.speaking !== false, [[true, t('On')], [false, t('Off')]])}</div>
+      <div class="setting"><span id="set-listening">${t('Listening tasks')}<small class="muted setting-note">${t('Show text also displays the words you hear')}</small></span>${seg('listening', listeningMode(s), [['on', t('On')], ['off', t('Off')], ['text', t('Show text')]])}</div>
+      <div class="setting"><span id="set-keys">${t('Keyboard shortcuts')}<small class="muted setting-note">${t('Number keys pick an answer')}</small></span>${seg('keys', shortcutsEnabled(s, matchMedia('(pointer: fine)').matches), [[true, t('On')], [false, t('Off')]])}</div>
+      <div class="setting"><span id="set-sfx">${t('Sound effects')}</span>${seg('sfx', s.sfx, [[true, t('On')], [false, t('Off')]])}</div>
       <div class="setting"><span>${t('Daily reminder')}<small class="muted setting-note">${s.reminders ? t('A nudge once a day if you have not studied') : t('Off')}</small></span>
         <button class="btn btn-white btn-small reminder-btn">${s.reminders ? t('Turn off') : t('Turn on')}</button></div>
-      ${L.latin ? '' : html`<div class="setting"><span>${t('Romaji help')}</span>${seg('romaji', s.romaji || 'auto', [['auto', t('Auto')], ['always', t('Always')]])}</div>`}
-      <div class="setting"><span>${t('Voice speed')}</span>${seg('voiceRate', s.voiceRate, [[0.7, t('Slow')], [0.85, t('Normal')], [1, t('Fast')]])}</div>
+      ${L.latin ? '' : html`<div class="setting"><span id="set-romaji">${t('Romaji help')}</span>${seg('romaji', s.romaji || 'auto', [['auto', t('Auto')], ['always', t('Always')]])}</div>`}
+      <div class="setting"><span id="set-voiceRate">${t('Voice speed')}</span>${seg('voiceRate', s.voiceRate, [[0.7, t('Slow')], [0.85, t('Normal')], [1, t('Fast')]])}</div>
       <div class="setting column"><span>${t('{lang} voice', { lang: langName() })}</span><small class="muted voice-status">${voiceText()[voiceStatus()]}</small>
         <button class="btn btn-white test-voice">${icon('speaker', 18)} ${t('Test:')} ${L.voiceTest}</button></div>
     </div>
@@ -170,6 +175,7 @@ export function renderProfile(root, focus) {
       if (!b) return;
       const name = segEl.dataset.setting;
       const raw = b.dataset.v;
+      pendingFocus = { name, v: raw };
       const v = raw === 'true' ? true : raw === 'false' ? false : Number.isNaN(Number(raw)) ? raw : Number(raw);
       if (name === 'dailyGoal') state.dailyGoal = v;
       else state.settings[name] = v;
@@ -178,6 +184,11 @@ export function renderProfile(root, focus) {
       if (name === 'voiceRate') speak(L.voiceTest);
     }),
   );
+  for (const group of $$('.seg', root)) wireArrows(group, (b) => b.click());
+  if (pendingFocus) {
+    $(`.seg[data-setting="${pendingFocus.name}"] [data-v="${pendingFocus.v}"]`, root)?.focus({ preventScroll: true });
+    pendingFocus = null;
+  }
   $('.streak-tile', root).addEventListener('click', showStreakCalendar);
   $('.reminder-btn', root).addEventListener('click', async () => {
     if (state.settings.reminders) {
@@ -238,10 +249,13 @@ export function renderProfile(root, focus) {
     lastTap = tapAt;
   });
   $('.check-update', root).addEventListener('click', () => checkForUpdate());
-  $('.version-row', root).addEventListener('click', () =>
+  // The list of releases is a big file that is only read when it is asked for.
+  $('.version-row', root).addEventListener('click', async () => {
+    const { CHANGELOG } = await import('../content/changelog.js');
     modal(html`<h2>${t('What\'s new')}</h2>
       <div class="changelog">${CHANGELOG.map((r) => html`<section><h3>v${r.version} <small>${r.date}</small></h3>
-        <ul>${r.changes.map((c) => html`<li>${c}</li>`)}</ul></section>`)}</div>`, [{ label: t('Close'), kind: 'secondary' }]));
+        <ul>${r.changes.map((c) => html`<li>${c}</li>`)}</ul></section>`)}</div>`, [{ label: t('Close'), kind: 'secondary' }]);
+  });
   $('.hard-refresh', root).addEventListener('click', () => hardRefresh());
   $('.reset', root).addEventListener('click', () =>
     modal(html`<div class="center">${mascot('sad', 90)}<h2>${t('Reset everything?')}</h2><p class="muted">${t('All XP, streaks and lessons on this device will be erased. This cannot be undone.')}</p></div>`, [

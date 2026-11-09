@@ -5,6 +5,7 @@ import { L } from './lang.js';
 import { icon } from './icons.js';
 import { setSfx, setVoiceRate } from './audio.js';
 import { writeReminderNote } from './reminders.js';
+import { t } from './strings.js';
 
 const storage = (() => {
   try {
@@ -116,7 +117,7 @@ export function statsBar() {
   return html`<div class="stats">
     <button class="stat stat-flag" aria-label="Course: ${L.name}. Change course">${raw(flagSvg(L.flag))}</button>
     <button class="stat stat-streak ${studiedToday(state, now) ? 'on' : ''}" aria-label="Day streak: ${streak}. Open calendar">${icon('flame', 22)}<b>${streak}</b></button>
-    <span class="stat stat-gems" title="Gems">${icon('gem', 22)}<b>${state.gems}</b></span>
+    <button class="stat stat-gems" aria-label="${t('Gems: {n}', { n: state.gems })}">${icon('gem', 22)}<b>${state.gems}</b></button>
     <button class="stat stat-hearts" aria-label="Hearts: ${hearts}. Refill">${icon('heart', 22)}<b>${hearts}</b></button>
   </div>`;
 }
@@ -134,6 +135,73 @@ export function toast(message, { action, onAction, ms = 3500 } = {}) {
   if (ms) toastTimer = setTimeout(() => el.classList.remove('show'), ms);
 }
 
+// A persistent polite live region for short announcements (combo, timer, answers) that have no element of their own.
+let live = null;
+let pending = [];
+let pendingTimer = null;
+export function announce(text) {
+  if (typeof document === 'undefined') return;
+  if (!live) {
+    live = Object.assign(document.createElement('div'), { id: 'sr-live', className: 'sr-only' });
+    live.setAttribute('role', 'status');
+    live.setAttribute('aria-live', 'polite');
+    live.setAttribute('aria-atomic', 'true');
+    document.body.append(live);
+  }
+  // Calls within a moment of each other are read together (an answer and a combo, say) instead of cutting each other off.
+  live.textContent = '';
+  if (text) pending.push(text);
+  clearTimeout(pendingTimer);
+  pendingTimer = setTimeout(() => {
+    live.textContent = pending.join('. ');
+    pending = [];
+  }, 80);
+}
+
+// While a dialog is open the page behind it is inert (unreachable by Tab and by screen readers); the first
+// control gets focus, Escape closes a dismissable dialog and focus goes back to where it was.
+const layer = { opener: null, onKey: null };
+export function inertBehind(on) {
+  for (const el of [$('#view'), $('#nav')]) {
+    if (!el) continue;
+    if ('inert' in el) el.inert = on;
+    else if (on) el.setAttribute('aria-hidden', 'true');
+    else el.removeAttribute('aria-hidden');
+  }
+}
+export function openLayer(root, { dismiss = null, focus = '[data-i], button' } = {}) {
+  if (!root.classList.contains('open')) layer.opener = document.activeElement;
+  root.classList.add('open');
+  inertBehind(true);
+  const dialog = root.querySelector('[role="dialog"]');
+  const title = dialog?.querySelector('h1, h2, h3');
+  if (title) {
+    title.id ||= 'dialog-title';
+    dialog.setAttribute('aria-labelledby', title.id);
+  }
+  if (layer.onKey) document.removeEventListener('keydown', layer.onKey, true);
+  layer.onKey = dismiss ? (e) => {
+    if (e.key !== 'Escape') return;
+    e.preventDefault();
+    e.stopPropagation();
+    dismiss();
+  } : null;
+  if (layer.onKey) document.addEventListener('keydown', layer.onKey, true);
+  if (dialog) dialog.tabIndex = -1;
+  (root.querySelector(focus) || dialog)?.focus({ preventScroll: true });
+}
+export function closeLayer(root = $('#modal')) {
+  if (!root.classList.contains('open')) return;
+  root.classList.remove('open');
+  root.innerHTML = '';
+  inertBehind(false);
+  if (layer.onKey) document.removeEventListener('keydown', layer.onKey, true);
+  layer.onKey = null;
+  const back = layer.opener;
+  layer.opener = null;
+  if (back?.isConnected && back !== document.body) back.focus({ preventScroll: true });
+}
+
 // Shows a modal. buttons: [{ label, kind, onClick }]. Returns a close function.
 export function modal(content, buttons = [], { dismissable = true } = {}) {
   const root = $('#modal');
@@ -142,11 +210,8 @@ export function modal(content, buttons = [], { dismissable = true } = {}) {
       ${content}
       <div class="sheet-actions">${buttons.map((b, i) => html`<button class="btn btn-${b.kind || 'primary'} btn-block" data-i="${i}">${b.label}</button>`)}</div>
     </div>`);
-  root.classList.add('open');
-  const close = () => {
-    root.classList.remove('open');
-    root.innerHTML = '';
-  };
+  const close = () => closeLayer(root);
+  openLayer(root, { dismiss: dismissable ? close : null });
   root.querySelectorAll('[data-i]').forEach((btn) =>
     btn.addEventListener('click', () => {
       const b = buttons[Number(btn.dataset.i)];
@@ -157,3 +222,6 @@ export function modal(content, buttons = [], { dismissable = true } = {}) {
   if (dismissable) root.querySelector('.scrim').addEventListener('click', close);
   return close;
 }
+
+// Keeps the live region at hand from the start, so the first announcement is not lost.
+if (typeof document !== 'undefined') announce('');

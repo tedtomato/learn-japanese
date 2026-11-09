@@ -5,7 +5,8 @@
 import { L, withRoman, joinChunks } from '../lang.js';
 import { glossKey, sameTiles } from '../normalise.js';
 import { ITEMS, NODE_BY_ID, MAX_LEVEL } from '../course.js';
-import { app, modal } from '../app.js';
+import { app, modal, announce } from '../app.js';
+import { lessonKeyIgnored, shortcutsEnabled, listeningMode } from '../a11y.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
@@ -52,7 +53,10 @@ function label(item, kind) {
   return item.jp;
 }
 
-const listenOff = () => (app.state.settings.listenOffUntil || 0) > app.now();
+// Listening tasks: Off in Profile is permanent; "Can't listen now" mutes them for an hour.
+const listenOff = () => listeningMode(app.state.settings) === 'off' || (app.state.settings.listenOffUntil || 0) > app.now();
+// "Show text": audio prompts and dialogue lines also show the words, for learners who cannot hear.
+const showText = () => listeningMode(app.state.settings) === 'text';
 const speakOff = () => (app.state.settings.speakOffUntil || 0) > app.now();
 const needsListening = (ex) => ex.prompt === 'audio' || ['audio', 'fast', 'dictation'].includes(ex.mode) || ex.type === 'dialogue' || ex.type === 'speak';
 
@@ -108,25 +112,65 @@ export function startSession(root, { nodeId, itemIds, demo, kanjiOnly, kanaScrip
 function renderShell(root, s) {
   const level = s.node ? nodeLevel(app.state, s.node) : 0;
   const timed = speedOn(app.state);
+  const hearts = currentHearts(app.state, app.now());
   mount(root, html`<div class="lesson">
+    <h1 class="sr-only">${s.node ? s.node.title : t('Practice')}</h1>
     <header class="lesson-top">
       <button class="icon-btn quit" aria-label="${t('Quit')}">${icon('close', 26)}</button>
-      <div class="bar bar-lg"><div class="bar-fill" style="width:0%"></div></div>
-      ${s.mode === 'lesson' ? html`<span class="stat stat-hearts">${icon('heart', 24)}<b class="hearts-n">${currentHearts(app.state, app.now())}</b></span>`
+      <div class="bar bar-lg" role="progressbar" aria-label="${t('Lesson progress')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar-fill" style="width:0%"></div></div>
+      ${s.mode === 'lesson' ? html`<span class="stat stat-hearts" role="img" aria-label="${t('Hearts: {n}', { n: hearts })}">${icon('heart', 24)}<b class="hearts-n">${hearts}</b></span>`
         : html`<span class="pill pill-blue">${t('Practice')}</span>`}
     </header>
-    <div class="timer ${timed ? '' : 'off'}" aria-live="off"><span class="timer-n"></span><div class="timer-bar"><i></i></div></div>
+    <div class="timer ${timed ? '' : 'off'}" role="timer" aria-live="off"><span class="timer-n"></span><div class="timer-bar" aria-hidden="true"><i></i></div><button class="link timer-off" hidden>${t('Turn off timer')}</button></div>
     ${s.node ? html`<div class="lesson-meta"><b>${t('Section {n} – Unit {m}', { n: s.node.sectionIndex + 1, m: s.node.unitIndex + 1 })}</b> · ${s.node.title}${s.node.kind === 'lesson' ? ` · ${t('Level {n}', { n: Math.min(level + 1, MAX_LEVEL) })}` : ''}</div>` : ''}
     <main class="lesson-body"></main>
     <footer class="lesson-foot"></footer>
-    <div class="explain-sheet" hidden></div>
+    <div class="explain-sheet" role="dialog" aria-modal="true" aria-label="${t('Explain my answer')}" hidden></div>
   </div>`);
+  $('.timer-off', root).addEventListener('click', () => timerOff(root, s));
   $('.quit', root).addEventListener('click', () =>
     modal(html`<div class="center">${mascot('sad', 96)}<h2>${t('Wait, don\'t go!')}</h2><p class="muted">${t('You\'ll lose your progress in this lesson.')}</p></div>`, [
       { label: t('Keep learning') },
+      ...(speedOn(app.state) ? [{ label: t('Turn off timer'), kind: 'ghost', onClick: () => timerOff(root, s) }] : []),
       { label: t('End session'), kind: 'danger-ghost', onClick: () => quit(s) },
     ]),
   );
+}
+
+// The countdown can be switched off for good (it is a setting in Profile too).
+function timerOff(root, s) {
+  app.state.settings.speed = false;
+  app.save();
+  stopTimer(s);
+  const box = $('.timer', root);
+  box.classList.add('idle');
+  $('.timer-off', root).hidden = true;
+  announce(t('Timer turned off. You can turn it back on in Profile.'));
+}
+
+// Focus follows the lesson: after a new task is drawn it lands on the task's heading, so a keyboard or screen-reader
+// user starts reading at the question (the controls come right after).
+function focusTask(root) {
+  const target = $('.lesson-body .instruction', root) || $('.lesson-body .bubble', root) || $('.lesson-body', root);
+  if (!target) return;
+  target.id ||= 'task-instr';
+  target.setAttribute('tabindex', '-1');
+  target.focus({ preventScroll: true });
+}
+
+// The explain sheet covers the lesson: keep Tab (and screen readers) out of what is behind it.
+function sheetOpen(root, open) {
+  $('.explain-sheet', root).hidden = !open;
+  for (const sel of ['.lesson-top', '.timer', '.lesson-body', '.lesson-foot']) {
+    const el = $(sel, root);
+    if (el) el.inert = open;
+  }
+}
+
+// Marks an option after the check and says so in words (colour alone is not enough).
+function markOption(b, kind) {
+  b.classList.add(kind);
+  b.insertAdjacentHTML('beforeend', `<span class="sr-only">, ${kind === 'right' ? t('Correct') : t('Your answer, not correct')}</span>`);
 }
 
 function cleanup(s) {
@@ -141,9 +185,14 @@ function quit(s) {
 }
 
 function updateProgress(root, s) {
-  $('.lesson-top .bar-fill', root).style.width = `${Math.min(100, (s.done / s.total) * 100)}%`;
+  const pct = Math.min(100, (s.done / s.total) * 100);
+  $('.lesson-top .bar-fill', root).style.width = `${pct}%`;
+  $('.lesson-top .bar', root).setAttribute('aria-valuenow', String(Math.round(pct)));
   const h = $('.hearts-n', root);
-  if (h) h.textContent = currentHearts(app.state, app.now());
+  if (h) {
+    h.textContent = currentHearts(app.state, app.now());
+    h.parentElement.setAttribute('aria-label', t('Hearts: {n}', { n: h.textContent }));
+  }
 }
 
 // ---------- Timer ----------
@@ -159,12 +208,17 @@ function startTimer(root, s, seconds) {
   s.timer = tm;
   const n = $('.timer-n', box);
   const bar = $('.timer-bar i', box);
+  // The first countdown a learner meets says how to turn it off.
+  const tip = $('.timer-off', box);
+  tip.hidden = !(s.timedCount === 0 && !app.state.settings.timerTipSeen);
+  if (!tip.hidden) app.state.settings.timerTipSeen = true;
   const tick = () => {
     const left = tm.limit - (performance.now() - tm.started);
     const secs = Math.max(0, Math.ceil(left / 1000));
     n.textContent = `${secs}s`;
     bar.style.width = `${Math.max(0, (left / tm.limit) * 100)}%`;
     if (secs <= 3 && secs > 0 && tm.lastTick !== secs) {
+      if (!tm.lastTick) announce(t('{n} seconds left', { n: secs }));
       tm.lastTick = secs;
       box.classList.add('urgent');
       sfx('tick');
@@ -174,6 +228,7 @@ function startTimer(root, s, seconds) {
       box.classList.add('late');
       sfx('timeup');
       n.textContent = t("Time's up");
+      announce(t("Time's up"));
     }
   };
   tick();
@@ -193,7 +248,7 @@ function stopTimer(s) {
 function next(root, s) {
   stopTimer(s);
   stopSpeaking();
-  $('.explain-sheet', root).hidden = true;
+  sheetOpen(root, false);
   updateProgress(root, s);
   s.current = s.queue.shift();
   s.checked = false;
@@ -214,13 +269,24 @@ function next(root, s) {
   startTimer(root, s, null);
   RENDERERS[s.current.type](root, s);
   fitText(root);
+  focusTask(root);
   // Tap a word of the Japanese sentence to hear it (not in reading tests, where it would give the answer).
   if (s.current.kind !== 'read') {
-    $$('.prompt-person .chunk', root).forEach((c) => c.addEventListener('click', () => {
-      c.classList.add('chunk-say');
-      setTimeout(() => c.classList.remove('chunk-say'), 700);
-      sayAs(root, s.speaker, c.dataset.chunk, { highlight: c });
-    }));
+    $$('.prompt-person .chunk', root).forEach((c) => {
+      c.setAttribute('tabindex', '0');
+      c.setAttribute('role', 'button');
+      const say = () => {
+        c.classList.add('chunk-say');
+        setTimeout(() => c.classList.remove('chunk-say'), 700);
+        sayAs(root, s.speaker, c.dataset.chunk, { highlight: c });
+      };
+      c.addEventListener('click', say);
+      c.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        say();
+      });
+    });
   }
   $$('.show-romaji', root).forEach((b) => b.addEventListener('click', () => {
     b.previousElementSibling?.classList.remove('rt-hidden');
@@ -244,6 +310,7 @@ function retryIntro(root, s) {
     <div class="bubble bubble-lg">${text}</div>
     ${mascot('cheer', 150)}</div>`);
   footer(root, s, { canCheck: true, text: t('Continue'), onCheck: () => { s.done += 1; next(root, s); } });
+  focusTask(root);
 }
 
 // ---------- Footer & feedback ----------
@@ -331,6 +398,7 @@ function result(root, s, ok, opts = {}) {
   const canExplain = item && ['word', 'sentence', 'kana', 'kanji', 'kword', 'radical'].includes(item.type);
   const foot = $('.lesson-foot', root);
   foot.className = `lesson-foot ${ok ? 'good' : 'bad'}`;
+  const verdict = ok ? pickOne(PRAISE) : t('Correct answer:');
   const badges = [];
   if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} ${t('Speed bonus')}</span>`);
   if (hesitated) badges.push(html`<span class="pill pill-orange">${opts.close ? t('Almost right') : ex.hinted ? t('Used a hint') : t('A bit slow')} — ${t('we\'ll practise it again')}</span>`);
@@ -340,7 +408,7 @@ function result(root, s, ok, opts = {}) {
   mount(foot, html`<div class="foot-inner feedback">
     <div class="fb-text">
       <span class="fb-icon">${icon(ok ? 'check' : 'close', 26)}</span>
-      <div><b>${ok ? pickOne(PRAISE) : t('Correct answer:')}</b>
+      <div><b>${verdict}</b>
       ${!ok && opts.answerText ? html`<p class="jp-mix">${opts.answerText}</p>` : ''}
       ${opts.meaning ? html`<p class="fb-meaning">${item?.type === 'fword' && item.art ? art(item.art, 'art-inline') : ''} ${opts.meaning}</p>` : ''}
       ${badges.length ? html`<p class="fb-badges">${badges}</p>` : ''}</div>
@@ -350,11 +418,16 @@ function result(root, s, ok, opts = {}) {
       <button class="btn ${ok ? 'btn-primary' : 'btn-danger'} check">${ok ? t('Continue') : t('Got it')}</button>
     </div></div>`);
   // No auto-continue: the learner moves on when ready, so there is always time to tap Explain.
+  // (A held-down Enter must not skip straight through the feedback: clicks in the first moments are ignored.)
+  const shownAt = performance.now();
   const go = () => {
+    if (performance.now() - shownAt < 250) return;
     if (outOfHearts) noHearts(root, s);
     else next(root, s);
   };
+  announce(`${ok ? '' : `${t('Not quite.')} `}${verdict}${!ok && opts.answerText ? ` ${opts.answerText}.` : ''}${opts.meaning ? ` ${opts.meaning}` : ''}`);
   $('.check', foot).addEventListener('click', go);
+  $('.check', foot).focus({ preventScroll: true });
   $('.pill-sure', foot)?.addEventListener('click', (e) => {
     const knew = e.currentTarget.dataset.sure === 'knew';
     for (const id of ids) {
@@ -379,19 +452,23 @@ function result(root, s, ok, opts = {}) {
 function showExplain(root, s, item, chosenLabel, go) {
   const cards = explainCards(item, { chosenLabel });
   const sheet = $('.explain-sheet', root);
-  sheet.hidden = false;
+  sheetOpen(root, true);
   const render = (i) => mount(sheet, html`<div class="ex-head"><button class="icon-btn back" aria-label="${t('Back')}">${icon('arrow', 24)}</button><h2>${t('Explain my answer')}</h2></div>
-    <div class="ex-chips">${cards.map((c, j) => html`<button class="tile ex-chip jp ${j === i ? 'on' : ''}" data-i="${j}">${c.chip}</button>`)}</div>
+    <div class="ex-chips">${cards.map((c, j) => html`<button class="tile ex-chip jp ${j === i ? 'on' : ''}" aria-pressed="${j === i}" data-i="${j}">${c.chip}</button>`)}</div>
     <div class="card ex-card">${cards[i].body}</div>
     <button class="btn btn-secondary btn-block ex-continue">${t('Continue lesson')}</button>`);
   const wire = (i) => {
     render(i);
     $$('.ex-chip', sheet).forEach((b) => b.addEventListener('click', () => wire(Number(b.dataset.i))));
-    $('.back', sheet).addEventListener('click', () => (sheet.hidden = true));
+    $('.back', sheet).addEventListener('click', () => {
+      sheetOpen(root, false);
+      $('.lesson-foot .explain', root)?.focus({ preventScroll: true });
+    });
     $('.ex-continue', sheet).addEventListener('click', () => {
-      sheet.hidden = true;
+      sheetOpen(root, false);
       go();
     });
+    $('.back', sheet).focus({ preventScroll: true });
   };
   wire(0);
 }
@@ -529,6 +606,11 @@ function playButtons(text, { slow = true } = {}) {
     ${slow ? html`<button class="speaker slow" data-play="${text}" data-slow="1" aria-label="${t('Play slowly')}">${icon('turtle', 28)}</button>` : ''}</div>`;
 }
 
+// An audio prompt: the play buttons, and (setting "Show text") the words themselves under them.
+function audioPrompt(item, opts) {
+  return html`<div class="audio-wrap">${playButtons(speechOf(item), opts)}${showText() ? html`<div class="audio-text">${jpItem(item, false)}</div>` : ''}</div>`;
+}
+
 function wirePlay(root, s, extra = {}) {
   $$('[data-play]', root).forEach((b) =>
     b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.play, { slow: !!b.dataset.slow, ...extra })),
@@ -591,7 +673,7 @@ function renderTrace(root, s) {
     <div class="trace-head"><button class="speaker small-speaker" data-play="${speechOf(item)}" aria-label="${t('Play sound')}">${icon('speaker', 26)}</button>
       <div><b class="jp">${item.jp}</b><small>${item.romaji || item.en}</small></div>
       <button class="link replay">${icon('play', 14)} ${t('Watch again')}</button></div>
-    <div class="trace-stage"><p class="trace-status">${t('Watch the strokes…')}</p><div class="trace-host"></div></div>`);
+    <div class="trace-stage"><p class="trace-status" role="status" aria-live="polite">${t('Watch the strokes…')}</p><div class="trace-host"></div></div>`);
   wirePlay(root, s);
   sayAs(root, s.speaker, speechOf(item));
   const status = $('.trace-status', root);
@@ -607,7 +689,7 @@ function renderTrace(root, s) {
 }
 
 function promptFor(root, s, ex, item) {
-  if (ex.prompt === 'audio') return speakerBubble(s, playButtons(speechOf(item)));
+  if (ex.prompt === 'audio') return speakerBubble(s, audioPrompt(item));
   if (ex.prompt === 'romaji') return speakerBubble(s, html`<div class="romaji-big">${item.romaji}</div>`);
   if (ex.prompt === 'en') return speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span></div>`);
   if (ex.prompt === 'kanji') {
@@ -651,7 +733,7 @@ function renderRecall(root, s) {
   let instruction = t('How do you say this in {lang}?', { lang: langName() });
   let intro = t('From memory — no choices this time!');
   if (mode === 'dictation') {
-    prompt = speakerBubble(s, playButtons(speechOf(item)));
+    prompt = speakerBubble(s, audioPrompt(item));
     [placeholder, instruction, intro] = [t('Type what you hear…'), ex.instruction, t('Listen, then type what you hear.')];
   } else if (mode === 'translate') {
     prompt = promptFor(root, s, { ...ex, prompt: 'jp' }, item);
@@ -659,7 +741,7 @@ function renderRecall(root, s) {
   }
   mount($('.lesson-body', root), html`<p class="instruction">${instruction}</p>
     ${prompt}
-    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${placeholder}" aria-label="${t('Your answer')}" ${mode === 'translate' ? '' : html`lang="${LANG_ATTR}"`}>
+    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${placeholder}" aria-label="${t('Your answer')}" aria-describedby="task-instr" ${mode === 'translate' ? '' : html`lang="${LANG_ATTR}"`}>
     <p class="muted small recall-help">${intro} ${mode === 'translate' ? t('Capitals and punctuation don\'t matter.') : help}</p>
     ${mode ? '' : memoryHint(item, true)}`);
   wirePlay(root, s);
@@ -713,7 +795,7 @@ function renderGuess(root, s) {
   mount($('.lesson-body', root), html`<p class="instruction">${t('New word — have a guess!')}</p>
     ${speakerBubble(s, html`<button class="say-inline" aria-label="${t('Play sound')}">${icon('speaker', 22)}</button><span class="jp-lg guess-word">${jpItem(item, true)}</span>`)}
     <p class="muted small guess-help">${t('No pressure: guessing first, even wrong, helps you remember it.')}</p>
-    <div class="options list">${ex.options.map((en, i) => html`<button class="option" data-i="${i}"><span class="key">${i + 1}</span><span class="opt-label">${en}</span></button>`)}</div>`);
+    <div class="options list">${ex.options.map((en, i) => html`<button class="option" data-i="${i}" aria-pressed="false"><span class="key" aria-hidden="true">${i + 1}</span><span class="opt-label">${en}</span></button>`)}</div>`);
   const say = () => sayAs(root, s.speaker, speechOf(item));
   $('.say-inline', root).addEventListener('click', say);
   say();
@@ -723,7 +805,7 @@ function renderGuess(root, s) {
     const ok = ex.options[Number(btn.dataset.i)] === item.en;
     $$('.option', root).forEach((b) => {
       b.disabled = true;
-      if (ex.options[Number(b.dataset.i)] === item.en) b.classList.add('right');
+      if (ex.options[Number(b.dataset.i)] === item.en) markOption(b, 'right');
       else if (b === btn) b.classList.add('guess-miss');
     });
     sfx(ok ? 'correct' : 'tap');
@@ -750,7 +832,7 @@ function renderChoice(root, s) {
     ${promptFor(root, s, ex, item)}
     ${item.type === 'kana' && item.example ? html`<div class="kana-hint"><button class="link hint-btn">💡 ${t('Hint')}</button><div class="hint-body" hidden>${kanaExample(item, { asHint: true })}</div></div>` : ''}
     ${memoryHint(item, ex.kind === 'en2jp' || ex.kind === 'jp2en')}
-    <div class="options ${grid ? 'grid' : 'list'}">${ex.options.map((id, i) => html`<button class="option" data-id="${id}"><span class="key">${i + 1}</span>${optionHtml(optionItem(ex, id), ex)}</button>`)}</div>`);
+    <div class="options ${grid ? 'grid' : 'list'}">${ex.options.map((id, i) => html`<button class="option" data-id="${id}" aria-pressed="false"><span class="key" aria-hidden="true">${i + 1}</span>${optionHtml(optionItem(ex, id), ex)}</button>`)}</div>`);
   wirePlay(root, s);
   // The memory word as a hint; using it brings the character back sooner (like a hesitation).
   $('.hint-btn', root)?.addEventListener('click', (e) => {
@@ -772,8 +854,8 @@ function renderChoice(root, s) {
     const ok = chosen === ex.itemId;
     $$('.option', root).forEach((b) => {
       b.disabled = true;
-      if (b.dataset.id === ex.itemId) b.classList.add('right');
-      else if (b.dataset.id === chosen) b.classList.add('wrong');
+      if (b.dataset.id === ex.itemId) markOption(b, 'right');
+      else if (b.dataset.id === chosen) markOption(b, 'wrong');
     });
     if (['word', 'sentence', 'kana', 'kword'].includes(item.type)) sayAs(root, s.speaker, speechOf(item));
     const meaning = item.en && ex.answerKind !== 'en' ? `${item.jp} = ${item.en}` : item.type === 'kana' ? `${item.jp} = ${item.romaji}${item.example ? ` — as in ${item.example.jp} (${item.example.romaji})` : ''}` : item.romaji && !L.latin ? `${item.jp} · ${item.romaji}` : null;
@@ -781,7 +863,10 @@ function renderChoice(root, s) {
   };
   const choose = (btn) => {
     if (s.checked) return;
-    $$('.option', root).forEach((b) => b.classList.toggle('selected', b === btn));
+    $$('.option', root).forEach((b) => {
+      b.classList.toggle('selected', b === btn);
+      b.setAttribute('aria-pressed', String(b === btn));
+    });
     chosen = btn.dataset.id;
     sfx('tap');
     if (['jp', 'kana'].includes(ex.answerKind) && ex.prompt !== 'audio') speak(speechOf(optionItem(ex, chosen)), { speaker: s.speaker });
@@ -810,14 +895,14 @@ function renderBuild(root, s) {
   const jpTiles = ex.mode !== 'jp2en';
   let prompt;
   if (ex.mode === 'jp2en') prompt = promptFor(root, s, { ...ex, prompt: 'jp' }, item);
-  else if (ex.mode === 'audio') prompt = speakerBubble(s, playButtons(speechOf(item)));
-  else if (ex.mode === 'fast') prompt = speakerBubble(s, html`${playButtons(speechOf(item), { slow: false })}<p class="muted small">${t('Natural speed — no slow mode!')}</p>`);
+  else if (ex.mode === 'audio') prompt = speakerBubble(s, audioPrompt(item));
+  else if (ex.mode === 'fast') prompt = speakerBubble(s, html`${audioPrompt(item, { slow: false })}<p class="muted small">${t('Natural speed — no slow mode!')}</p>`);
   else prompt = speakerBubble(s, html`<div class="en-prompt">${item.art ? art(item.art, 'art-lg') : ''}<span>${item.en}</span>
     ${ex.mode === 'spell' && ex.hint ? html`<div class="romaji-hint">${item.romaji}</div>` : ''}</div>`);
 
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
     ${prompt}
-    <div class="answer-line" aria-label="${t('Your answer')}"></div>
+    <div class="answer-line" role="group" aria-label="${t('Your answer')}"></div>
     <div class="bank">${ex.tiles.map((t, i) => tileButton(ex, i, jpTiles))}</div>`);
   wirePlay(root, s, ex.mode === 'fast' ? { fast: true } : {});
   if (ex.mode === 'audio' || ex.mode === 'jp2en') sayAs(root, s.speaker, speechOf(item));
@@ -828,12 +913,19 @@ function renderBuild(root, s) {
   const line = $('.answer-line', root);
   const redraw = () => {
     mount(line, html`${placed.map((i) => tileButton(ex, i, jpTiles, 'placed'))}`);
-    $$('.bank .tile', root).forEach((b) => b.classList.toggle('used', placed.includes(Number(b.dataset.i))));
+    $$('.bank .tile', root).forEach((b) => {
+      const used = placed.includes(Number(b.dataset.i));
+      b.classList.toggle('used', used);
+      b.setAttribute('aria-disabled', String(used));
+    });
     $$('.tile.placed', line).forEach((b) =>
       b.addEventListener('click', () => {
         if (s.checked) return;
-        placed.splice(placed.indexOf(Number(b.dataset.i)), 1);
+        const i = Number(b.dataset.i);
+        placed.splice(placed.indexOf(i), 1);
         redraw();
+        // The tile left the answer: focus goes back to its place in the bank.
+        $(`.bank .tile[data-i="${i}"]`, root)?.focus({ preventScroll: true });
       }),
     );
     setCheckEnabled(root, placed.length > 0);
@@ -877,8 +969,8 @@ function renderMatch(root, s) {
     const l = ITEMS.get(id);
     const r = ITEMS.get(right[i]);
     return [
-      html`<button class="option match-btn" data-side="l" data-id="${id}">${l.type === 'kana' ? html`<span class="jp jp-lg">${l.jp}</span>` : ['kanji', 'radical'].includes(l.type) ? html`<span class="jp match-kanji">${l.jp}</span>` : jpItem(l, ex.hint)}</button>`,
-      html`<button class="option match-btn" data-side="r" data-id="${right[i]}">${label(r, ex.right)}</button>`,
+      html`<button class="option match-btn" data-side="l" data-id="${id}" aria-pressed="false">${l.type === 'kana' ? html`<span class="jp jp-lg">${l.jp}</span>` : ['kanji', 'radical'].includes(l.type) ? html`<span class="jp match-kanji">${l.jp}</span>` : jpItem(l, ex.hint)}</button>`,
+      html`<button class="option match-btn" data-side="r" data-id="${right[i]}" aria-pressed="false">${label(r, ex.right)}</button>`,
     ];
   });
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p><div class="match">${cells}</div>`);
@@ -891,8 +983,9 @@ function renderMatch(root, s) {
     b.addEventListener('click', () => {
       if (b.classList.contains('right') || s.checked) return;
       const side = b.dataset.side;
-      $$(`.match-btn[data-side="${side}"]`, root).forEach((x) => x.classList.remove('selected'));
+      $$(`.match-btn[data-side="${side}"]`, root).forEach((x) => { x.classList.remove('selected'); x.setAttribute('aria-pressed', 'false'); });
       b.classList.add('selected');
+      b.setAttribute('aria-pressed', 'true');
       sel[side] = b;
       if (side === 'l') speak(speechOf(ITEMS.get(b.dataset.id)), { speaker: s.speaker });
       else sfx('tap');
@@ -900,7 +993,7 @@ function renderMatch(root, s) {
       const [l, r] = [sel.l, sel.r];
       sel.l = sel.r = null;
       if (l.dataset.id === r.dataset.id) {
-        [l, r].forEach((x) => { x.classList.remove('selected'); x.classList.add('right'); x.disabled = true; });
+        [l, r].forEach((x) => { x.classList.remove('selected'); x.classList.add('right'); x.disabled = true; x.insertAdjacentHTML('beforeend', `<span class="sr-only">, ${t('Matched')}</span>`); });
         sfx('correct');
         matched += 1;
         if (matched === left.length) {
@@ -916,7 +1009,7 @@ function renderMatch(root, s) {
       } else {
         wrongIds.add(l.dataset.id);
         wrongIds.add(r.dataset.id);
-        [l, r].forEach((x) => { x.classList.remove('selected'); x.classList.add('shake'); setTimeout(() => x.classList.remove('shake'), 400); });
+        [l, r].forEach((x) => { x.classList.remove('selected'); x.setAttribute('aria-pressed', 'false'); x.classList.add('shake'); setTimeout(() => x.classList.remove('shake'), 400); });
         sfx('wrong');
         buzz();
       }
@@ -930,7 +1023,7 @@ function renderSpeak(root, s) {
   mount($('.lesson-body', root), html`<p class="instruction">${t('Listen, then say it out loud')}</p>
     ${speakerBubble(s, html`<button class="say-inline" data-play="${speechOf(item)}" aria-label="${t('Play sound')}">${icon('speaker', 22)}</button>
       <div class="speak-text"><div class="jp-lg fit">${jpItem(item, true)}</div><div class="muted">${item.en}</div></div>`)}
-    <div class="mic-area"><button class="mic" aria-label="${t('Start speaking')}">${icon('mic', 40)}</button><p class="mic-status">${t('Tap the microphone and repeat.')}</p></div>`);
+    <div class="mic-area"><button class="mic" aria-label="${t('Start speaking')}">${icon('mic', 40)}</button><p class="mic-status" role="status" aria-live="polite">${t('Tap the microphone and repeat.')}</p></div>`);
   wirePlay(root, s);
   sayAs(root, s.speaker, speechOf(item));
   let tries = 0;
@@ -971,15 +1064,15 @@ function grammarCheck(root, s, g) {
   const { check } = g;
   mount($('.lesson-body', root), html`<p class="instruction">${t('Fill the gap — {en}', { en: check.en })}</p>
     <div class="g-blocks g-quiz">${check.prompt.map((c) => (c ? html`<div class="g-block g-noun"><span class="jp" lang="${LANG_ATTR}">${jpChunk(c, true)}</span></div>` : html`<div class="g-block g-gap">?</div>`))}</div>
-    <div class="options grid">${check.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key">${i + 1}</span><span class="jp jp-lg" lang="${LANG_ATTR}">${jpChunk(o, true)}</span></button>`)}</div>`);
+    <div class="options grid">${check.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key" aria-hidden="true">${i + 1}</span><span class="jp jp-lg" lang="${LANG_ATTR}">${jpChunk(o, true)}</span></button>`)}</div>`);
   startTimer(root, s, 15);
   const pickIt = (b) => {
     if (s.checked) return;
     const ok = b.dataset.o === check.answer;
     $$('.option', root).forEach((x) => {
       x.disabled = true;
-      if (x.dataset.o === check.answer) x.classList.add('right');
-      else if (x === b) x.classList.add('wrong');
+      if (x.dataset.o === check.answer) markOption(x, 'right');
+      else if (x === b) markOption(x, 'wrong');
     });
     $('.g-gap', root).textContent = check.answer;
     result(root, s, ok, { answerText: check.answer, meaning: g.rule });
@@ -999,15 +1092,15 @@ function renderCloze(root, s) {
   mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
     ${ex.art ? html`<div class="cloze-art">${art(ex.art, 'art-lg')}</div>` : ''}
     <div class="g-blocks g-quiz">${ex.prompt.map((c) => (c === null ? html`<div class="g-block g-gap">?</div>` : html`<div class="g-block g-noun"><span class="jp" lang="${LANG_ATTR}">${c}</span></div>`))}</div>
-    <div class="options grid">${ex.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key">${i + 1}</span><span class="jp jp-lg" lang="${LANG_ATTR}">${o}</span></button>`)}</div>`);
+    <div class="options grid">${ex.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key" aria-hidden="true">${i + 1}</span><span class="jp jp-lg" lang="${LANG_ATTR}">${o}</span></button>`)}</div>`);
   startTimer(root, s, timeLimit(ex));
   const pickIt = (b) => {
     if (s.checked) return;
     const ok = b.dataset.o === ex.answer;
     $$('.option', root).forEach((x) => {
       x.disabled = true;
-      if (x.dataset.o === ex.answer) x.classList.add('right');
-      else if (x === b) x.classList.add('wrong');
+      if (x.dataset.o === ex.answer) markOption(x, 'right');
+      else if (x === b) markOption(x, 'wrong');
     });
     $('.g-gap', root).textContent = ex.answer;
     sayAs(root, s.speaker, speechOf(item));
@@ -1029,11 +1122,11 @@ function renderDialogue(root, s) {
     <div class="dialogue">
       <div class="dl-cast"><div class="person-wrap" data-who="${a}">${person(a, 84)}<span class="person-name">${nameOf(a)}</span></div>
         <div class="person-wrap" data-who="${b}">${person(b, 84)}<span class="person-name">${nameOf(b)}</span></div></div>
-      <div class="dl-lines">${d.lines.map((l, i) => html`<div class="dl-line side-${l.who}" data-i="${i}" hidden><span class="dl-who">${nameOf(d.cast[l.who])}</span><span class="jp dl-jp">…</span><small class="dl-en" hidden>${l.en}</small></div>`)}</div>
+      <div class="dl-lines">${d.lines.map((l, i) => html`<div class="dl-line side-${l.who}" data-i="${i}" hidden><span class="dl-who">${nameOf(d.cast[l.who])}</span><span class="jp dl-jp">${showText() ? l.jp : '…'}</span><small class="dl-en" hidden>${l.en}</small></div>`)}</div>
       <button class="link replay-dl" hidden>${icon('play', 14)} ${t('Listen again')}</button>
     </div>
     <div class="dl-question" hidden><p class="instruction">${ex.instruction}</p>
-      <div class="options list">${ex.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key">${i + 1}</span><span class="opt-label">${o}</span></button>`)}</div></div>`);
+      <div class="options list">${ex.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key" aria-hidden="true">${i + 1}</span><span class="opt-label">${o}</span></button>`)}</div></div>`);
   const play = async () => {
     for (const [i, l] of d.lines.entries()) {
       const row = $(`.dl-line[data-i="${i}"]`, root);
@@ -1055,8 +1148,8 @@ function renderDialogue(root, s) {
     const ok = btn.dataset.o === ex.answer;
     $$('.dl-question .option', root).forEach((x) => {
       x.disabled = true;
-      if (x.dataset.o === ex.answer) x.classList.add('right');
-      else if (x === btn) x.classList.add('wrong');
+      if (x.dataset.o === ex.answer) markOption(x, 'right');
+      else if (x === btn) markOption(x, 'wrong');
     });
     // Reveal the conversation with its translation.
     d.lines.forEach((l, i) => {
@@ -1065,7 +1158,14 @@ function renderDialogue(root, s) {
       $('.dl-jp', row).textContent = l.jp;
       $('.dl-en', row).hidden = false;
       row.classList.add('tappable');
+      row.tabIndex = 0;
+      row.setAttribute('role', 'button');
       row.onclick = () => sayAs(root, d.cast[l.who], l.jp, { highlight: $('.dl-jp', row) });
+      row.onkeydown = (e) => {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        row.click();
+      };
     });
     result(root, s, ok, { answerText: ex.answer, noHeart: true });
   };
@@ -1094,6 +1194,7 @@ function renderTidbit(root, s) {
 const RENDERERS = {
   recall: renderRecall, guess: renderGuess, intro: renderIntro, trace: renderTrace, choice: renderChoice, build: renderBuild, match: renderMatch,
   speak: renderSpeak, cloze: renderCloze, grammar: renderGrammar, dialogue: renderDialogue, tidbit: renderTidbit,
+  conjugation: renderPick, tone: renderPick, 'type-sentence': renderTypeSentence,
 };
 
 // ---------- Finish ----------
@@ -1146,6 +1247,9 @@ function finish(root, s) {
     <button class="btn btn-primary btn-block continue">${t('Continue')}</button>
   </div>`);
   wireShare(root);
+  const heading = $('h1', root);
+  heading.setAttribute('tabindex', '-1');
+  heading.focus({ preventScroll: true });
   $('.continue', root).addEventListener('click', () => {
     const go = () => app.go(location.hash.startsWith('#/lab') ? '#/lab' : s.mode === 'practice' ? '#/practice' : '#/learn');
     const afterGoal = () => (summary.milestone
@@ -1156,12 +1260,109 @@ function finish(root, s) {
   });
 }
 
-// Keyboard: 1–9 pick an option, Enter checks / continues.
+// Keyboard: 1–9 pick an option (a setting), Enter checks / continues. Keys are left alone while a dialog or the
+// explain sheet is open, and when a control has focus (it handles Enter itself — otherwise "Keep learning" would
+// also submit the answer behind it).
 export function lessonKey(root, e) {
   const s = root.__session;
   if (!s) return;
+  const ctx = { modalOpen: !!$('#modal.open'), sheetOpen: !!$('.explain-sheet:not([hidden])', root) };
+  if (e.key === 'Escape' && ctx.sheetOpen && !ctx.modalOpen) {
+    sheetOpen(root, false);
+    $('.lesson-foot .explain', root)?.focus({ preventScroll: true });
+    return;
+  }
+  if (lessonKeyIgnored(e, ctx)) return;
   if (e.key === 'Enter') {
     const btn = $('.lesson-foot .check', root) || $('.complete .continue', root);
     if (btn && !btn.disabled) btn.click();
-  } else if (/^[1-9]$/.test(e.key) && s.keyHandler && !s.checked) s.keyHandler(e.key);
+  } else if (/^[1-9]$/.test(e.key) && s.keyHandler && !s.checked && shortcutsEnabled(app.state.settings, matchMedia('(pointer: fine)').matches)) s.keyHandler(e.key);
+}
+
+// ---------- Verb forms, tones and typed sentences (engine tasks) ----------
+// Pick a text option: a verb form ("tu" + aller → tu vas, or a sentence with the form missing) or the tone
+// of a word you hear.
+function renderPick(root, s) {
+  const ex = s.current;
+  const item = ITEMS.get(ex.itemId);
+  const tone = ex.type === 'tone';
+  const gap = html`<div class="g-block g-gap">?</div>`;
+  const verb = html`<div class="g-block g-noun"><span class="jp" lang="${LANG_ATTR}">${ex.verb}</span>${ex.verbRomaji ? html`<small class="muted">${ex.verbRomaji}</small>` : ''}</div>`;
+  const labelBlock = html`<div class="g-block"><span>${ex.label}</span></div>`;
+  let head;
+  if (tone) head = speakerBubble(s, audioPrompt(item));
+  else if (ex.prompt) head = html`<div class="g-blocks g-quiz">${ex.prompt.map((c) => (c === null ? gap : html`<div class="g-block g-noun"><span class="jp" lang="${LANG_ATTR}">${c}</span></div>`))}</div>`;
+  else head = html`<div class="g-blocks g-quiz">${L.latin ? html`${labelBlock}${verb}` : html`${verb}${labelBlock}`}${gap}</div>
+    <p class="muted small">${ex.meaning}</p>`;
+  mount($('.lesson-body', root), html`<p class="instruction">${ex.instruction}</p>
+    ${head}
+    <div class="options ${tone ? 'list' : 'grid'}">${ex.options.map((o, i) => html`<button class="option" data-o="${o}"><span class="key" aria-hidden="true">${i + 1}</span>${tone
+      ? html`<span class="opt-label">${o}</span>`
+      : html`<span class="opt-label"><span class="jp jp-lg" lang="${LANG_ATTR}">${o}</span>${ex.optionRomaji?.[o] ? html`<small class="muted">${ex.optionRomaji[o]}</small>` : ''}</span>`}</button>`)}</div>`);
+  wirePlay(root, s);
+  if (tone) sayAs(root, s.speaker, speechOf(item));
+  startTimer(root, s, tone ? 20 : 25);
+  const filled = ex.prompt ? ex.prompt.map((c) => (c === null ? ex.answer : c)).join(L.latin || ex.prompt.some((c) => /\s/.test(c || '')) ? ' ' : '') : ex.answer;
+  const pickIt = (b) => {
+    if (s.checked) return;
+    const ok = b.dataset.o === ex.answer;
+    $$('.option', root).forEach((x) => {
+      x.disabled = true;
+      if (x.dataset.o === ex.answer) markOption(x, 'right');
+      else if (x === b) markOption(x, 'wrong');
+    });
+    if (!tone && $('.g-gap', root)) $('.g-gap', root).textContent = ex.answer;
+    sayAs(root, s.speaker, tone ? speechOf(item) : filled);
+    const meaning = tone ? `${item.jp} · ${item.romaji} = ${item.en}` : ex.prompt ? `${filled} = ${ex.en}` : `${ex.verb} (${ex.meaning}) · ${ex.label}: ${ex.answer}`;
+    result(root, s, ok, { answerText: ex.answer, meaning, chosenLabel: ok ? null : b.dataset.o });
+  };
+  $$('.option', root).forEach((b) => b.addEventListener('click', () => pickIt(b)));
+  s.keyHandler = (key) => {
+    const b = $$('.option', root)[Number(key) - 1];
+    if (b) pickIt(b);
+  };
+  footer(root, s, { canCheck: false, text: t('Pick an answer'), onCheck: () => {},
+    skip: tone ? { label: t("Can't listen now"), onSkip: () => skipListening(root, s, 'listen') } : null });
+}
+
+// Type a whole sentence from its meaning (lenient: spaces, capitals, accents, tone marks and long vowels
+// do not matter). A miss costs no heart, like the word recall.
+function renderTypeSentence(root, s) {
+  const ex = s.current;
+  const item = ITEMS.get(ex.itemId);
+  const target = joinChunks(item.jp);
+  const shown = withRoman(target, item.romaji);
+  const help = t(L.latin ? 'Accents and capitals don\'t matter.' : L.code === 'zh' ? 'Tone marks and spaces don\'t matter.' : 'Spaces and long vowels (ou / o) don\'t matter.');
+  mount($('.lesson-body', root), html`<p class="instruction">${t('How do you say this in {lang}?', { lang: langName() })}</p>
+    ${speakerBubble(s, html`<div class="en-prompt"><span>${item.en}</span></div>`)}
+    <input class="recall-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${t('Type it in {lang}…', { lang: langName() })}" aria-label="${t('Your answer')}" lang="${LANG_ATTR}">
+    <p class="muted small recall-help">${t('From memory — no choices this time!')} ${help}</p>`);
+  startTimer(root, s, null);
+  const input = $('.recall-input', root);
+  const check = () => {
+    if (s.checked || !input.value.trim()) return;
+    const match = romajiMatch(input.value, L.latin ? target : item.romaji);
+    input.disabled = true;
+    input.classList.add(match ? 'right' : 'wrong');
+    sayAs(root, s.speaker, speechOf(item));
+    result(root, s, !!match, { answerText: shown, close: match === 'close', meaning: `${shown} = ${item.en}`, chosenLabel: input.value, noHeart: true, timing: null });
+  };
+  input.addEventListener('input', () => setCheckEnabled(root, !!input.value.trim()));
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      e.stopPropagation();
+      check();
+    }
+  });
+  footer(root, s, {
+    onCheck: check,
+    skip: { label: t("I don't know"), onSkip: () => {
+      if (s.checked) return;
+      input.disabled = true;
+      sayAs(root, s.speaker, speechOf(item));
+      result(root, s, false, { answerText: shown, meaning: `${shown} = ${item.en}`, noHeart: true, timing: null });
+    } },
+  });
+  setTimeout(() => input.focus(), 250);
 }

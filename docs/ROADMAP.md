@@ -19,12 +19,17 @@
 - Cast of four characters with their own voices; animated mascot; cartoon illustrations
 - Countdown + speed bonus, hesitation tracking and a "missed exercises" round
 - Explain my answer, themed fun-fact breaks, sakura finish, splash screen, reward pop-ups
+- Learning engine (0.94): Japanese reading pacing (kana from unit 2, loanword katakana, kanji after ~20 kana),
+  40% typed or built tasks from level 2 / in reviews and practice, sentence recall, conjugation cloze
+  (`conjugation`, `conj-sentence` from `CONJUGATIONS`), Chinese tone-in-lesson task, strength-based difficulty,
+  multi-question dialogues, pronunciation tips as tidbits, and a content validator (`npm run check`, part of `npm test`)
 
 ## Phase 2 — Smarter repetition
 - Replace the Leitner boxes with a **forgetting-curve model** (half-life regression / FSRS-style): each
   item gets a memory half-life that grows with correct answers and shrinks with mistakes; items come
   back when predicted recall drops below a threshold
-- **Adaptive difficulty:** estimate the chance of answering each exercise correctly and choose
+- **Adaptive difficulty:** a first version is in (item strength < 0.34 → easy tasks, > 0.67 → hard and typed
+  tasks); next, estimate the chance of answering each exercise correctly and choose
   exercises that keep the success rate around 75–85% (not boring, not discouraging)
 - **Mistakes inbox:** Practice hub sections for *Today's review*, *Weak words*, *Listening review*
 - Typing answers (romaji → kana keyboard) as an advanced exercise

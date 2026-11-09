@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 
 globalThis.__HAJIME_COURSE__ = 'zh';
 const { ITEMS, NODES, SECTIONS } = await import('../app/js/course.js');
-const { generateLesson, generatePractice, makeRng } = await import('../app/js/lesson/generate.js');
+const { generateLesson, generatePractice, makeRng, demoExercises, DEMO_KINDS, tonePattern, toneLabel, PRODUCTION_SHARE } = await import('../app/js/lesson/generate.js');
+const { playThrough, learnedState, productionShare } = await import('./sim.mjs');
 const { defaultState } = await import('../app/js/progress.js');
 const { pinyinParts } = await import('../app/js/pinyin.js');
 const { L } = await import('../app/js/lang.js');
@@ -54,4 +55,51 @@ test('Chinese typed answers ignore tones and ü, and 饭馆 splits as fàn + gu�
   assert.equal(romajiMatch('nihao', 'nǐhǎo'), 'exact');
   assert.equal(romajiMatch('lv', 'lǚ'), 'exact');
   assert.deepEqual(pinyinParts('饭馆', 'fànguǎn').map((p) => p.romaji), ['fàn', 'guǎn']);
+});
+
+test('tone tasks: hear a word, pick its tone pattern; only learned, audible words without sandhi', () => {
+  assert.ok(DEMO_KINDS.tone);
+  const tones = new Set();
+  for (let seed = 1; seed <= 5; seed++) {
+    const made = demoExercises('tone', defaultState(T0), { rng: makeRng(seed) });
+    assert.ok(made.length >= 3);
+    for (const ex of made) {
+      const item = ITEMS.get(ex.itemId);
+      assert.equal(ex.type, 'tone');
+      assert.equal(ex.prompt, 'audio');
+      assert.equal(ex.answer, toneLabel(tonePattern(item)));
+      assert.ok(ex.options.includes(ex.answer) && new Set(ex.options).size === ex.options.length && ex.options.length === 4);
+      assert.ok(!/[不一]/.test(item.jp) && tonePattern(item) !== '33');
+      tones.add(tonePattern(item));
+    }
+  }
+  assert.ok(tones.size >= 4, 'several tone patterns');
+  assert.equal(tonePattern(ITEMS.get('w-mai3')), '3');
+  // In lessons: needs listening and a word that was answered before.
+  const learned = learnedState(T0 + 9e8);
+  let heard = 0;
+  for (const node of NODES.filter((n) => n.kind === 'lesson' || n.kind === 'review')) {
+    for (const canListen of [true, false]) {
+      const { exercises } = generateLesson(node, learned, { rng: makeRng(node.index), now: T0 + 9e8, level: 3, canListen });
+      const n = exercises.filter((e) => e.type === 'tone').length;
+      if (canListen) heard += n;
+      else assert.equal(n, 0, `${node.id}: tone task without a voice`);
+    }
+  }
+  assert.ok(heard >= 5, `${heard} tone tasks in lessons`);
+  assert.equal(generateLesson(NODES[0], defaultState(T0), { rng: makeRng(1), now: T0, level: 3 }).exercises.filter((e) => e.type === 'tone').length, 0, 'not for unseen words');
+});
+
+test('Chinese: verb forms (了 / 不 / 没), typed sentences and the 40% production share', () => {
+  const kinds = new Set();
+  for (let seed = 1; seed <= 6; seed++) for (const ex of demoExercises('conjugation', defaultState(T0), { rng: makeRng(seed) })) {
+    kinds.add(ex.kind);
+    assert.ok(ex.options.includes(ex.answer) && new Set(ex.options).size === ex.options.length && ex.options.length >= 3);
+    assert.ok(Object.keys(ex.optionRomaji || {}).length >= ex.options.length - 1, 'pinyin under the options');
+  }
+  assert.deepEqual([...kinds].sort(), ['conj-sentence', 'conjugation']);
+  const { log } = playThrough({ levels: [0, 1, 2], kinds: ['lesson', 'review'] });
+  const mix = (pick) => productionShare(log.filter(pick).flatMap((l) => l.exercises));
+  assert.ok(mix((l) => l.level === 2 && l.node.kind === 'lesson').share >= PRODUCTION_SHARE);
+  assert.ok(mix((l) => l.level >= 1 && l.node.kind === 'review').share >= PRODUCTION_SHARE);
 });

@@ -94,7 +94,14 @@ const nodeTitle = (node) => (node.kind === 'chest' ? t('Treasure chest') : node.
 function levelPips(node) {
   if (!['lesson', 'read', 'kanji'].includes(node.kind) || !isNodeDone(app.state, node)) return '';
   const level = nodeLevel(app.state, node);
-  return html`<span class="pips" aria-label="${t('Level {a} of {b}', { a: level, b: MAX_LEVEL })}">${Array.from({ length: MAX_LEVEL }, (_, i) => html`<i class="${i < level ? 'on' : ''}"></i>`)}</span>`;
+  return html`<span class="pips" aria-hidden="true">${Array.from({ length: MAX_LEVEL }, (_, i) => html`<i class="${i < level ? 'on' : ''}"></i>`)}</span>`;
+}
+
+// What a screen reader says for a node: its name, then where it stands (the colours say the same to the eye).
+function nodeLabel(node, st) {
+  const status = t(st === 'locked' ? 'locked' : st === 'current' ? 'current lesson' : st === 'stale' ? 'needs review' : 'completed');
+  const lvl = st !== 'locked' && st !== 'current' && ['lesson', 'read', 'kanji'].includes(node.kind) ? nodeLevel(app.state, node) : 0;
+  return `${nodeTitle(node)}, ${status}${lvl ? `, ${t('Level {a} of {b}', { a: lvl, b: MAX_LEVEL })}` : ''}`;
 }
 
 function renderNode(node, i, current, now, firstRun) {
@@ -112,11 +119,11 @@ function renderNode(node, i, current, now, firstRun) {
         : html`<div class="bubble"><b class="jp">${cheer[0]}</b><small>${cheer[1]}</small></div>`}${mascot('happy', 64)}</div>`
       : html`<div class="decor-slot ${side}">${decorFor(i)}</div>`}
     <div class="node-wrap">
-      ${st === 'current' ? html`<div class="start-bubble">${t(node.kind === 'chest' ? 'OPEN' : 'START')}</div>` : ''}
-      <button class="node node-${node.kind} st-${st} c-${node.unit.color}" data-node="${node.id}" aria-label="${nodeTitle(node)}">
+      ${st === 'current' ? html`<div class="start-bubble" aria-hidden="true">${t(node.kind === 'chest' ? 'OPEN' : 'START')}</div>` : ''}
+      <button class="node node-${node.kind} st-${st} c-${node.unit.color}" data-node="${node.id}" aria-label="${nodeLabel(node, st)}" ${st === 'locked' ? 'aria-disabled="true"' : ''} ${st === 'current' ? 'aria-current="step"' : ''}>
         ${nodeIcon(node, st)}
-        ${st === 'stale' ? html`<span class="node-badge" title="${t('Needs review')}">${icon('refresh', 14)}</span>` : ''}
-        ${st === 'done' && node.kind !== 'chest' ? html`<span class="node-check">${icon('check', 14)}</span>` : ''}
+        ${st === 'stale' ? html`<span class="node-badge" aria-hidden="true">${icon('refresh', 14)}</span>` : ''}
+        ${st === 'done' && node.kind !== 'chest' ? html`<span class="node-check" aria-hidden="true">${icon('check', 14)}</span>` : ''}
       </button>
       ${levelPips(node)}
       ${node.kind === 'review' ? html`<div class="node-label">${t('{unit} trophy', { unit: node.unit.title })}</div>` : ''}
@@ -260,6 +267,7 @@ export function renderLearn(root) {
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page learn">
+    <h1 class="sr-only">${t('Learn')}</h1>
     <section class="card goal-card" role="button" tabindex="0" aria-label="${t('About the daily goal')}">
       <div class="goal-icon">${icon('bolt', 22)}</div>
       <div class="goal-text"><b>${t('Daily goal')}</b><span>${Math.min(xp, goal)} / ${goal} XP</span></div>
@@ -295,6 +303,11 @@ export function renderLearn(root) {
   root.addEventListener('click', () => document.querySelector('.popover')?.remove());
   $('.start-review', root)?.addEventListener('click', () => app.go('#/practice/go'));
   $('.goal-card', root).addEventListener('click', explainGoal);
+  $('.goal-card', root).addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault();
+    explainGoal();
+  });
   $$('[data-guide]', root).forEach((b) =>
     b.addEventListener('click', () => unitGuide(SECTIONS.flatMap((s) => s.units).find((u) => u.id === b.dataset.guide))),
   );

@@ -15,16 +15,18 @@ test('the course starts with Tokyo phrases and has no hiragana-only sections', (
   assert.equal(SECTIONS[0].id, 'tokyo');
   assert.ok(SECTIONS.every((s) => !/hiragana/i.test(s.title)));
   assert.equal(new Set(NODES.map((n) => n.id)).size, NODES.length);
-  // No kana in section 1, a little hiragana per unit after that, never katakana.
-  assert.ok(SECTIONS[0].units.every((u) => !u.nodes.some((n) => n.kind === 'read')));
+  // The first unit has no kana; every later unit has one short Read-it lesson (see generate.test.mjs for the pacing).
+  assert.ok(SECTIONS[0].units[0].nodes.every((n) => n.kind !== 'read'));
   const unitsWithReading = SECTIONS.flatMap((s) => s.units).filter((u) => u.nodes.some((n) => n.kind === 'read'));
-  assert.ok(unitsWithReading.length >= 4);
+  assert.ok(unitsWithReading.length >= 15);
+  assert.ok(SECTIONS[0].units.slice(1).every((u) => u.nodes.some((n) => n.kind === 'read')), 'reading starts in section 1');
   const readChars = NODES.filter((n) => n.kind === 'read').flatMap((n) => n.items.map((id) => ITEMS.get(id)));
-  assert.ok(readChars.every((k) => k.script === 'hiragana'));
+  assert.ok(readChars.some((k) => k.script === 'katakana'), 'katakana for the loanwords');
+  assert.ok(readChars.every((k) => KANA.has(k.jp)), 'only characters with stroke data');
 });
 
-test('every hiragana word and sentence becomes readable within the course', () => {
-  const unreadable = [...ITEMS.values()].filter((i) => (i.type === 'word' || i.type === 'sentence') && !i.readAt && i.chars.every((c) => KANA.get(c).script === 'hiragana'));
+test('every kana word and sentence (hiragana or katakana) becomes readable within the course', () => {
+  const unreadable = [...ITEMS.values()].filter((i) => (i.type === 'word' || i.type === 'sentence') && !i.readAt && i.chars.length && i.chars.every((c) => KANA.has(c)));
   assert.deepEqual(unreadable.map((i) => i.jp.toString()), []);
 });
 

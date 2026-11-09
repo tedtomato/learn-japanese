@@ -1,4 +1,5 @@
 // Kuri, the shiba inu mascot. Moods: happy, cheer, sad. Always animated (bob, blink, ear twitch).
+// Purely decorative, so hidden from screen readers (the text beside it says everything).
 import { raw } from './dom.js';
 
 const EYES = {
@@ -14,7 +15,7 @@ const MOUTH = {
 };
 
 export function mascotSvg(mood = 'happy', size = 96) {
-  return `<svg class="mascot mood-${mood}" width="${size}" height="${size}" viewBox="0 0 120 120" role="img" aria-label="Kuri the shiba">
+  return `<svg class="mascot mood-${mood}" width="${size}" height="${size}" viewBox="0 0 120 120" aria-hidden="true" focusable="false">
   <g class="ear ear-l"><path d="M22 50 28 12l30 24z" fill="#e48b3a"/><path d="M29 42 32 22l15 13z" fill="#f6c7a1"/></g>
   <g class="ear ear-r"><path d="M98 50 92 12 62 36z" fill="#e48b3a"/><path d="M91 42 88 22 73 35z" fill="#f6c7a1"/></g>
   <ellipse cx="60" cy="66" rx="44" ry="40" fill="#f0a04b"/>

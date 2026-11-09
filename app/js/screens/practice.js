@@ -192,10 +192,11 @@ export function renderPractice(root, focus) {
     <p class="muted small list-help">${t('One sentence, many words: swap words in until it\'s automatic.')}</p>
     ${drillCards(state)}` : ''}` : ''}
 
-    ${section === 'library' ? html`<div class="collections ${KINDS.kanji.list.length ? '' : 'two'}">
+    ${section === 'library' ? html`<div class="collections ${KINDS.kanji.list.length || KINDS.pron.list.length ? '' : 'two'}">
       <a class="card collection" href="#/collection/phrase">${art('💬', 'art-col')}<b>${t('Phrasebook')}</b><small>${t('{n} phrases', { n: KINDS.phrase.list.length })}</small></a>
       <a class="card collection" href="#/collection/fact">${art(L.flagEmoji || '🗾', 'art-col')}<b>${t('Fun facts')}</b><small>${state.seen.fact.length} / ${KINDS.fact.list.length}</small></a>
       ${KINDS.kanji.list.length ? html`<a class="card collection" href="#/collection/kanji"><span class="col-emoji jp">${L.glyph}</span><b>${t('{what} spotted', { what: L.Chars })}</b><small>${state.seen.kanji.length} / ${KINDS.kanji.list.length}</small></a>` : ''}
+      ${KINDS.pron.list.length ? html`<a class="card collection" href="#/collection/pron">${art('🗣️', 'art-col')}<b>${t('Pronunciation')}</b><small>${state.seen.pron.length} / ${KINDS.pron.list.length}</small></a>` : ''}
     </div>
 
     <h2 class="sub-title" id="sec-learned">${t('What you\'ve learned')}</h2>

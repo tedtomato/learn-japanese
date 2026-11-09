@@ -473,6 +473,13 @@ const FRENCH = {
   'In longer words': 'Dans les mots plus longs',
   'Another': 'Un autre',
   // Accessibility
+  'Which form is it?': 'Quelle est la forme ?',
+  'Which tone do you hear?': 'Quel ton entends-tu ?',
+  'Pronunciation tip': 'Astuce de prononciation',
+  'Pronunciation': 'Prononciation',
+  'Verb forms': 'Formes verbales',
+  'Type from memory': 'Écris de mémoire',
+  'Which tone?': 'Quel ton ?',
   'Gems: {n}': 'Gemmes : {n}',
   'Hearts: {n}': 'Cœurs : {n}',
   'Lesson progress': 'Progression de la leçon',

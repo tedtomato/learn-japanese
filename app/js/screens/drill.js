@@ -12,6 +12,8 @@ import { mascot } from '../mascot.js';
 import { PATTERNS } from '../content/pack.js';
 import { recordSigns } from '../progress.js';
 import { romajiMatch, shuffle } from '../lesson/generate.js';
+import { t } from '../strings.js';
+import { hideNav } from './activity.js';
 
 export const DRILL_MIN = 3;
 const ROUNDS = ['fill', 'fill', 'fill', 'type', 'fill', 'fill', 'type', 'type'];
@@ -32,6 +34,7 @@ export function renderDrill(root, id) {
   const results = new Map();
   let i = 0;
   let score = 0;
+  hideNav();
 
   // The blank comes first in Japanese (___ をください) and often last in Chinese (我要 ___: slotLast).
   const sentence = (slot, sep = ' ') => (p.slotLast ? `${p.jp}${sep}${slot.word.jp}` : `${slot.word.jp}${sep}${p.jp}`);
@@ -41,9 +44,9 @@ export function renderDrill(root, id) {
 
   const show = () => {
     const { kind, slot } = rounds[i];
-    mount(root, html`<header class="topbar topbar-back"><a class="icon-btn" href="#/practice" aria-label="Close">${icon('close', 24)}</a><h1>${p.title}</h1></header>
+    mount(root, html`<header class="topbar topbar-back"><a class="icon-btn" href="#/practice" aria-label="${t('Close')}">${icon('close', 24)}</a><h1>${p.title}</h1></header>
     <main class="page quiz drill">
-      <p class="muted quiz-count">${i + 1} of ${rounds.length} · ${p.meaning}</p>
+      <p class="muted quiz-count">${t('{a} of {b}', { a: i + 1, b: rounds.length })} · ${p.meaning}</p>
       <section class="card quiz-card">${slot.word.art ? art(slot.word.art, 'art-lg') : ''}<p class="quiz-text"><b>${p.en(slot.en)}</b></p></section>
       ${kind === 'fill'
         ? html`<p class="drill-pattern">${p.slotLast
@@ -51,9 +54,9 @@ export function renderDrill(root, id) {
           : html`<span class="drill-blank jp">＿＿</span><span class="jp">${p.jp}</span>${sub(`___ ${p.romaji}`)}`}</p>
           <div class="options list">${shuffle([slot, ...shuffle(slots.filter((x) => x.id !== slot.id)).slice(0, 2)]).map((o) => html`<button class="option drill-opt" data-id="${o.id}">
             <span class="opt-label"><span class="jp">${o.word.jp}</span>${sub(o.word.romaji)}</span></button>`)}</div>`
-        : html`<p class="muted small">Now the whole sentence, from memory — type it in ${L.roman}.</p>
-          <input class="recall-input drill-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="Type the sentence in ${L.roman}">
-          <button class="btn btn-primary btn-block drill-check" disabled>Check</button>`}
+        : html`<p class="muted small">${t('Now the whole sentence, from memory — type it in {what}.', { what: L.roman })}</p>
+          <input class="recall-input drill-input" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" placeholder="${t('Type the sentence in {what}', { what: L.roman })}">
+          <button class="btn btn-primary btn-block drill-check" disabled>${t('Check')}</button>`}
       <div class="quiz-after" hidden></div>
     </main>`);
     if (kind === 'fill') $$('.drill-opt', root).forEach((b) => b.addEventListener('click', () => answer(b.dataset.id === slot.id, b)));
@@ -95,9 +98,9 @@ export function renderDrill(root, id) {
     speak(sentence(slot, L.latin ? ' ' : ''), { speaker: 'woman2' });
     const after = $('.quiz-after', root);
     after.hidden = false;
-    mount(after, html`<p class="quiz-reveal"><span><b>${ok ? (almost ? 'Almost — watch the spelling!' : 'Right!') : 'Not quite.'}</b>
+    mount(after, html`<p class="quiz-reveal"><span><b>${ok ? (almost ? t('Almost — watch the spelling!') : t('Right!')) : t('Not quite.')}</b>
       <span class="jp">${sentence(slot)}</span>${L.latin ? '' : ` · ${romaji(slot)}`}</span></p>
-      <button class="btn btn-primary btn-block quiz-next">${i + 1 < rounds.length ? 'Next' : 'See my score'}</button>`);
+      <button class="btn btn-primary btn-block quiz-next">${t(i + 1 < rounds.length ? 'Next' : 'See my score')}</button>`);
     $('.quiz-next', root).addEventListener('click', () => {
       i += 1;
       if (i < rounds.length) show();
@@ -113,10 +116,10 @@ export function renderDrill(root, id) {
     <main class="page quiz quiz-end">
       ${mascot(score >= rounds.length - 1 ? 'cheer' : 'happy', 110)}
       <h1>${score} / ${rounds.length}</h1>
-      <p class="muted">${score === rounds.length ? `You can say “${p.meaning}” with anything now!` : score >= 5 ? 'Nice! The pattern is sinking in.' : 'Patterns take a few goes. Try again!'}</p>
-      ${score ? html`<p class="pill pill-gold">${icon('gem', 16)} +${score} gems</p>` : ''}
-      <button class="btn btn-primary btn-block quiz-again">Again</button>
-      <a class="btn btn-white btn-block" href="#/practice">Back to practice</a>
+      <p class="muted">${score === rounds.length ? t('You can say “{what}” with anything now!', { what: p.meaning }) : score >= 5 ? t('Nice! The pattern is sinking in.') : t('Patterns take a few goes. Try again!')}</p>
+      ${score ? html`<p class="pill pill-gold">${icon('gem', 16)} +${score} ${t('gems')}</p>` : ''}
+      <button class="btn btn-primary btn-block quiz-again">${t('Again')}</button>
+      <a class="btn btn-white btn-block" href="#/practice">${t('Back to practice')}</a>
     </main>`);
     $('.quiz-again', root).addEventListener('click', () => renderDrill(root, id));
   };
@@ -131,6 +134,6 @@ export function drillCards(state) {
     const open = n >= DRILL_MIN;
     return html`<a class="card mission-card ${open ? '' : 'locked'}" href="${open ? `#/drill/${p.id}` : '#/practice'}">
       ${art(p.art, 'art-col')}<b class="jp">${p.title}</b><small>${p.meaning}</small>
-      ${open ? '' : html`<small>🔒 Learn ${DRILL_MIN - n} more word${DRILL_MIN - n > 1 ? 's' : ''} for it</small>`}</a>`;
+      ${open ? '' : html`<small>🔒 ${t(DRILL_MIN - n > 1 ? 'Learn {n} more words for it' : 'Learn {n} more word for it', { n: DRILL_MIN - n })}</small>`}</a>`;
   })}</div>`;
 }

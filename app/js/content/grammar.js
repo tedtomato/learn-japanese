@@ -67,7 +67,70 @@ export const GRAMMAR = {
     tip: 'Literally "sushi is liked".',
     check: { prompt: ['ねこ', null, 'すき', 'です'], en: 'I like cats', options: ['が', 'と', 'か'], answer: 'が' },
   },
+  masu: {
+    title: 'ます — the polite verb ending',
+    rule: 'Polite verbs end in ます: たべます = "eat / will eat". The thing you eat goes before the verb, with を.',
+    blocks: [{ jp: 'すし', role: 'noun', en: 'sushi' }, { jp: 'を', role: 'particle', en: '(object)' }, { jp: 'たべます', role: 'verb', en: 'eat' }],
+    en: 'I eat sushi.',
+    tip: 'The verb always comes last. One form covers "I eat", "we eat" and "I will eat" — no "I" needed. Add か for a question: たべます か = "do you eat?".',
+    check: { prompt: ['すし', null, 'たべます'], en: 'I eat sushi', options: ['を', 'と', 'で'], answer: 'を' },
+  },
+  masen: {
+    title: 'ません — "do not"',
+    rule: 'Swap ます for ません to say "do not": たべます → たべません, のみます → のみません.',
+    blocks: [{ jp: 'にく', role: 'noun', en: 'meat' }, { jp: 'を', role: 'particle', en: '(object)' }, { jp: 'たべません', role: 'verb', en: 'do not eat' }],
+    en: 'I do not eat meat.',
+    tip: 'No extra word is needed — ません is the whole negative. Same pattern for あります → ありません, わかります → わかりません.',
+    check: { prompt: ['にく', 'を', null], en: 'I do not eat meat', options: ['たべません', 'たべます', 'たべました'], answer: 'たべません' },
+  },
+  mashita: {
+    title: 'ました — the past',
+    rule: 'Swap ます for ました for the past, and ません for ませんでした for "did not": たべました = "ate", たべませんでした = "did not eat".',
+    blocks: [{ jp: 'ビール', role: 'noun', en: 'beer' }, { jp: 'を', role: 'particle', en: '(object)' }, { jp: 'のみました', role: 'verb', en: 'drank' }],
+    en: 'I drank beer.',
+    tip: 'Put きのう (yesterday) in front to be clear. ありがとうございました is the same ました — "thank you for what you did".',
+    check: { prompt: ['きのう', 'ビール', 'を', null], en: 'I drank beer yesterday', options: ['のみました', 'のみます', 'のみません'], answer: 'のみました' },
+  },
+  janai: {
+    title: 'じゃない です — "is not"',
+    rule: 'X じゃない です = "X is not …". Use it where you would use です, after a noun.',
+    blocks: [{ jp: 'ビール', role: 'noun', en: 'beer' }, { jp: 'じゃない', role: 'end', en: 'is not' }, { jp: 'です', role: 'end', en: '(polite)' }],
+    en: 'It is not beer.',
+    tip: 'You will also hear じゃありません — the same meaning, a little more formal.',
+    check: { prompt: ['わたし', 'は', 'せんせい', null, 'です'], en: 'I am not a teacher', options: ['じゃない', 'の', 'か'], answer: 'じゃない' },
+  },
+  time: {
+    title: 'に — "at / on" a time',
+    rule: 'に after a day, date or clock time says when: げつようび に = "on Monday", しちじ に = "at seven".',
+    blocks: [{ jp: 'げつようび', role: 'noun', en: 'Monday' }, { jp: 'に', role: 'particle', en: 'on' }, { jp: 'いきます', role: 'verb', en: 'go' }],
+    en: 'I go on Monday.',
+    tip: 'Words like きょう, あした and まいにち take no に: あした いきます = "I go tomorrow".',
+    check: { prompt: ['しちじ', null, 'きます'], en: 'I come at seven', options: ['に', 'を', 'か'], answer: 'に' },
+  },
+  qwords: {
+    title: 'だれ・なに・いつ — question words',
+    rule: 'Put the question word where the answer will go, keep the word order and finish with か: なに を たべます か = "what do you eat?".',
+    blocks: [{ jp: 'なに', role: 'noun', en: 'what' }, { jp: 'を', role: 'particle', en: '(object)' }, { jp: 'たべます', role: 'verb', en: 'eat' }, { jp: 'か', role: 'end', en: '?' }],
+    en: 'What do you eat?',
+    tip: 'Answer in the same slot: すし を たべます. Other question words: だれ (who), いつ (when), どこ (where), どれ (which), どうして (why), どう (how), いくら (how much).',
+    check: { prompt: [null, 'が', 'きます', 'か'], en: 'Who is coming?', options: ['だれ', 'いつ', 'どこ'], answer: 'だれ' },
+  },
 };
+
+// Verb tables for the conjugation drill: the polite forms from one verb, and the て-form for three.
+// forms: { label: form }; example: { jp, en }.
+export const CONJUGATIONS = [
+  { id: 'iku', verb: 'いく', meaning: 'go', forms: { 'ます': 'いきます', 'ません': 'いきません', 'ました': 'いきました', 'ませんでした': 'いきませんでした', 'て-form': 'いって' }, example: { jp: 'えき に いきます', en: 'I go to the station.' } },
+  { id: 'kuru', verb: 'くる', meaning: 'come', forms: { 'ます': 'きます', 'ません': 'きません', 'ました': 'きました', 'ませんでした': 'きませんでした' }, example: { jp: 'ともだち が きます', en: 'A friend is coming.' } },
+  { id: 'taberu', verb: 'たべる', meaning: 'eat', forms: { 'ます': 'たべます', 'ません': 'たべません', 'ました': 'たべました', 'ませんでした': 'たべませんでした', 'て-form': 'たべて' }, example: { jp: 'すし を たべます', en: 'I eat sushi.' } },
+  { id: 'nomu', verb: 'のむ', meaning: 'drink', forms: { 'ます': 'のみます', 'ません': 'のみません', 'ました': 'のみました', 'ませんでした': 'のみませんでした', 'て-form': 'のんで' }, example: { jp: 'おちゃ を のみます', en: 'I drink tea.' } },
+  { id: 'kau', verb: 'かう', meaning: 'buy', forms: { 'ます': 'かいます', 'ません': 'かいません', 'ました': 'かいました', 'ませんでした': 'かいませんでした' }, example: { jp: 'ほん を かいます', en: 'I buy a book.' } },
+  { id: 'miru', verb: 'みる', meaning: 'see / watch', forms: { 'ます': 'みます', 'ません': 'みません', 'ました': 'みました', 'ませんでした': 'みませんでした' }, example: { jp: 'うみ を みます', en: 'I look at the sea.' } },
+  { id: 'hanasu', verb: 'はなす', meaning: 'speak', forms: { 'ます': 'はなします', 'ません': 'はなしません', 'ました': 'はなしました', 'ませんでした': 'はなしませんでした' }, example: { jp: 'えいご を はなします', en: 'I speak English.' } },
+  { id: 'suru', verb: 'する', meaning: 'do', forms: { 'ます': 'します', 'ません': 'しません', 'ました': 'しました', 'ませんでした': 'しませんでした' }, example: { jp: 'なに を します か', en: 'What do you do?' } },
+  { id: 'wakaru', verb: 'わかる', meaning: 'understand', forms: { 'ます': 'わかります', 'ません': 'わかりません', 'ました': 'わかりました', 'ませんでした': 'わかりませんでした' }, example: { jp: 'これ は わかりません', en: 'I do not understand this.' } },
+  { id: 'aru', verb: 'ある', meaning: 'there is / have', forms: { 'ます': 'あります', 'ません': 'ありません', 'ました': 'ありました', 'ませんでした': 'ありませんでした' }, example: { jp: 'よやく が あります', en: 'I have a reservation.' } },
+];
 
 // Particles and small words, for "Explain my answer".
 export const GLOSSARY = {
@@ -89,4 +152,18 @@ export const GLOSSARY = {
   おげんき: { en: 'well (polite, about someone else)', note: 'お makes it polite when talking about the other person.' },
   ゆき: { en: 'Yuki (a name)', note: 'A common name — it also means "snow".' },
   たなか: { en: 'Tanaka (a family name)', note: 'One of the most common family names.' },
+  に: { en: 'at / on / to', note: 'With a day or time it means "at / on": しちじ に = at seven. With a place it means "to": きょうと に = to Kyoto.' },
+  たべません: { en: 'do not eat', note: 'The negative of たべます.' },
+  のみません: { en: 'do not drink', note: 'The negative of のみます.' },
+  たべました: { en: 'ate', note: 'The past of たべます.' },
+  のみました: { en: 'drank', note: 'The past of のみます.' },
+  たべませんでした: { en: 'did not eat', note: 'ません + でした = the past negative.' },
+  かいませんでした: { en: 'did not buy', note: 'ません + でした = the past negative.' },
+  じゃない: { en: 'is not', note: 'Followed by です to be polite: せんせい じゃない です.' },
+  さんじ: { en: '3 o\'clock', note: 'さん (3) + じ (o\'clock).' },
+  しちじ: { en: '7 o\'clock', note: 'Seven o\'clock is しちじ, not ななじ.' },
+  じゅうごふん: { en: '15 minutes', note: 'じゅう (10) + ご (5) + ふん (minutes).' },
+  まよいました: { en: 'got lost', note: 'The past of まよいます (to get lost).' },
+  あずかって: { en: 'keep (for me)', note: 'From あずかる (to look after). ～て ください = please do…' },
+  よんで: { en: 'call', note: 'From よぶ (to call). よんで ください = please call.' },
 };

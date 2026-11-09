@@ -11,6 +11,7 @@ import { mascot } from '../mascot.js';
 import { SIGN_SCENES } from '../content/pack.js';
 import { recordSigns } from '../progress.js';
 import { shuffle } from '../lesson/generate.js';
+import { hideNav } from './activity.js';
 
 export const SIGNS_MIN = 3;
 const QUESTIONS = 8;
@@ -31,6 +32,7 @@ export function renderSigns(root) {
   const results = new Map();
   let i = 0;
   let score = 0;
+  hideNav();
 
   const show = () => {
     const { scene, options, read } = questions[i];

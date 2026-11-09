@@ -9,6 +9,7 @@ import { mascot } from '../mascot.js';
 import { speak, sfx } from '../audio.js';
 import { pinyinParts, stripTones } from '../pinyin.js';
 import { shuffle } from '../lesson/generate.js';
+import { hideNav } from './activity.js';
 
 export const TONES = [
   { n: 1, name: 'High & flat', tip: 'Hold it high and steady, like singing a note: māāā', path: 'M6 8 H46', ex: ['妈', 'mā', 'mother'] },
@@ -62,6 +63,7 @@ export function renderTones(root) {
   const rounds = Array.from({ length: ROUNDS }, (_, i) => (i % 2 && fromWords.length ? fromWords[(i >> 1) % fromWords.length] : fromSets[i % fromSets.length]));
   let i = 0;
   let score = 0;
+  hideNav();
 
   const show = () => {
     const [ch, py] = rounds[i];

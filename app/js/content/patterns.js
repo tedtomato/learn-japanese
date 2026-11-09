@@ -33,4 +33,39 @@ export const PATTERNS = [
     en: (w) => `To ${w}, please`,
     slots: [['w-eki', 'the station'], ['w-hoteru', 'the hotel'], ['w-kyouto', 'Kyoto'], ['w-resutoran', 'the restaurant']],
   },
+  {
+    id: 'tabemasu', jp: 'をたべます', romaji: 'o tabemasu', title: '___ をたべます', meaning: 'I eat ___', art: '🍽️',
+    en: (w) => `I eat ${w}`,
+    slots: [['w-sushi', 'sushi'], ['w-raamen', 'ramen'], ['w-gohan', 'rice'], ['w-sakana', 'fish'], ['w-niku', 'meat'], ['w-yasai', 'vegetables'], ['w-ringo', 'an apple'], ['w-tamago', 'an egg']],
+  },
+  {
+    id: 'nomimasu', jp: 'をのみます', romaji: 'o nomimasu', title: '___ をのみます', meaning: 'I drink ___', art: '🥤',
+    en: (w) => `I drink ${w}`,
+    slots: [['w-mizu', 'water'], ['w-ocha', 'green tea'], ['w-koohii', 'coffee'], ['w-biiru', 'beer'], ['w-nihonshu', 'sake'], ['w-oyu', 'hot water'], ['w-osake', 'alcohol']],
+  },
+  {
+    id: 'tabemasen', jp: 'をたべません', romaji: 'o tabemasen', title: '___ をたべません', meaning: 'I do not eat ___', art: '🙅',
+    en: (w) => `I do not eat ${w}`,
+    slots: [['w-niku', 'meat'], ['w-sakana', 'fish'], ['w-tamago', 'eggs'], ['w-yasai', 'vegetables'], ['w-sushi', 'sushi'], ['w-raamen', 'ramen']],
+  },
+  {
+    id: 'nomimasen', jp: 'をのみません', romaji: 'o nomimasen', title: '___ をのみません', meaning: 'I do not drink ___', art: '❌',
+    en: (w) => `I do not drink ${w}`,
+    slots: [['w-biiru', 'beer'], ['w-osake', 'alcohol'], ['w-koohii', 'coffee'], ['w-ocha', 'green tea'], ['w-mizu', 'water']],
+  },
+  {
+    id: 'tabemashita', jp: 'をたべました', romaji: 'o tabemashita', title: '___ をたべました', meaning: 'I ate ___', art: '😋',
+    en: (w) => `I ate ${w}`,
+    slots: [['w-sushi', 'sushi'], ['w-raamen', 'ramen'], ['w-gohan', 'rice'], ['w-sakana', 'fish'], ['w-ringo', 'an apple'], ['w-tamago', 'an egg'], ['w-yasai', 'vegetables']],
+  },
+  {
+    id: 'nomimashita', jp: 'をのみました', romaji: 'o nomimashita', title: '___ をのみました', meaning: 'I drank ___', art: '🍻',
+    en: (w) => `I drank ${w}`,
+    slots: [['w-mizu', 'water'], ['w-ocha', 'green tea'], ['w-koohii', 'coffee'], ['w-biiru', 'beer'], ['w-nihonshu', 'sake'], ['w-osake', 'alcohol']],
+  },
+  {
+    id: 'hoshii', jp: 'がほしいです', romaji: 'ga hoshii desu', title: '___ がほしいです', meaning: 'I want ___', art: '🙏',
+    en: (w) => `I want ${w}`,
+    slots: [['w-mizu', 'water'], ['w-koohii', 'coffee'], ['w-biiru', 'beer'], ['w-kippu', 'a ticket'], ['w-ocha', 'green tea'], ['w-ringo', 'an apple'], ['w-hon', 'a book'], ['w-kasa', 'an umbrella']],
+  },
 ];

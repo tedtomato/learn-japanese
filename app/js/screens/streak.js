@@ -1,6 +1,7 @@
 // Streak calendar: opened by tapping the flame in the top bar. Shows each month with the days
 // studied (flame), daily goal reached (gold), and today; arrows move between months.
 import { app, modal } from '../app.js';
+import { L } from '../lang.js';
 import { html, $ } from '../dom.js';
 import { icon } from '../icons.js';
 import { dayKey, displayStreak, studiedToday } from '../progress.js';
@@ -44,7 +45,7 @@ export function showStreakCalendar() {
 
   const render = () => {
     const root = $('#modal');
-    $('.cal-title', root).textContent = new Date(year, month, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    $('.cal-title', root).textContent = new Date(year, month, 1).toLocaleDateString(L.gloss === 'French' ? 'fr-FR' : 'en-GB', { month: 'long', year: 'numeric' });
     $('.cal-days', root).innerHTML = monthGrid(year, month, state, now).map((c) => c.__raw).join('');
     $('.cal-next', root).disabled = year === at.getFullYear() && month === at.getMonth();
   };

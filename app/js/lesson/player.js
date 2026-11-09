@@ -148,38 +148,38 @@ function startTimer(root, s, seconds) {
     return;
   }
   box.classList.remove('idle', 'late', 'urgent');
-  const t = { limit: seconds * 1000, started: performance.now(), late: false, lastTick: null };
-  s.timer = t;
+  const tm = { limit: seconds * 1000, started: performance.now(), late: false, lastTick: null };
+  s.timer = tm;
   const n = $('.timer-n', box);
   const bar = $('.timer-bar i', box);
   const tick = () => {
-    const left = t.limit - (performance.now() - t.started);
+    const left = tm.limit - (performance.now() - tm.started);
     const secs = Math.max(0, Math.ceil(left / 1000));
     n.textContent = `${secs}s`;
-    bar.style.width = `${Math.max(0, (left / t.limit) * 100)}%`;
-    if (secs <= 3 && secs > 0 && t.lastTick !== secs) {
-      t.lastTick = secs;
+    bar.style.width = `${Math.max(0, (left / tm.limit) * 100)}%`;
+    if (secs <= 3 && secs > 0 && tm.lastTick !== secs) {
+      tm.lastTick = secs;
       box.classList.add('urgent');
       sfx('tick');
     }
-    if (left <= 0 && !t.late) {
-      t.late = true;
+    if (left <= 0 && !tm.late) {
+      tm.late = true;
       box.classList.add('late');
       sfx('timeup');
       n.textContent = "Time's up";
     }
   };
   tick();
-  t.handle = setInterval(tick, 200);
+  tm.handle = setInterval(tick, 200);
 }
 
 function stopTimer(s) {
-  const t = s.timer;
-  if (!t) return null;
-  clearInterval(t.handle);
+  const tm = s.timer;
+  if (!tm) return null;
+  clearInterval(tm.handle);
   s.timer = null;
-  const elapsed = performance.now() - t.started;
-  return { elapsed, late: t.late || elapsed > t.limit, ratio: elapsed / t.limit };
+  const elapsed = performance.now() - tm.started;
+  return { elapsed, late: tm.late || elapsed > tm.limit, ratio: elapsed / tm.limit };
 }
 
 // ---------- Flow ----------
@@ -470,10 +470,10 @@ function karaoke(root, text, el) {
   const starts = [];
   let pos = 0;
   units.forEach((u) => {
-    const t = (u.tagName === 'RUBY' ? rubyText(u) : u.textContent).trim();
-    const at = text.indexOf(t, pos);
+    const piece = (u.tagName === 'RUBY' ? rubyText(u) : u.textContent).trim();
+    const at = text.indexOf(piece, pos);
     starts.push(at === -1 ? pos : at);
-    pos = (at === -1 ? pos : at) + t.length;
+    pos = (at === -1 ? pos : at) + piece.length;
   });
   let timer = null;
   let current = -1;
@@ -576,14 +576,14 @@ function renderTrace(root, s) {
   wirePlay(root, s);
   sayAs(root, s.speaker, speechOf(item));
   const status = $('.trace-status', root);
-  const t = mountTrace($('.trace-host', root), item.jp, {
+  const tracer = mountTrace($('.trace-host', root), item.jp, {
     rounds: kana ? 2 : 1,
     onProgress: ({ round, rounds, index, total }) => {
       status.textContent = `${round === 1 ? 'Follow the arrow' : 'Now from memory'} · stroke ${Math.min(index + 1, total)} of ${total}${rounds > 1 ? ` · round ${round}/${rounds}` : ''}`;
     },
     onDone: () => result(root, s, true, { meaning: `${item.jp} = ${item.romaji || item.en}`, timing: null }),
   });
-  $('.replay', root).addEventListener('click', () => t.replay());
+  $('.replay', root).addEventListener('click', () => tracer.replay());
   footer(root, s, { canCheck: false, text: 'Continue', skip: { label: 'Skip', onSkip: () => { s.done += 1; next(root, s); } } });
 }
 
@@ -1061,14 +1061,14 @@ function renderDialogue(root, s) {
 function renderTidbit(root, s) {
   const unit = s.node?.unit;
   // Mostly a fun fact about the country; about one break in four shows a kanji to spot (it then comes back in Practice).
-  const t = nextTidbit(app.state, Math.random, ['fact', 'kanji'], { facts: unit?.facts });
+  const tid = nextTidbit(app.state, Math.random, ['fact', 'kanji'], { facts: unit?.facts });
   app.save();
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-purple">Quick break</span></p>
-    ${speakerBubble(s, t.kind === 'kanji' ? `Here's a ${L.charOne} you'll see in ${L.country}…` : `Did you know? A fun fact about ${L.country}…`)}
-    ${tidbitCard(t.kind, t.item)}`);
+    ${speakerBubble(s, tid.kind === 'kanji' ? `Here's a ${L.charOne} you'll see in ${L.country}…` : `Did you know? A fun fact about ${L.country}…`)}
+    ${tidbitCard(tid.kind, tid.item)}`);
   $$('.tidbit [data-say]', root).forEach((b) => b.addEventListener('click', () => sayAs(root, s.speaker, b.dataset.say)));
   wireShare($('.lesson-body', root));
-  if (t.kind === 'phrase') sayAs(root, s.speaker, t.item.jp.replace(/[～~]/g, ''));
+  if (tid.kind === 'phrase') sayAs(root, s.speaker, tid.item.jp.replace(/[～~]/g, ''));
   footer(root, s, { canCheck: true, text: t('Continue'), onCheck: () => { s.done += 1; next(root, s); } });
 }
 
@@ -1081,8 +1081,8 @@ const RENDERERS = {
 function weekStrip(now) {
   const days = [];
   for (let i = 6; i >= 0; i--) {
-    const t = now - i * 86400000;
-    days.push({ label: new Date(t).toLocaleDateString('en-GB', { weekday: 'short' }).slice(0, 2), on: (app.state.daily[dayKey(t)] || 0) > 0, today: i === 0 });
+    const day = now - i * 86400000;
+    days.push({ label: new Date(day).toLocaleDateString('en-GB', { weekday: 'short' }).slice(0, 2), on: (app.state.daily[dayKey(day)] || 0) > 0, today: i === 0 });
   }
   return html`<div class="week">${days.map((d) => html`<div class="day ${d.on ? 'on' : ''} ${d.today ? 'today' : ''}"><small>${d.label}</small><i>${d.on ? icon('check', 16) : ''}</i></div>`)}</div>`;
 }

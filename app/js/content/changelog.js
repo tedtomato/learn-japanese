@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.93', date: '9 Nov 2026', changes: [
+    'Fixed: the "Quick break" fun-fact card in a lesson crashed the lesson since 0.92',
+  ] },
   { version: '0.92', date: '5 Nov 2026', changes: [
     'French, Spanish and English: typed answers are checked letter by letter now — "vos" is no longer accepted for "vous", or "ano" for "año" (accents and capitals still don\'t matter, and "soeur" works for "sœur")',
     'Building a sentence from word tiles no longer accepts words glued together (par + le is not "parle")',

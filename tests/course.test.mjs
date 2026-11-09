@@ -146,3 +146,12 @@ test('every course builds: no two different words share an id', () => {
     assert.ok(Number(run()) > 100, `${code} builds`);
   }
 });
+
+// The lesson player imports the translation helper `t`; a local `const t = …` would hide it and make
+// the next `t('…')` call throw inside that screen (it happened once in the quick-break card).
+test('no local variable hides the t() translation helper in the lesson player', async () => {
+  const { readFileSync } = await import('node:fs');
+  const src = readFileSync(new URL('../app/js/lesson/player.js', import.meta.url), 'utf8');
+  const shadowing = [...src.matchAll(/^\s*(?:const|let|var) t\b/gm)].map((m) => src.slice(0, m.index).split('\n').length);
+  assert.deepEqual(shadowing, [], `player.js lines ${shadowing.join(', ')} declare a local "t"`);
+});

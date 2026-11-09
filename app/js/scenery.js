@@ -2,6 +2,7 @@
 // little bonsai trees, zen stones, bushes and lanterns beside it, with pebbles and moss along its edges,
 // and small streams crossed on stepping stones.
 import { raw } from './dom.js';
+import { L } from './lang.js';
 
 const DECOR = {
   bonsai: `<svg viewBox="0 0 64 64"><path d="M20 54h24l-3 8H23z" fill="#a8613a"/><rect x="17" y="51" width="30" height="5" rx="2" fill="#c97a4a"/>
@@ -26,36 +27,80 @@ export function decorFor(i) {
   return raw(`<span class="decor decor-${kind}" aria-hidden="true">${DECOR[kind]}</span>`);
 }
 
+// The trail as a polyline of its cubic segments, so points along it come from arithmetic instead of the
+// browser's getPointAtLength (which cost ~350 ms per redraw). 24 samples per segment is well under a pixel off.
+const SAMPLES = 24;
+function trailCurve(pts) {
+  const xs = [pts[0].x];
+  const ys = [pts[0].y];
+  const cum = [0];
+  let d = `M${pts[0].x} ${pts[0].y}`;
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i - 1];
+    const b = pts[i];
+    const my = (a.y + b.y) / 2;
+    d += ` C${a.x} ${my} ${b.x} ${my} ${b.x} ${b.y}`;
+    for (let k = 1; k <= SAMPLES; k++) {
+      const t = k / SAMPLES;
+      const u = 1 - t;
+      // Control points (a.x, my) and (b.x, my): the x and y polynomials of the cubic.
+      const x = u * u * u * a.x + 3 * u * u * t * a.x + 3 * u * t * t * b.x + t * t * t * b.x;
+      const y = u * u * u * a.y + 3 * u * u * t * my + 3 * u * t * t * my + t * t * t * b.y;
+      const n = xs.length - 1;
+      cum.push(cum[n] + Math.hypot(x - xs[n], y - ys[n]));
+      xs.push(x);
+      ys.push(y);
+    }
+  }
+  const total = cum[cum.length - 1];
+  // Point at arc length s (clamped), linear between samples.
+  const at = (s) => {
+    if (s <= 0) return { x: xs[0], y: ys[0] };
+    if (s >= total) return { x: xs[xs.length - 1], y: ys[ys.length - 1] };
+    let lo = 0;
+    let hi = cum.length - 1;
+    while (hi - lo > 1) {
+      const mid = (lo + hi) >> 1;
+      if (cum[mid] <= s) lo = mid;
+      else hi = mid;
+    }
+    const f = (s - cum[lo]) / ((cum[hi] - cum[lo]) || 1);
+    return { x: xs[lo] + (xs[hi] - xs[lo]) * f, y: ys[lo] + (ys[hi] - ys[lo]) * f };
+  };
+  return { d, total, at };
+}
+
 // Draws the trail behind the nodes of each unit's track (call after the path is on screen).
+// All layout reads happen first, then the SVGs are written, so the browser lays out once. A track whose
+// size and node positions did not change keeps its trail (the second call after fonts load is then free).
 export function drawTrails(root) {
-  root.querySelectorAll('.track').forEach((track) => {
-    track.querySelector('.trail')?.remove();
+  const jobs = [...root.querySelectorAll('.track')].map((track) => {
     const box = track.getBoundingClientRect();
     const pts = [...track.querySelectorAll('.node')].map((n) => {
       const r = n.getBoundingClientRect();
       return { x: r.left + r.width / 2 - box.left, y: r.top + r.height / 2 - box.top };
     });
-    if (pts.length < 2) return;
-    let d = `M${pts[0].x} ${pts[0].y}`;
-    for (let i = 1; i < pts.length; i++) {
-      const a = pts[i - 1];
-      const b = pts[i];
-      const my = (a.y + b.y) / 2;
-      d += ` C${a.x} ${my} ${b.x} ${my} ${b.x} ${b.y}`;
-    }
+    const rows = [...track.querySelectorAll('.node-row')].map((row) => row.classList.contains('stream-after'));
+    const sig = `${box.width.toFixed(1)}x${box.height.toFixed(1)}|${pts.map((p) => `${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ')}|${rows.map((r) => (r ? 1 : 0)).join('')}`;
+    return { track, box, pts, rows, sig };
+  });
+  for (const { track, box, pts, rows, sig } of jobs) {
+    if (track.__trailSig === sig && track.querySelector('.trail')) continue;
+    track.querySelector('.trail')?.remove();
+    track.__trailSig = sig;
+    if (pts.length < 2) continue;
+    const curve = trailCurve(pts);
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'trail');
     svg.setAttribute('width', box.width);
     svg.setAttribute('height', box.height);
-    const rows = [...track.querySelectorAll('.node-row')];
-    const streams = rows.flatMap((row, i) => (row.classList.contains('stream-after') && pts[i + 1] ? [(pts[i].y + pts[i + 1].y) / 2] : []));
+    const streams = rows.flatMap((after, i) => (after && pts[i + 1] ? [(pts[i].y + pts[i + 1].y) / 2] : []));
     // Water over the trail, so where they meet only the stepping stones show.
-    svg.innerHTML = `<path d="${d}" class="trail-bed"/><path d="${d}" class="trail-stones"/>`
-      + streams.map((y) => streamPath(y, box.width)).join('');
-    const bed = svg.querySelector('.trail-bed');
-    svg.insertAdjacentHTML('beforeend', edging(bed, box.width, pts, streams) + streams.map((y) => bridge(bed, y)).join(''));
+    svg.innerHTML = `<path d="${curve.d}" class="trail-bed"/><path d="${curve.d}" class="trail-stones"/>`
+      + streams.map((y) => streamPath(y, box.width)).join('')
+      + edging(curve, box.width, pts, streams) + streams.map((y) => bridge(curve, y)).join('');
     track.prepend(svg);
-  });
+  }
 }
 
 // Same numbers on every redraw, so the pebbles don't jump around.
@@ -66,11 +111,11 @@ const noise = (n) => {
 
 // Zen pebbles and moss tufts scattered along both edges of the trail.
 function edging(path, width, nodes, streams = []) {
-  const len = path.getTotalLength();
+  const len = path.total;
   const out = [];
   for (let at = 20, i = 0; at < len - 20; at += 12 + noise(i) * 14, i += 1) {
-    const p = path.getPointAtLength(at);
-    const q = path.getPointAtLength(Math.min(at + 1, len));
+    const p = path.at(at);
+    const q = path.at(Math.min(at + 1, len));
     const dx = q.x - p.x;
     const dy = q.y - p.y;
     const n = Math.hypot(dx, dy) || 1;
@@ -113,17 +158,17 @@ function streamPath(y, width) {
 
 // Where the trail meets a stream, it crosses on flat stepping stones in the water.
 function bridge(path, y) {
-  const len = path.getTotalLength();
+  const len = path.total;
   let lo = 0;
   let hi = len;
   for (let k = 0; k < 24; k++) {
     const mid = (lo + hi) / 2;
-    if (path.getPointAtLength(mid).y < y) lo = mid;
+    if (path.at(mid).y < y) lo = mid;
     else hi = mid;
   }
   const sizes = [[11, 7], [13, 8], [12, 7.5]];
   const stones = [-16, 0, 16].map((d, i) => {
-    const p = path.getPointAtLength(Math.min(len, Math.max(0, lo + d)));
+    const p = path.at(Math.min(len, Math.max(0, lo + d)));
     const [rx, ry] = sizes[i];
     const x = p.x + (i === 1 ? 3 : -2);
     return `<ellipse cx="${x.toFixed(1)}" cy="${(p.y + 3).toFixed(1)}" rx="${rx + 3}" ry="${ry + 2}" class="stone-ripple"/>
@@ -133,7 +178,10 @@ function bridge(path, y) {
   return `<g class="bridge">${stones}</g>`;
 }
 
-// End of the path: a roadblock with cones and a 工事中 ("under construction") sign.
+// End of the path: a roadblock with cones and a "roadworks" sign in the course's language (工事中, 施工中, Travaux…).
+// Japanese and Chinese use their own fonts; the Latin courses use the app font, never the Japanese one.
+const SIGN_W = L.latin ? 80 : 48;
+const SIGN_FONT = L.latin ? "'Nunito Sans', system-ui, sans-serif" : L.code === 'ja' ? "'M PLUS Rounded 1c', sans-serif" : "system-ui, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif";
 export const ROADBLOCK = `<svg class="roadblock" viewBox="0 0 220 150" role="img" aria-label="Road under construction">
   <defs><pattern id="rb-stripes" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
     <rect width="24" height="24" fill="#ff9600"/><rect width="12" height="24" fill="#fff"/></pattern></defs>
@@ -144,8 +192,8 @@ export const ROADBLOCK = `<svg class="roadblock" viewBox="0 0 220 150" role="img
   <rect x="18" y="88" width="184" height="22" rx="6" fill="url(#rb-stripes)" stroke="#e08500" stroke-width="3"/>
   <circle cx="43" cy="36" r="7" fill="#ffd23f"><animate attributeName="opacity" values="1;.25;1" dur="1.2s" repeatCount="indefinite"/></circle>
   <circle cx="177" cy="36" r="7" fill="#ffd23f"><animate attributeName="opacity" values=".25;1;.25" dur="1.2s" repeatCount="indefinite"/></circle>
-  <g transform="translate(86 8)"><rect width="48" height="30" rx="5" fill="#fff" stroke="#e5484d" stroke-width="3"/>
-    <text x="24" y="21" text-anchor="middle" font-size="15" font-weight="800" fill="#e5484d" font-family="'M PLUS Rounded 1c', sans-serif">工事中</text></g>
+  <g transform="translate(${110 - SIGN_W / 2} 8)"><rect width="${SIGN_W}" height="30" rx="5" fill="#fff" stroke="#e5484d" stroke-width="3"/>
+    <text x="${SIGN_W / 2}" y="${L.latin ? 20 : 21}" text-anchor="middle" font-size="${L.latin ? 13 : 15}" font-weight="800" fill="#e5484d" font-family="${SIGN_FONT}">${L.roadworks}</text></g>
   <g transform="translate(2 100)"><path d="M10 36 16 4h6l6 32z" fill="#ff9600"/><path d="M12 26h14l1 5H11z" fill="#fff"/><rect x="4" y="34" width="30" height="5" rx="2" fill="#e08500"/></g>
   <g transform="translate(184 100)"><path d="M10 36 16 4h6l6 32z" fill="#ff9600"/><path d="M12 26h14l1 5H11z" fill="#fff"/><rect x="4" y="34" width="30" height="5" rx="2" fill="#e08500"/></g>
 </svg>`;

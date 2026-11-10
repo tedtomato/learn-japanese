@@ -17,6 +17,8 @@ import {
   reviewEstimate, REVIEW_FIRST_MIN, unitIsLocked, unitReview, TESTOUT_PASS, weeklyRecap, showRecap, weekKey, suggestGoal, unitLessonsDone,
 } from '../progress.js';
 import { strength } from '../srs.js';
+import { readResume, clearResume } from '../resume.js';
+import { maybeShowIntro } from './intro.js';
 
 const OFFSETS = [0, 44, 70, 44, 0, -44, -70, -44];
 const CHEERS = L.cheers;
@@ -36,6 +38,17 @@ function reviewCard(state, now) {
     ${words.length ? html`<p class="review-words">${words.map((w) => html`<span class="jp">${w.jp}</span>`)}${due.length > words.length ? html`<span class="muted">+${due.length - words.length}</span>` : ''}</p>` : ''}
     <button class="btn btn-secondary btn-block start-review">${t('Review now')}</button>
   </section>`;
+}
+
+// A lesson left half-way (kept for 24 hours): pick it up where it stopped, or start it again.
+function resumeCard(now) {
+  const snap = readResume(now, app.testMode);
+  const node = snap && NODE_BY_ID.get(snap.nodeId);
+  if (!node || !isNodeUnlocked(app.state, node)) return '';
+  return html`<section class="card review-card resume-card"><div class="review-head"><div class="review-icon">${icon('arrow', 22)}</div>
+      <div><b>${t('Continue where you left off')}</b><span>${node.title} · ${t(snap.queue.length === 1 ? '{n} exercise left' : '{n} exercises left', { n: snap.queue.length })}</span></div></div>
+    <div class="resume-btns"><button class="btn btn-secondary resume-go" data-node="${node.id}">${t('Continue')}</button>
+      <button class="btn btn-ghost resume-again" data-node="${node.id}">${t('Start again')}</button></div></section>`;
 }
 
 // What XP and the daily goal are, with a quick way to change the goal.
@@ -274,6 +287,7 @@ export function renderLearn(root) {
       ${xp >= goal ? html`<span class="pill pill-gold">${icon('check', 14)} ${t('Done!')}</span>` : ''}
       <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (xp / goal) * 100)}%"></div></div>
     </section>
+    ${resumeCard(now)}
     ${reviewCard(state, now)}
     ${recapCard(state, now)}
     ${SECTIONS.map((section, s) => html`
@@ -302,6 +316,11 @@ export function renderLearn(root) {
   );
   root.addEventListener('click', () => document.querySelector('.popover')?.remove());
   $('.start-review', root)?.addEventListener('click', () => app.go('#/practice/go'));
+  $('.resume-go', root)?.addEventListener('click', (e) => app.go(`#/lesson/${e.currentTarget.dataset.node}/resume`));
+  $('.resume-again', root)?.addEventListener('click', (e) => {
+    clearResume(app.testMode);
+    app.go(`#/lesson/${e.currentTarget.dataset.node}`);
+  });
   $('.goal-card', root).addEventListener('click', explainGoal);
   $('.goal-card', root).addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
@@ -329,12 +348,15 @@ export function renderLearn(root) {
   // Bring the current node into view on first paint (the path is long: a new learner starts at the top, a
   // returning one where they left off). Done now, so there is no jump, and again once the trails are drawn.
   const target = $('.st-current', root) || $('.unit', root);
-  const reveal = () => target?.scrollIntoView({ block: 'center' });
+  // A lesson to continue sits at the top: show it first, until the learner scrolls on.
+  const resume = $('.resume-card', root);
+  const reveal = () => (resume ? window.scrollTo(0, 0) : target?.scrollIntoView({ block: 'center' }));
   reveal();
   requestAnimationFrame(() => {
     drawTrails(root);
     reveal();
   });
   welcomeBack(state, now);
+  maybeShowIntro();
   document.fonts?.ready.then(() => drawTrails(root));
 }

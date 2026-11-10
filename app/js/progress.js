@@ -41,7 +41,7 @@ export function defaultState(now = Date.now()) {
     answers: {}, // day → [right, wrong] answers that day (for the weekly recap)
     recapWeek: null, // the week (its Monday) whose recap card was dismissed
     backupAt: null, // when the last backup was saved
-    settings: { theme: 'system', sfx: true, voiceRate: 0.85, speaking: true }, // speed: unset = on after 2 lessons (see speedOn)
+    settings: { theme: 'system', textSize: 'normal', sfx: true, voiceRate: 0.85, speaking: true }, // speed: unset = on after 2 lessons (see speedOn)
   };
 }
 

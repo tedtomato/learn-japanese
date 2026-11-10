@@ -12,7 +12,7 @@ const load = (p) => { try { return require(p); } catch { return null; } };
 const playwright = load('playwright') || load(process.env.PLAYWRIGHT_PATH || '/opt/node22/lib/node_modules/playwright');
 if (!playwright) throw new Error('Playwright not found: npm i --no-save playwright && npx playwright install chromium');
 
-const PORT = 4190;
+const PORT = Number(process.env.SCREENS_PORT) || 4190; // SCREENS_PORT lets several checks run side by side
 const MIN_TEXT = 13; // px, any text you read
 const MIN_RUBY = 12; // px, romaji above Japanese
 const shotsAt = process.argv.includes('--shots') ? process.argv[process.argv.indexOf('--shots') + 1] : null;
@@ -49,6 +49,9 @@ try {
         const r = el.getBoundingClientRect();
         if (!r.width || !r.height || cs.visibility === 'hidden' || +cs.opacity === 0) continue;
         if (r.bottom < 0 || r.top > innerHeight) continue; // only what is on screen
+        // A swipeable card that is not the one showing sits beside the track on purpose.
+        const card = el.closest('.intro-card');
+        if (card && Math.abs(card.getBoundingClientRect().left - card.parentElement.getBoundingClientRect().left) > 2) continue;
         const label = `"${text.slice(0, 30)}"`;
         const size = parseFloat(cs.fontSize);
         const ruby = !!el.closest('rt');
@@ -144,7 +147,114 @@ try {
       await continueLesson();
       await page.waitForTimeout(350);
     }
+
+    // ---- Usability ----
+    const need = async (selector, what) => { if (!(await page.$(selector))) problems.push(`${course.code}: ${what} is missing`); };
+    const press = async (selector) => { await page.click(selector); await page.waitForTimeout(350); };
+    // Resume: leaving mid-lesson offers it on the Learn screen and when the lesson is opened again.
+    await go('#/learn', 700);
+    await need('.resume-card', 'the "continue where you left off" card');
+    await check('learn-resume', theme);
+    await go(`#/lesson/${course.lesson}`, 700);
+    await need('#modal.open .sheet', 'the resume question');
+    await check('resume-modal', theme);
+    await press('#modal [data-i="0"]');
+    await check('resume-continued', theme);
+    await go('#/learn', 500);
+    await go(`#/lesson/${course.lesson}`, 700);
+    await press('#modal [data-i="1"]'); // Start again
+    // "I mistyped": a typed answer marked wrong can be counted as right (twice at most).
+    await go('#/lab/typed', 800);
+    for (let round = 1; round <= 3; round++) {
+      if (!(await page.$('.recall-input:not([disabled])'))) { problems.push(`${course.code}: typed task ${round} did not appear`); break; }
+      await page.fill('.recall-input', 'qqqq');
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(400);
+      if (round === 1) await check('typed-wrong', theme);
+      const shown = !!(await page.$('.mistyped'));
+      if (shown !== (round <= 2)) problems.push(`${course.code}: "I mistyped" ${shown ? 'shown' : 'missing'} on try ${round}`);
+      if (shown) {
+        await press('.mistyped');
+        if (!(await page.$('.lesson-foot.good'))) problems.push(`${course.code}: "I mistyped" did not turn the answer into a right one`);
+        if (round === 1) await check('typed-mistyped', theme);
+      }
+      await continueLesson();
+      await page.waitForTimeout(500);
+    }
+    // Hardest words (Library) and the practice session on them.
+    await go('#/practice/library', 500);
+    await need('.hardest-card', 'the hardest-words list');
+    await go('#/practice/hardest-go', 800);
+    await need('.lesson-body', 'the hardest-words practice session');
+    // Search and the show-to-staff card in the phrasebook.
+    await go('#/collection/phrase', 500);
+    await page.fill('.search-input', 'qzxqzx');
+    await page.waitForTimeout(150);
+    await need('.search-none:not([hidden])', 'the "nothing matches" line');
+    await check('phrasebook-search-none', theme);
+    await page.fill('.search-input', '');
+    await page.dispatchEvent('.search-input', 'input');
+    await press('.show-btn');
+    await need('.show-card', 'the show card');
+    await check('show-card', theme);
+    await page.click('.show-card');
+    await page.waitForTimeout(200);
+    // The first-run cards, from Profile.
+    await go('#/profile', 500);
+    await press('.how-it-works');
+    await need('.intro-card', 'the first-run cards');
+    await check('intro-1', theme);
+    for (let k = 2; k <= 4; k++) { await press('.intro-next'); await check(`intro-${k}`, theme); }
+    await press('.intro-next');
   }
+
+  // Large text: the same learner, a few screens, nothing may overflow.
+  for (const course of COURSES.filter((c) => ['ja', 'fr', 'en'].includes(c.code))) {
+    await page.goto(`http://localhost:${PORT}/`);
+    await page.evaluate((code) => { localStorage.setItem('hajime.course', code); localStorage.setItem('hajime.test-mode', '1'); }, course.code);
+    await page.reload();
+    await page.waitForSelector('.splash[data-ready]');
+    await page.waitForTimeout(500);
+    await page.tap('.splash');
+    await page.waitForTimeout(500);
+    await page.evaluate(async (stopAt) => {
+      const src = [...document.scripts].find((s) => s.type === 'module').src;
+      const q = src.includes('?') ? src.slice(src.indexOf('?')) : '';
+      const base = src.replace(/main\.js.*/, '');
+      const { app } = await import(`${base}app.js${q}`);
+      const { NODES } = await import(`${base}course.js${q}`);
+      const now = Date.now();
+      for (const n of NODES) {
+        if (n.unit.id === stopAt) break;
+        app.state.nodes[n.id] = { level: 1 };
+        for (const id of n.items || []) app.state.items[id] = { box: 1, seen: 2, right: 2, wrong: id.length % 3 ? 0 : 1, last: now, due: now + 1e8, ...(id.length % 5 ? {} : { missed: now }) };
+      }
+      app.state.settings.textSize = 'large';
+      app.save();
+    }, course.stopAt);
+    for (const [hash, name] of [['#/learn', 'learn'], ['#/practice/library', 'practice-library'], ['#/profile', 'profile'], ['#/collection/phrase', 'phrasebook'], ['#/courses', 'languages']]) {
+      await go(hash);
+      await check(`large-${name}`, course.code);
+    }
+    await go(`#/lesson/${course.lesson}`, 900);
+    for (let k = 1; k <= 4; k++) {
+      await check(`large-lesson-${k}`, course.code);
+      await continueLesson();
+      await page.waitForTimeout(350);
+    }
+    const root = await page.evaluate(() => getComputedStyle(document.documentElement).fontSize);
+    if (root !== '18.4px') problems.push(`${course.code}: Large text should make the root font 18.4px, it is ${root}`);
+  }
+
+  // A tablet: the layout centres at a maximum width instead of stretching.
+  await page.setViewportSize({ width: 820, height: 1180 });
+  for (const [hash, name] of [['#/learn', 'learn'], ['#/practice/library', 'practice-library'], ['#/collection/phrase', 'phrasebook']]) {
+    await go(hash);
+    await check(`tablet-${name}`, 'tablet');
+    const wide = await page.evaluate(() => Math.round((document.querySelector('.page')?.getBoundingClientRect().width) || 0));
+    if (wide > 640) problems.push(`tablet ${name}: the page is ${wide}px wide, it should stop at a maximum width`);
+  }
+  await page.setViewportSize({ width: 393, height: 851 });
 } finally {
   await browser.close();
   server.kill();

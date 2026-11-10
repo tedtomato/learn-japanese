@@ -33,8 +33,11 @@
     // Apply the saved theme before first paint to avoid a flash.
     try {
       var keys = { ja: 'hajime.progress.v1', zh: 'hajime.zh.progress.v1', fr: 'hajime.fr.progress.v1', es: 'hajime.es.progress.v1', en: 'hajime.en.progress.v1' };
-      var t = JSON.parse(localStorage.getItem(keys[localStorage.getItem('hajime.course')] || keys.ja) || '{}').settings?.theme;
+      var settings = JSON.parse(localStorage.getItem(keys[localStorage.getItem('hajime.course')] || keys.ja) || '{}').settings || {};
+      var t = settings.theme;
       if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      var size = { small: 90, large: 115, xlarge: 130 }[settings.textSize];
+      if (size) document.documentElement.style.fontSize = size + '%';
     } catch (e) {}
   </script>
   <script type="module" src="js/main.js"></script>
@@ -42,10 +45,9 @@
 <body>
   <!--SPLASH-->
   <script>
-    // The start screen above is only for phones and only on a fresh start (js/fx.js takes it over).
+    // The start screen above is only for touch devices (phones and tablets) and only on a fresh start (js/fx.js takes it over).
     try {
-      var ua = navigator.userAgent;
-      var phone = /Android|iPhone|iPod|Mobile/i.test(ua) && (matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0) && Math.min(screen.width, screen.height) <= 600;
+      var phone = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
       var skip = sessionStorage.getItem('hajime.skip-splash') === '1';
       var s = document.querySelector('.splash');
       if (s && (!phone || skip)) s.remove();

@@ -1,6 +1,13 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.97', date: '10 Nov 2026', changes: [
+    'New: three daily quests on the Learn screen with gem rewards — finish all three to open a chest (20 gems + 15 minutes of double XP)',
+    'Double XP: earned from the quests chest, and your first lesson on a Sunday counts double; a timer shows while it lasts',
+    'Set the date of your trip in Profile and watch the days count down on the Learn screen, with how many lessons a day get you through section 1',
+    'Lost your streak? Repair it for 100 gems within two days',
+    'Evening reminders warn you when your streak ends tonight, and every reminder brings a word of the day',
+  ] },
   { version: '0.96', date: '10 Nov 2026', changes: [
     'The Chinese course has a panda friend instead of the dog',
     'Each course has its own garden: bamboo, a pagoda and red lanterns for Chinese, lavender and a street lamp for French, an olive tree and a sunny fountain for Spanish, phone boxes and hedges for English',

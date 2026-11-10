@@ -12,7 +12,7 @@ const load = (p) => { try { return require(p); } catch { return null; } };
 const playwright = load('playwright') || load(process.env.PLAYWRIGHT_PATH || '/opt/node22/lib/node_modules/playwright');
 if (!playwright) throw new Error('Playwright not found: npm i --no-save playwright && npx playwright install chromium');
 
-const PORT = 4190;
+const PORT = Number(process.env.SCREENS_PORT) || 4190; // SCREENS_PORT lets several checks run side by side
 const MIN_TEXT = 13; // px, any text you read
 const MIN_RUBY = 12; // px, romaji above Japanese
 const shotsAt = process.argv.includes('--shots') ? process.argv[process.argv.indexOf('--shots') + 1] : null;

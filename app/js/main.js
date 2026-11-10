@@ -3,7 +3,7 @@ import { app, applySettings, closeLayer, toast } from './app.js';
 import { html, mount, raw, $, fitText } from './dom.js';
 import { icon } from './icons.js';
 import { renderLearn } from './screens/learn.js';
-import { renderPractice, renderCollection } from './screens/practice.js';
+import { renderPractice, renderCollection, hardestIds } from './screens/practice.js';
 import { renderProfile } from './screens/profile.js';
 import { renderLab } from './screens/lab.js';
 import { startSession, lessonKey } from './lesson/player.js';
@@ -39,9 +39,9 @@ function renderNav(active) {
   mount($('#nav'), html`${TABS.map(([id, label, ic]) => html`<a href="#/${id}" ${active === id ? raw('aria-current="page"') : ''} class="${active === id ? 'on' : ''} ${active === id && changed ? 'bounce' : ''}">${icon(ic, 26)}<span>${label}</span></a>`)}`);
 }
 
-// Phones only: progress lives on one device and cannot be shared yet, so computers and tablets
-// get a friendly "open it on your phone" screen instead of the app.
-// Computers and tablets are let through by "Continue anyway" (screen-reader and keyboard users are mostly there);
+// Phones and tablets get the app. A computer without a touch screen gets a friendly "open it on your phone"
+// screen instead (progress lives on one device and cannot be shared yet).
+// A computer is let through by "Continue anyway" (screen-reader and keyboard users are mostly there);
 // the choice is remembered on this device.
 const DESKTOP_OK = 'hajime.desktop-ok';
 function desktopOk() {
@@ -52,12 +52,10 @@ function desktopOk() {
   }
 }
 
-function isPhone() {
-  const ua = navigator.userAgent;
-  const mobile = /Android|iPhone|iPod|Mobile/i.test(ua);
-  const touch = matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
-  const small = Math.min(screen.width, screen.height) <= 600;
-  return mobile && touch && small;
+// Anything with a touch screen counts: phones, big phones and tablets (an iPad reports itself as a Mac, so the
+// browser name says nothing; touch points do).
+function isTouchDevice() {
+  return matchMedia('(pointer: coarse)').matches || navigator.maxTouchPoints > 0;
 }
 
 function phoneOnly() {
@@ -65,13 +63,13 @@ function phoneOnly() {
   const url = location.href.split('#')[0].split('?')[0];
   mount($('#view'), html`<div class="gate">
     ${mascot('happy', 130)}
-    <h1>Hajime is made for your phone</h1>
-    <p>Lessons, listening and speaking are designed for a phone in your hand — and your progress is saved on one device, so it can't move between computer and phone yet.</p>
-    <p>Open this address on your phone:</p>
+    <h1>${t('Hajime is made for phones and tablets')}</h1>
+    <p>${t('Lessons, listening and speaking are designed for a device in your hand — and your progress is saved on one device, so it can\'t move between computer and phone yet.')}</p>
+    <p>${t('Open this address on your phone or tablet:')}</p>
     <p class="gate-url">${url.replace(/^https?:\/\//, '')}</p>
-    <p class="muted small">Then add it to your home screen to install it.</p>
-    <button class="btn btn-secondary gate-go">Continue anyway</button>
-    <p class="muted small">It works on a computer too — your progress just stays on this device.</p>
+    <p class="muted small">${t('Then add it to your home screen to install it.')}</p>
+    <button class="btn btn-secondary gate-go">${t('Continue anyway')}</button>
+    <p class="muted small">${t('It works on a computer too — your progress just stays on this device.')}</p>
   </div>`);
   $('.gate-go').addEventListener('click', () => {
     try {
@@ -98,13 +96,14 @@ function route() {
   app.inLesson = false;
   app.busy = ACTIVITIES.includes(name);
 
-  const inSession = name === 'courses' || name === 'lesson' || (name === 'practice' && (arg === 'go' || arg === 'kanji-go' || arg === 'mistakes-go' || arg === 'hiragana-go' || arg === 'katakana-go')) || (name === 'lab' && !!arg);
+  const inSession = name === 'courses' || name === 'lesson' || (name === 'practice' && (arg === 'go' || arg === 'kanji-go' || arg === 'mistakes-go' || arg === 'hardest-go' || arg === 'hiragana-go' || arg === 'katakana-go')) || (name === 'lab' && !!arg);
   document.body.classList.toggle('in-lesson', inSession);
   if (name === 'courses') renderCourses(root);
   else if (name === 'lesson') startSession(root, { nodeId: arg });
   else if (name === 'practice' && arg === 'go') startSession(root, {});
   else if (name === 'practice' && arg === 'kanji-go') startSession(root, { kanjiOnly: true });
   else if (name === 'practice' && arg === 'mistakes-go') startSession(root, { itemIds: mistakeIds(app.state).slice(0, 8) });
+  else if (name === 'practice' && arg === 'hardest-go') startSession(root, { itemIds: hardestIds(app.state).slice(0, 8) });
   else if (name === 'practice' && /^(hiragana|katakana)-go$/.test(arg)) startSession(root, { kanaScript: arg.replace('-go', '') });
   else if (name === 'lab' && arg) startSession(root, { demo: arg });
   else if (name === 'lab') renderLab(root);
@@ -157,6 +156,6 @@ function start(withSplash = true) {
 }
 
 applySettings();
-if (isPhone() || desktopOk()) start();
+if (isTouchDevice() || desktopOk()) start();
 else phoneOnly();
 initUpdates();

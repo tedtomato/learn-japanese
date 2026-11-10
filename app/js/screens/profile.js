@@ -11,6 +11,7 @@ import { versionLabel, APP_RELEASE } from '../version.js';
 import { checkForUpdate, hardRefresh } from '../update.js';
 import { askOpenLab } from './lab.js';
 import { showStreakCalendar } from './streak.js';
+import { showIntro } from './intro.js';
 import { enableReminders, disableReminders } from '../reminders.js';
 import { shareButton, wireShare } from '../share.js';
 import { t, langName } from '../strings.js';
@@ -144,6 +145,7 @@ export function renderProfile(root, focus) {
     <h2 class="sub-title">${t('Settings')}</h2>
     <div class="card settings">
       <div class="setting"><span id="set-theme">${t('Appearance')}</span>${seg('theme', s.theme, [['system', t('Auto')], ['light', t('Light')], ['dark', t('Dark')]])}</div>
+      <div class="setting"><span id="set-textSize">${t('Text size')}</span>${seg('textSize', s.textSize || 'normal', [['small', t('Small')], ['normal', t('Normal')], ['large', t('Large')], ['xlarge', t('Extra large')]])}</div>
       <div class="setting"><span id="set-dailyGoal">${t('Daily goal')}</span>${seg('dailyGoal', state.dailyGoal, [[10, t('Casual')], [20, t('Regular')], [30, t('Serious')], [50, t('Intense')]])}</div>
       <div class="setting column"><span id="set-trip">${t('When is your trip?')}<small class="muted setting-note">${t('A countdown on the Learn screen, and a goal that fits')}</small></span>
         <div class="trip-row"><input type="date" class="trip-date" aria-labelledby="set-trip" value="${s.tripDate || ''}" min="${dayKey(now)}">${s.tripDate ? html`<button class="btn btn-white btn-small trip-clear">${t('Clear')}</button>` : ''}</div></div>
@@ -178,6 +180,7 @@ export function renderProfile(root, focus) {
 
     <h2 class="sub-title">${t('About')}</h2>
     <div class="card settings">
+      <button class="setting how-it-works"><span>${t('How it works')}</span><span class="version">${t('Hearts, gems, goals ›')}</span></button>
       <button class="setting version-row"><span>${t('App version')}</span><span class="version">v${APP_RELEASE} · ${versionLabel()} ›</span></button>
       <button class="btn btn-white check-update">${icon('refresh', 18)} ${t('Check for updates')}</button>
       <button class="btn btn-ghost hard-refresh">${t('Reload latest version')}</button>
@@ -305,6 +308,7 @@ export function renderProfile(root, focus) {
     if (tapAt - lastTap < 400) askOpenLab();
     lastTap = tapAt;
   });
+  $('.how-it-works', root).addEventListener('click', showIntro);
   $('.check-update', root).addEventListener('click', () => checkForUpdate());
   // The list of releases is a big file that is only read when it is asked for.
   $('.version-row', root).addEventListener('click', async () => {

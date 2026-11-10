@@ -1397,3 +1397,73 @@ html.course-zh { --font-jp: system-ui, 'PingFang SC', 'Hiragino Sans GB', 'Noto 
 .dxp-pill { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: 999px; background: var(--purple-soft); color: var(--purple-text); font-weight: 800; font-size: 0.8125rem; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .trip-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .trip-date { font: inherit; font-size: 1rem; min-height: 44px; padding: 6px 10px; border-radius: 12px; border: 2px solid var(--border); background: var(--card); color: var(--text-strong); }
+/* ---------- Usability ---------- */
+/* Right and wrong never rely on colour alone: a tick or a cross sits on the answers that were marked. */
+.options.list .option { padding-right: 44px; }
+.option.right::after, .option.wrong::after, .answer-line.right .tile::after, .answer-line.wrong .tile::after, .sign.right::after, .sign.wrong::after {
+  position: absolute; right: 8px; top: 8px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  color: #fff; font-size: 0.9375rem; font-weight: 900; line-height: 1; pointer-events: none;
+}
+.option.right::after, .answer-line.right .tile::after, .sign.right::after { content: '✓'; background: var(--green-btn); }
+.option.wrong::after, .answer-line.wrong .tile::after, .sign.wrong::after { content: '✗'; background: var(--red-btn); }
+.options.grid .option.right::after, .options.grid .option.wrong::after { right: 5px; top: 5px; }
+.answer-line .tile { position: relative; }
+.answer-line.right .tile::after, .answer-line.wrong .tile::after { right: -8px; top: -10px; width: 22px; height: 22px; font-size: 0.8125rem; }
+.sign { position: relative; }
+.recall-input.right, .recall-input.wrong { padding-right: 52px; background-repeat: no-repeat; background-position: right 14px center; background-size: 26px; }
+.recall-input.right { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23378500'/%3E%3Cpath d='M6.5 12.5l3.5 3.5 7.5-8' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+.recall-input.wrong { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='12' fill='%23d92b2b'/%3E%3Cpath d='M8 8l8 8M16 8l-8 8' fill='none' stroke='%23fff' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E"); }
+.mistyped { min-height: 44px; }
+.fb-actions { flex-wrap: wrap; }
+
+/* Search boxes */
+.search-wrap { position: relative; margin-bottom: 10px; }
+.search-input { width: 100%; min-height: 48px; font: inherit; font-size: 1rem; font-weight: 700; padding: 10px 14px 10px 44px; border-radius: 16px; border: 2px solid var(--border); border-bottom-width: 4px; background: var(--card); color: var(--text-strong); }
+.search-input:focus { border-color: var(--focus); }
+.search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--muted); display: flex; }
+.search-none { margin: 4px 0 8px; }
+[data-q][hidden], [data-search-group][hidden] { display: none !important; }
+
+/* "Show" button on rows, and the full-screen show card */
+.word-row.has-show { grid-template-columns: 1fr auto auto; }
+.word-row.phrase-row.has-show { grid-template-columns: 1fr auto; }
+.show-btn { position: relative; z-index: 1; display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 0; min-width: 44px; min-height: 44px; padding: 2px 6px; border: 0; border-radius: 12px; background: var(--blue-soft); color: var(--blue-text); font-weight: 800; font-size: 0.8125rem; }
+.show-card { position: fixed; inset: 0; z-index: 80; background: #fff; color: #111; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: calc(24px + var(--safe-top)) 20px calc(24px + var(--safe-bottom)); text-align: center; cursor: pointer; animation: fade .15s; }
+.show-body { display: flex; flex-direction: column; align-items: center; gap: 18px; max-width: 100%; }
+.show-text { margin: 0; color: #111; font-weight: 800; line-height: 1.15; overflow-wrap: anywhere; max-width: 100%; }
+.show-say { color: #444; font-size: 1.125rem; margin: 0; }
+.show-meaning { color: #555; font-size: 1rem; margin: 0; }
+.show-tap { position: absolute; bottom: calc(18px + var(--safe-bottom)); color: #666; font-size: 0.875rem; margin: 0; }
+.show-close { position: absolute; top: calc(12px + var(--safe-top)); right: 12px; width: 48px; height: 48px; border: 0; border-radius: 50%; background: #eee; color: #111; display: grid; place-items: center; }
+
+/* Hardest words */
+.hardest-card { display: flex; flex-direction: column; gap: 10px; }
+.hardest-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.hardest-list li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; border-bottom: 2px solid var(--border); }
+.hardest-list li:last-child { border-bottom: 0; }
+.hardest-word { display: flex; flex-direction: column; min-width: 0; }
+.hardest-word .word-jp { font-size: 1.25rem; color: var(--text-strong); overflow-wrap: anywhere; }
+.hardest-word small { color: var(--muted); font-size: 0.875rem; }
+.hardest-list .pill { flex: none; }
+
+/* Resume card and first-run intro */
+.resume-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.resume-btns .btn { flex: 1; min-width: 120px; }
+.intro { gap: 8px; }
+.intro-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.intro-heading { font-size: 1rem; color: var(--muted); }
+.intro-skip { min-height: 44px; padding: 0 8px; font-weight: 800; color: var(--blue-text); background: none; border: 0; position: relative; }
+.intro-track { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.intro-track::-webkit-scrollbar { display: none; }
+.intro-card { flex: 0 0 100%; scroll-snap-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding: 8px 12px 4px; min-height: 270px; }
+.intro-card h3 { font-size: 1.5rem; }
+.intro-card p { color: var(--text); font-size: 1rem; max-width: 34ch; }
+.intro-pic { width: 96px; height: 96px; border-radius: 28px; display: grid; place-items: center; background: var(--card-2); }
+.intro-pic.c-red { color: var(--red-text); background: var(--red-soft); }
+.intro-pic.c-blue { color: var(--blue-text); background: var(--blue-soft); }
+.intro-pic.c-orange { color: var(--orange-text); background: var(--orange-soft); }
+.intro-dots { display: flex; justify-content: center; gap: 8px; padding: 4px 0; }
+.intro-dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--border); }
+.intro-dots i.on { background: var(--blue); width: 24px; border-radius: 6px; }
+.fb-actions .mistyped { flex: 1 1 100%; order: -1; margin-bottom: 0; }
+.fb-badges .pill { font-size: 0.8125rem; }

@@ -29,6 +29,8 @@ import { celebrationHtml, pickCelebration } from '../celebrate.js';
 let lastParty = null; // the last celebration shown, so the next one differs
 import { questChest } from '../screens/quests.js';
 import { shareButton, wireShare } from '../share.js';
+import { saveResume, clearResume, readResume } from '../resume.js';
+import { applySnapshot, canMistype, forgiveMistype } from '../usability.js';
 
 const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', L.cheers[2][0], 'You got it!', 'Perfect!', L.cheers[1][0]].map((p) => t(p));
 const SPEED_BONUS_MAX = 5; // XP a session can earn from quick answers
@@ -110,7 +112,29 @@ export function startSession(root, { nodeId, itemIds, demo, kanjiOnly, kanaScrip
   app.inLesson = true;
   root.__session = s;
   renderShell(root, s);
-  next(root, s);
+  offerResume(root, s);
+}
+
+// A lesson left half-way is offered again for 24 hours: continue exactly where it stopped, or start over.
+// (#/lesson/<id>/resume, from the Learn screen's card, continues without asking.)
+function offerResume(root, s) {
+  const snap = s.node && !s.testOut && !location.hash.includes('lab') ? readResume(app.now(), app.testMode, s.node.id) : null;
+  const fresh = () => {
+    if (s.node) clearResume(app.testMode);
+    next(root, s);
+  };
+  const carryOn = () => {
+    applySnapshot(s, snap);
+    next(root, s);
+  };
+  if (!snap) return fresh();
+  if (location.hash.endsWith('/resume')) return carryOn();
+  const left = snap.queue.length;
+  modal(html`<div class="center">${mascot('happy', 96)}<h2>${t('Continue where you left off?')}</h2>
+    <p class="muted">${t(left === 1 ? '{n} exercise left in this lesson.' : '{n} exercises left in this lesson.', { n: left })}</p></div>`, [
+    { label: t('Continue where you left off'), onClick: carryOn },
+    { label: t('Start again'), kind: 'secondary', onClick: fresh },
+  ], { dismissable: false });
 }
 
 // Jumps straight to the lesson-complete screen (used by the phone-screen check, never by the app itself).
@@ -194,6 +218,7 @@ function cleanup(s) {
 
 function quit(s) {
   cleanup(s);
+  if (s.node) clearResume(app.testMode);
   app.inLesson = false;
   app.go(location.hash.startsWith('#/practice') ? '#/practice' : location.hash.startsWith('#/lab') ? '#/lab' : '#/learn');
 }
@@ -271,6 +296,7 @@ function next(root, s) {
     if (s.missed.size && !s.retryRound && !s.testOut) return retryIntro(root, s);
     return finish(root, s);
   }
+  saveResume(s, app.now(), app.testMode);
   if (needsListening(s.current) && ((s.current.type === 'speak' && speakOff()) || listenOff())) {
     s.done += 1;
     return next(root, s);
@@ -409,6 +435,7 @@ function result(root, s, ok, opts = {}) {
     }
   }
   updateProgress(root, s);
+  saveResume(s, app.now(), app.testMode, { includeCurrent: false });
   const outOfHearts = s.mode === 'lesson' && currentHearts(app.state, app.now()) <= 0;
   const item = opts.item || ITEMS.get(ex.itemId);
   const canExplain = item && ['word', 'sentence', 'kana', 'kanji', 'kword', 'radical'].includes(item.type);
@@ -417,9 +444,9 @@ function result(root, s, ok, opts = {}) {
   const verdict = ok ? pickOne(PRAISE) : t('Correct answer:');
   const badges = [];
   if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} ${t('Speed bonus')}</span>`);
-  if (hesitated) badges.push(html`<span class="pill pill-orange">${opts.close ? t('Almost right') : ex.hinted ? t('Used a hint') : t('A bit slow')} — ${t('we\'ll practise it again')}</span>`);
+  if (hesitated) badges.push(html`<span class="pill pill-orange">${opts.mistyped ? t('You mistyped') : opts.close ? t('Almost right') : ex.hinted ? t('Used a hint') : t('A bit slow')} — ${t('we\'ll practise it again')}</span>`);
   // How sure were you? A lucky guess comes back like a slow answer; a slow answer you knew does not.
-  const sureable = ok && ids.length && !ex.hinted && ex.type !== 'intro' && ex.type !== 'match';
+  const sureable = ok && !opts.mistyped && ids.length && !ex.hinted && ex.type !== 'intro' && ex.type !== 'match';
   if (sureable) badges.push(html`<button class="pill pill-sure" data-sure="${hesitated ? 'knew' : 'guessed'}">${t(hesitated ? '😎 I knew it' : '🤔 I guessed')}</button>`);
   mount(foot, html`<div class="foot-inner feedback">
     <div class="fb-text">
@@ -430,6 +457,7 @@ function result(root, s, ok, opts = {}) {
       ${badges.length ? html`<p class="fb-badges">${badges}</p>` : ''}</div>
     </div>
     <div class="fb-actions">
+      ${!ok && opts.typed && canMistype(s.mistypes) ? html`<button class="btn btn-ghost mistyped">${t('I mistyped')}</button>` : ''}
       ${canExplain ? html`<button class="btn btn-ghost explain">${t('Explain')}</button>` : ''}
       <button class="btn ${ok ? 'btn-primary' : 'btn-danger'} check">${ok ? t('Continue') : t('Got it')}</button>
     </div></div>`);
@@ -460,9 +488,36 @@ function result(root, s, ok, opts = {}) {
       textContent: knew ? `👍 ${t('No extra practice')}` : `👍 ${t('It will come back soon')}`,
     }));
   });
+  $('.mistyped', foot)?.addEventListener('click', () => mistyped(root, s, ids, opts));
   $('.explain', foot)?.addEventListener('click', () => {
     showExplain(root, s, item, ok ? null : opts.chosenLabel, go);
   });
+}
+
+// "I mistyped": a typed answer marked wrong counts as right (no heart was lost for typing anyway), but is
+// kept as a slip, so the word still comes back like a slow answer. At most twice a lesson. The wrong answer
+// is taken back out of the score and the task is marked again as a right one.
+function mistyped(root, s, ids, opts) {
+  if (!s.checked || !canMistype(s.mistypes)) return;
+  s.mistypes = (s.mistypes || 0) + 1;
+  s.mistakes -= 1;
+  s.answered -= 1;
+  if (!s.retryRound) {
+    s.passAnswered -= 1;
+    s.passWrong -= 1;
+    s.done -= 1;
+  } else {
+    // The retry round put the task back in the queue, or showed the answer and moved on.
+    const key = ids.join('+') || s.current.type;
+    const misses = s.retryMisses.get(key) || 0;
+    s.retryMisses.set(key, Math.max(0, misses - 1));
+    if (retryAgain(misses)) s.queue.pop();
+    else s.done -= 1;
+  }
+  forgiveMistype(s.results, ids);
+  $('.recall-input', root)?.classList.replace('wrong', 'right');
+  s.checked = false;
+  result(root, s, true, { ...opts, close: true, mistyped: true, typed: false, timing: null, meaning: opts.answerText ? `${opts.answerText}${opts.meaning ? ` — ${opts.meaning}` : ''}` : opts.meaning });
 }
 
 function showExplain(root, s, item, chosenLabel, go) {
@@ -778,7 +833,7 @@ function renderRecall(root, s) {
     input.disabled = true;
     input.classList.add(match ? 'right' : 'wrong');
     if (mode !== 'translate') sayAs(root, s.speaker, speechOf(item));
-    result(root, s, !!match, { answerText, close: match === 'close',
+    result(root, s, !!match, { answerText, close: match === 'close', typed: true,
       meaning: match === 'close' ? t('Almost! It\'s spelled {w}', { w: L.latin ? target : `${item.romaji} (${item.jp})` }) : match || mode ? said : t('means “{en}”', { en: item.en }),
       chosenLabel: input.value, noHeart: true, timing: null });
   };
@@ -1225,6 +1280,7 @@ function weekStrip(now) {
 
 function finish(root, s) {
   cleanup(s);
+  if (s.node) clearResume(app.testMode);
   app.inLesson = false;
   const now = app.now();
   const bonusXp = Math.min(SPEED_BONUS_MAX, s.speedBonus);
@@ -1370,7 +1426,7 @@ function renderTypeSentence(root, s) {
     input.disabled = true;
     input.classList.add(match ? 'right' : 'wrong');
     sayAs(root, s.speaker, speechOf(item));
-    result(root, s, !!match, { answerText: shown, close: match === 'close', meaning: `${shown} = ${item.en}`, chosenLabel: input.value, noHeart: true, timing: null });
+    result(root, s, !!match, { answerText: shown, close: match === 'close', typed: true, meaning: `${shown} = ${item.en}`, chosenLabel: input.value, noHeart: true, timing: null });
   };
   input.addEventListener('input', () => setCheckEnabled(root, !!input.value.trim()));
   input.addEventListener('keydown', (e) => {

@@ -1,5 +1,5 @@
 // Practice hub: personalised review session, collections, kana charts, kanji and words learned.
-import { L } from '../lang.js';
+import { L, joinChunks } from '../lang.js';
 import { ITEMS } from '../course.js';
 import { kanaId } from '../content/kana.js';
 import { HIRAGANA_ROWS, KATAKANA_ROWS, MISSIONS, PATTERNS } from '../content/pack.js';
@@ -11,6 +11,9 @@ import { art } from '../art.js';
 import { speak } from '../audio.js';
 import { strength } from '../srs.js';
 import { learnedItemIds, dueItemIds, mistakeIds, backupStale } from '../progress.js';
+import { hardestItems } from '../usability.js';
+import { searchBox, searchText, wireSearch } from './search.js';
+import { showCard } from './showcard.js';
 import { KINDS, phraseSpeech, tidbitCard } from '../tidbits.js';
 import { wireShare } from '../share.js';
 import { QUIZ_MIN_FACTS, seenFacts } from './factquiz.js';
@@ -58,7 +61,34 @@ const phraseArt = (p) => {
   return artByText.get(p.jp.replace(/[～~]/g, '')) || '';
 };
 
-const LEVEL_NAME = { strong: 'Strong', mid: 'Okay', weak: 'Fading', none: 'Not learned' };
+// The text of a word or sentence as written (a sentence is a list of chunks).
+const wordText = (w) => (w.type === 'sentence' ? joinChunks(w.jp) : w.jp);
+// A "Show" button: opens the phrase full screen in very large text.
+const showButton = (text, meaning, say = '') => html`<button class="show-btn" data-show="${text}" data-meaning="${meaning}" data-say-text="${say}" aria-label="${t('Show to someone')}: ${text}">${icon('expand', 22)}<span>${t('Show')}</span></button>`;
+const wireShow = (root) => $$('[data-show]', root).forEach((b) => b.addEventListener('click', (e) => {
+  e.stopPropagation();
+  showCard({ text: b.dataset.show, meaning: b.dataset.meaning, say: b.dataset.sayText });
+}));
+
+// The hardest words: the items answered wrong most often (at least 3 answers), with a practice session on them.
+const HARDEST_TYPES = ['word', 'sentence', 'kanji', 'kword', 'kana'];
+export const hardestIds = (state) => hardestItems(state, learnedItemIds(state).filter((id) => HARDEST_TYPES.includes(ITEMS.get(id).type))).map((x) => x.id);
+function hardestSection(state) {
+  const ranked = hardestItems(state, hardestIds(state));
+  if (!ranked.length) return '';
+  return html`<h2 class="sub-title" id="sec-hardest">${t('Hardest words')}</h2>
+    <section class="card hardest-card">
+      <p class="muted small">${t('The ones you get wrong most often (at least 3 answers).')}</p>
+      <ol class="hardest-list">${ranked.map((x) => {
+        const it = ITEMS.get(x.id);
+        return html`<li><span class="hardest-word"><span class="jp word-jp">${wordText(it)}</span><small>${it.en}</small></span>
+          <span class="pill pill-orange">${Math.round(x.accuracy * 100)}% · ${x.right}/${x.answers}</span></li>`;
+      })}</ol>
+      <button class="btn btn-secondary btn-block start-hardest">${icon('refresh', 18)} ${t('Practise these')}</button>
+    </section>`;
+}
+
+const LEVEL_NAME ={ strong: 'Strong', mid: 'Okay', weak: 'Fading', none: 'Not learned' };
 const DAY = 24 * 60 * 60 * 1000;
 
 // What a progress bar means, for this word: how it is measured and where this one stands.
@@ -118,20 +148,21 @@ export function renderPractice(root, focus) {
   const reading = (k) => (k.type === 'kword' ? `${k.kana} · ${k.romaji}` : [k.kun, k.on].filter(Boolean)[0] || '');
 
   const lists = {
-    words: () => (words.length ? html`<div class="word-list">${words.map(({ it: w, st }) => html`<div class="word-row"><button class="word-say" data-say="${speechOf(w)}">
+    words: () => (words.length ? html`<div data-search-scope>${searchBox(t('Search words'))}<div class="word-list">${words.map(({ it: w, st }) => html`<div class="word-row has-show" data-q="${searchText(wordText(w), w.romaji, w.en)}"><button class="word-say" data-say="${speechOf(w)}">
         ${w.art ? art(w.art, 'art-row') : html`<span class="art-row"></span>`}
         <span class="word-main"><span class="word-jp">${jpItem(w, false)}</span><small>${L.latin ? w.en : `${w.romaji} · ${w.en}`}</small></span></button>
-        ${meter(st, w.id)}</div>`)}</div>`
+        ${showButton(wordText(w), w.en, L.latin ? '' : w.romaji)}
+        ${meter(st, w.id)}</div>`)}</div></div>`
       : html`<p class="muted">${t('Words you learn will be listed here, weakest first.')}</p>`),
     kanji: () => (kanji.length ? html`<section class="card kanji-practice">
         <span class="kanji-chip jp">${L.glyph}</span>
         <div><b>${t('Kanji practice')}</b><small>${kanji.length >= 3 ? t('Only kanji, weakest first — about 2 min') : t('Learn 3 kanji to unlock')}</small></div>
         <button class="btn btn-secondary start-kanji" ${kanji.length >= 3 ? '' : 'disabled'}>${t('Start')}</button>
       </section>
-      <div class="word-list">${kanji.map(({ it: k, st }) => html`<div class="word-row"><button class="word-say" data-say="${speechOf(k)}">
+      <div data-search-scope>${searchBox(t('Search {what}', { what: L.chars }))}<div class="word-list">${kanji.map(({ it: k, st }) => html`<div class="word-row" data-q="${searchText(k.jp, k.en, reading(k), k.kun, k.on, k.romaji, k.kana)}"><button class="word-say" data-say="${speechOf(k)}">
         <span class="kanji-chip jp ${[...k.jp].length > 1 ? 'wide' : ''} ${[...k.jp].length > 2 ? 'xwide' : ''}">${k.jp}</span>
         <span class="word-main"><b>${k.en}</b><small>${reading(k)}</small></span></button>
-        ${meter(st, k.id)}</div>`)}</div>`
+        ${meter(st, k.id)}</div>`)}</div></div>`
       : html`<p class="muted">${t('{what} lessons appear along the path from the first unit.', { what: L.Chars === 'Kanji' ? 'Kanji' : t('Character') })}</p>`),
     tones: () => html`${toneCard()}${toneChart()}`,
     kana: () => html`${kanaCard('hiragana', 'あ', t('Hiragana practice'))}${kanaCard('katakana', 'ア', t('Katakana practice'))}<p class="muted legend"><i class="dot strong"></i>${t('Strong')} <i class="dot mid"></i>${t('Okay')} <i class="dot weak"></i>${t('Fading')} <i class="dot none"></i>${t('Not learned')}</p>
@@ -199,6 +230,8 @@ export function renderPractice(root, focus) {
       ${KINDS.pron.list.length ? html`<a class="card collection" href="#/collection/pron">${art('🗣️', 'art-col')}<b>${t('Pronunciation')}</b><small>${state.seen.pron.length} / ${KINDS.pron.list.length}</small></a>` : ''}
     </div>
 
+    ${hardestSection(state)}
+
     <h2 class="sub-title" id="sec-learned">${t('What you\'ve learned')}</h2>
     ${TABS.length > 1 ? html`<div class="seg practice-tabs" role="tablist">${TABS.map(([id, label, n]) => html`<button role="tab" id="tab-${id}-list" aria-selected="${String(id === tab)}" aria-controls="library-panel" class="${id === tab ? 'on' : ''}" data-tab="${id}">${label}${n != null ? html` <small>${n}</small>` : ''}</button>`)}</div>`
       : html`<h3 class="sub-title small-title">${TABS[0][1]} <small class="muted">${TABS[0][2]}</small></h3>`}
@@ -214,6 +247,9 @@ export function renderPractice(root, focus) {
     renderPractice(root, b.dataset.section);
     window.scrollTo(0, 0);
   }));
+  $('.start-hardest', root)?.addEventListener('click', () => app.go('#/practice/hardest-go'));
+  wireSearch(root);
+  wireShow(root);
   $('.start-mistakes', root)?.addEventListener('click', () => app.go('#/practice/mistakes-go'));
   $('.start-kanji', root)?.addEventListener('click', () => app.go('#/practice/kanji-go'));
   $$('.start-kana', root).forEach((b) => b.addEventListener('click', () => app.go(`#/practice/${b.dataset.script}-go`)));
@@ -257,13 +293,19 @@ export function renderCollection(root, kind) {
       ? html`<a class="card kanji-practice" href="#/quiz"><span class="kanji-chip">${art('❓', 'art-row')}</span><div><b>${t('Quiz me')}</b><small>${t('5 questions about facts you have read · +1 gem each')}</small></div><span class="btn btn-secondary">${t('Start')}</span></a>`
       : html`<p class="muted small">${t('Discover {n} facts to unlock the quiz.', { n: QUIZ_MIN_FACTS })}</p>`) : ''}
     ${kind !== 'phrase' ? html`<p class="muted">${items.length ? t('{a} of {b} found.', { a: items.length, b: info.list.length }) : t('Nothing found yet.')} ${locked ? t('Keep doing lessons to discover more — they pop up on your path and during lessons.') : t('You found them all!')}${kind === 'kanji' ? ` ${t('Spotted kanji also come back in practice, with their tip as a clue.')}` : ''}</p>` : html`<p class="muted">${t('Tap a phrase to hear it.')}</p>`}
-    ${[...groups].map(([g, list]) => html`${g && g !== 'Basic kanji' ? html`<h2 class="sub-title">${g}</h2>` : ''}
+    <div data-search-scope>
+    ${kind === 'phrase' ? searchBox(t('Search phrases')) : ''}
+    ${[...groups].map(([g, list]) => html`<div data-search-group>${g && g !== 'Basic kanji' ? html`<h2 class="sub-title">${g}</h2>` : ''}
       ${kind === 'phrase'
-        ? html`<div class="word-list">${list.map((p) => html`<div class="word-row phrase-row"><button class="word-say" data-say="${phraseSpeech(p)}">
+        ? html`<div class="word-list">${list.map((p) => html`<div class="word-row phrase-row has-show" data-q="${searchText(p.jp, p.romaji, p.say, p.en)}"><button class="word-say" data-say="${phraseSpeech(p)}">
             ${phraseArt(p) ? art(phraseArt(p), 'art-row') : ''}
-            <span class="phrase-main"><span class="jp word-jp">${p.jp}</span><small>${p.romaji ? `${p.romaji} · ${p.en}` : `${p.say} · ${p.en}`}</small></span></button></div>`)}</div>`
-        : html`<div class="tidbit-list">${list.map((x) => tidbitCard(kind, x))}</div>`}`)}
+            <span class="phrase-main"><span class="jp word-jp">${p.jp}</span><small>${p.romaji ? `${p.romaji} · ${p.en}` : `${p.say} · ${p.en}`}</small></span></button>
+            ${showButton(phraseSpeech(p), p.en, L.latin ? '' : p.romaji)}</div>`)}</div>`
+        : html`<div class="tidbit-list">${list.map((x) => tidbitCard(kind, x))}</div>`}</div>`)}
+    </div>
   </main>`);
   $$('[data-say]', root).forEach((b) => b.addEventListener('click', () => speak(b.dataset.say)));
+  wireSearch(root);
+  wireShow(root);
   wireShare(root);
 }

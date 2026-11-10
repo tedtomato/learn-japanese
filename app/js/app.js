@@ -5,6 +5,7 @@ import { L } from './lang.js';
 import { icon } from './icons.js';
 import { setSfx, setVoiceRate, setHaptics } from './audio.js';
 import { writeReminderNote } from './reminders.js';
+import { textSizePercent } from './usability.js';
 import { t } from './strings.js';
 
 const storage = (() => {
@@ -79,6 +80,8 @@ export function saveSummary() {
 export function applySettings() {
   const { theme, sfx, voiceRate, haptics, toneColors } = app.state.settings;
   const root = document.documentElement;
+  // Text size: everything is sized in rem, so the root font size scales the whole app.
+  root.style.fontSize = `${textSizePercent(app.state.settings)}%`;
   if (theme === 'system') root.removeAttribute('data-theme');
   else root.dataset.theme = theme;
   const bg = getComputedStyle(root).getPropertyValue('--bg').trim();

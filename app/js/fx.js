@@ -30,7 +30,7 @@ export function rewardPopup({ kind = 'chest', title, reward, text = '', onDone }
       <h2>${title}</h2>
       <p class="big-reward">${reward}</p>
       ${text ? html`<p class="muted">${text}</p>` : ''}
-      <button class="btn btn-primary btn-block">Collect</button>
+      <button class="btn btn-primary btn-block">${t('Collect')}</button>
     </div>`);
   openLayer(root, { focus: 'button' });
   root.querySelector('button').addEventListener('click', () => {

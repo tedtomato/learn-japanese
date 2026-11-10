@@ -3,13 +3,29 @@
 // notification. The app leaves the worker a small note in Cache Storage, since the worker cannot read
 // the progress kept in localStorage.
 import { L } from './lang.js';
-import { dayKey, displayStreak, dueItemIds } from './progress.js';
+import { dayKey, displayStreak, dueItemIds, wordOfTheDay } from './progress.js';
+import { t, langName } from './strings.js';
 
 const NOTE_CACHE = 'reminder-note';
 const NOTE_URL = './__reminder.json';
 const TAG = 'daily-reminder';
 
 export const remindersSupported = () => typeof navigator !== 'undefined' && 'serviceWorker' in navigator && 'Notification' in window;
+
+// The words of the notification, written here (in the interface language) because the worker cannot translate.
+// body: the usual nudge; evening: after 19:00 with a streak on the line, "your streak ends tonight". Both end with a
+// word of the day (a word you know that is due soon, with its meaning).
+export function reminderText(state, now) {
+  const streak = displayStreak(state, now);
+  const due = dueItemIds(state, now).filter((id) => state.items[id].seen > 0).length;
+  const w = wordOfTheDay(state, now);
+  const word = w ? ` ${t('Word of the day: {word}', { word: `${w.jp}${w.romaji && w.romaji !== w.jp ? ` (${w.romaji})` : ''} = ${w.en}` })}` : '';
+  const body = (streak > 0
+    ? t('Keep your {n}-day streak going 🔥', { n: streak }) + (due ? ` — ${t('{n} words to review', { n: due })}` : '')
+    : due ? t('{n} words are ready to review. Two minutes is enough!', { n: due }) : t('A quick lesson keeps your {lang} fresh.', { lang: langName() })) + word;
+  const evening = streak > 0 ? t('Your {n}-day streak ends tonight 🔥 One quick lesson saves it.', { n: streak }) + word : body;
+  return { title: t('Time for {lang}! {say}', { lang: langName(), say: L.titleSay || '' }).trim(), body, evening };
+}
 
 // Called on every save (real progress only).
 export function writeReminderNote(state, now) {
@@ -22,6 +38,7 @@ export function writeReminderNote(state, now) {
     today: dayKey(now),
     name: L.name,
     say: L.titleSay,
+    ...reminderText(state, now),
   };
   caches.open(NOTE_CACHE)
     .then((c) => c.put(NOTE_URL, new Response(JSON.stringify(note), { headers: { 'Content-Type': 'application/json' } })))

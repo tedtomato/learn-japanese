@@ -116,6 +116,7 @@ try {
       const base = src.replace(/main\.js.*/, '');
       const { app } = await import(`${base}app.js${q}`);
       const { NODES } = await import(`${base}course.js${q}`);
+      const { dayKey, ensureQuests } = await import(`${base}progress.js${q}`);
       const now = Date.now();
       for (const n of NODES) {
         if (n.unit.id === stopAt) break;
@@ -123,6 +124,12 @@ try {
         for (const id of n.items || []) app.state.items[id] = { box: 1, seen: 2, right: 2, wrong: id.length % 3 ? 0 : 1, last: now, due: now + 1e8, ...(id.length % 5 ? {} : { missed: now }) };
       }
       app.state.seen.fact = ['f1', 'f2', 'f3', 'f4', 'f5', '1', '2', '3', '4', '5'];
+      // Daily habits: a trip in 23 days, a streak that broke yesterday (repair offer), double XP running, a quest half done.
+      app.state.settings.tripDate = dayKey(now + 23 * 86400000);
+      app.state.streak = { count: 12, lastDay: dayKey(now - 2 * 86400000), freezes: 0, best: 12, lost: null };
+      app.state.gems = 150;
+      app.state.doubleXpUntil = now + 14 * 60000;
+      ensureQuests(app.state, now).items[0].p = 1;
       app.save();
     }, course.stopAt);
     const theme = course.code;
@@ -142,6 +149,40 @@ try {
         await check(`${name}-bottom`, theme);
       }
     }
+    // The top of the Learn screen: trip banner, repair offer, quests, double-XP pill.
+    await go('#/learn');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(200);
+    await check('learn-top', theme);
+    // Quests all done with the chest waiting, the trip day itself, and the streak calendar with its repair button.
+    await page.evaluate(async () => {
+      const src = [...document.scripts].find((s) => s.type === 'module').src;
+      const q = src.includes('?') ? src.slice(src.indexOf('?')) : '';
+      const base = src.replace(/main\.js.*/, '');
+      const { app } = await import(`${base}app.js${q}`);
+      const { dayKey } = await import(`${base}progress.js${q}`);
+      for (const it of app.state.quests.items) it.paid = true, it.p = 9;
+      app.state.quests.chest = 'ready';
+      app.state.settings.tripDate = dayKey(Date.now());
+      app.save();
+    });
+    await go('#/practice', 200); // leave and come back: the same hash would not redraw
+    await go('#/learn');
+    await page.evaluate(() => window.scrollTo(0, 0));
+    await page.waitForTimeout(200);
+    await check('learn-chest-ready', theme);
+    await page.evaluate(() => document.querySelector('.open-quest-chest')?.click());
+    await page.waitForTimeout(400);
+    await check('quests-chest-popup', theme);
+    await page.evaluate(() => document.querySelector('#modal button')?.click());
+    await page.waitForTimeout(400);
+    await page.evaluate(() => document.querySelector('.stat-streak')?.click());
+    await page.waitForTimeout(400);
+    await check('streak-calendar-repair', theme);
+    await page.evaluate(() => document.querySelector('#modal [data-i]')?.click());
+    await go('#/profile');
+    await page.evaluate(() => document.querySelector('#set-trip')?.scrollIntoView({ block: 'center' }));
+    await check('profile-trip', theme);
     for (const kind of LAB) {
       await go(`#/lab/${kind}`, 600);
       await check(`lab-${kind}`, theme);

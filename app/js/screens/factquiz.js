@@ -13,6 +13,8 @@ import { FACT_QUIZ } from '../content/pack.js';
 import { shuffle } from '../lesson/generate.js';
 import { t, countryName } from '../strings.js';
 import { hideNav } from './activity.js';
+import { announceQuests } from './quests.js';
+import { recordGame } from '../progress.js';
 
 export const QUIZ_MIN_FACTS = 4;
 const QUESTIONS = 5;
@@ -71,8 +73,10 @@ export function renderFactQuiz(root) {
 
   const finish = () => {
     app.state.gems += score;
+    const quests = recordGame(app.state, app.now());
     app.save();
     if (score) sfx('bonus');
+    announceQuests(quests);
     mount(root, html`<header class="topbar">${statsBar()}</header>
     <main class="page quiz quiz-end">
       ${mascot(score >= questions.length - 1 ? 'cheer' : 'happy', 110)}

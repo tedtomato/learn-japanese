@@ -16,7 +16,7 @@ import { shareButton, wireShare } from '../share.js';
 import { t, langName } from '../strings.js';
 import { driveConfigured, syncOn, lastSyncAt, enableSync, disableSync, downloadBackup } from '../drive.js';
 import {
-  displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, backupStale, defaultState, FREEZE_PRICE, MAX_FREEZES, speedOn,
+  displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, backupStale, defaultState, FREEZE_PRICE, MAX_FREEZES, speedOn, dayKey,
 } from '../progress.js';
 
 function achievements(state, now) {
@@ -145,6 +145,8 @@ export function renderProfile(root, focus) {
     <div class="card settings">
       <div class="setting"><span id="set-theme">${t('Appearance')}</span>${seg('theme', s.theme, [['system', t('Auto')], ['light', t('Light')], ['dark', t('Dark')]])}</div>
       <div class="setting"><span id="set-dailyGoal">${t('Daily goal')}</span>${seg('dailyGoal', state.dailyGoal, [[10, t('Casual')], [20, t('Regular')], [30, t('Serious')], [50, t('Intense')]])}</div>
+      <div class="setting column"><span id="set-trip">${t('When is your trip?')}<small class="muted setting-note">${t('A countdown on the Learn screen, and a goal that fits')}</small></span>
+        <div class="trip-row"><input type="date" class="trip-date" aria-labelledby="set-trip" value="${s.tripDate || ''}" min="${dayKey(now)}">${s.tripDate ? html`<button class="btn btn-white btn-small trip-clear">${t('Clear')}</button>` : ''}</div></div>
       <div class="setting"><span id="set-speed">${t('Speed challenge')}<small class="muted setting-note">${s.speed === undefined ? t('Starts after your second lesson') : ''}</small></span>${seg('speed', speedOn(state), [[true, t('On')], [false, t('Off')]])}</div>
       <div class="setting"><span id="set-speaking">${t('Speaking tasks')}</span>${seg('speaking', s.speaking !== false, [[true, t('On')], [false, t('Off')]])}</div>
       <div class="setting"><span id="set-listening">${t('Listening tasks')}<small class="muted setting-note">${t('Show text also displays the words you hear')}</small></span>${seg('listening', listeningMode(s), [['on', t('On')], ['off', t('Off')], ['text', t('Show text')]])}</div>
@@ -207,6 +209,16 @@ export function renderProfile(root, focus) {
     pendingFocus = null;
   }
   $('.streak-tile', root).addEventListener('click', showStreakCalendar);
+  $('.trip-date', root).addEventListener('change', (e) => {
+    state.settings.tripDate = /^\d{4}-\d{2}-\d{2}$/.test(e.target.value) ? e.target.value : undefined;
+    app.save();
+    renderProfile(root);
+  });
+  $('.trip-clear', root)?.addEventListener('click', () => {
+    state.settings.tripDate = undefined;
+    app.save();
+    renderProfile(root);
+  });
   $('.reminder-btn', root).addEventListener('click', async () => {
     if (state.settings.reminders) {
       await disableReminders();

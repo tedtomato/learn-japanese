@@ -1,6 +1,16 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.98', date: '10 Nov 2026', changes: [
+    'New here? Four quick cards explain hearts, gems, your daily goal and how to switch language (again any time from Profile → How it works)',
+    'Left a lesson half-way? Pick it up where you stopped, for up to 24 hours',
+    'Typo in a typed answer? Tap "I mistyped" to count it as right (twice per lesson)',
+    'Search your phrasebook and your word and character lists',
+    'New "Show" button: hold a phrase up to a shop assistant or taxi driver in very large text',
+    'Tablets are welcome now, and you can pick your text size in Profile',
+    'Right and wrong answers carry a ✓ or ✗ mark, not just a colour',
+    'Practice → Library lists your hardest words, with a button to practise them',
+  ] },
   { version: '0.97', date: '10 Nov 2026', changes: [
     'New: three daily quests on the Learn screen with gem rewards — finish all three to open a chest (20 gems + 15 minutes of double XP)',
     'Double XP: earned from the quests chest, and your first lesson on a Sunday counts double; a timer shows while it lasts',

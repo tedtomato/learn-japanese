@@ -11,5 +11,5 @@ export function versionLabel(v = VERSION) {
 
 // The release shown on the start screen and in Profile. Keep in step with the newest entry of CHANGELOG
 // (content/changelog.js, loaded only by the version list); tests/perf.test.mjs checks they agree.
-export const APP_RELEASE = '0.97';
+export const APP_RELEASE = '0.98';
 export const APP_RELEASE_DATE = 'Nov 26'; // "Nov 26" = November 2026

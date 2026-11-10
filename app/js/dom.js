@@ -23,7 +23,7 @@ export const $$ = (sel, root = document) => [...root.querySelectorAll(sel)];
 // Words in the course language are marked with their language, so a screen reader uses the right voice.
 const TARGET = '.jp, .word-jp, .guide-jp';
 export function tagLang(el) {
-  const lang = L.speech.slice(0, 2);
+  const lang = L.tag; // zh-Hans, so Chinese characters get the mainland glyph shapes
   for (const x of el.querySelectorAll(TARGET)) {
     if (x.hasAttribute('lang') || x.closest('[lang]') !== document.documentElement) continue;
     x.setAttribute('lang', lang);

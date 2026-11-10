@@ -8,6 +8,7 @@ import { html, mount, raw, $ } from './dom.js';
 import { mascot } from './mascot.js';
 import { sfx, speak } from './audio.js';
 import { icon } from './icons.js';
+import { celebrationHtml, pickCelebration } from './celebrate.js';
 import { APP_RELEASE, APP_RELEASE_DATE } from './version.js';
 
 const CHEST = `<svg class="fx-chest" viewBox="0 0 120 100" aria-hidden="true">
@@ -113,6 +114,7 @@ export function splash() {
   });
 }
 
+let lastCombo = null;
 // "5 in a row!" burst over the lesson: a flame, the count and a ring of sparks; gone after ~1.6 s.
 export function comboBurst(count) {
   document.querySelector('.combo')?.remove();
@@ -124,6 +126,10 @@ export function comboBurst(count) {
   const sparks = Array.from({ length: 12 }, (_, i) => `<i style="--a:${i * 30}deg"></i>`).join('');
   el.innerHTML = `<div class="combo-card"><div class="combo-sparks">${sparks}</div><div class="combo-flame">🔥</div>
     <b>${t('{n} in a row!', { n: count })}</b><span>${t(count >= 10 ? 'Unstoppable!' : 'On fire!')}</span></div>`;
+  // Sometimes confetti or fireworks behind the card too (the dance is for the lesson end).
+  const extra = pickCelebration('x', lastCombo);
+  lastCombo = extra;
+  if (extra !== 'dance') el.insertAdjacentHTML('afterbegin', celebrationHtml(extra));
   document.body.append(el);
   setTimeout(() => el.remove(), 1700);
 }

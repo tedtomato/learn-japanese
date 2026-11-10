@@ -2,17 +2,21 @@
 import { html, raw } from '../dom.js';
 import { art } from '../art.js';
 import { syllablesFor } from '../romaji.js';
+import { toneOf } from '../pinyin.js';
 import { romajiOfChunk } from './generate.js';
 import { L, LANG } from '../lang.js';
 import { t } from '../strings.js';
 
 // Marks text in the course language, so screen readers use the right voice for it.
-export const LANG_ATTR = L.speech.slice(0, 2);
+export const LANG_ATTR = L.tag;
+
+// Chinese pinyin carries its tone as a class (tone-1 … tone-4, tone-0 neutral), coloured by CSS unless switched off.
+const rt = (romaji) => (LANG === 'zh' ? html`<rt class="tone-${toneOf(romaji)}">${romaji}</rt>` : html`<rt>${romaji}</rt>`);
 
 function rubyWord(text, romaji) {
   const parts = romaji ? syllablesFor(text, romaji) : null;
   if (!parts) return romaji ? html`<ruby class="ruby-word">${text}<rt>${romaji}</rt></ruby>` : html`${text}`;
-  return html`${parts.map((p) => html`<ruby>${p.text}<rt>${p.romaji}</rt></ruby>`)}`;
+  return html`${parts.map((p) => html`<ruby>${p.text}${rt(p.romaji)}</ruby>`)}`;
 }
 
 // A word (or a single chunk) with romaji over it when `hint` is on.

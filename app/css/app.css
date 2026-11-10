@@ -1331,3 +1331,45 @@ button.stat-gems { background: none; border: 0; font: inherit; font-weight: 800;
 .chunk[tabindex]:focus-visible, .dl-line.tappable:focus-visible { outline-offset: 0; border-radius: 8px; }
 .splash-go:focus-visible { outline-color: #fff; box-shadow: 0 4px 0 var(--border), 0 0 0 2px var(--green-btn); }
 
+
+/* ---------- Look & sound: tones, glyphs, course accent, celebrations, scenery ---------- */
+/* Chinese pinyin by tone: 1 red, 2 amber, 3 green, 4 blue, neutral grey (readable on both themes). */
+:root { --tone-1: #d12f2f; --tone-2: #a85f00; --tone-3: #2c7a1f; --tone-4: #1769ad; --tone-0: var(--muted); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --tone-1: #ff7b7b; --tone-2: #ffbf47; --tone-3: #7ddc5a; --tone-4: #5cc4ff; } }
+:root[data-theme="dark"] { --tone-1: #ff7b7b; --tone-2: #ffbf47; --tone-3: #7ddc5a; --tone-4: #5cc4ff; }
+rt.tone-1 { color: var(--tone-1); } rt.tone-2 { color: var(--tone-2); } rt.tone-3 { color: var(--tone-3); } rt.tone-4 { color: var(--tone-4); } rt.tone-0 { color: var(--tone-0); }
+.no-tones rt[class^="tone-"] { color: var(--muted); }
+/* Chinese characters use the mainland fonts and glyph shapes (the text itself is tagged lang="zh-Hans"). */
+html.course-zh { --font-jp: system-ui, 'PingFang SC', 'Hiragino Sans GB', 'Noto Sans SC', 'Source Han Sans SC', 'Microsoft YaHei', sans-serif; }
+
+/* Course accent on the unit banner: the course flag next to the kicker. */
+.unit-kicker { display: inline-flex; align-items: center; gap: 6px; }
+.unit-kicker .flag-chip { display: inline-flex; line-height: 0; }
+
+/* Lesson-complete variety. */
+.mascot.mood-dance { animation: dog-dance .7s ease-in-out infinite alternate; }
+@keyframes dog-dance { 0% { transform: translateY(0) rotate(-9deg); } 100% { transform: translateY(-14px) rotate(9deg); } }
+.fb-sad { display: grid; place-items: center; flex: none; }
+.fb-sad .mascot { animation: none; }
+.cele { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.cele-confetti i { position: absolute; top: -16px; left: calc(var(--x) * 1%); width: 9px; height: 14px; border-radius: 2px; background: var(--c); transform: rotate(var(--r));
+  animation: confetti-fall calc(3.2s + (var(--i) * 0.06s)) linear calc(var(--i) * -0.17s) infinite; }
+@keyframes confetti-fall { from { transform: translateY(0) rotate(var(--r)); } to { transform: translateY(105dvh) rotate(calc(var(--r) + 540deg)); } }
+.fw { position: absolute; width: 0; height: 0; }
+.fw i { position: absolute; width: 8px; height: 8px; margin: -4px; border-radius: 50%; background: var(--c); opacity: 0; animation: fw-burst 1.6s ease-out var(--d) infinite; }
+.fw i:nth-child(even) { background: var(--gold); width: 6px; height: 6px; }
+@keyframes fw-burst { 0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(1); } 70% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateY(-70px) scale(.4); } }
+.cele-notes i { position: absolute; bottom: 30%; left: calc(var(--x) * 1%); font-style: normal; font-size: 1.75rem; font-weight: 900; color: var(--purple-text);
+  animation: note-float 2.4s ease-in infinite calc(var(--i) * .35s); opacity: 0; }
+@keyframes note-float { 0% { opacity: 0; transform: translateY(0) rotate(-10deg); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateY(-190px) rotate(12deg); } }
+.combo > .cele { position: fixed; z-index: -1; }
+@media (prefers-reduced-motion: reduce) { .cele { display: none; } .mascot.mood-dance { animation: none; } }
+
+/* Scenery for the other courses. */
+.decor-bamboo svg, .decor-lavender svg, .decor-olive svg, .decor-hedge svg { transform-origin: 50% 95%; animation: plant-sway 4.5s ease-in-out infinite; }
+.decor-redlantern svg .lamp, .decor-streetlamp svg .lamp, .decor-lamppost svg .lamp { animation: lantern-glow 2.4s ease-in-out infinite alternate; }
+.decor-sun svg .rays { transform-origin: 32px 32px; animation: sun-turn 24s linear infinite; }
+@keyframes sun-turn { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .decor svg, .decor svg * { animation: none !important; } }
+.result span { font-size: 0.8125rem; letter-spacing: .04em; }
+.day small { font-size: 0.8125rem; }

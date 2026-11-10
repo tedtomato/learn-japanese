@@ -12,7 +12,7 @@ const load = (p) => { try { return require(p); } catch { return null; } };
 const playwright = load('playwright') || load(process.env.PLAYWRIGHT_PATH || '/opt/node22/lib/node_modules/playwright');
 if (!playwright) throw new Error('Playwright not found: npm i --no-save playwright && npx playwright install chromium');
 
-const PORT = 4190;
+const PORT = Number(process.env.SCREENS_PORT) || 4190; // SCREENS_PORT lets several checks run side by side
 const MIN_TEXT = 13; // px, any text you read
 const MIN_RUBY = 12; // px, romaji above Japanese
 const shotsAt = process.argv.includes('--shots') ? process.argv[process.argv.indexOf('--shots') + 1] : null;
@@ -127,6 +127,13 @@ try {
     for (const [hash, name] of [...SCREENS, ...course.extra]) {
       await go(hash);
       await check(name, theme);
+      // The path and profile in the light theme too (course scenery, banner flag, tone colours).
+      if (name === 'learn' || name === 'profile') {
+        await page.emulateMedia({ colorScheme: 'light' });
+        await page.waitForTimeout(150);
+        await check(`${name}-light`, theme);
+        await page.emulateMedia({ colorScheme: 'dark' });
+      }
       if (name.startsWith('practice')) {
         await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
         await page.waitForTimeout(200);
@@ -143,6 +150,22 @@ try {
       await check(`lesson-${k}`, theme);
       await continueLesson();
       await page.waitForTimeout(350);
+    }
+    // On to the lesson-complete screen (dark and light), then back to the app.
+    await page.evaluate(async () => {
+      const src = [...document.scripts].find((x) => x.type === 'module').src;
+      const q = src.includes('?') ? src.slice(src.indexOf('?')) : '';
+      const { finishNow } = await import(`${src.replace(/main\.js.*/, '')}lesson/player.js${q}`);
+      finishNow([...document.querySelectorAll('*')].find((e) => e.__session));
+    });
+    await page.waitForTimeout(500);
+    if (!(await page.$('.complete'))) problems.push(`${theme}: the lesson never reached the complete screen`);
+    else {
+      await check('lesson-complete', theme);
+      await page.emulateMedia({ colorScheme: 'light' });
+      await page.waitForTimeout(150);
+      await check('lesson-complete-light', theme);
+      await page.emulateMedia({ colorScheme: 'dark' });
     }
   }
 } finally {

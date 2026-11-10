@@ -12,7 +12,7 @@ import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { person, nameOf } from '../characters.js';
 import { art } from '../art.js';
-import { speak, stopSpeaking, sfx, buzz, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
+import { speak, stopSpeaking, sfx, buzz, HAPTIC, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
 import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds, romajiOfChunk, romajiMatch } from './generate.js';
 import {
   completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey, buyHearts, HEARTS_PRICE, costsHeart, retryAgain, testOutUnit, TESTOUT_PASS, unitIsLocked, speedOn,
@@ -24,6 +24,9 @@ import { t, langName, countryName, countryIn } from '../strings.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';
 import { rewardPopup, comboBurst } from '../fx.js';
+import { celebrationHtml, pickCelebration } from '../celebrate.js';
+
+let lastParty = null; // the last celebration shown, so the next one differs
 import { shareButton, wireShare } from '../share.js';
 
 const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', L.cheers[2][0], 'You got it!', 'Perfect!', L.cheers[1][0]].map((p) => t(p));
@@ -107,6 +110,15 @@ export function startSession(root, { nodeId, itemIds, demo, kanjiOnly, kanaScrip
   root.__session = s;
   renderShell(root, s);
   next(root, s);
+}
+
+// Jumps straight to the lesson-complete screen (used by the phone-screen check, never by the app itself).
+export function finishNow(root) {
+  const s = root.__session;
+  if (!s) return;
+  s.queue.length = 0;
+  s.missed.clear();
+  finish(root, s);
 }
 
 function renderShell(root, s) {
@@ -370,6 +382,7 @@ function result(root, s, ok, opts = {}) {
       ids.forEach((id) => s.missed.add(id));
     }
     sfx('correct');
+    buzz(HAPTIC.right);
   } else {
     s.mistakes += 1;
     s.combo = 0;
@@ -407,7 +420,7 @@ function result(root, s, ok, opts = {}) {
   if (sureable) badges.push(html`<button class="pill pill-sure" data-sure="${hesitated ? 'knew' : 'guessed'}">${t(hesitated ? '😎 I knew it' : '🤔 I guessed')}</button>`);
   mount(foot, html`<div class="foot-inner feedback">
     <div class="fb-text">
-      <span class="fb-icon">${icon(ok ? 'check' : 'close', 26)}</span>
+      ${ok ? html`<span class="fb-icon">${icon('check', 26)}</span>` : html`<span class="fb-icon fb-sad">${mascot('sad', 44)}</span>`}
       <div><b>${verdict}</b>
       ${!ok && opts.answerText ? html`<p class="jp-mix">${opts.answerText}</p>` : ''}
       ${opts.meaning ? html`<p class="fb-meaning">${item?.type === 'fword' && item.art ? art(item.art, 'art-inline') : ''} ${opts.meaning}</p>` : ''}
@@ -1232,9 +1245,12 @@ function finish(root, s) {
   if (s.mode === 'practice') extras.push(html`<p class="pill pill-red">${icon('heart', 16)} ${t('+1 heart')}</p>`);
   if (summary.levelUp && s.node?.kind !== 'review') extras.push(html`<p class="pill pill-green">${icon('star', 16)} ${t('Level {a} of {b}', { a: summary.levelUp, b: MAX_LEVEL })}</p>`);
 
+  // A random celebration each time (a perfect lesson always gets the fireworks and a bigger cheer).
+  const party = accuracy === 100 && !s.testOut ? 'fireworks' : pickCelebration(L.code, lastParty);
+  lastParty = party;
   mount(root, html`<div class="complete">
-    <div class="petals" aria-hidden="true">${raw(Array.from({ length: 28 }, (_, i) => `<i style="--i:${i};--x:${(i * 37) % 100}"></i>`).join(''))}</div>
-    ${mascot('cheer', 140)}
+    ${raw(celebrationHtml(party))}
+    ${mascot(party === 'dance' ? 'dance' : 'cheer', accuracy === 100 ? 180 : 140)}
     <h1>${title}</h1>
     <div class="extras">${extras}</div>
     <div class="result-tiles">

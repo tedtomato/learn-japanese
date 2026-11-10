@@ -4,7 +4,7 @@ import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID } from '../course.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 import { rewardPopup } from '../fx.js';
 import { decorFor, drawTrails, ROADBLOCK } from '../scenery.js';
-import { app, statsBar, toast, modal } from '../app.js';
+import { app, statsBar, toast, modal, flagSvg } from '../app.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
@@ -281,7 +281,7 @@ export function renderLearn(root) {
       ${section.units.map((unit, u) => html`
         <section class="unit" id="unit-${unit.id}">
           <div class="unit-banner c-${unit.color}">
-            <div><span class="unit-kicker">${t('Section {n} – Unit {m}', { n: s + 1, m: u + 1 })}</span><h3>${unit.title}</h3><p>${unit.desc}</p>${unitGoal(unit, state)}</div>
+            <div><span class="unit-kicker"><span class="flag-chip">${raw(flagSvg(L.flag, 22))}</span>${t('Section {n} – Unit {m}', { n: s + 1, m: u + 1 })}</span><h3>${unit.title}</h3><p>${unit.desc}</p>${unitGoal(unit, state)}</div>
             <div class="banner-btns">
               <button class="btn-guide" data-guide="${unit.id}">${icon('book', 18)}<span>${t('Guide')}</span></button>
               ${unitIsLocked(state, unit) && unitReview(unit) ? html`<button class="btn-guide btn-testout" data-testout="${unit.id}">${icon('arrow', 18)}<span>${t('Jump here')}</span></button>` : ''}

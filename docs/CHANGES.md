@@ -11,7 +11,7 @@ Releases are listed in the in-app change log (Profile → App version).
 | Automatic Google Drive backup | ✅ built, off until the owner adds an OAuth client id (docs/GOOGLE_DRIVE_SETUP.md) | 0.95 |
 | Daily quests, trip countdown, double XP, streak repair, evening reminder + word of the day | 🚧 | |
 | Onboarding, resume lesson, "I mistyped", search, show-to-staff cards, tablets, text size, colour-blind cues, hardest words | 🚧 | |
-| Panda + course scenery, celebration variety, haptics, best voices, tone colours, correct CJK glyphs | 🚧 | |
+| Panda + course scenery, celebration variety, haptics, best voices, tone colours, correct CJK glyphs | ✅ (per-unit scenery themes skipped) | 0.96 |
 | League, shareable progress card, trophy wall, gem shop, extra units, CSS consolidation | ⏳ round 2 | |
 | Native-speaker review, recorded audio, iPhone testing, usage analytics, repo rename | ❌ need a person / recordings / a device / tracking; rename would break the installed app | |
 

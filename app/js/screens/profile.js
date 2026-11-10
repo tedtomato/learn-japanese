@@ -14,6 +14,7 @@ import { showStreakCalendar } from './streak.js';
 import { enableReminders, disableReminders } from '../reminders.js';
 import { shareButton, wireShare } from '../share.js';
 import { t, langName } from '../strings.js';
+import { driveConfigured, syncOn, lastSyncAt, enableSync, disableSync, downloadBackup } from '../drive.js';
 import {
   displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, backupStale, defaultState, FREEZE_PRICE, MAX_FREEZES, speedOn,
 } from '../progress.js';
@@ -76,6 +77,19 @@ async function saveBackup(state) {
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
   return 'downloaded';
 }
+// Automatic Google Drive sync: only drawn when the owner has set a client id in drive.js.
+function driveSection() {
+  const at = lastSyncAt();
+  const when = at ? new Date(at).toLocaleString(L.gloss === 'French' ? 'fr-FR' : 'en-GB', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : null;
+  return html`<div class="drive-sync">
+    <p class="muted small">${t('Your progress is also saved to a private app folder in your Google Drive, at most once a day after a lesson.')}</p>
+    <p class="drive-age">${t('Last Drive sync: {when}', { when: when || t('Not synced yet') })}</p>
+    <div class="row-btns">
+      <button class="btn btn-white drive-toggle">${syncOn() ? t('Turn off Drive sync') : t('Sync with Google Drive')}</button>
+      <button class="btn btn-white drive-restore">${t('Restore from Drive')}</button>
+    </div></div>`;
+}
+
 function backupAgeText(state, now) {
   if (!state.backupAt) return t('No backup yet');
   const days = Math.floor((now - state.backupAt) / 86400000);
@@ -152,6 +166,7 @@ export function renderProfile(root, focus) {
         <button class="btn btn-white export">${icon('upload', 18)} ${t(canShareFiles() ? 'Save to Drive' : 'Save backup')}</button>
         <label class="btn btn-white import">${icon('download', 18)} ${t('Restore')}<input type="file" accept="application/json,.json,text/plain,.txt" hidden></label>
       </div>
+      ${driveConfigured() ? driveSection() : ''}
       <p class="muted small">${canShareFiles()
         ? t('Save to Drive opens your phone\'s share menu: pick Drive → Save. To restore, tap Restore, open the menu ☰ in the file picker, choose Drive and pick the newest hajime-backup file.')
         : t('The backup file goes to your Downloads. Keep a copy in Google Drive or iCloud.')}</p>
@@ -225,6 +240,34 @@ export function renderProfile(root, focus) {
     app.save();
     toast(t(saved === 'shared' ? 'Backup sent ✅ — check it arrived in Drive' : 'Backup saved to Downloads ✅'));
     renderProfile(root, 'backup');
+  });
+  // A message from drive.js (English) or the browser, shown translated.
+  const driveError = (err) => toast(t(err.message || 'Could not read that file.', err.vars));
+  $('.drive-toggle', root)?.addEventListener('click', async () => {
+    if (syncOn()) {
+      disableSync();
+      toast(t('Drive sync is off.'));
+      return renderProfile(root, 'backup');
+    }
+    try {
+      await enableSync(state);
+      toast(t('Synced with Google Drive ✅'));
+      renderProfile(root, 'backup');
+    } catch (err) {
+      driveError(err);
+    }
+  });
+  $('.drive-restore', root)?.addEventListener('click', async () => {
+    try {
+      const next = await downloadBackup();
+      if (!next) return toast(t('There is no backup in Google Drive yet.'));
+      modal(html`<h2>${t('Restore from Google Drive?')}</h2><p class="muted">${t('It has {n} XP and replaces the progress on this device.', { n: next.xp })}</p>`, [
+        { label: t('Restore'), onClick: () => { app.replaceState(next); toast(t('Progress restored ✅')); renderProfile(root); } },
+        { label: t('Cancel'), kind: 'secondary' },
+      ]);
+    } catch (err) {
+      driveError(err);
+    }
   });
   $('.import input', root).addEventListener('change', async (e) => {
     const file = e.target.files[0];

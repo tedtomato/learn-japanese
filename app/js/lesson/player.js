@@ -1217,6 +1217,8 @@ function finish(root, s) {
   const summary = completeSession(app.state, { node: s.testOut ? null : s.node, mode: s.testOut ? 'test' : s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp });
   const skipped = passed ? testOutUnit(app.state, s.node.unit) : 0;
   app.save();
+  // Google Drive sync (only when the owner has set it up and the learner turned it on): loaded on demand.
+  if (!s.testOut) import('../drive.js').then((d) => d.syncOn() && d.autoSync(app.state, now)).catch(() => {});
   sfx('complete');
   const secs = Math.round((now - s.startedAt) / 1000);
   const accuracy = s.answered ? Math.round(((s.answered - s.mistakes) / s.answered) * 100) : 100;

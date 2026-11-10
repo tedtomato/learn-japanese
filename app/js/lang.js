@@ -6,7 +6,7 @@
 
 export const COURSES = {
   ja: {
-    code: 'ja', name: 'Japanese', native: '日本語', country: 'Japan', flag: 'jp', gloss: 'English',
+    code: 'ja', tag: 'ja', name: 'Japanese', native: '日本語', country: 'Japan', flag: 'jp', gloss: 'English',
     speech: 'ja-JP', roman: 'romaji', chars: 'kanji', Chars: 'Kanji', charOne: 'kanji', glyph: '漢',
     titleNative: 'はじめ', titleSay: 'はじめ！', voiceTest: 'こんにちは', hasKana: true,
     roadworks: '工事中',
@@ -15,7 +15,7 @@ export const COURSES = {
     storageKey: 'hajime.progress.v1', testKey: 'hajime.test-progress.v1',
   },
   zh: {
-    code: 'zh', name: 'Chinese', native: '中文', country: 'China', flag: 'cn', gloss: 'English',
+    code: 'zh', tag: 'zh-Hans', name: 'Chinese', native: '中文', country: 'China', flag: 'cn', gloss: 'English',
     speech: 'zh-CN', roman: 'pinyin', chars: 'characters', Chars: 'Characters', charOne: 'character', glyph: '字',
     titleNative: '开始', titleSay: '开始！', voiceTest: '你好', hasKana: false,
     roadworks: '施工中',
@@ -26,7 +26,7 @@ export const COURSES = {
   // Latin-alphabet courses: no characters to learn, so no kana, kanji, strokes or romanisation
   // (`romaji` holds the word itself). `gloss` is the language of the meanings (the `en` fields).
   fr: {
-    code: 'fr', name: 'French', native: 'Français', country: 'France', flag: 'fr', flagEmoji: '🇫🇷', latin: true, gloss: 'English',
+    code: 'fr', tag: 'fr', name: 'French', native: 'Français', country: 'France', flag: 'fr', flagEmoji: '🇫🇷', latin: true, gloss: 'English',
     speech: 'fr-FR', roman: 'French', chars: 'words', Chars: 'Words', charOne: 'word', glyph: 'Fr',
     titleNative: 'C\'est parti !', titleSay: 'C\'est parti !', voiceTest: 'Bonjour !', hasKana: false,
     roadworks: 'Travaux',
@@ -35,7 +35,7 @@ export const COURSES = {
     storageKey: 'hajime.fr.progress.v1', testKey: 'hajime.fr.test-progress.v1',
   },
   es: {
-    code: 'es', name: 'Spanish', native: 'Español', country: 'Spain', flag: 'es', flagEmoji: '🇪🇸', latin: true, gloss: 'English',
+    code: 'es', tag: 'es', name: 'Spanish', native: 'Español', country: 'Spain', flag: 'es', flagEmoji: '🇪🇸', latin: true, gloss: 'English',
     speech: 'es-ES', roman: 'Spanish', chars: 'words', Chars: 'Words', charOne: 'word', glyph: 'Es',
     titleNative: '¡Vamos!', titleSay: '¡Vamos!', voiceTest: '¡Hola!', hasKana: false,
     roadworks: 'Obras',
@@ -44,7 +44,7 @@ export const COURSES = {
     storageKey: 'hajime.es.progress.v1', testKey: 'hajime.es.test-progress.v1',
   },
   en: {
-    code: 'en', name: 'English', native: 'English', country: 'the UK', flag: 'gb', flagEmoji: '🇬🇧', latin: true, gloss: 'French',
+    code: 'en', tag: 'en-GB', name: 'English', native: 'English', country: 'the UK', flag: 'gb', flagEmoji: '🇬🇧', latin: true, gloss: 'French',
     speech: 'en-GB', roman: 'English', chars: 'words', Chars: 'Words', charOne: 'word', glyph: 'En',
     titleNative: 'Let\'s go!', titleSay: 'Let\'s go!', voiceTest: 'Hello!', hasKana: false,
     roadworks: 'Roadworks',

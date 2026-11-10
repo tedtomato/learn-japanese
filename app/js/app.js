@@ -3,7 +3,7 @@ import { loadState, saveState, currentHearts, displayStreak, studiedToday, cours
 import { html, mount, raw, $ } from './dom.js';
 import { L } from './lang.js';
 import { icon } from './icons.js';
-import { setSfx, setVoiceRate } from './audio.js';
+import { setSfx, setVoiceRate, setHaptics } from './audio.js';
 import { writeReminderNote } from './reminders.js';
 import { t } from './strings.js';
 
@@ -77,7 +77,7 @@ export function saveSummary() {
 }
 
 export function applySettings() {
-  const { theme, sfx, voiceRate } = app.state.settings;
+  const { theme, sfx, voiceRate, haptics, toneColors } = app.state.settings;
   const root = document.documentElement;
   if (theme === 'system') root.removeAttribute('data-theme');
   else root.dataset.theme = theme;
@@ -86,6 +86,11 @@ export function applySettings() {
   document.body.classList.toggle('test-mode', app.testMode);
   // Latin-alphabet courses show their words in the main font.
   document.body.classList.toggle('latin', !!L.latin);
+  // Chinese pinyin is coloured by tone unless switched off; the page language and CJK font follow the course.
+  document.body.classList.toggle('no-tones', toneColors === false);
+  root.lang = L.gloss === 'French' ? 'fr' : 'en';
+  root.classList.add(`course-${L.code}`);
+  setHaptics(haptics);
   setSfx(sfx);
   setVoiceRate(voiceRate);
 }

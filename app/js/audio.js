@@ -17,11 +17,15 @@ const MALE = /otoya|hattori|ichiro|keita|daichi|naoki|takumi|kenji|li-?mu|kangka
 const LANG_PREFIX = new RegExp(`^${L.speech.slice(0, 2)}([-_]|$)`, 'i');
 const exactLang = (v) => v.lang.replace('_', '-').toLowerCase() === L.speech.toLowerCase();
 
+// Better-sounding voices first: names that say Enhanced, Premium, Natural, Neural, Online, Google or Siri.
+const QUALITY = [[/premium|enhanced|neural|natural/i, 3], [/online|siri/i, 2], [/google/i, 1]];
+export const voiceQuality = (name) => QUALITY.reduce((best, [re, n]) => (re.test(name) ? Math.max(best, n) : best), 0);
+
 function loadVoices() {
   if (!synth) return;
   const voices = synth.getVoices();
   voiceCount = voices.length;
-  jaVoices = voices.filter((v) => LANG_PREFIX.test(v.lang)).sort((a, b) => exactLang(b) - exactLang(a)).map((v) => ({
+  jaVoices = voices.filter((v) => LANG_PREFIX.test(v.lang)).sort((a, b) => exactLang(b) - exactLang(a) || voiceQuality(b.name) - voiceQuality(a.name)).map((v) => ({
     voice: v,
     gender: MALE.test(v.name) ? 'male' : FEMALE.test(v.name) ? 'female' : 'unknown',
   }));
@@ -201,7 +205,13 @@ export function sfx(name) {
   }
 }
 
-export function buzz(ms = 60) {
+// Vibration for right and wrong answers: a light tap, or a longer double pulse. Off in the Profile settings.
+let hapticsOn = true;
+export const setHaptics = (on) => (hapticsOn = on !== false);
+export const HAPTIC = { right: 12, wrong: [40, 40, 70] };
+
+export function buzz(ms = HAPTIC.wrong) {
+  if (!hapticsOn) return;
   try {
     navigator.vibrate?.(ms);
   } catch {

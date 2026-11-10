@@ -20,6 +20,9 @@ function base(ch) {
   return d[0].toLowerCase();
 }
 
+// The tone of one pinyin syllable: 1-4 from its mark, 0 for the neutral tone (ma, de, le).
+export const toneOf = (syl) => [...syl.normalize('NFD')].map((c) => TONE_MARKS[c]).find(Boolean) || 0;
+
 export const stripTones = (s) => [...s].map(base).join('');
 
 // "nǐhǎo" → "ni3hao3" (for ids: 买 mǎi and 卖 mài must not clash).

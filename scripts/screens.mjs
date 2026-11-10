@@ -87,8 +87,10 @@ try {
     ['#/practice/kanji', 'practice-kanji'], ['#/profile', 'profile'], ['#/collection/phrase', 'phrasebook'], ['#/collection/fact', 'facts'],
     ['#/quiz', 'facts-quiz'], ['#/signs', 'signs'], ['#/listen', 'listening'], ['#/courses', 'languages'],
   ];
+  const LIGHT_SCREENS = [['#/learn', 'learn'], ['#/practice/today', 'practice'], ['#/practice/games', 'practice-games'], ['#/quiz', 'facts-quiz'], ['#/profile', 'profile']];
+  const LIGHT_LESSON_SCREENS = 3;
   const LAB = ['intro', 'read', 'build', 'match', 'grammar', 'dialogue', 'kanji', 'listen', 'fast', 'speak', 'trace'];
-  // Sizes are the same in both themes: dark only (the app's usual look) keeps the check quick.
+  // Every screen is checked in dark (the app's usual look); light gets a pass over a subset per course (LIGHT_SCREENS).
   await page.emulateMedia({ colorScheme: 'dark' });
   // First launch: the language screen comes before anything else.
   await page.goto(`http://localhost:${PORT}/`);
@@ -144,6 +146,20 @@ try {
       await continueLesson();
       await page.waitForTimeout(350);
     }
+    // Light mode: the same learner, a subset of screens and the start of a lesson.
+    await page.emulateMedia({ colorScheme: 'light' });
+    await go('#/learn');
+    for (const [hash, name] of LIGHT_SCREENS) {
+      await go(hash);
+      await check(name, `${course.code}-light`);
+    }
+    await go(`#/lesson/${course.lesson}`, 900);
+    for (let k = 1; k <= LIGHT_LESSON_SCREENS; k++) {
+      await check(`lesson-${k}`, `${course.code}-light`);
+      await continueLesson();
+      await page.waitForTimeout(350);
+    }
+    await page.emulateMedia({ colorScheme: 'dark' });
   }
 } finally {
   await browser.close();

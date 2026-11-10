@@ -24,6 +24,8 @@ jobs:
         with:
           node-version: 22
       - run: npm test
+      - name: Install the minifier (the build still works without it)
+        run: npm i --no-save --no-package-lock esbuild
       - run: npm run build
       # Every screen at a real phone size: no text off-screen, cut off or too small to read.
       - name: Phone-screen check

@@ -4,6 +4,7 @@ import { cpSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } fr
 import { join, relative, sep, dirname, posix } from 'node:path';
 import { execSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
+import { gzipSync } from 'node:zlib';
 import { mascotSvg } from '../app/js/mascot.js';
 import { APP_RELEASE, APP_RELEASE_DATE } from '../app/js/version.js';
 import { COURSE_CODES, EXTRA_EMOJIS, courseEmojis, artFile } from './course-art.mjs';
@@ -139,6 +140,31 @@ writeFileSync(join(out, 'files.json'), JSON.stringify(manifest) + '\n');
 replace('sw.js', [['__APP_VERSION__', version]]);
 writeFileSync(join(out, 'version.json'), JSON.stringify({ version }) + '\n');
 
+// ---- Minify -------------------------------------------------------------------------------------------------
+// Last, after the ?v= stamps and the version are in place: esbuild keeps import addresses as they are (no bundling),
+// so the stamped files still match what files.json and the service worker expect. Without esbuild
+// (npm i --no-save --no-package-lock esbuild) the build still works, just unminified. NO_MINIFY=1 skips it.
+let minified = null;
+const esbuild = process.env.NO_MINIFY ? null : await import('esbuild').catch(() => null);
+if (esbuild) {
+  const sized = { before: 0, after: 0, gzBefore: 0, gzAfter: 0 };
+  for (const file of [...files.filter((f) => /\.(js|css)$/.test(f)), 'sw.js']) {
+    const path = join(out, file);
+    const text = readFileSync(path, 'utf8');
+    const { code } = esbuild.transformSync(text, file.endsWith('.css') ? { loader: 'css', minify: true } : { loader: 'js', format: 'esm', minify: true, target: 'es2022', legalComments: 'none' });
+    writeFileSync(path, code);
+    sized.before += Buffer.byteLength(text);
+    sized.after += Buffer.byteLength(code);
+    sized.gzBefore += gzipSync(text).length;
+    sized.gzAfter += gzipSync(code).length;
+  }
+  minified = sized;
+} else console.log('Note: esbuild is not installed, so the files are not minified (npm i --no-save --no-package-lock esbuild).');
+
 const kb = (list) => Math.round(list.reduce((n, u) => n + (u === './' ? 0 : statSync(join(out, u.split('?')[0])).size), 0) / 1024);
 console.log(`Built ${files.length} files into dist/ — version ${version}`);
 console.log(`Offline cache: shared ${shared.length} files (${kb(shared)} KB) + per course ${COURSE_CODES.map((c) => `${c} ${perCourse[c].length} (${kb(perCourse[c])} KB)`).join(', ')}`);
+if (minified) {
+  const k = (n) => `${(n / 1024).toFixed(0)} KB`;
+  console.log(`Minified JS+CSS: ${k(minified.before)} → ${k(minified.after)} (gzip ${k(minified.gzBefore)} → ${k(minified.gzAfter)})`);
+}

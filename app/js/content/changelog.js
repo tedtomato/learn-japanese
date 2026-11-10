@@ -1,6 +1,11 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.95', date: '10 Nov 2026', changes: [
+    'The app downloads less data when it loads or updates (smaller, compressed files)',
+    'Optional automatic backup to your own Google Drive, once a day after a lesson — it appears in Profile → Backup once the app owner has set it up',
+    'Every screen is now checked in light mode as well as dark before each release',
+  ] },
   { version: '0.94', date: '9 Nov 2026', changes: [
     'Faster start: the app only downloads the language you are learning, and the learning path draws instantly',
     'Smaller updates: a new version only downloads the files that changed, and a slow connection no longer wipes the offline copy',

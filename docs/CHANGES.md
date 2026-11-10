@@ -3,6 +3,18 @@
 Every request, and whether it is in the app. ✅ done · 🚧 in progress / next chunk · ⏳ planned · ❌ not doing (reason given).
 Releases are listed in the in-app change log (Profile → App version).
 
+## Batch 19 — 10 Nov 2026 (improvement list: content, speed, usability, look, stickiness)
+| Request | Status | Release |
+|---|---|---|
+| Smaller downloads: minified JS + CSS at build (esbuild in CI; unminified fallback) | ✅ | 0.95 |
+| Phone-screen check in light mode too | ✅ | 0.95 |
+| Automatic Google Drive backup | ✅ built, off until the owner adds an OAuth client id (docs/GOOGLE_DRIVE_SETUP.md) | 0.95 |
+| Daily quests, trip countdown, double XP, streak repair, evening reminder + word of the day | 🚧 | |
+| Onboarding, resume lesson, "I mistyped", search, show-to-staff cards, tablets, text size, colour-blind cues, hardest words | 🚧 | |
+| Panda + course scenery, celebration variety, haptics, best voices, tone colours, correct CJK glyphs | 🚧 | |
+| League, shareable progress card, trophy wall, gem shop, extra units, CSS consolidation | ⏳ round 2 | |
+| Native-speaker review, recorded audio, iPhone testing, usage analytics, repo rename | ❌ need a person / recordings / a device / tracking; rename would break the installed app | |
+
 ## Batch 18 — 9 Nov 2026 (review fixes: performance and start-up)
 | Request | Status | Release |
 |---|---|---|

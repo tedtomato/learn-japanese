@@ -14,6 +14,7 @@ import { completeMission, unitLessonsDone } from '../progress.js';
 import { shuffle } from '../lesson/generate.js';
 import { t } from '../strings.js';
 import { hideNav } from './activity.js';
+import { announceQuests } from './quests.js';
 
 export const missionUnit = (m) => SECTIONS.flatMap((s) => s.units).find((u) => u.id === m.unit);
 export const missionOpen = (state, m) => app.testMode || unitLessonsDone(state, missionUnit(m));
@@ -98,6 +99,7 @@ export function renderMission(root, id) {
     const res = completeMission(app.state, m.id, stars, app.now());
     app.save();
     sfx('complete');
+    announceQuests(res.quests);
     mount(root, html`<main class="page mission-done">
       ${art(m.art, 'art-xl')}
       <h1>${t('Mission complete!')}</h1>

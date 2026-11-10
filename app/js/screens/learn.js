@@ -14,9 +14,10 @@ import { MISSIONS } from '../content/pack.js';
 import { t } from '../strings.js';
 import {
   currentNodeIndex, nodeLevel, isNodeDone, isNodeUnlocked, nodeNeedsReview, openChest, todayXp, currentHearts, dueItemIds, studiedToday,
-  reviewEstimate, REVIEW_FIRST_MIN, unitIsLocked, unitReview, TESTOUT_PASS, weeklyRecap, showRecap, weekKey, suggestGoal, unitLessonsDone,
+  reviewEstimate, REVIEW_FIRST_MIN, unitIsLocked, unitReview, TESTOUT_PASS, weeklyRecap, showRecap, weekKey, suggestGoal, unitLessonsDone, tripPlan,
 } from '../progress.js';
 import { strength } from '../srs.js';
+import { questsCard, tripBanner, repairCard, doRepair, questChest, lessonRate } from './quests.js';
 
 const OFFSETS = [0, 44, 70, 44, 0, -44, -70, -44];
 const CHEERS = L.cheers;
@@ -45,6 +46,7 @@ function explainGoal() {
   const { state } = app;
   const xp = todayXp(state, app.now());
   const suggested = suggestGoal(state, app.now());
+  const trip = tripPlan(state, app.now());
   const render = () => html`<div class="goal-help">
     <h2>${t('Daily goal')}</h2>
     <p><b>XP</b> ${t('(experience points) measure how much you practised. Today:')} <b class="goal-today">${xp} / ${state.dailyGoal} XP</b>.</p>
@@ -55,6 +57,7 @@ function explainGoal() {
     </ul>
     <p>${t('Reach your goal to earn')} <b>+5 ${t('gems')}</b>. ${t('Studying any amount each day keeps your 🔥 streak going.')}</p>
     ${suggested ? html`<p class="goal-suggest">${icon('bolt', 16)} ${t('Based on your last 7 days, {name} ({v} XP) would fit you.', { name: goalName(suggested), v: suggested })}</p>` : ''}
+    ${trip ? html`<p class="goal-suggest">${icon('bolt', 16)} ${trip.left ? t('Your trip: about {rate} finishes section 1 in time — the {name} goal ({v} XP) fits.', { rate: lessonRate(trip.perDay), name: goalName(trip.goal), v: trip.goal }) : t('Section 1 is done — you are ready for your trip!')}</p>` : ''}
     <p class="muted small">${t('Choose your goal:')}</p>
     <div class="goal-choices">${GOALS.map(([v, name, hint]) => html`<button class="goal-choice ${state.dailyGoal === v ? 'on' : ''} ${suggested === v ? 'suggested' : ''}" data-goal="${v}"><b>${t(name)}</b><small>${v} XP · ${t(hint)}</small></button>`)}</div>
   </div>`;
@@ -268,12 +271,15 @@ export function renderLearn(root) {
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page learn">
     <h1 class="sr-only">${t('Learn')}</h1>
+    ${tripBanner(state, now)}
+    ${repairCard(state, now)}
     <section class="card goal-card" role="button" tabindex="0" aria-label="${t('About the daily goal')}">
       <div class="goal-icon">${icon('bolt', 22)}</div>
       <div class="goal-text"><b>${t('Daily goal')}</b><span>${Math.min(xp, goal)} / ${goal} XP</span></div>
       ${xp >= goal ? html`<span class="pill pill-gold">${icon('check', 14)} ${t('Done!')}</span>` : ''}
       <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (xp / goal) * 100)}%"></div></div>
     </section>
+    ${questsCard(state, now)}
     ${reviewCard(state, now)}
     ${recapCard(state, now)}
     ${SECTIONS.map((section, s) => html`
@@ -302,6 +308,8 @@ export function renderLearn(root) {
   );
   root.addEventListener('click', () => document.querySelector('.popover')?.remove());
   $('.start-review', root)?.addEventListener('click', () => app.go('#/practice/go'));
+  $('.open-quest-chest', root)?.addEventListener('click', () => questChest(() => renderLearn(root)));
+  $('.do-repair', root)?.addEventListener('click', () => doRepair() && renderLearn(root));
   $('.goal-card', root).addEventListener('click', explainGoal);
   $('.goal-card', root).addEventListener('keydown', (e) => {
     if (e.key !== 'Enter' && e.key !== ' ') return;

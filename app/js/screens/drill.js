@@ -14,6 +14,7 @@ import { recordSigns } from '../progress.js';
 import { romajiMatch, shuffle } from '../lesson/generate.js';
 import { t } from '../strings.js';
 import { hideNav } from './activity.js';
+import { announceQuests } from './quests.js';
 
 export const DRILL_MIN = 3;
 const ROUNDS = ['fill', 'fill', 'fill', 'type', 'fill', 'fill', 'type', 'type'];
@@ -109,9 +110,10 @@ export function renderDrill(root, id) {
   };
 
   const finish = () => {
-    recordSigns(app.state, results, score, app.now());
+    const quests = recordSigns(app.state, results, score, app.now());
     app.save();
     if (score) sfx('bonus');
+    announceQuests(quests);
     mount(root, html`<header class="topbar">${statsBar()}</header>
     <main class="page quiz quiz-end">
       ${mascot(score >= rounds.length - 1 ? 'cheer' : 'happy', 110)}

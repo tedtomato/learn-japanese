@@ -5,7 +5,7 @@
 import { L, withRoman, joinChunks } from '../lang.js';
 import { glossKey, sameTiles } from '../normalise.js';
 import { ITEMS, NODE_BY_ID, MAX_LEVEL } from '../course.js';
-import { app, modal, announce } from '../app.js';
+import { app, modal, announce, doubleXpPill } from '../app.js';
 import { lessonKeyIgnored, shortcutsEnabled, listeningMode } from '../a11y.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
@@ -24,6 +24,7 @@ import { t, langName, countryName, countryIn } from '../strings.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';
 import { rewardPopup, comboBurst } from '../fx.js';
+import { questChest } from '../screens/quests.js';
 import { shareButton, wireShare } from '../share.js';
 
 const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', L.cheers[2][0], 'You got it!', 'Perfect!', L.cheers[1][0]].map((p) => t(p));
@@ -118,6 +119,7 @@ function renderShell(root, s) {
     <header class="lesson-top">
       <button class="icon-btn quit" aria-label="${t('Quit')}">${icon('close', 26)}</button>
       <div class="bar bar-lg" role="progressbar" aria-label="${t('Lesson progress')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar-fill" style="width:0%"></div></div>
+      ${doubleXpPill()}
       ${s.mode === 'lesson' ? html`<span class="stat stat-hearts" role="img" aria-label="${t('Hearts: {n}', { n: hearts })}">${icon('heart', 24)}<b class="hearts-n">${hearts}</b></span>`
         : html`<span class="pill pill-blue">${t('Practice')}</span>`}
     </header>
@@ -361,6 +363,7 @@ function result(root, s, ok, opts = {}) {
     record(s, ids, 'right');
     // Every 5 right answers in a row (that count), a short celebration.
     s.combo = (s.combo || 0) + 1;
+    s.bestRun = Math.max(s.bestRun || 0, s.combo);
     if (s.combo % 5 === 0) {
       comboBurst(s.combo);
       setTimeout(() => sfx('bonus'), 150);
@@ -1214,7 +1217,7 @@ function finish(root, s) {
   const bonusXp = Math.min(SPEED_BONUS_MAX, s.speedBonus);
   // Testing out of a unit: first-pass accuracy decides; passing marks the unit's lessons as played once.
   const passed = s.testOut && s.passAnswered > 0 && 1 - s.passWrong / s.passAnswered >= TESTOUT_PASS;
-  const summary = completeSession(app.state, { node: s.testOut ? null : s.node, mode: s.testOut ? 'test' : s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp });
+  const summary = completeSession(app.state, { node: s.testOut ? null : s.node, mode: s.testOut ? 'test' : s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp, bestRun: s.bestRun || 0 });
   const skipped = passed ? testOutUnit(app.state, s.node.unit) : 0;
   app.save();
   sfx('complete');
@@ -1226,6 +1229,8 @@ function finish(root, s) {
   if (s.testOut) extras.push(html`<p class="pill ${passed ? 'pill-green' : 'pill-orange'}">${passed ? t('{n} lessons unlocked as played', { n: skipped }) : t('You need {n}% to skip — the lessons will get you there', { n: Math.round(TESTOUT_PASS * 100) })}</p>`);
   if (summary.streakExtended) extras.push(html`<p class="pill pill-orange">${icon('flame', 16)} ${t('{n} day streak!', { n: summary.streak })}</p>`);
   if (summary.milestone) extras.push(html`<p class="pill pill-gold">${icon('flame', 16)} ${t('{n}-day streak milestone!', { n: summary.milestone })}</p>`);
+  if (summary.sundayBonus) extras.push(html`<p class="pill pill-purple">${icon('bolt', 16)} ${t('Sunday bonus: double XP for 15 minutes!')}</p>`);
+  for (const q of summary.quests.done) extras.push(html`<p class="pill pill-purple">${icon('check', 16)} ${t('Quest done: {text} +{n} gems', { text: t(q.text), n: q.gems })}</p>`);
   if (bonusXp) extras.push(html`<p class="pill pill-gold">${icon('bolt', 16)} ${t('Speed bonus +{n} XP', { n: bonusXp })}</p>`);
   if (summary.goalReached) extras.push(html`<p class="pill pill-gold">${icon('star', 16)} ${t('Daily goal reached! +5 gems')}</p>`);
   if (summary.mistakesCleared) extras.push(html`<p class="pill pill-green">${icon('check', 16)} ${t('All mistakes fixed! +5 gems')}</p>`);
@@ -1252,11 +1257,13 @@ function finish(root, s) {
   heading.focus({ preventScroll: true });
   $('.continue', root).addEventListener('click', () => {
     const go = () => app.go(location.hash.startsWith('#/lab') ? '#/lab' : s.mode === 'practice' ? '#/practice' : '#/learn');
-    const afterGoal = () => (summary.milestone
-      ? rewardPopup({ kind: 'bonus', title: t('{n}-day streak!', { n: summary.milestone }), reward: html`${icon('flame', 30)} ${summary.milestone}`, text: t(summary.milestone >= 100 ? 'A hundred days in a row. Legendary!' : summary.milestone >= 30 ? 'A whole month without missing a day. Amazing!' : 'A full week in a row. Keep it going!'), onDone: go })
-      : go());
-    if (summary.goalReached) rewardPopup({ kind: 'bonus', title: t('Daily goal reached!'), reward: html`${icon('gem', 30)} +5 gems`, text: t('Come back tomorrow to keep your streak going.'), onDone: afterGoal });
-    else afterGoal();
+    // Pop-ups one after the other: daily goal, streak milestone, the quests chest.
+    const steps = [];
+    if (summary.goalReached) steps.push((next) => rewardPopup({ kind: 'bonus', title: t('Daily goal reached!'), reward: html`${icon('gem', 30)} +5 gems`, text: t('Come back tomorrow to keep your streak going.'), onDone: next }));
+    if (summary.milestone) steps.push((next) => rewardPopup({ kind: 'bonus', title: t('{n}-day streak!', { n: summary.milestone }), reward: html`${icon('flame', 30)} ${summary.milestone}`, text: t(summary.milestone >= 100 ? 'A hundred days in a row. Legendary!' : summary.milestone >= 30 ? 'A whole month without missing a day. Amazing!' : 'A full week in a row. Keep it going!'), onDone: next }));
+    if (summary.quests.chestReady) steps.push((next) => questChest(next));
+    const run = (i) => (i < steps.length ? steps[i](() => run(i + 1)) : go());
+    run(0);
   });
 }
 

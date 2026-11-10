@@ -1,5 +1,5 @@
 // Learner progress: pure functions over a plain state object, plus saving to the device.
-import { NODES, MAX_LEVEL, ITEMS } from './course.js';
+import { NODES, MAX_LEVEL, ITEMS, SECTIONS } from './course.js';
 import { review, isDue, strength } from './srs.js';
 import { L, COURSES } from './lang.js';
 
@@ -15,6 +15,11 @@ export const GEMS_CHEST = 15;
 export const FREEZE_PRICE = 50;
 export const HEARTS_PRICE = 30; // gems for a full set of hearts
 export const MAX_FREEZES = 2;
+export const REPAIR_PRICE = 100; // gems to bring back a streak that broke in the last 2 days
+export const REPAIR_DAYS = 2;
+export const QUEST_COUNT = 3;
+export const QUEST_CHEST_GEMS = 20;
+export const DOUBLE_XP_MS = 15 * 60 * 1000;
 
 // Bumped when a course's path is rebuilt, so finished lessons are carried over. One number per course,
 // so rebuilding the Japanese path does not re-migrate the others.
@@ -31,7 +36,7 @@ export function defaultState(now = Date.now()) {
     daily: {},
     dailyGoal: 20,
     gems: 20,
-    streak: { count: 0, lastDay: null, freezes: 0, best: 0 },
+    streak: { count: 0, lastDay: null, freezes: 0, best: 0, lost: null }, // lost: a streak that just broke, kept for a repair
     hearts: { count: MAX_HEARTS, updatedAt: now },
     nodes: {},
     items: {},
@@ -39,6 +44,9 @@ export function defaultState(now = Date.now()) {
     seen: { fact: [], phrase: [], kanji: [], pron: [] },
     missions: {}, // mission id → best stars (1–3)
     answers: {}, // day → [right, wrong] answers that day (for the weekly recap)
+    quests: null, // today's daily quests: { day, items: [{ id, p, paid }], chest: false | 'ready' | 'opened' }
+    doubleXpUntil: 0, // double XP until this time
+    sundayDay: null, // the Sunday whose first-lesson double XP was given
     recapWeek: null, // the week (its Monday) whose recap card was dismissed
     backupAt: null, // when the last backup was saved
     settings: { theme: 'system', sfx: true, voiceRate: 0.85, speaking: true }, // speed: unset = on after 2 lessons (see speedOn)
@@ -62,6 +70,7 @@ export function migrate(raw, now = Date.now()) {
     daily: raw.daily || {},
     missions: raw.missions || {},
     answers: raw.answers || {},
+    quests: raw.quests?.items ? raw.quests : null,
   };
   if (raw.course !== COURSE_VERSION) state.nodes = carryOverNodes(state, raw.nodes || {});
   state.course = COURSE_VERSION;
@@ -170,7 +179,11 @@ export function recordActivity(state, now) {
       usedFreezes = missed;
       s.freezes -= missed;
       s.count += 1;
-    } else s.count = 1;
+    } else {
+      // The streak broke: keep it aside for a short while so it can be repaired for gems.
+      if (s.count >= 2) s.lost = { count: s.count, at: today, late: missed - s.freezes };
+      s.count = 1;
+    }
   }
   s.lastDay = today;
   s.best = Math.max(s.best, s.count);
@@ -265,7 +278,7 @@ function logAnswers(state, results, now) {
 }
 
 // results: Map itemId → { right, wrong }. mode: 'lesson' | 'practice'.
-export function completeSession(state, { node, mode, results, mistakes, now, bonusXp = 0 }) {
+export function completeSession(state, { node, mode, results, mistakes, now, bonusXp = 0, bestRun = 0 }) {
   const missedBefore = mistakeIds(state).length;
   for (const [id, r] of results) state.items[id] = review(state.items[id], r, now, id);
   logAnswers(state, results, now);
@@ -273,9 +286,15 @@ export function completeSession(state, { node, mode, results, mistakes, now, bon
   const mistakesCleared = missedBefore > 0 && mistakesLeft === 0;
 
   const perfect = mistakes === 0;
-  const xp = XP_LESSON + (perfect ? XP_PERFECT_BONUS : 0) + bonusXp;
-  state.xp += xp;
   const today = dayKey(now);
+  // Sundays: the first lesson starts a double-XP window (and counts double itself).
+  const sundayBonus = mode === 'lesson' && isSunday(now) && state.sundayDay !== today;
+  if (sundayBonus) {
+    state.sundayDay = today;
+    grantDoubleXp(state, now);
+  }
+  const xp = (XP_LESSON + (perfect ? XP_PERFECT_BONUS : 0) + bonusXp) * xpMultiplier(state, now);
+  state.xp += xp;
   const goalBefore = (state.daily[today] || 0) >= state.dailyGoal;
   state.daily[today] = (state.daily[today] || 0) + xp;
   const goalReached = !goalBefore && state.daily[today] >= state.dailyGoal;
@@ -297,18 +316,32 @@ export function completeSession(state, { node, mode, results, mistakes, now, bon
   const streak = recordActivity(state, now);
   if (mistakesCleared) state.gems += 5;
   const milestone = streak.extended && STREAK_MILESTONES.includes(state.streak.count) ? state.streak.count : 0;
-  return { xp, gems, perfect, levelUp, goalReached, mistakesCleared, streakExtended: streak.extended, streak: state.streak.count, milestone };
+  // Daily quests: what this session adds up to.
+  let right = 0;
+  let wrong = 0;
+  for (const r of results.values()) {
+    right += r.right || 0;
+    wrong += r.wrong || 0;
+  }
+  const quests = bumpQuests(state, now, {
+    lessons: mode === 'lesson' ? 1 : 0,
+    words: mode === 'practice' ? results.size : 0,
+    run: bestRun,
+    accuracy: mode === 'lesson' && right >= 5 && right / (right + wrong) >= 0.9 ? 1 : 0,
+  });
+  return { xp, gems, perfect, levelUp, goalReached, mistakesCleared, streakExtended: streak.extended, streak: state.streak.count, milestone, quests, sundayBonus };
 }
 
 // Hands-free listening: XP (counts for the daily goal and streak) once enough phrases were heard.
 export const LISTEN_XP_MIN = 10;
 export function completeListening(state, heard, now) {
   if (heard < LISTEN_XP_MIN) return 0;
-  const xp = 5;
+  const xp = 5 * xpMultiplier(state, now);
   state.xp += xp;
   const today = dayKey(now);
   state.daily[today] = (state.daily[today] || 0) + xp;
   recordActivity(state, now);
+  bumpQuests(state, now, {});
   return xp;
 }
 
@@ -316,7 +349,10 @@ export function completeListening(state, heard, now) {
 export function recordSigns(state, results, gems, now) {
   for (const [id, r] of results) if (state.items[id]) state.items[id] = review(state.items[id], r, now, id);
   state.gems += gems;
+  return bumpQuests(state, now, { games: 1 });
 }
+// Any other game that ends (the fun-facts quiz): counts for the "play a game" quest.
+export const recordGame = (state, now) => bumpQuests(state, now, { games: 1 });
 
 // Missions: 10 XP each time (daily goal + streak); 2 gems per star above your best.
 export const unitLessonsDone = (state, unit) => unit.nodes.filter((n) => n.kind === 'lesson').every((n) => isNodeDone(state, n));
@@ -325,16 +361,170 @@ export function completeMission(state, id, stars, now) {
   const gems = Math.max(0, stars - best) * 2;
   state.missions[id] = Math.max(best, stars);
   state.gems += gems;
-  const xp = 10;
+  const xp = 10 * xpMultiplier(state, now);
   state.xp += xp;
   const today = dayKey(now);
   state.daily[today] = (state.daily[today] || 0) + xp;
   recordActivity(state, now);
-  return { xp, gems, best: Math.max(best, stars), improved: stars > best };
+  const quests = bumpQuests(state, now, { games: 1 });
+  return { xp, gems, best: Math.max(best, stars), improved: stars > best, quests };
+}
+
+const GOAL_STEPS = [10, 20, 30, 50];
+
+// ---- Double XP ----
+// A 15-minute window in which every XP source pays double: from the all-quests chest, and on a Sunday's first lesson.
+export const doubleXpActive = (state, now) => (state.doubleXpUntil || 0) > now;
+export const xpMultiplier = (state, now) => (doubleXpActive(state, now) ? 2 : 1);
+export const doubleXpLeftMs = (state, now) => Math.max(0, (state.doubleXpUntil || 0) - now);
+export function grantDoubleXp(state, now) {
+  state.doubleXpUntil = Math.max(state.doubleXpUntil || 0, now) + DOUBLE_XP_MS;
+  return state.doubleXpUntil;
+}
+const isSunday = (now) => new Date(now).getDay() === 0;
+
+// ---- Daily quests ----
+// Three small quests a day from a pool, picked by the date (so they are the same all day), and reset at local
+// midnight. Each pays gems when done; all three open a chest (gems + double XP). `metric` says what counts.
+export const QUEST_POOL = [
+  { id: 'lessons2', metric: 'lessons', target: 2, gems: 5, text: 'Finish 2 lessons' },
+  { id: 'lessons3', metric: 'lessons', target: 3, gems: 8, text: 'Finish 3 lessons' },
+  { id: 'run5', metric: 'run', target: 5, gems: 4, text: 'Get 5 right in a row' },
+  { id: 'run8', metric: 'run', target: 8, gems: 6, text: 'Get 8 right in a row' },
+  { id: 'words10', metric: 'words', target: 10, gems: 5, text: 'Review 10 words' },
+  { id: 'game1', metric: 'games', target: 1, gems: 4, text: 'Play a game from Practice' },
+  { id: 'goal', metric: 'goal', target: 1, gems: 5, text: 'Reach your daily goal' },
+  { id: 'acc90', metric: 'accuracy', target: 1, gems: 6, text: 'Get 90% or more in a lesson' },
+];
+export const questDef = (id) => QUEST_POOL.find((q) => q.id === id);
+
+// A small seeded generator, so the same day always gives the same quests.
+function seeded(text) {
+  let h = 2166136261;
+  for (const c of text) h = Math.imul(h ^ c.charCodeAt(0), 16777619);
+  return () => {
+    h = Math.imul(h ^ (h >>> 15), 2246822507);
+    h = Math.imul(h ^ (h >>> 13), 3266489909);
+    return ((h ^= h >>> 16) >>> 0) / 4294967296;
+  };
+}
+// Three quests with three different metrics.
+export function pickQuests(dayStr) {
+  const rand = seeded(`quests-${dayStr}`);
+  const pool = [...QUEST_POOL];
+  const picked = [];
+  while (picked.length < QUEST_COUNT && pool.length) {
+    const q = pool.splice(Math.floor(rand() * pool.length), 1)[0];
+    if (!picked.some((p) => p.metric === q.metric)) picked.push(q);
+  }
+  return picked;
+}
+
+// Today's quests, started fresh when the day has changed.
+export function ensureQuests(state, now) {
+  const today = dayKey(now);
+  if (state.quests?.day !== today) state.quests = { day: today, items: pickQuests(today).map((q) => ({ id: q.id, p: 0, paid: false })), chest: false };
+  return state.quests;
+}
+export const questList = (state, now) => ensureQuests(state, now).items.map((it) => {
+  const def = questDef(it.id);
+  return { def, p: it.paid ? def.target : Math.min(it.p, def.target), done: it.paid };
+});
+
+// Adds what happened to the quests. gains: { lessons, words, games, accuracy: counts; run: the best streak of
+// right answers }. Returns the quests that were just completed and whether the chest just became ready.
+export function bumpQuests(state, now, gains) {
+  const quests = ensureQuests(state, now);
+  const g = { ...gains, goal: todayXp(state, now) >= state.dailyGoal ? 1 : 0 };
+  const done = [];
+  for (const it of quests.items) {
+    const def = questDef(it.id);
+    const v = g[def.metric] || 0;
+    if (!v || it.paid) continue;
+    it.p = def.metric === 'run' || def.metric === 'goal' ? Math.max(it.p, v) : it.p + v;
+    if (it.p >= def.target) {
+      it.paid = true;
+      state.gems += def.gems;
+      done.push(def);
+    }
+  }
+  const chestReady = quests.chest === false && quests.items.every((it) => it.paid);
+  if (chestReady) quests.chest = 'ready';
+  return { done, chestReady };
+}
+
+// Opens the chest once all three are done: gems and a double-XP window. null when there is nothing to open.
+export function claimQuestChest(state, now) {
+  const quests = ensureQuests(state, now);
+  if (quests.chest !== 'ready') return null;
+  quests.chest = 'opened';
+  state.gems += QUEST_CHEST_GEMS;
+  grantDoubleXp(state, now);
+  return { gems: QUEST_CHEST_GEMS, minutes: DOUBLE_XP_MS / 60000 };
+}
+
+// ---- Streak repair ----
+// A streak that broke within the last 2 days (and no freeze saved it) can be brought back once for gems.
+// Either it has not been restarted yet (the old count is still there), or it was and the old count was kept in streak.lost.
+export function repairOffer(state, now) {
+  const s = state.streak;
+  const today = dayKey(now);
+  if (s.lastDay && s.count >= 2) {
+    const lapsed = daysBetween(s.lastDay, today) - 1 - s.freezes;
+    if (lapsed >= 1 && lapsed <= REPAIR_DAYS) return { count: s.count, price: REPAIR_PRICE, restarted: false };
+  }
+  const lost = s.lost;
+  if (lost && !lost.repaired && lost.late + daysBetween(lost.at, today) <= REPAIR_DAYS) {
+    return { count: lost.count + (s.lastDay ? s.count : 0), price: REPAIR_PRICE, restarted: true };
+  }
+  return null;
+}
+export function repairStreak(state, now) {
+  const offer = repairOffer(state, now);
+  if (!offer || state.gems < offer.price) return 0;
+  state.gems -= offer.price;
+  const s = state.streak;
+  if (offer.restarted) {
+    s.count = offer.count;
+    s.lost.repaired = true;
+  } else {
+    // As if yesterday was studied: studying today carries the streak on.
+    s.lastDay = dayKey(now - 86400000);
+    s.lost = null;
+  }
+  s.best = Math.max(s.best, s.count);
+  return s.count;
+}
+
+// ---- Trip countdown ----
+// Days until the learner's trip (0 on the day), or null when no date is set or it has passed.
+export function tripDaysLeft(state, now) {
+  const date = state.settings.tripDate;
+  if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) return null;
+  const n = daysBetween(dayKey(now), date);
+  return n < 0 ? null : n;
+}
+// What finishing section 1 before the trip takes: lessons left, lessons a day, and the nearest daily goal.
+export function tripPlan(state, now) {
+  const days = tripDaysLeft(state, now);
+  if (!days) return null;
+  const left = SECTIONS[0].units.flatMap((u) => u.nodes).filter((n) => ['lesson', 'read', 'kanji'].includes(n.kind) && !isNodeDone(state, n)).length;
+  if (!left) return { days, left: 0, perDay: 0, goal: null };
+  const perDay = Math.ceil(left / days);
+  const goal = GOAL_STEPS.find((g) => g >= perDay * XP_LESSON) || GOAL_STEPS[GOAL_STEPS.length - 1];
+  return { days, left, perDay, goal };
+}
+
+// ---- Word of the day (for the reminder) ----
+// A word you know that is due soonest (within two days), with its meaning.
+export function wordOfTheDay(state, now) {
+  const soon = now + 2 * 86400000;
+  const word = learnedItemIds(state).filter((id) => ITEMS.get(id).type === 'word' && state.items[id].seen > 0 && (state.items[id].due || 0) <= soon)
+    .sort((a, b) => (state.items[a].due || 0) - (state.items[b].due || 0)).map((id) => ITEMS.get(id))[0];
+  return word ? { jp: word.jp, romaji: word.romaji, en: word.en } : null;
 }
 
 // ---- Weekly recap & goal suggestion ----
-const GOAL_STEPS = [10, 20, 30, 50];
 const lastDays = (n, now) => Array.from({ length: n }, (_, i) => dayKey(now - i * 86400000));
 
 // The last 7 days: words met for the first time, accuracy, the weakest words and the streak.

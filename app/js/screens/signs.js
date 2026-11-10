@@ -12,6 +12,7 @@ import { SIGN_SCENES } from '../content/pack.js';
 import { recordSigns } from '../progress.js';
 import { shuffle } from '../lesson/generate.js';
 import { hideNav } from './activity.js';
+import { announceQuests } from './quests.js';
 
 export const SIGNS_MIN = 3;
 const QUESTIONS = 8;
@@ -88,9 +89,10 @@ export function renderSigns(root) {
   };
 
   const finish = () => {
-    recordSigns(app.state, results, score, app.now());
+    const quests = recordSigns(app.state, results, score, app.now());
     app.save();
     if (score) sfx('bonus');
+    announceQuests(quests);
     mount(root, html`<header class="topbar">${statsBar()}</header>
     <main class="page quiz quiz-end">
       ${mascot(score >= questions.length - 1 ? 'cheer' : 'happy', 110)}

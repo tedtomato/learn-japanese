@@ -4,7 +4,8 @@ import { app, modal } from '../app.js';
 import { L } from '../lang.js';
 import { html, $ } from '../dom.js';
 import { icon } from '../icons.js';
-import { dayKey, displayStreak, studiedToday } from '../progress.js';
+import { dayKey, displayStreak, studiedToday, repairOffer } from '../progress.js';
+import { doRepair } from './quests.js';
 import { t } from '../strings.js';
 
 const WEEKDAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
@@ -31,11 +32,13 @@ export function showStreakCalendar() {
   let year = at.getFullYear();
   let month = at.getMonth();
   const streak = displayStreak(state, now);
+  const repair = repairOffer(state, now);
   const daysStudied = Object.values(state.daily).filter((xp) => xp > 0).length;
 
   modal(html`<div class="streak-cal">
     <div class="streak-head"><span class="streak-flame ${studiedToday(state, now) ? 'on' : ''}">${icon('flame', 40)}</span>
       <div><b>${t('{n} day streak', { n: streak })}</b><small>${t(studiedToday(state, now) ? 'You studied today. See you tomorrow!' : streak ? 'Do a lesson today to keep it going.' : 'Do a lesson today to start a streak.')}</small></div></div>
+    ${repair ? html`<div class="repair-row"><button class="btn btn-secondary btn-block do-repair" ${state.gems >= repair.price ? '' : 'disabled'}>${t('Repair your streak')} · ${icon('gem', 16)} ${repair.price}</button></div>` : ''}
     <div class="cal-nav"><button class="icon-btn cal-prev" aria-label="${t('Previous month')}">‹</button><b class="cal-title"></b><button class="icon-btn cal-next" aria-label="${t('Next month')}">›</button></div>
     <div class="cal-grid cal-weekdays">${WEEKDAYS.map((w) => html`<span>${w}</span>`)}</div>
     <div class="cal-grid cal-days"></div>
@@ -55,6 +58,11 @@ export function showStreakCalendar() {
     if (month > 11) { month = 0; year += 1; }
     render();
   };
+  $('#modal .do-repair')?.addEventListener('click', () => {
+    if (!doRepair()) return;
+    window.dispatchEvent(new HashChangeEvent('hashchange')); // the screen behind shows the repaired streak
+    showStreakCalendar();
+  });
   $('#modal .cal-prev').addEventListener('click', () => step(-1));
   $('#modal .cal-next').addEventListener('click', () => step(1));
   render();

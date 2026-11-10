@@ -1,5 +1,5 @@
 // Shared app context: progress state, saving, navigation, toasts and modals.
-import { loadState, saveState, currentHearts, displayStreak, studiedToday, courseSummary, STORAGE_KEY, TEST_STORAGE_KEY, SUMMARY_KEY } from './progress.js';
+import { loadState, saveState, currentHearts, displayStreak, studiedToday, courseSummary, doubleXpLeftMs, STORAGE_KEY, TEST_STORAGE_KEY, SUMMARY_KEY } from './progress.js';
 import { html, mount, raw, $ } from './dom.js';
 import { L } from './lang.js';
 import { icon } from './icons.js';
@@ -109,6 +109,22 @@ export function flagSvg(code, w = 34) {
     + `<g clip-path="url(#${id})">${(FLAGS[code] || FLAGS.jp)()}</g><rect x="1" y="1" width="32" height="22" rx="5" fill="none" stroke="var(--border)" stroke-width="2"/></svg>`;
 }
 
+// The double-XP timer pill (top bar and lesson header); tickDoubleXp keeps it counting down.
+const clock = (ms) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
+export function doubleXpPill() {
+  const left = doubleXpLeftMs(app.state, app.now());
+  if (!left) return '';
+  return html`<span class="dxp-pill" role="img" aria-label="${t('Double XP: {time} left', { time: clock(left) })}">${icon('bolt', 16)}<b>2× ${clock(left)}</b></span>`;
+}
+function tickDoubleXp() {
+  const left = doubleXpLeftMs(app.state, app.now());
+  document.querySelectorAll('.dxp-pill').forEach((el) => {
+    if (!left) el.remove();
+    else el.querySelector('b').textContent = `2× ${clock(left)}`;
+  });
+}
+if (typeof document !== 'undefined') setInterval(tickDoubleXp, 1000);
+
 export function statsBar() {
   const { state } = app;
   const now = app.now();
@@ -119,6 +135,7 @@ export function statsBar() {
     <button class="stat stat-streak ${studiedToday(state, now) ? 'on' : ''}" aria-label="Day streak: ${streak}. Open calendar">${icon('flame', 22)}<b>${streak}</b></button>
     <button class="stat stat-gems" aria-label="${t('Gems: {n}', { n: state.gems })}">${icon('gem', 22)}<b>${state.gems}</b></button>
     <button class="stat stat-hearts" aria-label="Hearts: ${hearts}. Refill">${icon('heart', 22)}<b>${hearts}</b></button>
+    ${doubleXpPill()}
   </div>`;
 }
 

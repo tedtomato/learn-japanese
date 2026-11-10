@@ -52,7 +52,7 @@ their quiz, and 20 pronunciation tips.
 - **Keep repeating**: spaced repetition per word and character with a one-day grace for new words. Wrong
   *or hesitant* answers come back in a "Let's correct the exercises you missed" round and return sooner
   later. *Explain my answer* breaks any answer down word by word.
-- **Game layer**: streak with freezes and milestones, daily goal, hearts (none lost in a lesson's first
+- **Game layer**: three daily quests with a chest, double-XP windows, streak repair, an optional trip countdown, streak with freezes and milestones, daily goal, hearts (none lost in a lesson's first
   play), gems, treasure chests, trophies, achievements, weekly recap, petals when you finish.
 - **Breaks**: fun facts, phrases, pronunciation tips and (Japanese / Chinese) a character to spot, all
   collected in Practice → Library.

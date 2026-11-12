@@ -37,7 +37,10 @@ try {
     const found = await page.evaluate(({ MIN_TEXT, MIN_RUBY }) => {
       const out = [];
       const W = innerWidth;
-      if (document.documentElement.scrollWidth > W + 1) out.push(`page scrolls sideways (${document.documentElement.scrollWidth}px wide)`);
+      // Compare with the document width, not innerWidth: when something overflows, the phone widens the
+      // layout viewport (innerWidth grows with it) and zooms the whole page out.
+      const DW = document.documentElement.clientWidth;
+      if (document.documentElement.scrollWidth > DW + 1 || W > DW + 1) out.push(`page scrolls sideways or zoomed out (${document.documentElement.scrollWidth}px wide, viewport ${W}px)`);
       const seen = new Set();
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       for (let n = walker.nextNode(); n; n = walker.nextNode()) {
@@ -58,7 +61,7 @@ try {
         if (ruby ? size < MIN_RUBY : size < MIN_TEXT) out.push(`${label} is ${size}px`);
         if (r.right > W + 1 || r.left < -1) out.push(`${label} goes off the screen`);
         // Text cut by its own box (overflow hidden / ellipsis is allowed only where it is meant).
-        if (el.scrollWidth > el.clientWidth + 2 && cs.overflow !== 'visible' && cs.textOverflow !== 'ellipsis' && !el.closest('.word-main')) out.push(`${label} is cut off`);
+        if (el.scrollWidth > el.clientWidth + 2 && cs.overflow !== 'visible' && cs.textOverflow !== 'ellipsis' && !el.closest('.word-main') && !el.closest('.sr-only')) out.push(`${label} is cut off`);
       }
       // Answer boxes and bubbles must hold their content.
       for (const box of document.querySelectorAll('.option, .tile, .bubble, .chat-bubble, .card, .sign')) {

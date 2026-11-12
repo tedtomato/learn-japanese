@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.99', date: '12 Nov 2026', changes: [
+    'Fixed: after answering, the lesson (and the Explain screen) could zoom out and overflow the phone screen',
+  ] },
   { version: '0.98', date: '10 Nov 2026', changes: [
     'New here? Four quick cards explain hearts, gems, your daily goal and how to switch language (again any time from Profile → How it works)',
     'Left a lesson half-way? Pick it up where you stopped, for up to 24 hours',

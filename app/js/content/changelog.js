@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.95', date: '12 Nov 2026', changes: [
+    'Fixed: after answering, the lesson (and the Explain screen) could zoom out and overflow the phone screen',
+  ] },
   { version: '0.94', date: '9 Nov 2026', changes: [
     'Faster start: the app only downloads the language you are learning, and the learning path draws instantly',
     'Smaller updates: a new version only downloads the files that changed, and a slow connection no longer wipes the offline copy',

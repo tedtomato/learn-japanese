@@ -1188,6 +1188,7 @@ function renderCloze(root, s) {
 function renderDialogue(root, s) {
   const ex = s.current;
   const d = ITEMS.get(ex.itemId);
+  (s.heard ||= new Set()).add(ex.itemId);
   const [a, b] = d.cast;
   mount($('.lesson-body', root), html`<p class="instruction"><span class="pill pill-blue">${icon('chat', 14)} ${d.title}</span></p>
     <div class="dialogue">
@@ -1286,7 +1287,7 @@ function finish(root, s) {
   const bonusXp = Math.min(SPEED_BONUS_MAX, s.speedBonus);
   // Testing out of a unit: first-pass accuracy decides; passing marks the unit's lessons as played once.
   const passed = s.testOut && s.passAnswered > 0 && 1 - s.passWrong / s.passAnswered >= TESTOUT_PASS;
-  const summary = completeSession(app.state, { node: s.testOut ? null : s.node, mode: s.testOut ? 'test' : s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp, bestRun: s.bestRun || 0 });
+  const summary = completeSession(app.state, { node: s.testOut ? null : s.node, mode: s.testOut ? 'test' : s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp, bestRun: s.bestRun || 0, heard: [...(s.heard || [])] });
   const skipped = passed ? testOutUnit(app.state, s.node.unit) : 0;
   app.save();
   // Google Drive sync (only when the owner has set it up and the learner turned it on): loaded on demand.

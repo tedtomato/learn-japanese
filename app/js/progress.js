@@ -44,6 +44,7 @@ export function defaultState(now = Date.now()) {
     seen: { fact: [], phrase: [], kanji: [], pron: [] },
     missions: {}, // mission id → best stars (1–3)
     answers: {}, // day → [right, wrong] answers that day (for the weekly recap)
+    heard: {}, // dialogue id → when it was last played in a lesson (dialogues take turns)
     quests: null, // today's daily quests: { day, items: [{ id, p, paid }], chest: false | 'ready' | 'opened' }
     doubleXpUntil: 0, // double XP until this time
     sundayDay: null, // the Sunday whose first-lesson double XP was given
@@ -69,6 +70,7 @@ export function migrate(raw, now = Date.now()) {
     items: raw.items || {},
     daily: raw.daily || {},
     missions: raw.missions || {},
+    heard: raw.heard || {},
     answers: raw.answers || {},
     quests: raw.quests?.items ? raw.quests : null,
   };
@@ -278,8 +280,9 @@ function logAnswers(state, results, now) {
 }
 
 // results: Map itemId → { right, wrong }. mode: 'lesson' | 'practice'.
-export function completeSession(state, { node, mode, results, mistakes, now, bonusXp = 0, bestRun = 0 }) {
+export function completeSession(state, { node, mode, results, mistakes, now, bonusXp = 0, bestRun = 0, heard = [] }) {
   const missedBefore = mistakeIds(state).length;
+  for (const id of heard) state.heard[id] = now;
   for (const [id, r] of results) state.items[id] = review(state.items[id], r, now, id);
   logAnswers(state, results, now);
   const mistakesLeft = mistakeIds(state).length;

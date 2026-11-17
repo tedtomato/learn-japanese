@@ -57,7 +57,9 @@ export function strength(record, now) {
   return Math.max(0.05, base * Math.max(0.4, 1 - overdue * 0.3));
 }
 
-// Most urgent first: overdue items, then weak boxes, then the rest by due date.
+// Most urgent first: overdue items (weakest boxes first), then the rest by how soon they are due.
+// Not-due items are NOT ranked by box: that kept asking the words of the previous lesson (box 1,
+// due tomorrow) in every following lesson, even when they were answered right each time.
 export function byUrgency(records, now) {
   return (a, b) => {
     const ra = records[a];
@@ -65,7 +67,11 @@ export function byUrgency(records, now) {
     const da = isDue(ra, now) ? 0 : 1;
     const db = isDue(rb, now) ? 0 : 1;
     if (da !== db) return da - db;
-    if (ra.box !== rb.box) return ra.box - rb.box;
+    if (!da && ra.box !== rb.box) return ra.box - rb.box;
     return ra.due - rb.due;
   };
 }
+
+// Answered within the last few hours and not due yet: leave it alone for now.
+export const RECENT_MS = 4 * 60 * 60 * 1000;
+export const isRecent = (record, now) => !!record && !isDue(record, now) && now - (record.last || 0) < RECENT_MS;

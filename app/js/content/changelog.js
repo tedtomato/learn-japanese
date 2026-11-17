@@ -1,6 +1,11 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.99.1', date: '17 Nov 2026', changes: [
+    'Reviews no longer keep asking the words you just learned: something answered in the last few hours waits its turn, and reviews pick what is actually due (or due soonest)',
+    'A unit\'s dialogues now take turns instead of the same one playing lesson after lesson',
+    'First-time kana lessons ask each character three times instead of four',
+  ] },
   { version: '0.99', date: '12 Nov 2026', changes: [
     'Fixed: after answering, the lesson (and the Explain screen) could zoom out and overflow the phone screen',
   ] },

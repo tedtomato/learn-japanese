@@ -1,6 +1,6 @@
 // Turns a path node (or a practice request) into a list of exercises.
 import { FAMILIAR_IDS, ITEMS } from '../course.js';
-import { byUrgency, strength } from '../srs.js';
+import { byUrgency, strength, isRecent } from '../srs.js';
 import { L, LANG } from '../lang.js';
 import { romajiMatch, latinKey } from '../normalise.js';
 import { splitSyllables, toneNumbers } from '../pinyin.js';
@@ -438,6 +438,13 @@ function matchExercise(ids, ctx) {
 }
 
 // A question about a conversation: one of its `questions` when it has several (the first option is the answer).
+// The unit's dialogue heard least recently (never heard first), so a unit's dialogues take turns.
+export function nextDialogue(ids, state, rng) {
+  const heard = state.heard || {};
+  const oldest = Math.min(...ids.map((id) => heard[id] || 0));
+  return pick(ids.filter((id) => (heard[id] || 0) === oldest), rng);
+}
+
 function dialogueExercise(id, ctx, q = null) {
   const d = ITEMS.get(id);
   const { question, options } = q || (d.questions?.length ? pick(d.questions, ctx.rng) : d);
@@ -488,7 +495,10 @@ export function context({ state, sessionIds, level, rng, canListen = true, canSp
 function pickReview(state, exclude, count, rng, now, { peeks = false } = {}) {
   const learned = Object.keys(state.items).filter((id) => ITEMS.has(id) && !exclude.includes(id) && ITEMS.get(id).type !== 'dialogue'
     && (peeks || !ITEMS.get(id).peek));
-  const urgent = learned.sort(byUrgency(state.items, now)).slice(0, Math.max(count * 2, 6));
+  // Something answered in the last few hours and not due yet is left alone: fewer reviews beat asking
+  // the previous lesson's words again right away.
+  const rested = learned.filter((id) => !isRecent(state.items[id], now));
+  const urgent = rested.sort(byUrgency(state.items, now)).slice(0, Math.max(count * 2, 6));
   return shuffle(urgent, rng).slice(0, count);
 }
 
@@ -599,7 +609,8 @@ export function generateLesson(node, state, opts = {}) {
     }
     const first = buildExercise(item, questionType(item, level >= 2 || isReview ? 'any' : 'easy', ctx), ctx);
     (!isNew(state, id) || isReview || gentleKana ? rest : head).push(first);
-    if (!isReview) rest.push(buildExercise(item, questionType(item, level >= 1 ? 'hard' : 'any', ctx), ctx));
+    // Gentle kana lessons already ask each character three times (check, pair, first): no fourth ask.
+    if (!isReview && !gentleKana) rest.push(buildExercise(item, questionType(item, level >= 1 ? 'hard' : 'any', ctx), ctx));
   }
   // Reading practice with words the learner already knows, written with this lesson's characters.
   if (readMode) {
@@ -636,7 +647,7 @@ export function generateLesson(node, state, opts = {}) {
   }
   // From the second level on, units with conversations add one to listen to.
   const dialogues = node.unit?.dialogueIds || [];
-  if (dialogues.length && level >= 1 && ctx.canListen) body.splice(Math.floor(body.length * 0.8), 0, dialogueExercise(pick(dialogues, rng), ctx));
+  if (dialogues.length && level >= 1 && ctx.canListen) body.splice(Math.floor(body.length * 0.8), 0, dialogueExercise(nextDialogue(dialogues, state, rng), ctx));
   const exercises = [...head, ...body];
   if (LANG === 'ja' && level >= 1 && !readMode) ensureReading(exercises, ctx, state);
   if ((level >= 2 || isReview) && !readMode) raiseProduction(exercises, ctx);

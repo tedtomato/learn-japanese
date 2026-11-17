@@ -401,3 +401,28 @@ test('pronunciation tips are tidbits, collected in state.seen.pron', () => {
   const { item } = nextTidbit(state, () => 0.99, ['pron']);
   assert.ok(item.title && item.text && item.example && item.say);
 });
+
+test('reviews skip words answered in the last few hours, and a unit\'s dialogues take turns', async () => {
+  const { nextDialogue } = await import('../app/js/lesson/generate.js');
+  const { review } = await import('../app/js/srs.js');
+  const { defaultState, completeSession } = await import('../app/js/progress.js');
+  const now = new Date(2026, 10, 10, 9).getTime();
+  const state = defaultState(now);
+  const lesson = NODES.find((n) => n.kind === 'lesson');
+  const next = NODES.find((n) => n.kind === 'lesson' && n !== lesson);
+  // Learn the first lesson's words right now (all right, not due for a day)…
+  for (const id of lesson.items) state.items[id] = review(undefined, { right: 2, wrong: 0 }, now, id);
+  // …and some older words that are due.
+  const older = NODES.filter((n) => n.kind === 'lesson').slice(5, 8).flatMap((n) => n.items).slice(0, 6);
+  for (const id of older) state.items[id] = review(undefined, { right: 1, wrong: 0 }, now - 3 * 86400000, id);
+  const { exercises } = generateLesson(next, state, { rng: makeRng(3), now: now + 30 * 60000, level: 0, canListen: true });
+  const asked = new Set(exercises.flatMap((e) => e.itemIds || []));
+  assert.ok(!lesson.items.some((id) => asked.has(id)), 'the previous lesson\'s words are not reviewed half an hour later');
+  assert.ok(older.some((id) => asked.has(id)), 'due words are');
+  // Dialogues: the one heard least recently comes next.
+  const ids = ['dl-a', 'dl-b'];
+  completeSession(state, { mode: 'lesson', results: new Map(), mistakes: 0, now, heard: ['dl-a'] });
+  assert.equal(nextDialogue(ids, state, makeRng(1)), 'dl-b');
+  completeSession(state, { mode: 'lesson', results: new Map(), mistakes: 0, now: now + 1, heard: ['dl-b'] });
+  assert.equal(nextDialogue(ids, state, makeRng(1)), 'dl-a');
+});

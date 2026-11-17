@@ -408,7 +408,8 @@ function result(root, s, ok, opts = {}) {
     }
     if (hesitated) {
       record(s, ids, 'hesitated');
-      ids.forEach((id) => s.missed.add(id));
+      // Only a hint, a typo or a lucky guess brings the item back at the end; merely slow is fine.
+      if (ex.hinted || opts.close) ids.forEach((id) => s.missed.add(id));
     }
     sfx('correct');
     buzz(HAPTIC.right);
@@ -444,7 +445,7 @@ function result(root, s, ok, opts = {}) {
   const verdict = ok ? pickOne(PRAISE) : t('Correct answer:');
   const badges = [];
   if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} ${t('Speed bonus')}</span>`);
-  if (hesitated) badges.push(html`<span class="pill pill-orange">${opts.mistyped ? t('You mistyped') : opts.close ? t('Almost right') : ex.hinted ? t('Used a hint') : t('A bit slow')} — ${t('we\'ll practise it again')}</span>`);
+  if (hesitated) badges.push(html`<span class="pill pill-orange">${opts.mistyped ? t('You mistyped') : opts.close ? t('Almost right') : ex.hinted ? t('Used a hint') : t('A bit slow')}${ex.hinted || opts.close ? ` — ${t('we\'ll practise it again')}` : ''}</span>`);
   // How sure were you? A lucky guess comes back like a slow answer; a slow answer you knew does not.
   const sureable = ok && !opts.mistyped && ids.length && !ex.hinted && ex.type !== 'intro' && ex.type !== 'match';
   if (sureable) badges.push(html`<button class="pill pill-sure" data-sure="${hesitated ? 'knew' : 'guessed'}">${t(hesitated ? '😎 I knew it' : '🤔 I guessed')}</button>`);

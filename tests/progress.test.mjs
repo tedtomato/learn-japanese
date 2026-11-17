@@ -99,10 +99,9 @@ test('a mistake stays in the Mistakes review until answered right, and fixing th
   const [a, b] = NODES[0].items;
   completeSession(s, { mode: 'lesson', node: NODES[0], results: new Map([[a, { right: 0, wrong: 1 }], [b, { right: 1, wrong: 0 }]]), mistakes: 1, now: T0 });
   assert.deepEqual(mistakeIds(s), [a]);
-  completeSession(s, { mode: 'practice', results: new Map([[a, { right: 1, wrong: 0, hesitated: 1 }]]), mistakes: 0, now: T0 + 1 });
-  assert.deepEqual(mistakeIds(s), [a], 'a hesitant answer does not clear it');
   const gems = s.gems;
-  const r = completeSession(s, { mode: 'practice', results: new Map([[a, { right: 1, wrong: 0 }]]), mistakes: 0, now: T0 + 2 });
+  // A slow but right answer clears it too (it only comes back a little sooner), and that pays the gems.
+  const r = completeSession(s, { mode: 'practice', results: new Map([[a, { right: 1, wrong: 0, hesitated: 1 }]]), mistakes: 0, now: T0 + 1 });
   assert.deepEqual(mistakeIds(s), []);
   assert.ok(r.mistakesCleared && s.gems > gems + 5);
 });

@@ -50,8 +50,8 @@ their quiz, and 20 pronunciation tips.
 - **Speed challenge** (off for your first two lessons): a countdown per task; quick answers earn a bonus.
   Correct answers move on automatically.
 - **Keep repeating**: spaced repetition per word and character with a one-day grace for new words. Wrong
-  *or hesitant* answers come back in a "Let's correct the exercises you missed" round and return sooner
-  later. *Explain my answer* breaks any answer down word by word.
+  answers (and lucky guesses, hints and typos) come back in a "Let's correct the exercises you missed"
+  round; slow answers just return a little sooner. *Explain my answer* breaks any answer down word by word.
 - **Game layer**: three daily quests with a chest, double-XP windows, streak repair, an optional trip countdown, streak with freezes and milestones, daily goal, hearts (none lost in a lesson's first
   play), gems, treasure chests, trophies, achievements, weekly recap, petals when you finish.
 - **Breaks**: fun facts, phrases, pronunciation tips and (Japanese / Chinese) a character to spot, all

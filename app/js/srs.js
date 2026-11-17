@@ -26,7 +26,9 @@ export function review(record, { right, wrong, hesitated = 0 }, now, id = null) 
   // Grace period: something just learned is not "due" until a day has passed, so a lesson is not flagged
   // for review minutes after it was finished (the retry round already covers the shaky ones).
   if (!prev.seen) wait = Math.max(wait, FIRST_GRACE);
-  const missed = wrong > 0 ? now : right > 0 && !hesitated ? undefined : prev.missed;
+  // A mistake marks the item for the Mistakes review; any right answer clears the mark (a slow one
+  // already comes back sooner through the shorter wait).
+  const missed = wrong > 0 ? now : right > 0 ? undefined : prev.missed;
   return {
     box,
     seen: prev.seen + 1,

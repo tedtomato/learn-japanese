@@ -1,6 +1,12 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '0.99.3', date: '19 Nov 2026', changes: [
+    'The app feels more alive: tasks slide in, answers pop and shake, tiles fly into place, and the progress bar shines as it grows',
+    'A flame on the progress bar grows as you string right answers together, and your hearts bounce when one is lost',
+    'Finishing a lesson is a little show: Kuri bounces in, your numbers count up, and your path lights up when you come back',
+    'Gems fly to your counter, the play button glows while a word is spoken, and the bottom menu slides between tabs (all of it stops if you use "Reduce motion")',
+  ] },
   { version: '0.99.2', date: '17 Nov 2026', changes: [
     'A slow but right answer no longer comes back at the end of the lesson or in "Fix your mistakes" — only mistakes, hints, typos and lucky guesses do (slow answers just return a little sooner in later reviews)',
   ] },

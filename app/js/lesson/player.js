@@ -7,7 +7,7 @@ import { glossKey, sameTiles } from '../normalise.js';
 import { ITEMS, NODE_BY_ID, MAX_LEVEL } from '../course.js';
 import { app, modal, announce, doubleXpPill } from '../app.js';
 import { lessonKeyIgnored, shortcutsEnabled, listeningMode } from '../a11y.js';
-import { html, mount, raw, $, $$, fitText } from '../dom.js';
+import { html, mount, raw, esc, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot } from '../mascot.js';
 import { person, nameOf } from '../characters.js';
@@ -15,7 +15,7 @@ import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, HAPTIC, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
 import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds, romajiOfChunk, romajiMatch } from './generate.js';
 import {
-  completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, dayKey, buyHearts, HEARTS_PRICE, costsHeart, retryAgain, testOutUnit, TESTOUT_PASS, unitIsLocked, speedOn,
+  completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, isNodeDone, currentNodeIndex, dayKey, buyHearts, HEARTS_PRICE, costsHeart, retryAgain, testOutUnit, TESTOUT_PASS, unitIsLocked, speedOn,
 } from '../progress.js';
 import { nextTidbit, tidbitCard, readings, BREAK_KINDS } from '../tidbits.js';
 import { GRAMMAR } from '../content/pack.js';
@@ -31,6 +31,7 @@ import { questChest } from '../screens/quests.js';
 import { shareButton, wireShare } from '../share.js';
 import { saveResume, clearResume, readResume } from '../resume.js';
 import { applySnapshot, canMistype, forgiveMistype } from '../usability.js';
+import { pop, flip, snapshot, playFrom, countUp, leaveGhost, breathe, pathFx, reduced } from '../motion.js';
 
 const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', L.cheers[2][0], 'You got it!', 'Perfect!', L.cheers[1][0]].map((p) => t(p));
 const SPEED_BONUS_MAX = 5; // XP a session can earn from quick answers
@@ -154,7 +155,8 @@ function renderShell(root, s) {
     <h1 class="sr-only">${s.node ? s.node.title : t('Practice')}</h1>
     <header class="lesson-top">
       <button class="icon-btn quit" aria-label="${t('Quit')}">${icon('close', 26)}</button>
-      <div class="bar bar-lg" role="progressbar" aria-label="${t('Lesson progress')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar-fill" style="width:0%"></div></div>
+      <div class="bar-wrap"><div class="bar bar-lg" role="progressbar" aria-label="${t('Lesson progress')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="bar-fill" style="width:0%"></div></div>
+        <span class="run" hidden aria-hidden="true" data-lvl="0"><span class="run-fl">${icon('flame', 18)}</span><b class="run-n"></b></span></div>
       ${doubleXpPill()}
       ${s.mode === 'lesson' ? html`<span class="stat stat-hearts" role="img" aria-label="${t('Hearts: {n}', { n: hearts })}">${icon('heart', 24)}<b class="hearts-n">${hearts}</b></span>`
         : html`<span class="pill pill-blue">${t('Practice')}</span>`}
@@ -225,12 +227,54 @@ function quit(s) {
 
 function updateProgress(root, s) {
   const pct = Math.min(100, (s.done / s.total) * 100);
-  $('.lesson-top .bar-fill', root).style.width = `${pct}%`;
+  const fill = $('.lesson-top .bar-fill', root);
+  const grew = (parseFloat(fill.style.width) || 0) < pct - 0.01;
+  fill.style.width = `${pct}%`;
+  if (grew) pop(fill, 'shine', 600);
   $('.lesson-top .bar', root).setAttribute('aria-valuenow', String(Math.round(pct)));
   const h = $('.hearts-n', root);
   if (h) {
-    h.textContent = currentHearts(app.state, app.now());
+    const was = Number(h.textContent);
+    const now = currentHearts(app.state, app.now());
+    h.textContent = now;
+    if (now < was) pop(h.parentElement, 'lost', 700);
+    else if (now > was) pop(h.parentElement, 'gain', 700);
     h.parentElement.setAttribute('aria-label', t('Hearts: {n}', { n: h.textContent }));
+  }
+}
+
+// The flame on the progress bar: appears at 3 right answers in a row and grows at 5 and 10; a mistake puts it out.
+function setRun(root, combo) {
+  const run = $('.run', root);
+  if (!run) return;
+  const lvl = combo >= 10 ? 3 : combo >= 5 ? 2 : combo >= 3 ? 1 : 0;
+  const was = Number(run.dataset.lvl);
+  if (!lvl) {
+    if (!run.hidden && !reduced()) {
+      run.classList.remove('on', 'grow');
+      run.classList.add('out');
+      setTimeout(() => { if (!Number(run.dataset.lvl)) run.hidden = true; run.classList.remove('out'); }, 260);
+    } else run.hidden = true;
+    run.dataset.lvl = '0';
+    return;
+  }
+  run.classList.remove('out');
+  $('.run-n', run).textContent = combo;
+  run.dataset.lvl = String(lvl);
+  if (run.hidden) {
+    run.hidden = false;
+    run.classList.remove('on');
+    void run.offsetWidth;
+    run.classList.add('on');
+  } else if (lvl > was) pop(run, 'grow', 600);
+  if (was === 0 && lvl === 1) {
+    // "On fire!" the moment the flame lights (5 and 10 have the big burst instead).
+    const toast = document.createElement('span');
+    toast.className = 'run-toast';
+    toast.setAttribute('aria-hidden', 'true');
+    toast.textContent = t('On fire!');
+    run.parentElement.append(toast);
+    setTimeout(() => toast.remove(), 1500);
   }
 }
 
@@ -302,6 +346,7 @@ function next(root, s) {
     return next(root, s);
   }
   const body = $('.lesson-body', root);
+  leaveGhost(body, 120);
   body.classList.remove('enter');
   void body.offsetWidth;
   body.classList.add('enter');
@@ -413,7 +458,9 @@ function result(root, s, ok, opts = {}) {
     }
     sfx('correct');
     buzz(HAPTIC.right);
+    setRun(root, s.combo);
   } else {
+    setRun(root, 0);
     s.mistakes += 1;
     s.combo = 0;
     record(s, ids, 'wrong');
@@ -444,7 +491,7 @@ function result(root, s, ok, opts = {}) {
   foot.className = `lesson-foot ${ok ? 'good' : 'bad'}`;
   const verdict = ok ? pickOne(PRAISE) : t('Correct answer:');
   const badges = [];
-  if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} ${t('Speed bonus')}</span>`);
+  if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} ${t('Speed bonus')} <b class="xp-n">+${s.speedBonus}</b> XP</span>`);
   if (hesitated) badges.push(html`<span class="pill pill-orange">${opts.mistyped ? t('You mistyped') : opts.close ? t('Almost right') : ex.hinted ? t('Used a hint') : t('A bit slow')}${ex.hinted || opts.close ? ` — ${t('we\'ll practise it again')}` : ''}</span>`);
   // How sure were you? A lucky guess comes back like a slow answer; a slow answer you knew does not.
   const sureable = ok && !opts.mistyped && ids.length && !ex.hinted && ex.type !== 'intro' && ex.type !== 'match';
@@ -470,6 +517,12 @@ function result(root, s, ok, opts = {}) {
     if (outOfHearts) noHearts(root, s);
     else next(root, s);
   };
+  // The speaker reacts, the speed bonus counts up, and a lone "Continue" breathes when the learner idles.
+  const talker = $('.person-wrap', root);
+  if (talker) pop(talker, ok ? 'cheer' : 'oops', 800);
+  const xp = $('.xp-n', foot);
+  if (xp) countUp(xp, s.speedBonus - 1, s.speedBonus, 500, { delay: 260, format: (n) => `+${n}` });
+  if ($$('.fb-actions button', foot).length === 1) breathe($('.check', foot));
   announce(`${ok ? '' : `${t('Not quite.')} `}${verdict}${!ok && opts.answerText ? ` ${opts.answerText}.` : ''}${opts.meaning ? ` ${opts.meaning}` : ''}`);
   $('.check', foot).addEventListener('click', go);
   $('.check', foot).focus({ preventScroll: true });
@@ -593,9 +646,9 @@ function sayAs(root, who, text, { highlight, ...opts } = {}) {
   return speak(text, {
     ...opts,
     speaker: who,
-    onStart: (info) => { wrap?.classList.add('talking'); k?.start(info?.rate || 1); },
+    onStart: (info) => { wrap?.classList.add('talking'); $$('.speaker, .say-inline', root).forEach((b) => b.classList.add('playing')); k?.start(info?.rate || 1); },
     onBoundary: (i) => k?.at(i),
-    onEnd: () => { wrap?.classList.remove('talking'); k?.stop(); },
+    onEnd: () => { wrap?.classList.remove('talking'); $$('.speaker, .say-inline', root).forEach((b) => b.classList.remove('playing')); k?.stop(); },
   });
 }
 
@@ -833,6 +886,7 @@ function renderRecall(root, s) {
       : romajiMatch(input.value, mode === 'dictation' ? target : item.romaji);
     input.disabled = true;
     input.classList.add(match ? 'right' : 'wrong');
+    if (match === 'close') input.classList.add('close');
     if (mode !== 'translate') sayAs(root, s.speaker, speechOf(item));
     result(root, s, !!match, { answerText, close: match === 'close', typed: true,
       meaning: match === 'close' ? t('Almost! It\'s spelled {w}', { w: L.latin ? target : `${item.romaji} (${item.jp})` }) : match || mode ? said : t('means “{en}”', { en: item.en }),
@@ -933,12 +987,13 @@ function renderChoice(root, s) {
     const meaning = item.en && ex.answerKind !== 'en' ? `${item.jp} = ${item.en}` : item.type === 'kana' ? `${item.jp} = ${item.romaji}${item.example ? ` — as in ${item.example.jp} (${item.example.romaji})` : ''}` : item.romaji && !L.latin ? `${item.jp} · ${item.romaji}` : null;
     result(root, s, ok, { answerText: label(item, ex.answerKind === 'kana' ? 'jp' : ex.answerKind), meaning, chosenLabel: ok ? null : label(optionItem(ex, chosen), ex.answerKind === 'kana' ? 'jp' : ex.answerKind) });
   };
-  const choose = (btn) => {
+  const choose = (btn, viaKey = false) => {
     if (s.checked) return;
     $$('.option', root).forEach((b) => {
       b.classList.toggle('selected', b === btn);
       b.setAttribute('aria-pressed', String(b === btn));
     });
+    if (viaKey) pop($('.key', btn), 'bounce', 600);
     chosen = btn.dataset.id;
     sfx('tap');
     if (['jp', 'kana'].includes(ex.answerKind) && ex.prompt !== 'audio') speak(speechOf(optionItem(ex, chosen)), { speaker: s.speaker });
@@ -947,7 +1002,7 @@ function renderChoice(root, s) {
   $$('.option', root).forEach((b) => b.addEventListener('click', () => choose(b)));
   s.keyHandler = (key) => {
     const b = $$('.option', root)[Number(key) - 1];
-    if (b) choose(b);
+    if (b) choose(b, true);
   };
   footer(root, s, {
     onCheck: check,
@@ -984,7 +1039,10 @@ function renderBuild(root, s) {
   const placed = [];
   const line = $('.answer-line', root);
   const redraw = () => {
+    // Tiles that stay in the answer glide to their new place when one is taken out (FLIP).
+    const before = snapshot($$('.tile.placed', line));
     mount(line, html`${placed.map((i) => tileButton(ex, i, jpTiles, 'placed'))}`);
+    playFrom(before, $$('.tile.placed', line));
     $$('.bank .tile', root).forEach((b) => {
       const used = placed.includes(Number(b.dataset.i));
       b.classList.toggle('used', used);
@@ -995,7 +1053,11 @@ function renderBuild(root, s) {
         if (s.checked) return;
         const i = Number(b.dataset.i);
         placed.splice(placed.indexOf(i), 1);
-        redraw();
+        // The tile flies back to its slot in the bank.
+        flip(b, () => {
+          redraw();
+          return $(`.bank .tile[data-i="${i}"]`, root);
+        }, { ms: 240, settle: 'settle' });
         // The tile left the answer: focus goes back to its place in the bank.
         $(`.bank .tile[data-i="${i}"]`, root)?.focus({ preventScroll: true });
       }),
@@ -1009,7 +1071,11 @@ function renderBuild(root, s) {
       placed.push(i);
       sfx('tap');
       if (jpTiles && ex.mode !== 'fast' && ex.mode !== 'audio') speak(ex.tiles[i], { speaker: s.speaker });
-      redraw();
+      // The tile flies from the bank to the answer line (the bank slot stays as a faint ghost).
+      flip(b, () => {
+        redraw();
+        return line.lastElementChild;
+      }, { ms: 260, settle: 'settle' });
     }),
   );
   footer(root, s, {
@@ -1022,6 +1088,7 @@ function renderBuild(root, s) {
         ? sameTiles(given, ex.answer) || ((ex.mode === 'audio' || ex.mode === 'fast') && given.every(romajiOfChunk) && sound(given) === sound(ex.answer))
         : (ex.accept || [ex.answer.join(' ')]).some((a) => glossKey(a) === glossKey(given.join(' ')));
       line.classList.add(ok ? 'right' : 'wrong');
+      $$('.tile', line).forEach((tile, k) => tile.style.setProperty('--k', k));
       sayAs(root, s.speaker, speechOf(item));
       result(root, s, ok, {
         answerText: jpTiles ? ex.answer.join(jpTiles && ex.mode !== 'spell' ? ' ' : '') : ex.answer.join(' '),
@@ -1288,9 +1355,13 @@ function finish(root, s) {
   const bonusXp = Math.min(SPEED_BONUS_MAX, s.speedBonus);
   // Testing out of a unit: first-pass accuracy decides; passing marks the unit's lessons as played once.
   const passed = s.testOut && s.passAnswered > 0 && 1 - s.passWrong / s.passAnswered >= TESTOUT_PASS;
+  // What the path will celebrate on return: the node that was just finished, and the one that opens after it.
+  const wasDone = s.node ? isNodeDone(app.state, s.node) : false;
+  const prevCurrent = currentNodeIndex(app.state);
   const summary = completeSession(app.state, { node: s.testOut ? null : s.node, mode: s.testOut ? 'test' : s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp, bestRun: s.bestRun || 0, heard: [...(s.heard || [])] });
   const skipped = passed ? testOutUnit(app.state, s.node.unit) : 0;
   app.save();
+  pathFx.pending = { id: !s.testOut && s.node ? s.node.id : null, first: !wasDone, prevCurrent, streak: !!summary.streakExtended, at: Date.now() };
   // Google Drive sync (only when the owner has set it up and the learner turned it on): loaded on demand.
   if (!s.testOut) import('../drive.js').then((d) => d.syncOn() && d.autoSync(app.state, now)).catch(() => {});
   sfx('complete');
@@ -1300,7 +1371,7 @@ function finish(root, s) {
     : t(s.mode === 'practice' ? 'Practice complete!' : s.node?.kind === 'story' ? 'Story complete!' : summary.perfect ? 'Perfect lesson!' : 'Lesson complete!');
   const extras = [];
   if (s.testOut) extras.push(html`<p class="pill ${passed ? 'pill-green' : 'pill-orange'}">${passed ? t('{n} lessons unlocked as played', { n: skipped }) : t('You need {n}% to skip — the lessons will get you there', { n: Math.round(TESTOUT_PASS * 100) })}</p>`);
-  if (summary.streakExtended) extras.push(html`<p class="pill pill-orange">${icon('flame', 16)} ${t('{n} day streak!', { n: summary.streak })}</p>`);
+  if (summary.streakExtended) extras.push(html`<p class="pill pill-orange">${icon('flame', 16)} ${raw(esc(t('{n} day streak!', { n: summary.streak })).replace(String(summary.streak), `<i class="cu" data-from="${Math.max(0, summary.streak - 1)}" data-to="${summary.streak}">${summary.streak}</i>`))}</p>`);
   if (summary.milestone) extras.push(html`<p class="pill pill-gold">${icon('flame', 16)} ${t('{n}-day streak milestone!', { n: summary.milestone })}</p>`);
   if (summary.sundayBonus) extras.push(html`<p class="pill pill-purple">${icon('bolt', 16)} ${t('Sunday bonus: double XP for 15 minutes!')}</p>`);
   for (const q of summary.quests.done) extras.push(html`<p class="pill pill-purple">${icon('check', 16)} ${t('Quest done: {text} +{n} gems', { text: t(q.text), n: q.gems })}</p>`);
@@ -1313,20 +1384,30 @@ function finish(root, s) {
   // A random celebration each time (a perfect lesson always gets the fireworks and a bigger cheer).
   const party = accuracy === 100 && !s.testOut ? 'fireworks' : pickCelebration(L.code, lastParty);
   lastParty = party;
+  const mmss = (n) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
+  // Staged reveal: mascot, title, stat tiles (90 ms apart, numbers counting up), extras, week, Continue; then the party.
   mount(root, html`<div class="complete">
-    ${raw(celebrationHtml(party))}
-    ${mascot(party === 'dance' ? 'dance' : 'cheer', accuracy === 100 ? 180 : 140)}
-    <h1>${title}</h1>
-    <div class="extras">${extras}</div>
+    <div class="rev rev-mascot" style="--d:0ms">${mascot(party === 'dance' ? 'dance' : 'cheer', accuracy === 100 ? 180 : 140)}</div>
+    <h1 class="rev" style="--d:200ms">${title}</h1>
     <div class="result-tiles">
-      <div class="result gold"><span>${t('Total XP')}</span><b>${icon('bolt', 20)} ${summary.xp}</b></div>
-      <div class="result green ${accuracy < 70 ? 'low' : ''}"><span>${t(accuracy === 100 ? 'Amazing' : 'Accuracy')}</span><b>${icon('check', 20)} ${accuracy}%</b></div>
-      <div class="result blue"><span>${t('Time')}</span><b>${Math.floor(secs / 60)}:${String(secs % 60).padStart(2, '0')}</b></div>
+      <div class="result gold rev" style="--d:380ms"><span>${t('Total XP')}</span><b>${icon('bolt', 20)} <i class="cu" data-to="${summary.xp}">${summary.xp}</i></b></div>
+      <div class="result green rev ${accuracy < 70 ? 'low' : ''}" style="--d:470ms"><span>${t(accuracy === 100 ? 'Amazing' : 'Accuracy')}</span><b>${icon('check', 20)} <i class="cu" data-to="${accuracy}" data-suffix="%">${accuracy}%</i></b></div>
+      <div class="result blue rev" style="--d:560ms"><span>${t('Time')}</span><b><i class="cu" data-to="${secs}" data-time="1">${mmss(secs)}</i></b></div>
     </div>
-    ${weekStrip(now)}
+    <div class="extras rev" style="--d:700ms">${extras}</div>
+    <div class="rev" style="--d:800ms">${weekStrip(now)}</div>
     ${s.node?.kind === 'review' && !s.testOut ? html`<div class="trophy-share">${art('🏆', 'art-lg')}<div><b>${t('{unit} trophy earned!', { unit: s.node.unit.title })}</b>${shareButton(`🏆 I earned the "${s.node.unit.title}" trophy learning ${L.name} with Hajime! ${summary.streak > 1 ? `🔥 ${summary.streak} day streak.` : ''}`, t('Share on WhatsApp'))}</div></div>` : ''}
-    <button class="btn btn-primary btn-block continue">${t('Continue')}</button>
+    <button class="btn btn-primary btn-block continue rev" style="--d:900ms">${t('Continue')}</button>
   </div>`);
+  // Numbers count up as their tile pops in; the streak pill counts too. Confetti and petals come last.
+  $$('.cu', root).forEach((el, k) => {
+    const to = Number(el.dataset.to);
+    const fmt = el.dataset.time ? mmss : (n) => `${n}${el.dataset.suffix || ''}`;
+    countUp(el, Number(el.dataset.from || 0), to, 650, { delay: 430 + k * 90, format: fmt });
+  });
+  if (!reduced()) setTimeout(() => $('.complete', root)?.insertAdjacentHTML('afterbegin', celebrationHtml(party)), 650);
+  else $('.complete', root).insertAdjacentHTML('afterbegin', celebrationHtml(party));
+  breathe($('.continue', root), 4500);
   wireShare(root);
   const heading = $('h1', root);
   heading.setAttribute('tabindex', '-1');
@@ -1335,7 +1416,7 @@ function finish(root, s) {
     const go = () => app.go(location.hash.startsWith('#/lab') ? '#/lab' : s.mode === 'practice' ? '#/practice' : '#/learn');
     // Pop-ups one after the other: daily goal, streak milestone, the quests chest.
     const steps = [];
-    if (summary.goalReached) steps.push((next) => rewardPopup({ kind: 'bonus', title: t('Daily goal reached!'), reward: html`${icon('gem', 30)} +5 gems`, text: t('Come back tomorrow to keep your streak going.'), onDone: next }));
+    if (summary.goalReached) steps.push((next) => rewardPopup({ kind: 'bonus', gems: true, title: t('Daily goal reached!'), reward: html`${icon('gem', 30)} +5 gems`, text: t('Come back tomorrow to keep your streak going.'), onDone: next }));
     if (summary.milestone) steps.push((next) => rewardPopup({ kind: 'bonus', title: t('{n}-day streak!', { n: summary.milestone }), reward: html`${icon('flame', 30)} ${summary.milestone}`, text: t(summary.milestone >= 100 ? 'A hundred days in a row. Legendary!' : summary.milestone >= 30 ? 'A whole month without missing a day. Amazing!' : 'A full week in a row. Keep it going!'), onDone: next }));
     if (summary.quests.chestReady) steps.push((next) => questChest(next));
     const run = (i) => (i < steps.length ? steps[i](() => run(i + 1)) : go());
@@ -1427,6 +1508,7 @@ function renderTypeSentence(root, s) {
     const match = romajiMatch(input.value, L.latin ? target : item.romaji);
     input.disabled = true;
     input.classList.add(match ? 'right' : 'wrong');
+    if (match === 'close') input.classList.add('close');
     sayAs(root, s.speaker, speechOf(item));
     result(root, s, !!match, { answerText: shown, close: match === 'close', typed: true, meaning: `${shown} = ${item.en}`, chosenLabel: input.value, noHeart: true, timing: null });
   };

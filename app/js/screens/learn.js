@@ -20,6 +20,7 @@ import { strength } from '../srs.js';
 import { questsCard, tripBanner, repairCard, doRepair, questChest, lessonRate } from './quests.js';
 import { readResume, clearResume } from '../resume.js';
 import { maybeShowIntro } from './intro.js';
+import { pathFx, pop, reduced } from '../motion.js';
 
 const OFFSETS = [0, 44, 70, 44, 0, -44, -70, -44];
 const CHEERS = L.cheers;
@@ -272,6 +273,39 @@ function welcomeBack(state, now) {
   toast(t('Welcome back! {n} words are ready to review.', { n: due }), { action: t('Review'), onAction: () => app.go('#/practice/go'), ms: 7000 });
 }
 
+// The unit the learner is in slides its banner in the first time it appears in a session.
+function bannerEnter(unit, current) {
+  if (pathFx.unitsSeen.has(unit.id) || !unit.nodes.some((n) => n.index === current)) return '';
+  pathFx.unitsSeen.add(unit.id);
+  return 'enter';
+}
+
+// Back from a lesson: the finished node fills gold from the centre and its check pops, the next one unlocks (the lock
+// pops away, the node bounces, the START bubble floats in), and a streak that just grew flares.
+function pathCelebration(root, fx, current) {
+  const timers = [];
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  const done = fx.id && $(`.node[data-node="${fx.id}"]`, root);
+  if (done && (done.classList.contains('st-done') || done.classList.contains('st-stale'))) {
+    done.classList.add('just-done');
+    if (!fx.first) done.classList.add('replay');
+    later(() => done.classList.remove('just-done', 'replay'), 1400);
+  }
+  const cur = $('.st-current', root);
+  if (cur && fx.id && current !== fx.prevCurrent) {
+    cur.classList.add('just-unlocked');
+    if (!cur.classList.contains('node-chest')) cur.insertAdjacentHTML('beforeend', `<span class="lock-ghost" aria-hidden="true">${icon('lock', 30).__raw}</span>`);
+    cur.closest('.node-wrap')?.querySelector('.start-bubble')?.classList.add('enter');
+    later(() => {
+      cur.classList.remove('just-unlocked');
+      $('.lock-ghost', cur)?.remove();
+      cur.closest('.node-wrap')?.querySelector('.start-bubble')?.classList.remove('enter');
+    }, 1500);
+  }
+  if (fx.streak) pop($('.stat-streak', root), 'flare', 900);
+  return timers;
+}
+
 export function renderLearn(root) {
   const now = app.now();
   const { state } = app;
@@ -300,7 +334,7 @@ export function renderLearn(root) {
       <h2 class="section-title"><span>${t('Section {n}', { n: s + 1 })}</span>${section.title}</h2>
       ${section.units.map((unit, u) => html`
         <section class="unit" id="unit-${unit.id}">
-          <div class="unit-banner c-${unit.color}">
+          <div class="unit-banner c-${unit.color} ${bannerEnter(unit, current)}">
             <div><span class="unit-kicker"><span class="flag-chip">${raw(flagSvg(L.flag, 22))}</span>${t('Section {n} – Unit {m}', { n: s + 1, m: u + 1 })}</span><h3>${unit.title}</h3><p>${unit.desc}</p>${unitGoal(unit, state)}</div>
             <div class="banner-btns">
               <button class="btn-guide" data-guide="${unit.id}">${icon('book', 18)}<span>${t('Guide')}</span></button>
@@ -358,12 +392,25 @@ export function renderLearn(root) {
   const target = $('.st-current', root) || $('.unit', root);
   // A lesson to continue sits at the top: show it first, until the learner scrolls on.
   const resume = $('.resume-card', root);
-  const reveal = () => (resume ? window.scrollTo(0, 0) : target?.scrollIntoView({ block: 'center' }));
+  // Back from a lesson: frame the finished node and the one that just opened together, so the celebration is in view.
+  const fx = pathFx.pending;
+  pathFx.pending = null;
+  const fxOn = fx && !reduced() && Date.now() - fx.at < 120000;
+  const reveal = () => {
+    const finished = fxOn && fx.id && $(`.node[data-node="${fx.id}"]`, root);
+    if (resume) window.scrollTo(0, 0);
+    else if (finished && target?.classList.contains('st-current')) {
+      const a = finished.getBoundingClientRect();
+      const b = target.getBoundingClientRect();
+      window.scrollBy(0, (a.top + b.bottom) / 2 - window.innerHeight / 2 + 40);
+    } else target?.scrollIntoView({ block: 'center' });
+  };
   reveal();
   requestAnimationFrame(() => {
     drawTrails(root);
     reveal();
   });
+  if (fxOn) pathCelebration(root, fx, current);
   welcomeBack(state, now);
   maybeShowIntro();
   document.fonts?.ready.then(() => drawTrails(root));

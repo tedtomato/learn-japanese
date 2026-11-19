@@ -10,6 +10,7 @@ import { sfx, speak } from './audio.js';
 import { icon } from './icons.js';
 import { celebrationHtml, pickCelebration } from './celebrate.js';
 import { APP_RELEASE, APP_RELEASE_DATE } from './version.js';
+import { flyGems } from './motion.js';
 
 const CHEST = `<svg class="fx-chest" viewBox="0 0 120 100" aria-hidden="true">
   <g class="fx-rays">${Array.from({ length: 12 }, (_, i) => `<rect x="58" y="-30" width="4" height="34" rx="2" transform="rotate(${i * 30} 60 50)"/>`).join('')}</g>
@@ -19,7 +20,7 @@ const CHEST = `<svg class="fx-chest" viewBox="0 0 120 100" aria-hidden="true">
 </svg>`;
 
 // kind: 'chest' | 'bonus'. reward: html for the prize line.
-export function rewardPopup({ kind = 'chest', title, reward, text = '', onDone } = {}) {
+export function rewardPopup({ kind = 'chest', title, reward, text = '', onDone, gems = kind === 'chest' } = {}) {
   const root = $('#modal');
   sfx(kind === 'chest' ? 'chest' : 'bonus');
   mount(root, html`<div class="scrim"></div>
@@ -34,6 +35,8 @@ export function rewardPopup({ kind = 'chest', title, reward, text = '', onDone }
     </div>`);
   openLayer(root, { focus: 'button' });
   root.querySelector('button').addEventListener('click', () => {
+    // Gems fly up to the counter in the top bar (when this screen has one).
+    if (gems) flyGems(root.querySelector('.big-reward') || root.querySelector('.fx-stage'));
     closeLayer(root);
     onDone?.();
   });

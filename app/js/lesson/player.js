@@ -9,7 +9,7 @@ import { app, modal, announce, doubleXpPill } from '../app.js';
 import { lessonKeyIgnored, shortcutsEnabled, listeningMode } from '../a11y.js';
 import { html, mount, raw, esc, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
-import { mascot } from '../mascot.js';
+import { mascot, lookAt } from '../mascot.js';
 import { person, nameOf } from '../characters.js';
 import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, HAPTIC, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
@@ -23,7 +23,7 @@ import { jpItem, jpChunk, speechOf, kanaExample, LANG_ATTR } from './text.js';
 import { t, langName, countryName, countryIn } from '../strings.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';
-import { comboBurst } from '../fx.js';
+import { thunderCombo } from '../fx.js';
 import { queueMoment, playMoments, buildQueue, weekOf, sayLine } from '../moments.js';
 import { achievements, newlyUnlocked } from '../screens/profile.js';
 import { celebrationHtml, pickCelebration } from '../celebrate.js';
@@ -460,10 +460,8 @@ function result(root, s, ok, opts = {}) {
     // Every 5 right answers in a row (that count), a short celebration.
     s.combo = (s.combo || 0) + 1;
     s.bestRun = Math.max(s.bestRun || 0, s.combo);
-    if (s.combo % 5 === 0) {
-      comboBurst(s.combo);
-      setTimeout(() => sfx('bonus'), 150);
-    }
+    // At 3, 5, 10 (and every 5 after): the thunder combo (fx.js), with the combo sound and buzz below.
+    if (s.combo === 3 || s.combo % 5 === 0) thunderCombo(s.combo);
     if (hesitated) {
       record(s, ids, 'hesitated');
       // Only a hint, a typo or a lucky guess brings the item back at the end; merely slow is fine.
@@ -540,6 +538,7 @@ function result(root, s, ok, opts = {}) {
   // The speaker reacts, the speed bonus counts up, and a lone "Continue" breathes when the learner idles.
   const talker = $('.person-wrap', root);
   if (talker) pop(talker, ok ? 'cheer' : 'oops', 800);
+  lookAt($('.person', talker || root)); // and looks back at the learner
   if (ok && s.combo >= 5) sparkleRing(foot);
   const xp = $('.xp-n', foot);
   if (xp) countUp(xp, s.speedBonus - 1, s.speedBonus, 500, { delay: 260, format: (n) => `+${n}` });
@@ -1016,6 +1015,7 @@ function renderChoice(root, s) {
     });
     if (viaKey) pop($('.key', btn), 'bounce', 600);
     chosen = btn.dataset.id;
+    lookAt($('.prompt .person, .prompt .mascot', root), btn); // the speaker glances at the chosen answer
     sfx('select');
     buzz(HAPTIC.select);
     if (['jp', 'kana'].includes(ex.answerKind) && ex.prompt !== 'audio') speak(speechOf(optionItem(ex, chosen)), { speaker: s.speaker });
@@ -1094,6 +1094,7 @@ function renderBuild(root, s) {
       placed.push(i);
       sfx('tile');
       buzz(HAPTIC.tile);
+      lookAt($('.prompt .person, .prompt .mascot', root), line); // the speaker watches the tile land
       if (jpTiles && ex.mode !== 'fast' && ex.mode !== 'audio') speak(ex.tiles[i], { speaker: s.speaker });
       // The tile flies from the bank to the answer line (the bank slot stays as a faint ghost).
       const flight = flip(b, () => {
@@ -1396,7 +1397,7 @@ function finish(root, s) {
   const skipped = passed ? testOutUnit(app.state, s.node.unit) : 0;
   const newAch = newlyUnlocked(achBefore, achievements(app.state, now));
   app.save();
-  pathFx.pending = { id: !s.testOut && s.node ? s.node.id : null, first: !wasDone, prevCurrent, streak: !!summary.streakExtended, at: Date.now() };
+  pathFx.pending = { id: !s.testOut && s.node ? s.node.id : null, first: !wasDone, prevCurrent, streak: !!summary.streakExtended, xp: summary.xp, at: Date.now() };
   // Google Drive sync (only when the owner has set it up and the learner turned it on): loaded on demand.
   if (!s.testOut) import('../drive.js').then((d) => d.syncOn() && d.autoSync(app.state, now)).catch(() => {});
   sfx(summary.perfect ? 'perfect' : 'complete');

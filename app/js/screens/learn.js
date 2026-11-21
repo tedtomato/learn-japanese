@@ -8,7 +8,8 @@ import { decorFor, drawTrails, trailBetween, ROADBLOCK } from '../scenery.js';
 import { app, statsBar, toast, modal, flagSvg } from '../app.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
-import { mascot, MOODS } from '../mascot.js';
+import { mascot, MOODS, followFinger } from '../mascot.js';
+import { energyMeter, pourEnergy } from '../energy.js';
 import { speak, sfx, buzz, HAPTIC } from '../audio.js';
 import { art } from '../art.js';
 import { MISSIONS } from '../content/pack.js';
@@ -386,9 +387,9 @@ export function renderLearn(root) {
     ${gift && !giftOnPath ? giftCard() : ''}
     <section class="card goal-card" role="button" tabindex="0" aria-label="${t('About the daily goal')}">
       <div class="goal-icon">${icon('bolt', 22)}</div>
-      <div class="goal-text"><b>${t('Daily goal')}</b><span>${Math.min(xp, goal)} / ${goal} XP</span></div>
+      <div class="goal-text"><b>${t('Daily goal')}</b><span><span class="goal-xp">${Math.min(xp, goal)}</span> / ${goal} XP</span></div>
       ${xp >= goal ? html`<span class="pill pill-gold">${icon('check', 14)} ${t('Done!')}</span>` : ''}
-      <div class="bar"><div class="bar-fill" style="width:${Math.min(100, (xp / goal) * 100)}%"></div></div>
+      ${energyMeter(xp, goal)}
     </section>
     ${resumeCard(now)}
     ${questsCard(state, now)}
@@ -468,6 +469,8 @@ export function renderLearn(root) {
   const fx = pathFx.pending;
   pathFx.pending = null;
   const fxOn = fx && !reduced() && Date.now() - fx.at < 120000;
+  if (fx && fx.xp && Date.now() - fx.at < 120000) pourEnergy($('.goal-card', root), xp - fx.xp, xp, goal); // the goal meter pours up to today's XP
+  followFinger(root); // Kuri beside the current node follows the finger and looks at the node
   let cameraMoved = false;
   const reveal = () => {
     const finished = fxOn && fx.id && $(`.node[data-node="${fx.id}"]`, root);

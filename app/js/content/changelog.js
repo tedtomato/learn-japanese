@@ -9,6 +9,7 @@ export const CHANGELOG = [
     'Reward moments are bigger: huge heroes with slowly turning rays, coins fountaining from chests, gifts that shake harder and harder before the lid pops, and Kuri jumping in from below',
     'The path camera follows you after a lesson: it frames the finished node, draws the trail to the next one dot by dot, then glides down as it pops open; Kuri hops beside your lesson now and then',
     'New Profile setting: Animations — Full or Calm (Calm skips the movement, like your phone\'s "Reduce motion")',
+    'Kuri and the panda are drawn with volume now (shaded fur, a lit side, a shadow on the ground), breathe, wag and turn their head to look at what you tap; 3, 5 and 10 in a row call down a lightning strike with a screen flash and the number slamming in; your daily goal is an energy capsule that fills with a sloshing liquid and sparks when it is full',
   ] },
   { version: '1.0', date: '21 Nov 2026', changes: [
     'Rewards are moments now: your streak flame ignites and counts up while the week fills in, the daily goal ring fills and bursts into gems, chests wobble and fly open, and finishing a unit raises a trophy',

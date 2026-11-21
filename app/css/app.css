@@ -2054,3 +2054,152 @@ body:not(.in-lesson) .screen { animation: screen-in .18s var(--ease-out) backwar
   .unit-banner.enter, .unit-ribbon, .node-mascot.left, .node-mascot.right, .lesson-body.enter, .lesson-body.enter > *, .leave-ghost { animation: none; }
 }
 :root.calm .unit-banner.enter, :root.calm .unit-ribbon, :root.calm .node-mascot.left, :root.calm .node-mascot.right, :root.calm .lesson-body.enter, :root.calm .lesson-body.enter > *, :root.calm .leave-ghost { animation: none; }
+
+/* ---------- Mascot 2.5D + thunder (v1.1) ---------- */
+/* Kuri with volume: layered groups (js/mascot.js) that breathe, wag, blink and turn. Every layer pivots around its own
+   box (transform-box: fill-box); the look direction comes in as --lx/--ly (−1..1, set by lookAt) on the individual
+   `translate` / `scale` / `rotate` properties, which compose with the pose keyframes on `transform`. */
+.mascot .m-body, .mascot .m-head, .mascot .m-face, .mascot .m-features, .mascot .m-ears, .mascot .m-tail, .mascot .m-shadow, .mascot .m-paws, .mascot .m-arms { transform-box: fill-box; }
+.mascot .m-body { transform-origin: 50% 100%; animation: m-breathe 2.6s ease-in-out infinite; }
+.mascot .m-head { transform-origin: 50% 85%; animation: m-head-idle 5.2s calc(var(--seed, 0) * -5.2s) ease-in-out infinite; transition: translate .28s var(--ease-out), scale .28s var(--ease-out); }
+.mascot .m-features { transform-origin: 50% 50%; transition: translate .28s var(--ease-out); }
+.mascot .m-ears { transform-origin: 50% 100%; transition: translate .28s var(--ease-out); }
+.mascot .m-tail { transform-origin: 12% 88%; animation: m-wag 1.4s ease-in-out infinite alternate; }
+.mascot .m-shadow { transform-origin: 50% 50%; transition: scale .28s var(--ease-out), translate .28s var(--ease-out); }
+.mascot .dog-eyes { animation-delay: calc(var(--seed, 0) * -4.2s); }
+.mascot .ear-r { animation-delay: calc(.35s + var(--seed, 0) * -5s); }
+/* Head turn with parallax: the head shell moves a little, the features more, the ears the other way. */
+.mascot .m-head { translate: calc(var(--lx, 0) * 3.5px) calc(var(--ly, 0) * 2.5px); scale: calc(1 - .05 * max(var(--lx, 0), -1 * var(--lx, 0))) calc(1 + .02 * max(var(--ly, 0), -1 * var(--ly, 0))); }
+.mascot .m-features { translate: calc(var(--lx, 0) * 6.5px) calc(var(--ly, 0) * 4.5px); }
+.mascot .m-ears { translate: calc(var(--lx, 0) * -2.5px) calc(var(--ly, 0) * 1px); }
+.mascot[data-look="up"] .m-features { translate: calc(var(--lx, 0) * 6.5px) -5px; }
+/* Lean (--lean −1..1): the whole body tips and the contact shadow stretches away from the lean. */
+.mascot { rotate: calc(var(--lean, 0) * 6deg); transition: rotate .3s var(--ease-out); }
+.mascot .m-shadow { scale: calc(1 + .22 * max(var(--lean, 0), -1 * var(--lean, 0))) 1; translate: calc(var(--lean, 0) * -5px) 0; }
+@keyframes m-breathe { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.03); } }
+@keyframes m-head-idle { 0%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-.9px) rotate(0); } 50% { transform: translateY(0); } 78% { transform: translateY(-.4px) rotate(0); } 84%, 92% { transform: translateY(0) rotate(-5deg); } 97% { transform: rotate(1deg); } }
+@keyframes m-wag { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+/* Poses, layered: a jump's ears trail and the shadow shrinks; the cheer tilts the head and waves; sad drops the ears and the head. */
+.mascot.mood-jump .ear, .mascot.mood-party .ear, .mascot.mood-cheer .ear, .mascot.mood-dance .ear { animation: m-ear-trail 1s ease-in-out infinite; }
+.mascot.mood-cheer .ear { animation-duration: 1.2s; } .mascot.mood-party .ear { animation-duration: 1.1s; } .mascot.mood-dance .ear { animation: m-ear-trail .7s ease-in-out infinite alternate; }
+.mascot .ear-r { animation-delay: .04s; }
+@keyframes m-ear-trail { 0%, 100% { transform: rotate(0); } 14% { transform: rotate(-4deg); } 38% { transform: rotate(12deg); } 62% { transform: rotate(-8deg); } 78% { transform: rotate(3deg); } }
+.mascot.mood-jump .m-arms, .mascot.mood-cheer .m-arms, .mascot.mood-dance .m-arms { transform-origin: 50% 100%; animation: m-wave 1.2s ease-in-out infinite; }
+.mascot.mood-jump .m-arms { animation-duration: 1s; }
+@keyframes m-wave { 0%, 100% { transform: scaleY(1) translateY(0); } 38% { transform: scaleY(1.08) translateY(-3px); } 62% { transform: scaleY(.94) translateY(2px); } }
+.mascot.mood-cheer .m-head, .mascot.mood-party .m-head { animation: m-cheer-head 1.2s ease-in-out infinite; }
+.mascot.mood-party .m-head { animation-duration: 1.1s; }
+@keyframes m-cheer-head { 0%, 100% { transform: rotate(0) translateY(0); } 36% { transform: rotate(6deg) translateY(-2px); } 62% { transform: rotate(-3deg) translateY(1px); } }
+.mascot.mood-cheer .shadow, .mascot.mood-party .shadow, .mascot.mood-dance .shadow { transform-box: fill-box; transform-origin: center; animation: mm-shadow 1.2s ease-in-out infinite; }
+.mascot.mood-party .shadow { animation-duration: 1.1s; } .mascot.mood-dance .shadow { animation: mm-shadow .7s ease-in-out infinite alternate; }
+.mascot.mood-sad .ear-l { rotate: 14deg; } .mascot.mood-sad .ear-r { rotate: -14deg; }
+.mascot.mood-sad .m-head { translate: 0 3px; animation: none; } .mascot.mood-sad .m-tail { animation: none; rotate: -20deg; }
+.mascot.mood-sleepy .m-head { translate: 0 2px; animation: m-sleepy-head 3.2s ease-in-out infinite; }
+@keyframes m-sleepy-head { 0%, 100% { transform: rotate(-3deg) translateY(0); } 50% { transform: rotate(-4deg) translateY(1.5px); } }
+.mascot.mood-think .m-head { animation: m-think-head 2.5s ease-in-out infinite; }
+@keyframes m-think-head { 0%, 100% { transform: rotate(-4deg); } 50% { transform: rotate(-6deg) translateY(-.5px); } }
+.mascot.mood-cool .m-head { animation: m-cool-head 3s ease-in-out infinite; }
+@keyframes m-cool-head { 0%, 100% { transform: rotate(0); } 50% { transform: rotate(-3deg) translateY(-1px); } }
+/* Oops (the small sad Kuri in the feedback bar): a quick head shake on top of the drooping ears. */
+.fb-sad .mascot .m-head { animation: m-headshake .6s var(--ease-out); translate: 0 2px; }
+@keyframes m-headshake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-3px) rotate(-4deg); } 45% { transform: translateX(3px) rotate(4deg); } 70% { transform: translateX(-2px) rotate(-2deg); } }
+/* The lesson characters look too: eyes and head follow --lx/--ly from lookAt. */
+.person .head { translate: calc(var(--lx, 0) * 2px) calc(var(--ly, 0) * 1.5px); rotate: calc(var(--lx, 0) * 3deg); transition: translate .28s var(--ease-out), rotate .28s var(--ease-out); }
+.person .eyes { translate: calc(var(--lx, 0) * 3px) calc(var(--ly, 0) * 2px); transition: translate .22s var(--ease-out); }
+
+/* Thunder combo (fx.js thunderCombo): charge-up → strike → slam → settle, ~1.1 s over the lesson, never blocking input. */
+.thunder { position: fixed; inset: 0; z-index: 60; pointer-events: none; display: grid; place-items: center; --el: #58c7ff; }
+.thunder[data-lvl="10"] { --el: #ffd23f; }
+.th-dim { position: absolute; inset: 0; background: #000; opacity: 0; animation: th-dim .25s ease-out forwards; }
+@keyframes th-dim { to { opacity: .1; } }
+.thunder.settle .th-dim { animation: th-undim .4s ease-out forwards; }
+@keyframes th-undim { from { opacity: .1; } to { opacity: 0; } }
+.th-flash { position: absolute; inset: 0; background: #fff; opacity: 0; }
+.thunder.strike .th-flash { animation: th-flash .18s linear forwards; }
+@keyframes th-flash { 0% { opacity: .55; } 100% { opacity: 0; } }
+.th-stage { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; translate: 0 -6vh; }
+.th-mascot { display: inline-flex; line-height: 0; position: relative; transform-origin: 50% 90%; animation: th-charge .25s ease-in forwards; }
+.th-mascot .mascot { animation: none; }
+@keyframes th-charge { 0% { scale: 1; } 100% { scale: .9; } }
+.thunder.charging .th-mascot .mascot { animation: th-vibe 50ms linear infinite; }
+@keyframes th-vibe { 0%, 100% { translate: 0 0; } 25% { translate: 2px -1px; } 50% { translate: -2px 1px; } 75% { translate: 1px 2px; } }
+.thunder.strike .th-mascot { animation: th-release .45s var(--ease-bounce) forwards; }
+@keyframes th-release { 0% { scale: .9; } 50% { scale: 1.18; } 100% { scale: 1.06; } }
+.thunder.strike .th-mascot .m-eyes, .thunder.strike .th-mascot .shades, .thunder.strike .th-mascot .hat { animation: th-glow .5s ease-out; }
+@keyframes th-glow { 0%, 60% { filter: drop-shadow(0 0 3px #fff) drop-shadow(0 0 7px var(--el)); } 100% { filter: none; } }
+.th-sparks { position: absolute; left: 50%; top: 60px; width: 200px; height: 200px; translate: -50% -50%; overflow: visible; }
+.th-sparks polyline { fill: none; stroke: var(--el); stroke-width: 3.5; stroke-linejoin: round; stroke-linecap: round; opacity: 0; animation: th-spark .25s var(--d, 0ms) steps(2, jump-none) infinite; filter: drop-shadow(0 0 3px var(--el)); }
+.th-sparks polyline:nth-child(odd) { stroke: #fff; }
+@keyframes th-spark { 0% { opacity: 0; } 100% { opacity: 1; } }
+.thunder.strike .th-sparks { display: none; }
+.th-bolt { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; opacity: 0; }
+.thunder.strike .th-bolt { animation: th-bolt .5s linear forwards; }
+@keyframes th-bolt { 0%, 14% { opacity: 1; } 18% { opacity: .5; } 24%, 50% { opacity: 1; } 100% { opacity: 0; } }
+.th-bolt path { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.th-bolt .th-glow { stroke: var(--el); stroke-width: 14; opacity: .75; }
+.th-bolt .th-core { stroke: #fff; stroke-width: 6; }
+.th-bolt .th-fork-glow { stroke: var(--el); stroke-width: 7; opacity: .7; }
+.th-bolt .th-fork { stroke: #fff; stroke-width: 3; }
+.th-numwrap { position: relative; display: flex; flex-direction: column; align-items: center; margin-top: -10px; opacity: 0; }
+.thunder.slam .th-numwrap { opacity: 1; }
+.th-num { display: block; font-size: 6.5rem; line-height: 1; font-weight: 900; color: var(--gold); rotate: -6deg; letter-spacing: -.04em;
+  -webkit-text-stroke: 2px #6b4600; paint-order: stroke fill; text-shadow: 0 6px 0 #b37d00, 0 14px 22px rgba(0, 0, 0, .35); }
+.thunder.slam .th-num { animation: th-slam .32s cubic-bezier(.2, 1.6, .35, 1) both; }
+@keyframes th-slam { 0% { opacity: 0; scale: 3; } 55% { opacity: 1; scale: .88; } 78% { scale: 1.1; } 100% { scale: 1; } }
+.th-label { margin-top: 6px; padding: 3px 12px; border-radius: 999px; background: var(--text-strong); font-weight: 900; font-size: .9375rem; letter-spacing: .14em; text-transform: uppercase; color: var(--card); box-shadow: 0 0 14px var(--el), 0 3px 0 rgba(0, 0, 0, .25); opacity: 0; }
+.thunder.slam .th-label { animation: th-label .3s .1s var(--ease-out) forwards; }
+@keyframes th-label { from { opacity: 0; translate: 0 14px; } to { opacity: 1; translate: 0 0; } }
+.th-ring { position: absolute; left: 50%; top: 45%; width: 110px; height: 110px; margin: -55px; border-radius: 50%; border: 6px solid var(--el); opacity: 0; }
+.thunder.slam .th-ring { animation: th-ring .55s .05s ease-out forwards; }
+@keyframes th-ring { 0% { scale: .25; opacity: .9; } 100% { scale: 2.8; opacity: 0; } }
+.thunder.settle .th-stage { animation: th-out .4s ease-in forwards; }
+@keyframes th-out { to { opacity: 0; translate: 0 -40px; scale: .8; } }
+.lesson.th-shake { animation: th-shake .3s linear; }
+@keyframes th-shake { 0%, 100% { translate: 0 0; } 16% { translate: -4px 2px; } 33% { translate: 4px -2px; } 50% { translate: -4px 1px; } 66% { translate: 4px -1px; } 83% { translate: -2px 0; } }
+/* After a strike the run flame carries a bolt. */
+.run-bolt { display: inline-flex; margin-left: 1px; color: #1e9fe0; animation: th-boltpop .45s var(--ease-bounce); }
+.run[data-lvl="3"] .run-bolt { color: var(--gold-text); }
+@keyframes th-boltpop { from { opacity: 0; scale: .2; } 60% { scale: 1.4; } to { scale: 1; } }
+
+/* Energy meter (js/energy.js): the daily goal as a capsule of liquid with two waves, ticks, a glow, bubbles while it pours. */
+.goal-card .energy { grid-column: 1 / -1; }
+.energy { position: relative; height: 26px; padding-right: 7px; --lvl: 0; }
+.energy-cap { position: absolute; right: 0; top: 7px; bottom: 7px; width: 7px; border-radius: 0 4px 4px 0; background: color-mix(in srgb, var(--text) 24%, var(--border)); }
+.energy-body { position: relative; height: 100%; border-radius: 999px; background: var(--border); border: 2px solid color-mix(in srgb, var(--text) 22%, transparent); overflow: hidden; isolation: isolate; }
+.energy-liquid { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.energy-fill { transform: translateY(calc((1 - var(--lvl)) * 46px - 6px)); will-change: transform; }
+.energy-fill .wave { animation: energy-wave 3.4s linear infinite; }
+.energy-fill .wave-b { animation-duration: 5.2s; animation-direction: reverse; opacity: .55; }
+.energy.pouring .wave, .energy.slosh .wave { animation-duration: 1.1s; }
+.energy.pouring .wave-b, .energy.slosh .wave-b { animation-duration: 1.7s; }
+@keyframes energy-wave { to { transform: translateX(-400px); } }
+.energy-glow { position: absolute; inset: 0; border-radius: inherit; pointer-events: none; box-shadow: inset 0 0 14px 2px rgba(255, 255, 255, .55), inset 0 -6px 12px rgba(88, 204, 2, .5); opacity: var(--lvl); }
+.energy-sheen { position: absolute; left: 10%; right: 10%; top: 3px; height: 4px; border-radius: 4px; background: rgba(255, 255, 255, .45); pointer-events: none; }
+.energy-ticks i { position: absolute; top: 4px; bottom: 4px; width: 2px; border-radius: 2px; background: color-mix(in srgb, var(--text) 25%, transparent); translate: -50% 0; transition: background-color .2s, box-shadow .2s, scale .25s var(--ease-bounce); }
+.energy-ticks i.lit { background: #fff; box-shadow: 0 0 6px 1px rgba(255, 255, 255, .9); scale: 1.3 1.1; }
+.energy-bubbles i { position: absolute; bottom: 0; left: var(--x); width: 6px; height: 6px; border-radius: 50%; background: rgba(255, 255, 255, .75); opacity: 0; }
+.energy.pouring .energy-bubbles i, .energy.slosh .energy-bubbles i { animation: energy-bubble .9s var(--d, 0s) ease-in infinite; }
+.energy-bubbles i:nth-child(even) { width: 4px; height: 4px; }
+@keyframes energy-bubble { 0% { opacity: 0; translate: 0 2px; } 20% { opacity: .9; } 100% { opacity: 0; translate: 3px -24px; } }
+.energy-body::after { content: ''; position: absolute; inset: 0; background: #fff; opacity: 0; pointer-events: none; }
+.energy.full-flash .energy-body::after { animation: energy-flash .28s ease-out; }
+@keyframes energy-flash { 0% { opacity: .75; } 100% { opacity: 0; } }
+.energy.full .energy-body { border-color: var(--gold); }
+.energy-sparks { position: absolute; left: 0; right: 7px; top: 0; height: 0; pointer-events: none; }
+.energy-sparks i { position: absolute; left: var(--x); top: 0; width: 7px; height: 7px; margin: -3px; border-radius: 50%; background: var(--gold); box-shadow: 0 0 8px 2px rgba(255, 200, 0, .8); opacity: 0; }
+.energy-sparks i:nth-child(odd) { background: var(--green); box-shadow: 0 0 8px 2px rgba(88, 204, 2, .8); }
+.energy.full-flash .energy-sparks i { animation: energy-spark .8s var(--d, 0s) var(--ease-out) forwards; }
+@keyframes energy-spark { 0% { opacity: 1; translate: 0 0; scale: .5; } 50% { opacity: 1; translate: var(--dx) -34px; scale: 1.2; } 100% { opacity: 0; translate: calc(var(--dx) * 1.3) -14px; scale: .6; } }
+.goal-card.pulse { animation: card-pulse .6s var(--ease-bounce); }
+@keyframes card-pulse { 0% { scale: 1; } 40% { scale: 1.035; } 100% { scale: 1; } }
+.goal-card.pouring .pill { opacity: 0; }
+.goal-card .pill.pop { animation: pop .4s var(--ease-bounce) backwards; }
+/* Calm and the OS switch: a still mascot in its pose, no thunder theatre (the old card plays instead), a flat fill that jumps. */
+@media (prefers-reduced-motion: reduce) {
+  .mascot, .mascot .m-body, .mascot .m-head, .mascot .m-tail, .mascot .ear, .mascot .m-arms, .mascot .shadow, .mascot .dog-eyes, .fb-sad .mascot .m-head { animation: none; }
+  .mascot .m-head, .mascot .m-features, .mascot .m-ears, .mascot .m-shadow, .mascot, .person .head, .person .eyes, .energy-ticks i { transition: none; }
+  .energy-fill .wave { animation: none; }
+  .energy-bubbles, .energy-sparks, .thunder { display: none; }
+}
+:root.calm .energy-fill .wave { animation: none; }
+:root.calm .energy-bubbles, :root.calm .energy-sparks, :root.calm .thunder { display: none; }

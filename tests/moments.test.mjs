@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { buildQueue, queueMoment, pendingMoments, clearMoments, weekOf, LINES, mascotLine, MOMENT_KINDS } from '../app/js/moments.js';
 import { mascotSvg, MOODS } from '../app/js/mascot.js';
-import { SFX_NAMES } from '../app/js/audio.js';
+import { SFX_NAMES, SFX_ALIASES } from '../app/js/audio.js';
 import { t } from '../app/js/strings.js';
 
 const full = { streakExtended: true, streak: 7, milestone: 7, goalReached: true, xp: 15, quests: { chestReady: true }, bonusChest: true, weeklyChest: true, unitComplete: { title: 'Greetings', color: '#58cc02' }, levelUp: 3 };
@@ -53,7 +53,7 @@ test('mascot poses render for the shiba and the panda', () => {
 });
 
 test('sound effects for the moments exist', () => {
-  for (const n of ['fanfare', 'coins', 'whoosh', 'chest', 'levelup', 'gift', 'flame']) assert.ok(SFX_NAMES.includes(n), n);
+  for (const n of ['fanfare', 'coins', 'whoosh', 'chest', 'levelup', 'gift', 'flame']) assert.ok(SFX_NAMES.includes(SFX_ALIASES[n] || n), n);
 });
 
 test('mascot lines: 8+ per situation, varied, never repeating the previous one', () => {

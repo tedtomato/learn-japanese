@@ -9,7 +9,7 @@ import { app, statsBar, toast, modal, flagSvg } from '../app.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
 import { mascot, MOODS } from '../mascot.js';
-import { speak } from '../audio.js';
+import { speak, sfx, buzz, HAPTIC } from '../audio.js';
 import { art } from '../art.js';
 import { MISSIONS } from '../content/pack.js';
 import { t } from '../strings.js';
@@ -185,6 +185,7 @@ function nodePopover(nodeEl, node, st) {
     playMoments().then(() => app.go('#/learn'));
     return;
   }
+  sfx('pop');
   const level = nodeLevel(app.state, node);
   const hearts = currentHearts(app.state, app.now());
   const isReview = node.kind === 'review';
@@ -302,6 +303,7 @@ function pathCelebration(root, fx, current) {
   const cur = $('.st-current', root);
   if (cur && fx.id && current !== fx.prevCurrent) {
     cur.classList.add('just-unlocked');
+    sfx('unlock'); buzz(HAPTIC.unlock);
     if (!cur.classList.contains('node-chest')) cur.insertAdjacentHTML('beforeend', `<span class="lock-ghost" aria-hidden="true">${icon('lock', 30).__raw}</span>`);
     cur.closest('.node-wrap')?.querySelector('.start-bubble')?.classList.add('enter');
     later(() => {

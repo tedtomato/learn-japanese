@@ -164,7 +164,7 @@ const KINDS = {
       action: badge ? shareButton(shareText, t('Share')).__raw : '',
       haptic: HAPTIC.streak,
       setup({ el, later }) {
-        later(0, () => sfx(badge ? 'fanfare' : 'flame'));
+        later(0, () => sfx(badge ? 'milestone' : 'streak'));
         const num = el.querySelector('.mm-num');
         if (num && !first) later(750, () => countUp(num, from, m.count, 650));
         later(1100, () => {
@@ -190,11 +190,12 @@ const KINDS = {
       setup({ el, later }) {
         const arc = el.querySelector('.mm-arc');
         arc.style.setProperty('--from', String(RING_LEN * (1 - from)));
-        later(0, () => sfx('whoosh'));
+        later(0, () => sfx('swoosh'));
+        later(500, () => sfx('goal'));
         later(80, () => arc.classList.add('fill'));
         later(1000, () => {
           el.querySelector('.mm-hero')?.classList.add('burst');
-          sfx('fanfare');
+          sfx('pop');
         });
         later(1350, () => {
           sfx('coins');
@@ -268,8 +269,8 @@ const KINDS = {
       extra: `<p class="mm-unit" style="--c:${esc(m.color || '#ffc800')}">${esc(m.unitTitle || '')}</p>`,
       haptic: HAPTIC.unit,
       setup({ later }) {
-        later(0, () => sfx('fanfare'));
-        later(600, () => sfx('coins'));
+        later(0, () => sfx('unit'));
+        later(900, () => sfx('gem'));
       },
     };
   },
@@ -284,7 +285,7 @@ const KINDS = {
       extra: '',
       haptic: HAPTIC.achievement,
       setup({ later }) {
-        later(0, () => sfx('levelup'));
+        later(0, () => sfx('achievement'));
       },
     };
   },

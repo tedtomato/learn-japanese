@@ -252,7 +252,7 @@ export const SOUNDS = {
     return room(mix([[fill, 0, 0.6], [burst, 0.5, 1], [sparkle([88, 91, 96, 100, 103], 0.05, 0.4, 0.18), 0.6, 1]]), 0.3, 0.9, 0.4);
   },
   chest: () => {
-    const creak = shape(biquad(whiteNoise(0.3), 'bp', (t) => 180 + 240 * (t / 0.3) + 25 * Math.sin(t * 90), 7), (t) => (0.5 + 0.5 * Math.sin(t * 60)) * swell(0.3, 0.2, 1));
+    const creak = shape(biquad(whiteNoise(0.3), 'bp', (t) => 180 + 240 * (t / 0.3) + 25 * Math.sin(t * 90), 7), (t) => (0.5 + 0.5 * Math.sin(t * 60)) * swell(0.3, 0.2, 1)(t));
     const parts = [[norm(creak, 0.5), 0, 1], [osc('sine', 260, 0.1, { f1: 420, glideT: 0.04, amp: expo(0.03) }), 0.29, 0.7]];
     for (let i = 0; i < 12; i++) parts.push([coin(1800 + rnd() * 1700, 0.14, 1), 0.33 + i * 0.045 + rnd() * 0.02, 0.35 + rnd() * 0.3]);
     return room(mix(parts), 0.18, 0.7, 0.2);
@@ -269,7 +269,7 @@ export const SOUNDS = {
   quest: () => room(mix([[glass(hz(N.G6), 0.35, 0.8), 0, 1], [glass(hz(N.C7), 0.6, 1), 0.1, 1], [marimba(hz(N.C6), 0.2, 0.5), 0.1, 1]]), 0.25, 0.7, 0.3),
   flame: () => {
     const n = shape(biquad(whiteNoise(0.6), 'lp', (t) => 150 + 900 * Math.sin((t / 0.6) * Math.PI * 0.8), 0.9), swell(0.6, 0.25, 1.6));
-    return mix([[norm(n, 0.8), 0, 1], [shape(osc('sine', 90, 0.6, { f1: 140, glideT: 0.4 }), swell(0.6, 0.2, 1.5)), 0, 0.5], [norm(shape(biquad(whiteNoise(0.5), 'hp', 3000), (t) => (0.5 + 0.5 * Math.sin(t * 160)) * swell(0.5, 0.15, 1.5)), 0.15), 0.05, 1]]);
+    return mix([[norm(n, 0.8), 0, 1], [shape(osc('sine', 90, 0.6, { f1: 140, glideT: 0.4 }), swell(0.6, 0.2, 1.5)), 0, 0.5], [norm(shape(biquad(whiteNoise(0.5), 'hp', 3000), (t) => (0.5 + 0.5 * Math.sin(t * 160)) * swell(0.5, 0.15, 1.5)(t)), 0.15), 0.05, 1]]);
   },
 };
 

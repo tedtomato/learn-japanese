@@ -95,7 +95,7 @@ const kind = (f) => {
   if (NOT_PRECACHED.has(f)) return 'none';
   if (f.endsWith('.js')) return !anyCourse(f) || everyCourse(f) ? 'shared' : 'course';
   if (f.startsWith('art/')) return artShared(f) ? 'shared' : artUsed(f) ? 'course' : 'none';
-  return 'shared';
+  return 'shared'; // includes sfx/*.mp3: the sound effects are precached with the app shell
 };
 
 // ---- Hashes, so an update can copy unchanged files from the previous cache ------------------------------------

@@ -1,6 +1,14 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '1.1', date: '21 Nov 2026', changes: [
+    'Game feel: a right answer flashes the screen green, the answer squashes and pops, a big check stamps the feedback bar and your speaker jumps for joy with raised arms; a wrong one shakes the whole task, cracks a heart and makes Kuri wince',
+    'Tiles fly in a real arc and land with a squash, pairs glow when they match, tasks slide in with depth, and the progress bar bounces as it grows',
+    'Lesson complete is a party: 80 confetti pieces burst from behind Kuri (party hat for a perfect lesson), the title pops in letter by letter, XP slot-rolls, the accuracy ring draws itself',
+    'Reward moments are bigger: huge heroes with slowly turning rays, coins fountaining from chests, gifts that shake harder and harder before the lid pops, and Kuri jumping in from below',
+    'The path camera follows you after a lesson: it frames the finished node, draws the trail to the next one dot by dot, then glides down as it pops open; Kuri hops beside your lesson now and then',
+    'New Profile setting: Animations — Full or Calm (Calm skips the movement, like your phone\'s "Reduce motion")',
+  ] },
   { version: '1.0', date: '21 Nov 2026', changes: [
     'Rewards are moments now: your streak flame ignites and counts up while the week fills in, the daily goal ring fills and bursts into gems, chests wobble and fly open, and finishing a unit raises a trophy',
     'Streak badges for 7, 30, 100 and 365 days drop in with a shine (and a Share button), and new achievements slide in as cards',

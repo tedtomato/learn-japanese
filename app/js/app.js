@@ -3,7 +3,7 @@ import { loadState, saveState, currentHearts, displayStreak, streakState, giftRe
 import { html, mount, raw, $ } from './dom.js';
 import { L } from './lang.js';
 import { icon } from './icons.js';
-import { setSfx, setVoiceRate, setHaptics } from './audio.js';
+import { sfx, setSfx, setVoiceRate, setHaptics } from './audio.js';
 import { writeReminderNote } from './reminders.js';
 import { textSizePercent } from './usability.js';
 import { t } from './strings.js';
@@ -155,7 +155,9 @@ export function statsBar() {
   const flare = shown.secured === false && mood === 'secured';
   shown.gems = state.gems;
   shown.secured = mood === 'secured';
+  if (flare) setTimeout(() => sfx('flame'), 30);
   if (gemsChanged) {
+    if (state.gems > gemsFrom) setTimeout(() => sfx('gem'), 30);
     clearTimeout(barTimer);
     barTimer = setTimeout(() => countUp(document.querySelector('.stat-gems b'), gemsFrom, state.gems, 700), 30);
   }
@@ -252,6 +254,7 @@ export function closeLayer(root = $('#modal')) {
 // Shows a modal. buttons: [{ label, kind, onClick }]. Returns a close function.
 export function modal(content, buttons = [], { dismissable = true } = {}) {
   const root = $('#modal');
+  sfx('pop');
   mount(root, html`<div class="scrim"></div>
     <div class="sheet" role="dialog" aria-modal="true">
       ${content}

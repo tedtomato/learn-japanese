@@ -161,6 +161,7 @@ export function renderProfile(root, focus) {
       <div class="setting"><span id="set-keys">${t('Keyboard shortcuts')}<small class="muted setting-note">${t('Number keys pick an answer')}</small></span>${seg('keys', shortcutsEnabled(s, matchMedia('(pointer: fine)').matches), [[true, t('On')], [false, t('Off')]])}</div>
       <div class="setting"><span id="set-sfx">${t('Sound effects')}</span>${seg('sfx', s.sfx, [[true, t('On')], [false, t('Off')]])}</div>
       <div class="setting"><span id="set-haptics">${t('Vibration')}<small class="muted setting-note">${t('A short buzz on right and wrong answers')}</small></span>${seg('haptics', s.haptics !== false, [[true, t('On')], [false, t('Off')]])}</div>
+      <div class="setting"><span id="set-motion">${t('Animations')}<small class="muted setting-note">${t('Calm keeps the colours but skips the movement')}</small></span>${seg('motion', s.motion || 'full', [['full', t('Full')], ['calm', t('Calm')]])}</div>
       ${L.code === 'zh' ? html`<div class="setting"><span id="set-toneColors">${t('Tone colours')}<small class="muted setting-note">${t('Pinyin is coloured by tone')}</small></span>${seg('toneColors', s.toneColors !== false, [[true, t('On')], [false, t('Off')]])}</div>` : ''}
       <div class="setting"><span>${t('Daily reminder')}<small class="muted setting-note">${s.reminders ? t('A nudge once a day if you have not studied') : t('Off')}</small></span>
         <button class="btn btn-white btn-small reminder-btn">${s.reminders ? t('Turn off') : t('Turn on')}</button></div>

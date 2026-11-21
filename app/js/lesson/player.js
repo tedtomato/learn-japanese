@@ -32,7 +32,7 @@ let lastParty = null; // the last celebration shown, so the next one differs
 import { shareButton, wireShare } from '../share.js';
 import { saveResume, clearResume, readResume } from '../resume.js';
 import { applySnapshot, canMistype, forgiveMistype } from '../usability.js';
-import { pop, flip, snapshot, playFrom, countUp, leaveGhost, breathe, pathFx, reduced } from '../motion.js';
+import { pop, flip, snapshot, playFrom, countUp, leaveGhost, breathe, pathFx, reduced, screenFlash, sparkleRing, crackHeart, burstConfetti, rollUp } from '../motion.js';
 
 const PRAISE = ['Nicely done!', 'Great job!', 'Correct!', 'Awesome!', L.cheers[2][0], 'You got it!', 'Perfect!', L.cheers[1][0]].map((p) => t(p));
 const SPEED_BONUS_MAX = 5; // XP a session can earn from quick answers
@@ -231,14 +231,20 @@ function updateProgress(root, s) {
   const fill = $('.lesson-top .bar-fill', root);
   const grew = (parseFloat(fill.style.width) || 0) < pct - 0.01;
   fill.style.width = `${pct}%`;
-  if (grew) pop(fill, 'shine', 600);
+  if (grew) {
+    pop(fill, 'shine', 700);
+    pop($('.lesson-top .bar', root), 'punch', 600); // the bar bounces as it grows
+  }
   $('.lesson-top .bar', root).setAttribute('aria-valuenow', String(Math.round(pct)));
   const h = $('.hearts-n', root);
   if (h) {
     const was = Number(h.textContent);
     const now = currentHearts(app.state, app.now());
     h.textContent = now;
-    if (now < was) pop(h.parentElement, 'lost', 700);
+    if (now < was) {
+      pop(h.parentElement, 'lost', 800);
+      crackHeart(h.parentElement);
+    }
     else if (now > was) pop(h.parentElement, 'gain', 700);
     h.parentElement.setAttribute('aria-label', t('Hearts: {n}', { n: h.textContent }));
   }
@@ -353,6 +359,10 @@ function next(root, s) {
   body.classList.remove('enter');
   void body.offsetWidth;
   body.classList.add('enter');
+  // The entrance (pieces sliding in with depth) is over well within a second; the class goes so later animations
+  // on those pieces (a shaking answer line, a caught tile) are not outranked by it.
+  clearTimeout(s.enterTimer);
+  s.enterTimer = setTimeout(() => body.classList.remove('enter'), 800);
   s.speaker = pickOne(SPEAKERS);
   startTimer(root, s, null);
   RENDERERS[s.current.type](root, s);
@@ -494,6 +504,11 @@ function result(root, s, ok, opts = {}) {
   const canExplain = item && ['word', 'sentence', 'kana', 'kanji', 'kword', 'radical'].includes(item.type);
   const foot = $('.lesson-foot', root);
   foot.className = `lesson-foot ${ok ? 'good' : 'bad'}`;
+  // The whole screen takes the beat: a green flash (and a green glow at the edges from 3 in a row) or a red vignette,
+  // with the task itself jolting on a mistake.
+  screenFlash(ok ? 'good' : 'bad');
+  if (ok && s.combo >= 3) screenFlash('combo');
+  if (!ok) pop($('.lesson-body', root), 'jolt', 500);
   const verdict = ok ? pickOne(PRAISE) : t('Correct answer:');
   const badges = [];
   if (onTime && !hesitated) badges.push(html`<span class="pill pill-gold">${icon('bolt', 14)} ${t('Speed bonus')} <b class="xp-n">+${s.speedBonus}</b> XP</span>`);
@@ -525,6 +540,7 @@ function result(root, s, ok, opts = {}) {
   // The speaker reacts, the speed bonus counts up, and a lone "Continue" breathes when the learner idles.
   const talker = $('.person-wrap', root);
   if (talker) pop(talker, ok ? 'cheer' : 'oops', 800);
+  if (ok && s.combo >= 5) sparkleRing(foot);
   const xp = $('.xp-n', foot);
   if (xp) countUp(xp, s.speedBonus - 1, s.speedBonus, 500, { delay: 260, format: (n) => `+${n}` });
   if ($$('.fb-actions button', foot).length === 1) breathe($('.check', foot));
@@ -1064,7 +1080,7 @@ function renderBuild(root, s) {
         flip(b, () => {
           redraw();
           return $(`.bank .tile[data-i="${i}"]`, root);
-        }, { ms: 240, settle: 'settle' });
+        }, { ms: 260, settle: 'settle', arc: 10, spin: 6 }); // tossed back with a little spin
         // The tile left the answer: focus goes back to its place in the bank.
         $(`.bank .tile[data-i="${i}"]`, root)?.focus({ preventScroll: true });
       }),
@@ -1080,10 +1096,11 @@ function renderBuild(root, s) {
       buzz(HAPTIC.tile);
       if (jpTiles && ex.mode !== 'fast' && ex.mode !== 'audio') speak(ex.tiles[i], { speaker: s.speaker });
       // The tile flies from the bank to the answer line (the bank slot stays as a faint ghost).
-      flip(b, () => {
+      const flight = flip(b, () => {
         redraw();
         return line.lastElementChild;
-      }, { ms: 260, settle: 'settle' });
+      }, { ms: 300, settle: 'settle', arc: 14 }); // a real arc, a squash on landing, and the line catches it
+      if (flight) flight.finished.then(() => pop(line, 'catch', 400), () => {});
     }),
   );
   footer(root, s, {
@@ -1157,7 +1174,7 @@ function renderMatch(root, s) {
       } else {
         wrongIds.add(l.dataset.id);
         wrongIds.add(r.dataset.id);
-        [l, r].forEach((x) => { x.classList.remove('selected'); x.setAttribute('aria-pressed', 'false'); x.classList.add('shake'); setTimeout(() => x.classList.remove('shake'), 400); });
+        [l, r].forEach((x) => { x.classList.remove('selected'); x.setAttribute('aria-pressed', 'false'); x.classList.add('shake'); setTimeout(() => x.classList.remove('shake'), 520); });
         sfx('wrong');
         buzz();
       }
@@ -1347,6 +1364,13 @@ const RENDERERS = {
 };
 
 // ---------- Finish ----------
+// A title whose letters pop in one by one (words stay whole; a screen reader gets the plain text).
+const ACC_RING = 69.1; // 2π × 11
+function letters(text) {
+  let i = 0;
+  return html`<span class="sr-only">${text}</span><span aria-hidden="true">${text.split(' ').map((w, wi) => html`${wi ? ' ' : ''}<span class="word">${[...w].map((ch) => html`<span class="ltr" style="--i:${i++}">${ch}</span>`)}</span>`)}</span>`;
+}
+
 function weekStrip(now) {
   const days = [];
   for (let i = 6; i >= 0; i--) {
@@ -1397,12 +1421,12 @@ function finish(root, s) {
   const mmss = (n) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, '0')}`;
   // Staged reveal: mascot, title, stat tiles (90 ms apart, numbers counting up), extras, week, Continue; then the party.
   mount(root, html`<div class="complete">
-    <div class="rev rev-mascot" style="--d:0ms">${mascot(party === 'dance' ? 'dance' : 'cheer', accuracy === 100 ? 180 : 140)}</div>
-    <h1 class="rev" style="--d:200ms">${title}</h1>
+    <div class="rev rev-mascot" style="--d:0ms">${mascot(accuracy === 100 && !s.testOut ? 'party' : party === 'dance' ? 'dance' : 'cheer', accuracy === 100 ? 180 : 140)}</div>
+    <h1 class="rev letters" style="--d:200ms">${letters(title)}</h1>
     <p class="complete-line rev" style="--d:290ms">${sayLine('end')}</p>
     <div class="result-tiles">
-      <div class="result gold rev" style="--d:380ms"><span>${t('Total XP')}</span><b>${icon('bolt', 20)} <i class="cu" data-to="${summary.xp}">${summary.xp}</i></b></div>
-      <div class="result green rev ${accuracy < 70 ? 'low' : ''}" style="--d:470ms"><span>${t(accuracy === 100 ? 'Amazing' : 'Accuracy')}</span><b>${icon('check', 20)} <i class="cu" data-to="${accuracy}" data-suffix="%">${accuracy}%</i></b></div>
+      <div class="result gold rev" style="--d:380ms"><span>${t('Total XP')}</span><b>${icon('bolt', 20)} <i class="cu roll" data-to="${summary.xp}">${summary.xp}</i></b></div>
+      <div class="result green rev ${accuracy < 70 ? 'low' : ''}" style="--d:470ms"><span>${t(accuracy === 100 ? 'Amazing' : 'Accuracy')}</span><b><span class="acc-wrap"><svg class="acc-ring" viewBox="0 0 28 28" aria-hidden="true"><circle class="track" cx="14" cy="14" r="11"/><circle class="arc" cx="14" cy="14" r="11" stroke-dasharray="${ACC_RING}" stroke-dashoffset="${ACC_RING}"/></svg>${icon('check', 14)}</span> <i class="cu" data-to="${accuracy}" data-suffix="%">${accuracy}%</i></b></div>
       <div class="result blue rev" style="--d:560ms"><span>${t('Time')}</span><b><i class="cu" data-to="${secs}" data-time="1">${mmss(secs)}</i></b></div>
     </div>
     <div class="extras rev" style="--d:700ms">${extras}</div>
@@ -1414,8 +1438,20 @@ function finish(root, s) {
   $$('.cu', root).forEach((el, k) => {
     const to = Number(el.dataset.to);
     const fmt = el.dataset.time ? mmss : (n) => `${n}${el.dataset.suffix || ''}`;
-    countUp(el, Number(el.dataset.from || 0), to, 650, { delay: 430 + k * 90, format: fmt });
+    if (el.classList.contains('roll')) rollUp(el, Number(el.dataset.from || 0), to, 800, { delay: 430 + k * 90, format: fmt });
+    else countUp(el, Number(el.dataset.from || 0), to, 650, { delay: 430 + k * 90, format: fmt, punch: true });
   });
+  // The accuracy ring draws itself to the score.
+  setTimeout(() => $('.acc-ring .arc', root)?.setAttribute('stroke-dashoffset', (ACC_RING * (1 - accuracy / 100)).toFixed(1)), reduced() ? 0 : 500);
+  // Two bursts of confetti from behind the mascot, then the celebration layer (petals, fireworks, notes).
+  if (!reduced()) setTimeout(() => {
+    const stage = $('.complete', root);
+    const m = $('.rev-mascot', root);
+    if (!stage || !m) return;
+    const a = m.getBoundingClientRect();
+    const b = stage.getBoundingClientRect();
+    burstConfetti(stage, { n: 80, bursts: 2, x: ((a.left + a.width / 2 - b.left) / b.width) * 100, y: ((a.top + a.height / 2 - b.top) / b.height) * 100 });
+  }, 420);
   if (!reduced()) setTimeout(() => $('.complete', root)?.insertAdjacentHTML('afterbegin', celebrationHtml(party)), 650);
   else $('.complete', root).insertAdjacentHTML('afterbegin', celebrationHtml(party));
   breathe($('.continue', root), 4500);

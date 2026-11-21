@@ -1,6 +1,8 @@
 // The lesson cast: Yuki and Mika (women) speak in lessons for now, as phones only have a female
 // Japanese voice; Ken (man), Sora (boy) and Hana (girl) wait for later. Flat cartoon SVGs that
 // blink while idle and move their mouth while their voice is speaking (.talking on the wrapper).
+// Arms, legs and the head are their own groups (arm-l, arm-r, leg-l, leg-r, head), so the feedback
+// animations in app.css can raise the arms, tuck the legs and tilt the head (the joints are the transform origins).
 import { L } from './lang.js';
 import { raw } from './dom.js';
 
@@ -29,15 +31,17 @@ export const nameOf = (who) => L.cast[who] || PEOPLE[who]?.name || '';
 export function personSvg(who, size = 110) {
   const p = PEOPLE[who] || PEOPLE.woman;
   const body = p.kid
-    ? `<rect x="42" y="98" width="36" height="34" rx="12" fill="${p.top}"/><rect x="45" y="128" width="11" height="22" rx="5" fill="${p.legs}"/><rect x="64" y="128" width="11" height="22" rx="5" fill="${p.legs}"/>
-       <rect x="30" y="100" width="12" height="28" rx="6" fill="${p.top}" transform="rotate(12 36 100)"/><rect x="78" y="100" width="12" height="28" rx="6" fill="${p.top}" transform="rotate(-12 84 100)"/>`
-    : `<rect x="38" y="90" width="44" height="46" rx="14" fill="${p.top}"/><path d="M52 90h16l-8 10z" fill="${p.topDark}"/><rect x="43" y="132" width="13" height="24" rx="6" fill="${p.legs}"/><rect x="64" y="132" width="13" height="24" rx="6" fill="${p.legs}"/>
-       <rect x="25" y="93" width="13" height="36" rx="6.5" fill="${p.top}" transform="rotate(10 31 93)"/><rect x="82" y="93" width="13" height="36" rx="6.5" fill="${p.top}" transform="rotate(-10 88 93)"/>`;
+    ? `<g class="leg leg-l"><rect x="45" y="128" width="11" height="22" rx="5" fill="${p.legs}"/></g><g class="leg leg-r"><rect x="64" y="128" width="11" height="22" rx="5" fill="${p.legs}"/></g>
+       <rect x="42" y="98" width="36" height="34" rx="12" fill="${p.top}"/>
+       <g class="arm arm-l"><rect x="30" y="100" width="12" height="28" rx="6" fill="${p.top}" transform="rotate(12 36 100)"/></g><g class="arm arm-r"><rect x="78" y="100" width="12" height="28" rx="6" fill="${p.top}" transform="rotate(-12 84 100)"/></g>`
+    : `<g class="leg leg-l"><rect x="43" y="132" width="13" height="24" rx="6" fill="${p.legs}"/></g><g class="leg leg-r"><rect x="64" y="132" width="13" height="24" rx="6" fill="${p.legs}"/></g>
+       <rect x="38" y="90" width="44" height="46" rx="14" fill="${p.top}"/><path d="M52 90h16l-8 10z" fill="${p.topDark}"/>
+       <g class="arm arm-l"><rect x="25" y="93" width="13" height="36" rx="6.5" fill="${p.top}" transform="rotate(10 31 93)"/></g><g class="arm arm-r"><rect x="82" y="93" width="13" height="36" rx="6.5" fill="${p.top}" transform="rotate(-10 88 93)"/></g>`;
   const headY = p.kid ? 8 : 0;
   return `<svg class="person person-${who}" width="${size}" height="${Math.round(size * 1.4)}" viewBox="0 0 120 168" role="img" aria-label="${p.name}">
   <ellipse cx="60" cy="158" rx="30" ry="6" class="shadow"/>
   ${body}
-  <g transform="translate(0 ${headY})">
+  <g class="head" transform="translate(0 ${headY})">
     <g fill="${p.hair}">${p.hairBack || ''}</g>
     <rect x="54" y="72" width="12" height="16" rx="5" fill="${p.skin}"/>
     <circle cx="60" cy="52" r="27" fill="${p.skin}"/>

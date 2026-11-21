@@ -1856,3 +1856,8 @@ body:not(.in-lesson) .screen { animation: screen-in .18s var(--ease-out) backwar
 }
 .fb-line { display: block; font-size: .8125rem; font-weight: 700; font-style: italic; opacity: .85; }
 .complete-line { margin: -8px 0 0; font-weight: 800; color: var(--muted); font-size: 1.0625rem; }
+/* The mascot's line on the path can be longer now: it wraps inside its side of the track. */
+.node-mascot { max-width: 44%; }
+.node-mascot .bubble small { overflow-wrap: anywhere; }
+/* The mascot (and other things) slide in from the edge of the path: never let that widen the page. */
+.page.learn { overflow-x: clip; }

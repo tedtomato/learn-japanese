@@ -2048,3 +2048,9 @@ body:not(.in-lesson) .screen { animation: screen-in .18s var(--ease-out) backwar
   .acc-ring .arc { transition: none; }
 }
 :root.calm .mm-particles, :root.calm .trail-draw, :root.calm .trail-dot { display: none; }
+/* Entrances that start off-screen (backwards fill) are skipped outright without motion: a slow first frame must never
+   leave a banner, the mascot or a task's pieces parked beside the screen. */
+@media (prefers-reduced-motion: reduce) {
+  .unit-banner.enter, .unit-ribbon, .node-mascot.left, .node-mascot.right, .lesson-body.enter, .lesson-body.enter > *, .leave-ghost { animation: none; }
+}
+:root.calm .unit-banner.enter, :root.calm .unit-ribbon, :root.calm .node-mascot.left, :root.calm .node-mascot.right, :root.calm .lesson-body.enter, :root.calm .lesson-body.enter > *, :root.calm .leave-ghost { animation: none; }

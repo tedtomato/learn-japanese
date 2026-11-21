@@ -1,6 +1,16 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '1.0', date: '21 Nov 2026', changes: [
+    'Rewards are moments now: your streak flame ignites and counts up while the week fills in, the daily goal ring fills and bursts into gems, chests wobble and fly open, and finishing a unit raises a trophy',
+    'Streak badges for 7, 30, 100 and 365 days drop in with a shine (and a Share button), and new achievements slide in as cards',
+    'Kuri (and the panda) have new poses: jumping, holding a trophy, wearing shades, in a party hat, asleep, and thinking — with new things to say in every situation',
+    'New sounds and vibrations for every moment; tap to move on, or "Skip all". Nothing moves if you use "Reduce motion"',
+    'A mystery gift waits on your path every day (gems, a streak freeze, double XP or a fun fact), and one lesson in six is "lucky" and pays bonus gems',
+    'Three perfect lessons in a row open a bonus chest, every 7th streak day brings a weekly treasure, and finishing a unit leaves a gift box at its end',
+    'The streak flame is grey until you have studied, lights up (with a flare) once you have, and pulses after 20:00 when your streak is at risk; Kuri nods off on the path to remind you',
+    'The streak calendar has flames that light up one by one, milestone badges, streak freezes shown as snowflakes, and a count-down to the weekly treasure; double XP is a ring that drains',
+  ] },
   { version: '0.99.3', date: '19 Nov 2026', changes: [
     'The app feels more alive: tasks slide in, answers pop and shake, tiles fly into place, and the progress bar shines as it grows',
     'A flame on the progress bar grows as you string right answers together, and your hearts bounce when one is lost',

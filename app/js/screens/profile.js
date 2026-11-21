@@ -20,7 +20,7 @@ import {
   displayStreak, learnedItemIds, isNodeDone, buyFreeze, exportBackup, importBackup, backupStale, defaultState, FREEZE_PRICE, MAX_FREEZES, speedOn, dayKey,
 } from '../progress.js';
 
-function achievements(state, now) {
+export function achievements(state, now) {
   const learned = learnedItemIds(state).map((id) => ITEMS.get(id));
   const kana = learned.filter((i) => i.type === 'kana' && i.script === 'hiragana').length;
   const words = learned.filter((i) => i.type === 'word' || i.type === 'sentence').length;
@@ -42,6 +42,12 @@ function achievements(state, now) {
     { icon: '📚', title: t('Curious mind'), desc: t('Discover 50 fun facts'), value: state.seen.fact.length, goal: 50 },
   ];
 }
+
+// Achievements that are done in `after` but were not in `before` (both from achievements()), for the unlock moment.
+export const newlyUnlocked = (before, after) => {
+  const had = new Set(before.filter((a) => a.value >= a.goal).map((a) => a.goal + a.desc));
+  return after.filter((a) => a.value >= a.goal && !had.has(a.goal + a.desc));
+};
 
 const voiceText = () => ({
   yes: t('{lang} voice ready.', { lang: langName() }),

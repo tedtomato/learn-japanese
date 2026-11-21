@@ -1,5 +1,5 @@
 // Shared app context: progress state, saving, navigation, toasts and modals.
-import { loadState, saveState, currentHearts, displayStreak, studiedToday, courseSummary, doubleXpLeftMs, STORAGE_KEY, TEST_STORAGE_KEY, SUMMARY_KEY } from './progress.js';
+import { loadState, saveState, currentHearts, displayStreak, streakState, giftReady, courseSummary, doubleXpLeftMs, DOUBLE_XP_MS, STORAGE_KEY, TEST_STORAGE_KEY, SUMMARY_KEY } from './progress.js';
 import { html, mount, raw, $ } from './dom.js';
 import { L } from './lang.js';
 import { icon } from './icons.js';
@@ -7,6 +7,7 @@ import { setSfx, setVoiceRate, setHaptics } from './audio.js';
 import { writeReminderNote } from './reminders.js';
 import { textSizePercent } from './usability.js';
 import { t } from './strings.js';
+import { countUp, reduced } from './motion.js';
 
 const storage = (() => {
   try {
@@ -117,31 +118,52 @@ export function flagSvg(code, w = 34) {
     + `<g clip-path="url(#${id})">${(FLAGS[code] || FLAGS.jp)()}</g><rect x="1" y="1" width="32" height="22" rx="5" fill="none" stroke="var(--border)" stroke-width="2"/></svg>`;
 }
 
-// The double-XP timer pill (top bar and lesson header); tickDoubleXp keeps it counting down.
+// The double-XP pill (top bar and lesson header): a small ring that drains with the time left, and the minutes.
+// tickDoubleXp keeps the text counting and moves the ring every 30 seconds.
 const clock = (ms) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')}`;
+const RING = 2 * Math.PI * 9;
+const ringOffset = (left) => (RING * (1 - Math.min(1, left / Math.max(DOUBLE_XP_MS, left)))).toFixed(1);
+const minutesLeft = (left) => `${Math.max(1, Math.ceil(left / 60000))}m`;
 export function doubleXpPill() {
   const left = doubleXpLeftMs(app.state, app.now());
   if (!left) return '';
-  return html`<span class="dxp-pill" role="img" aria-label="${t('Double XP: {time} left', { time: clock(left) })}">${icon('bolt', 16)}<b>2× ${clock(left)}</b></span>`;
+  return html`<span class="dxp-pill" role="img" aria-label="${t('Double XP: {time} left', { time: clock(left) })}"><svg class="dxp-ring" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" class="dxp-track"/><circle cx="12" cy="12" r="9" class="dxp-arc" stroke-dasharray="${RING.toFixed(1)}" stroke-dashoffset="${ringOffset(left)}"/><path d="M13 6 8.5 13h3l-.6 5 4.6-7h-3z" class="dxp-bolt"/></svg><b>2× ${minutesLeft(left)}</b></span>`;
 }
 function tickDoubleXp() {
   const left = doubleXpLeftMs(app.state, app.now());
+  const ring = Math.floor(left / 1000) % 30 === 0;
   document.querySelectorAll('.dxp-pill').forEach((el) => {
-    if (!left) el.remove();
-    else el.querySelector('b').textContent = `2× ${clock(left)}`;
+    if (!left) return el.remove();
+    el.querySelector('b').textContent = `2× ${minutesLeft(left)}`;
+    el.setAttribute('aria-label', t('Double XP: {time} left', { time: clock(left) }));
+    if (ring) el.querySelector('.dxp-arc')?.setAttribute('stroke-dashoffset', ringOffset(left));
   });
 }
 if (typeof document !== 'undefined') setInterval(tickDoubleXp, 1000);
 
+// What the top bar showed last, so a change plays: the gems count up and bump, the flame flares when the day is secured.
+const shown = { gems: null, secured: null };
+let barTimer = null;
 export function statsBar() {
   const { state } = app;
   const now = app.now();
   const streak = displayStreak(state, now);
   const hearts = currentHearts(state, now);
+  const mood = streakState(state, now);
+  const gemsFrom = shown.gems;
+  const gemsChanged = gemsFrom !== null && gemsFrom !== state.gems;
+  const flare = shown.secured === false && mood === 'secured';
+  shown.gems = state.gems;
+  shown.secured = mood === 'secured';
+  if (gemsChanged) {
+    clearTimeout(barTimer);
+    barTimer = setTimeout(() => countUp(document.querySelector('.stat-gems b'), gemsFrom, state.gems, 700), 30);
+  }
+  const gift = giftReady(state, now);
   return html`<div class="stats">
     <button class="stat stat-flag" aria-label="Course: ${L.name}. Change course">${raw(flagSvg(L.flag))}</button>
-    <button class="stat stat-streak ${studiedToday(state, now) ? 'on' : ''}" aria-label="Day streak: ${streak}. Open calendar">${icon('flame', 22)}<b>${streak}</b></button>
-    <button class="stat stat-gems" aria-label="${t('Gems: {n}', { n: state.gems })}">${icon('gem', 22)}<b>${state.gems}</b></button>
+    <button class="stat stat-streak ${mood === 'secured' ? 'on' : mood} ${flare ? 'flare' : ''}" aria-label="${t('Day streak: {n}. Open calendar', { n: streak })}${mood === 'risk' ? `. ${t('At risk tonight')}` : ''}">${icon('flame', 22)}<b>${streak}</b></button>
+    <button class="stat stat-gems ${gemsChanged && !reduced() ? 'bump' : ''}" aria-label="${t('Gems: {n}', { n: state.gems })}${gift ? `. ${t('A gift is waiting')}` : ''}">${icon('gem', 22)}<b>${gemsChanged && !reduced() ? gemsFrom : state.gems}</b>${gift ? html`<i class="gift-dot" aria-hidden="true"></i>` : ''}</button>
     <button class="stat stat-hearts" aria-label="Hearts: ${hearts}. Refill">${icon('heart', 22)}<b>${hearts}</b></button>
     ${doubleXpPill()}
   </div>`;

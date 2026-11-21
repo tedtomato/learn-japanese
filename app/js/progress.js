@@ -1,5 +1,6 @@
 // Learner progress: pure functions over a plain state object, plus saving to the device.
-import { NODES, MAX_LEVEL, ITEMS, SECTIONS } from './course.js';
+import { NODES, MAX_LEVEL, ITEMS, SECTIONS, NODE_BY_ID } from './course.js';
+import { FACTS } from './content/pack.js';
 import { review, isDue, strength } from './srs.js';
 import { L, COURSES } from './lang.js';
 
@@ -20,6 +21,13 @@ export const REPAIR_DAYS = 2;
 export const QUEST_COUNT = 3;
 export const QUEST_CHEST_GEMS = 20;
 export const DOUBLE_XP_MS = 15 * 60 * 1000;
+export const GEMS_LUCKY = 8; // extra gems for a lucky lesson
+export const GEMS_BONUS_CHEST = 15; // three perfect lessons in a row
+export const GEMS_WEEKLY = 20; // the weekly treasure, every 7th streak day
+export const GEMS_UNIT_GIFT = 15; // the gift box at the end of a finished unit
+export const PERFECT_RUN_BONUS = 3;
+export const LUCKY_ODDS = 6; // about 1 lesson in 6 is lucky on a given day
+export const AT_RISK_HOUR = 20; // after 20:00 an unsecured streak is "at risk"
 
 // Bumped when a course's path is rebuilt, so finished lessons are carried over. One number per course,
 // so rebuilding the Japanese path does not re-migrate the others.
@@ -40,7 +48,9 @@ export function defaultState(now = Date.now()) {
     hearts: { count: MAX_HEARTS, updatedAt: now },
     nodes: {},
     items: {},
-    stats: { lessons: 0, perfect: 0 },
+    stats: { lessons: 0, perfect: 0, perfectRun: 0 }, // perfectRun: perfect lessons in a row (3 → bonus chest)
+    gift: null, // today's mystery gift: { day, claimed }
+    unitGifts: {}, // unit id → 'ready' (a gift box waits at the end of the unit) | 'opened'
     seen: { fact: [], phrase: [], kanji: [], pron: [] },
     missions: {}, // mission id → best stars (1–3)
     answers: {}, // day → [right, wrong] answers that day (for the weekly recap)
@@ -73,6 +83,8 @@ export function migrate(raw, now = Date.now()) {
     heard: raw.heard || {},
     answers: raw.answers || {},
     quests: raw.quests?.items ? raw.quests : null,
+    gift: raw.gift && typeof raw.gift === 'object' ? { day: raw.gift.day || null, claimed: !!raw.gift.claimed } : null,
+    unitGifts: raw.unitGifts && typeof raw.unitGifts === 'object' ? raw.unitGifts : {},
   };
   if (raw.course !== COURSE_VERSION) state.nodes = carryOverNodes(state, raw.nodes || {});
   state.course = COURSE_VERSION;
@@ -202,6 +214,70 @@ export function buyFreeze(state) {
   return true;
 }
 
+// ---- Streak states (pure, given `now`) ----
+// 'secured': studied today · 'risk': a streak is on the line and it is past 20:00 · 'open': not yet today.
+export const atRiskHour = (now) => new Date(now).getHours() >= AT_RISK_HOUR;
+export function streakState(state, now) {
+  if (studiedToday(state, now)) return 'secured';
+  return displayStreak(state, now) > 0 && atRiskHour(now) ? 'risk' : 'open';
+}
+// Study days still needed for the next weekly treasure (every 7th streak day): 7 right after one was earned.
+export const weeklyTreasureIn = (state, now) => 7 - (displayStreak(state, now) % 7);
+// The streak milestones: reached (best streak so far), and the next one with the days to go.
+export const STREAK_BADGES = [7, 30, 100, 365];
+export function milestoneRow(state, now) {
+  const best = Math.max(state.streak.best || 0, displayStreak(state, now));
+  const next = STREAK_BADGES.find((m) => m > displayStreak(state, now));
+  return { badges: STREAK_BADGES.map((m) => ({ days: m, earned: best >= m })), next: next || null, toGo: next ? next - displayStreak(state, now) : 0 };
+}
+
+// ---- Daily mystery gift ----
+// One a day, the same all day (seeded by the date): gems 60%, a streak freeze 15% (only when there is room),
+// a 15-minute double-XP window 15%, a fun fact (with a few gems) 10%.
+export const giftReady = (state, now) => state.stats.lessons >= 1 && !(state.gift?.day === dayKey(now) && state.gift.claimed);
+export function dailyGift(state, now) {
+  const day = dayKey(now);
+  const rand = seeded(`gift-${day}`);
+  const roll = rand();
+  const gems = 5 + Math.floor(rand() * 11);
+  if (roll < 0.6) return { gems };
+  if (roll < 0.75) return state.streak.freezes < MAX_FREEZES ? { freeze: 1 } : { gems };
+  if (roll < 0.9) return { doubleXpMs: DOUBLE_XP_MS };
+  const fact = FACTS.length ? FACTS[Math.floor(rand() * FACTS.length)] : null;
+  return fact ? { text: fact.title, gems: 3 } : { gems };
+}
+// Opens today's gift (once): applies the reward and returns it, or null when there is nothing to open.
+export function claimGift(state, now) {
+  if (!giftReady(state, now)) return null;
+  const reward = dailyGift(state, now);
+  if (reward.gems) state.gems += reward.gems;
+  if (reward.freeze) state.streak.freezes = Math.min(MAX_FREEZES, state.streak.freezes + reward.freeze);
+  if (reward.doubleXpMs) grantDoubleXp(state, now);
+  state.gift = { day: dayKey(now), claimed: true };
+  return reward;
+}
+
+// ---- Lucky lessons ----
+// About 1 in 6 not-yet-done lessons is lucky on a given day (seeded by the day and the lesson, so it stays the same
+// all day): finishing it for the first time pays extra gems.
+export const PLAYABLE = ['lesson', 'read', 'kanji'];
+export function luckyNode(state, nodeId, day) {
+  const node = NODE_BY_ID.get(nodeId);
+  if (!node || !PLAYABLE.includes(node.kind) || (state.nodes[nodeId]?.level || 0) > 0) return false;
+  return seeded(`lucky-${day}-${nodeId}`)() < 1 / LUCKY_ODDS;
+}
+
+// ---- Units ----
+// A unit is complete when each of its lessons (and reading / kanji lessons) was finished once.
+export const unitFinished = (state, unit) => unit.nodes.filter((n) => PLAYABLE.includes(n.kind)).every((n) => (state.nodes[n.id]?.level || 0) > 0);
+// The gift box at the end of a finished unit: opens once for gems. Returns the gems, or 0.
+export function openUnitGift(state, unitId) {
+  if (state.unitGifts[unitId] !== 'ready') return 0;
+  state.unitGifts[unitId] = 'opened';
+  state.gems += GEMS_UNIT_GIFT;
+  return GEMS_UNIT_GIFT;
+}
+
 // ---- Path ----
 export const nodeLevel = (state, node) => state.nodes[node.id]?.level || 0;
 export const isNodeDone = (state, node) => nodeLevel(state, node) > 0;
@@ -263,7 +339,7 @@ export const mistakeIds = (state) => learnedItemIds(state)
   .sort((a, b) => state.items[b].missed - state.items[a].missed);
 
 // ---- Finishing a session ----
-export const STREAK_MILESTONES = [7, 30, 100];
+export const STREAK_MILESTONES = [7, 30, 100, 365];
 const ANSWER_DAYS = 60; // how long the right / wrong log is kept
 function logAnswers(state, results, now) {
   let right = 0;
@@ -303,15 +379,33 @@ export function completeSession(state, { node, mode, results, mistakes, now, bon
   const goalReached = !goalBefore && state.daily[today] >= state.dailyGoal;
 
   let levelUp = null;
+  let unitComplete = null;
+  let luckyGems = 0;
   if (mode === 'lesson' && node) {
     const level = nodeLevel(state, node);
     const next = node.kind === 'review' ? Math.max(level, 1) : Math.min(MAX_LEVEL, level + 1);
+    // A lucky lesson (see luckyNode) pays extra gems the first time it is finished.
+    if (level === 0 && luckyNode(state, node.id, today)) luckyGems = GEMS_LUCKY;
     state.nodes[node.id] = { level: next };
     if (next !== level) levelUp = next;
+    // The first time the last lesson of a unit is finished: the unit is complete (once), and a gift box waits on the path.
+    if (level === 0 && PLAYABLE.includes(node.kind) && unitFinished(state, node.unit) && !state.unitGifts[node.unit.id]) {
+      state.unitGifts[node.unit.id] = 'ready';
+      unitComplete = { title: node.unit.title, color: node.unit.color };
+    }
   }
 
   let gems = GEMS_LESSON + (goalReached ? 5 : 0);
-  state.gems += gems;
+  state.gems += gems + luckyGems;
+  // Three perfect lessons in a row open a bonus chest (the run starts again).
+  let perfectRun = state.stats.perfectRun || 0;
+  let bonusChest = false;
+  if (mode === 'lesson') {
+    perfectRun = perfect ? perfectRun + 1 : 0;
+    bonusChest = perfectRun >= PERFECT_RUN_BONUS;
+    state.stats.perfectRun = bonusChest ? 0 : perfectRun;
+    if (bonusChest) state.gems += GEMS_BONUS_CHEST;
+  }
   if (mode === 'practice') gainHeart(state, now);
 
   state.stats.lessons += 1;
@@ -332,7 +426,13 @@ export function completeSession(state, { node, mode, results, mistakes, now, bon
     run: bestRun,
     accuracy: mode === 'lesson' && right >= 5 && right / (right + wrong) >= 0.9 ? 1 : 0,
   });
-  return { xp, gems, perfect, levelUp, goalReached, mistakesCleared, streakExtended: streak.extended, streak: state.streak.count, milestone, quests, sundayBonus };
+  // Every 7th day of the streak: the weekly treasure.
+  const weeklyChest = streak.extended && state.streak.count % 7 === 0;
+  if (weeklyChest) state.gems += GEMS_WEEKLY;
+  return {
+    xp, gems, perfect, levelUp, goalReached, mistakesCleared, streakExtended: streak.extended, streak: state.streak.count, milestone, quests, sundayBonus,
+    unitComplete, luckyGems, perfectRun, bonusChest, weeklyChest, bonusChestGems: GEMS_BONUS_CHEST, weeklyChestGems: GEMS_WEEKLY,
+  };
 }
 
 // Hands-free listening: XP (counts for the daily goal and streak) once enough phrases were heard.

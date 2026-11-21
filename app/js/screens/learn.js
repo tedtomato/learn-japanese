@@ -1,13 +1,14 @@
 // The learning path: sections → unit banners → winding track of lesson nodes.
 import { L } from '../lang.js';
-import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID } from '../course.js';
+import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID, NODES } from '../course.js';
 import { jpItem, speechOf } from '../lesson/text.js';
-import { rewardPopup } from '../fx.js';
+import { queueMoment, playMoments, sayLine } from '../moments.js';
+import { giftSvg, cloverSvg, cupSvg } from '../rewardicons.js';
 import { decorFor, drawTrails, ROADBLOCK } from '../scenery.js';
 import { app, statsBar, toast, modal, flagSvg } from '../app.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
-import { mascot } from '../mascot.js';
+import { mascot, MOODS } from '../mascot.js';
 import { speak } from '../audio.js';
 import { art } from '../art.js';
 import { MISSIONS } from '../content/pack.js';
@@ -15,6 +16,7 @@ import { t } from '../strings.js';
 import {
   currentNodeIndex, nodeLevel, isNodeDone, isNodeUnlocked, nodeNeedsReview, openChest, todayXp, currentHearts, dueItemIds, studiedToday,
   reviewEstimate, REVIEW_FIRST_MIN, unitIsLocked, unitReview, TESTOUT_PASS, weeklyRecap, showRecap, weekKey, suggestGoal, unitLessonsDone, tripPlan,
+  giftReady, claimGift, luckyNode, streakState, displayStreak, unitFinished, openUnitGift, dayKey, GEMS_LUCKY, GEMS_UNIT_GIFT,
 } from '../progress.js';
 import { strength } from '../srs.js';
 import { questsCard, tripBanner, repairCard, doRepair, questChest, lessonRate } from './quests.js';
@@ -121,7 +123,7 @@ function nodeLabel(node, st) {
   return `${nodeTitle(node)}, ${status}${lvl ? `, ${t('Level {a} of {b}', { a: lvl, b: MAX_LEVEL })}` : ''}`;
 }
 
-function renderNode(node, i, current, now, firstRun) {
+function renderNode(node, i, current, now, firstRun, gift) {
   const st = nodeState(node, current, now);
   const offset = OFFSETS[i % OFFSETS.length];
   const showCheer = st === 'current' && node.kind !== 'chest';
@@ -130,18 +132,21 @@ function renderNode(node, i, current, now, firstRun) {
   // Every few steps the path crosses a little stream on a red garden bridge (drawn by drawTrails).
   const k = node.unit.nodes.indexOf(node);
   const stream = k % 4 === 2 && k < node.unit.nodes.length - 1;
+  const lucky = st === 'current' && luckyNode(app.state, node.id, dayKey(now));
   return html`<div class="node-row ${stream ? 'stream-after' : ''}" style="--x:${offset}px">
     ${showCheer ? html`<div class="node-mascot ${side} ${firstRun ? 'first-run' : ''}">
       ${firstRun ? html`<div class="bubble"><b>${t('Tap the green circle to start — about 3 minutes')}</b></div>`
-        : html`<div class="bubble"><b class="jp">${cheer[0]}</b><small>${cheer[1]}</small></div>`}${mascot('happy', 64)}</div>`
+        : html`<div class="bubble"><b class="jp">${cheer[0]}</b><small>${sayLine('start')}</small></div>`}${mascot('happy', 64)}</div>`
       : html`<div class="decor-slot ${side}">${decorFor(i)}</div>`}
     <div class="node-wrap">
       ${st === 'current' ? html`<div class="start-bubble" aria-hidden="true">${t(node.kind === 'chest' ? 'OPEN' : 'START')}</div>` : ''}
-      <button class="node node-${node.kind} st-${st} c-${node.unit.color}" data-node="${node.id}" aria-label="${nodeLabel(node, st)}" ${st === 'locked' ? raw('aria-disabled="true"') : ''} ${st === 'current' ? raw('aria-current="step"') : ''}>
+      <button class="node node-${node.kind} st-${st} c-${node.unit.color} ${lucky ? 'lucky' : ''}" data-node="${node.id}"  aria-label="${nodeLabel(node, st)}${lucky ? `, ${t('Lucky lesson')}` : ''}" ${st === 'locked' ? raw('aria-disabled="true"') : ''} ${st === 'current' ? raw('aria-current="step"') : ''}>
         ${nodeIcon(node, st)}
         ${st === 'stale' ? html`<span class="node-badge" aria-hidden="true">${icon('refresh', 14)}</span>` : ''}
         ${st === 'done' && node.kind !== 'chest' ? html`<span class="node-check" aria-hidden="true">${icon('check', 14)}</span>` : ''}
+        ${lucky ? html`<span class="node-lucky" aria-hidden="true">${cloverSvg(22)}</span>` : ''}
       </button>
+      ${st === 'current' && gift ? html`<button class="gift-box ${offset > 0 ? 'right' : 'left'}" aria-label="${t('Open today\'s gift')}">${giftSvg(54)}<i class="gift-spark" aria-hidden="true"></i></button>` : ''}
       ${levelPips(node)}
       ${node.kind === 'review' ? html`<div class="node-label">${t('{unit} trophy', { unit: node.unit.title })}</div>` : ''}
     </div>
@@ -176,7 +181,8 @@ function nodePopover(nodeEl, node, st) {
     if (isNodeDone(app.state, node)) return toast(t('You already opened this chest.'));
     const gems = openChest(app.state, node);
     app.save();
-    rewardPopup({ kind: 'chest', title: t('Treasure!'), reward: html`${icon('gem', 30)} +${gems} ${t('gems')}`, onDone: () => app.go('#/learn') });
+    queueMoment({ kind: 'chest', title: t('Treasure!'), gems, source: 'path' });
+    playMoments().then(() => app.go('#/learn'));
     return;
   }
   const level = nodeLevel(app.state, node);
@@ -191,9 +197,11 @@ function nodePopover(nodeEl, node, st) {
   // Before a new lesson, a nudge when many words are fading: a short review first keeps them.
   const due = dueItemIds(app.state, app.now()).filter((id) => app.state.items[id].seen > 0).length;
   const nudge = !level && !isReview && due >= REVIEW_FIRST_MIN;
+  const lucky = st === 'current' && luckyNode(app.state, node.id, dayKey(app.now()));
   const pop = document.createElement('div');
   pop.className = `popover c-${node.unit.color}`;
   mount(pop, html`<small class="pop-kicker">${t('Section {n} – Unit {m}', { n: node.sectionIndex + 1, m: node.unitIndex + 1 })}</small><b>${nodeTitle(node)}</b><span>${sub}</span>
+    ${lucky ? html`<span class="pop-lucky">${cloverSvg(16)} ${t('Lucky lesson: +{n} bonus gems', { n: GEMS_LUCKY })}</span>` : ''}
     ${nudge ? html`<span class="pop-nudge">${icon('refresh', 14)} ${t('{n} words are fading — review first?', { n: due })}</span>` : ''}
     <button class="btn btn-white btn-block go-node">${hearts > 0 || level === 0 ? label : t('No hearts — practice to refill')}</button>
     ${nudge ? html`<button class="btn btn-ghost btn-block pop-review">${t('Review first')} · ${t('about {m} min', { m: reviewEstimate(due).minutes })}</button>` : ''}`);
@@ -306,6 +314,48 @@ function pathCelebration(root, fx, current) {
   return timers;
 }
 
+// After 20:00 with a streak that is not yet secured: a gentle nudge from a sleepy Kuri.
+function streakNudge(state, now, current) {
+  if (streakState(state, now) !== 'risk') return '';
+  const n = displayStreak(state, now);
+  return html`<section class="card nudge-card" aria-label="${t('Your streak is at risk')}">
+    ${mascot(MOODS.includes('sleepy') ? 'sleepy' : 'sad', 56)}
+    <div><b>${t('Your {n}-day streak ends tonight', { n })}</b><small>${t('One quick lesson keeps the flame lit.')}</small></div>
+    <button class="btn btn-primary btn-small nudge-go" data-node="${NODES[current]?.id || ''}">${t('Save it')}</button></section>`;
+}
+
+// The daily gift when every lesson is done (no current node to sit beside): a small card instead.
+const giftCard = () => html`<section class="card gift-card"><button class="gift-box inline" aria-label="${t('Open today\'s gift')}">${giftSvg(48)}<i class="gift-spark" aria-hidden="true"></i></button>
+  <div><b>${t('A gift is waiting')}</b><small>${t('Tap the box to open it.')}</small></div></section>`;
+
+// The gift box at the end of a finished unit.
+const unitGiftRow = (unit, state) => (state.unitGifts[unit.id] === 'ready'
+  ? html`<button class="card unit-gift" data-unit-gift="${unit.id}" aria-label="${t('Open the unit gift: +{n} gems', { n: GEMS_UNIT_GIFT })}"><span class="unit-gift-box">${giftSvg(52)}<i class="gift-spark" aria-hidden="true"></i></span>
+    <span><b>${t('Unit gift')}</b><small>${t('You finished “{unit}”. Tap to open!', { unit: unit.title })}</small></span></button>` : '');
+
+// Opens today's gift: the reward is applied now, the moment plays it, then the top bar catches up.
+async function openGift(root) {
+  const reward = claimGift(app.state, app.now());
+  if (!reward) return;
+  app.save();
+  root.querySelectorAll('.gift-box, .gift-card').forEach((el) => el.remove());
+  queueMoment({ kind: 'gift', title: t('Daily gift'), reward });
+  await playMoments();
+  const bar = root.querySelector('.topbar');
+  if (bar) mount(bar, statsBar());
+}
+
+async function openUnitGiftBox(root, unitId) {
+  const gems = openUnitGift(app.state, unitId);
+  if (!gems) return;
+  app.save();
+  root.querySelector(`[data-unit-gift="${unitId}"]`)?.remove();
+  queueMoment({ kind: 'chest', title: t('Unit gift'), gems, source: 'path' });
+  await playMoments();
+  const bar = root.querySelector('.topbar');
+  if (bar) mount(bar, statsBar());
+}
+
 export function renderLearn(root) {
   const now = app.now();
   const { state } = app;
@@ -314,12 +364,16 @@ export function renderLearn(root) {
   const goal = state.dailyGoal;
   let n = 0;
   const firstRun = state.stats.lessons === 0;
+  const gift = giftReady(state, now);
+  const giftOnPath = gift && current < NODES.length;
 
   mount(root, html`<header class="topbar">${statsBar()}</header>
   <main class="page learn">
     <h1 class="sr-only">${t('Learn')}</h1>
     ${tripBanner(state, now)}
     ${repairCard(state, now)}
+    ${streakNudge(state, now, current)}
+    ${gift && !giftOnPath ? giftCard() : ''}
     <section class="card goal-card" role="button" tabindex="0" aria-label="${t('About the daily goal')}">
       <div class="goal-icon">${icon('bolt', 22)}</div>
       <div class="goal-text"><b>${t('Daily goal')}</b><span>${Math.min(xp, goal)} / ${goal} XP</span></div>
@@ -334,14 +388,15 @@ export function renderLearn(root) {
       <h2 class="section-title"><span>${t('Section {n}', { n: s + 1 })}</span>${section.title}</h2>
       ${section.units.map((unit, u) => html`
         <section class="unit" id="unit-${unit.id}">
-          <div class="unit-banner c-${unit.color} ${bannerEnter(unit, current)}">
-            <div><span class="unit-kicker"><span class="flag-chip">${raw(flagSvg(L.flag, 22))}</span>${t('Section {n} – Unit {m}', { n: s + 1, m: u + 1 })}</span><h3>${unit.title}</h3><p>${unit.desc}</p>${unitGoal(unit, state)}</div>
+          <div class="unit-banner c-${unit.color} ${bannerEnter(unit, current)} ${unitFinished(state, unit) ? 'complete' : ''}">
+            <div><span class="unit-kicker"><span class="flag-chip">${raw(flagSvg(L.flag, 22))}</span>${t('Section {n} – Unit {m}', { n: s + 1, m: u + 1 })}</span>${unitFinished(state, unit) ? html`<span class="unit-ribbon">${cupSvg(16)} ${t('Complete')}</span>` : ''}<h3>${unit.title}</h3><p>${unit.desc}</p>${unitGoal(unit, state)}</div>
             <div class="banner-btns">
               <button class="btn-guide" data-guide="${unit.id}">${icon('book', 18)}<span>${t('Guide')}</span></button>
               ${unitIsLocked(state, unit) && unitReview(unit) ? html`<button class="btn-guide btn-testout" data-testout="${unit.id}">${icon('arrow', 18)}<span>${t('Jump here')}</span></button>` : ''}
             </div>
           </div>
-          <div class="track">${unit.nodes.map((node) => renderNode(node, n++, current, now, firstRun && node.index === 0))}</div>
+          <div class="track">${unit.nodes.map((node) => renderNode(node, n++, current, now, firstRun && node.index === 0, giftOnPath))}</div>
+          ${unitGiftRow(unit, state)}
           ${missionOnPath(unit, state)}
         </section>`)}`)}
     <div class="path-end">${raw(ROADBLOCK)}<p><b>${t(current >= n ? 'You finished every lesson!' : 'Road under construction')}</b><br>${current >= n ? t('More units are coming — keep practising.') : t('More units are on the way: phrases, {what} and conversations.', { what: L.latin ? t('grammar') : L.chars })}</p></div>
@@ -355,6 +410,12 @@ export function renderLearn(root) {
     }),
   );
   root.addEventListener('click', () => document.querySelector('.popover')?.remove());
+  root.querySelectorAll('.gift-box').forEach((b) => b.addEventListener('click', (e) => {
+    e.stopPropagation();
+    openGift(root);
+  }));
+  root.querySelectorAll('[data-unit-gift]').forEach((b) => b.addEventListener('click', () => openUnitGiftBox(root, b.dataset.unitGift)));
+  $('.nudge-go', root)?.addEventListener('click', (e) => app.go(e.currentTarget.dataset.node ? `#/lesson/${e.currentTarget.dataset.node}` : '#/practice/go'));
   $('.start-review', root)?.addEventListener('click', () => app.go('#/practice/go'));
   $('.open-quest-chest', root)?.addEventListener('click', () => questChest(() => renderLearn(root)));
   $('.do-repair', root)?.addEventListener('click', () => doRepair() && renderLearn(root));

@@ -15,7 +15,7 @@ import { art } from '../art.js';
 import { speak, stopSpeaking, sfx, buzz, HAPTIC, canSpeakAloud, canRecognise, listen, speechMatches, SPEAKERS } from '../audio.js';
 import { generateLesson, generatePractice, generateRetry, demoExercises, kanjiPracticeIds, kanaPracticeIds, romajiOfChunk, romajiMatch } from './generate.js';
 import {
-  completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, isNodeDone, currentNodeIndex, dayKey, buyHearts, HEARTS_PRICE, costsHeart, retryAgain, testOutUnit, TESTOUT_PASS, unitIsLocked, speedOn,
+  completeSession, currentHearts, loseHeart, nodeLevel, isNodeUnlocked, isNodeDone, currentNodeIndex, dayKey, buyHearts, HEARTS_PRICE, costsHeart, retryAgain, testOutUnit, TESTOUT_PASS, unitIsLocked, speedOn, claimQuestChest,
 } from '../progress.js';
 import { nextTidbit, tidbitCard, readings, BREAK_KINDS } from '../tidbits.js';
 import { GRAMMAR } from '../content/pack.js';
@@ -23,11 +23,12 @@ import { jpItem, jpChunk, speechOf, kanaExample, LANG_ATTR } from './text.js';
 import { t, langName, countryName, countryIn } from '../strings.js';
 import { explainCards } from './explain.js';
 import { mountTrace } from './trace.js';
-import { rewardPopup, comboBurst } from '../fx.js';
+import { comboBurst } from '../fx.js';
+import { queueMoment, playMoments, buildQueue, weekOf, sayLine } from '../moments.js';
+import { achievements, newlyUnlocked } from '../screens/profile.js';
 import { celebrationHtml, pickCelebration } from '../celebrate.js';
 
 let lastParty = null; // the last celebration shown, so the next one differs
-import { questChest } from '../screens/quests.js';
 import { shareButton, wireShare } from '../share.js';
 import { saveResume, clearResume, readResume } from '../resume.js';
 import { applySnapshot, canMistype, forgiveMistype } from '../usability.js';
@@ -169,7 +170,7 @@ function renderShell(root, s) {
   </div>`);
   $('.timer-off', root).addEventListener('click', () => timerOff(root, s));
   $('.quit', root).addEventListener('click', () =>
-    modal(html`<div class="center">${mascot('sad', 96)}<h2>${t('Wait, don\'t go!')}</h2><p class="muted">${t('You\'ll lose your progress in this lesson.')}</p></div>`, [
+    modal(html`<div class="center">${mascot('think', 96)}<h2>${sayLine('quit')}</h2><p class="muted">${t('You\'ll lose your progress in this lesson.')}</p></div>`, [
       { label: t('Keep learning') },
       ...(speedOn(app.state) ? [{ label: t('Turn off timer'), kind: 'ghost', onClick: () => timerOff(root, s) }] : []),
       { label: t('End session'), kind: 'danger-ghost', onClick: () => quit(s) },
@@ -499,7 +500,7 @@ function result(root, s, ok, opts = {}) {
   mount(foot, html`<div class="foot-inner feedback">
     <div class="fb-text">
       ${ok ? html`<span class="fb-icon">${icon('check', 26)}</span>` : html`<span class="fb-icon fb-sad">${mascot('sad', 44)}</span>`}
-      <div><b>${verdict}</b>
+      <div><b>${verdict}</b>${!ok && !outOfHearts ? html`<span class="fb-line">${sayLine('wrong')}</span>` : ''}
       ${!ok && opts.answerText ? html`<p class="jp-mix">${opts.answerText}</p>` : ''}
       ${opts.meaning ? html`<p class="fb-meaning">${item?.type === 'fword' && item.art ? art(item.art, 'art-inline') : ''} ${opts.meaning}</p>` : ''}
       ${badges.length ? html`<p class="fb-badges">${badges}</p>` : ''}</div>
@@ -1358,8 +1359,10 @@ function finish(root, s) {
   // What the path will celebrate on return: the node that was just finished, and the one that opens after it.
   const wasDone = s.node ? isNodeDone(app.state, s.node) : false;
   const prevCurrent = currentNodeIndex(app.state);
+  const achBefore = achievements(app.state, now);
   const summary = completeSession(app.state, { node: s.testOut ? null : s.node, mode: s.testOut ? 'test' : s.mode, results: s.results, mistakes: s.mistakes, now, bonusXp, bestRun: s.bestRun || 0, heard: [...(s.heard || [])] });
   const skipped = passed ? testOutUnit(app.state, s.node.unit) : 0;
+  const newAch = newlyUnlocked(achBefore, achievements(app.state, now));
   app.save();
   pathFx.pending = { id: !s.testOut && s.node ? s.node.id : null, first: !wasDone, prevCurrent, streak: !!summary.streakExtended, at: Date.now() };
   // Google Drive sync (only when the owner has set it up and the learner turned it on): loaded on demand.
@@ -1371,12 +1374,8 @@ function finish(root, s) {
     : t(s.mode === 'practice' ? 'Practice complete!' : s.node?.kind === 'story' ? 'Story complete!' : summary.perfect ? 'Perfect lesson!' : 'Lesson complete!');
   const extras = [];
   if (s.testOut) extras.push(html`<p class="pill ${passed ? 'pill-green' : 'pill-orange'}">${passed ? t('{n} lessons unlocked as played', { n: skipped }) : t('You need {n}% to skip — the lessons will get you there', { n: Math.round(TESTOUT_PASS * 100) })}</p>`);
-  if (summary.streakExtended) extras.push(html`<p class="pill pill-orange">${icon('flame', 16)} ${raw(esc(t('{n} day streak!', { n: summary.streak })).replace(String(summary.streak), `<i class="cu" data-from="${Math.max(0, summary.streak - 1)}" data-to="${summary.streak}">${summary.streak}</i>`))}</p>`);
-  if (summary.milestone) extras.push(html`<p class="pill pill-gold">${icon('flame', 16)} ${t('{n}-day streak milestone!', { n: summary.milestone })}</p>`);
   if (summary.sundayBonus) extras.push(html`<p class="pill pill-purple">${icon('bolt', 16)} ${t('Sunday bonus: double XP for 15 minutes!')}</p>`);
-  for (const q of summary.quests.done) extras.push(html`<p class="pill pill-purple">${icon('check', 16)} ${t('Quest done: {text} +{n} gems', { text: t(q.text), n: q.gems })}</p>`);
   if (bonusXp) extras.push(html`<p class="pill pill-gold">${icon('bolt', 16)} ${t('Speed bonus +{n} XP', { n: bonusXp })}</p>`);
-  if (summary.goalReached) extras.push(html`<p class="pill pill-gold">${icon('star', 16)} ${t('Daily goal reached! +5 gems')}</p>`);
   if (summary.mistakesCleared) extras.push(html`<p class="pill pill-green">${icon('check', 16)} ${t('All mistakes fixed! +5 gems')}</p>`);
   if (s.mode === 'practice') extras.push(html`<p class="pill pill-red">${icon('heart', 16)} ${t('+1 heart')}</p>`);
   if (summary.levelUp && s.node?.kind !== 'review') extras.push(html`<p class="pill pill-green">${icon('star', 16)} ${t('Level {a} of {b}', { a: summary.levelUp, b: MAX_LEVEL })}</p>`);
@@ -1389,6 +1388,7 @@ function finish(root, s) {
   mount(root, html`<div class="complete">
     <div class="rev rev-mascot" style="--d:0ms">${mascot(party === 'dance' ? 'dance' : 'cheer', accuracy === 100 ? 180 : 140)}</div>
     <h1 class="rev" style="--d:200ms">${title}</h1>
+    <p class="complete-line rev" style="--d:290ms">${sayLine('end')}</p>
     <div class="result-tiles">
       <div class="result gold rev" style="--d:380ms"><span>${t('Total XP')}</span><b>${icon('bolt', 20)} <i class="cu" data-to="${summary.xp}">${summary.xp}</i></b></div>
       <div class="result green rev ${accuracy < 70 ? 'low' : ''}" style="--d:470ms"><span>${t(accuracy === 100 ? 'Amazing' : 'Accuracy')}</span><b>${icon('check', 20)} <i class="cu" data-to="${accuracy}" data-suffix="%">${accuracy}%</i></b></div>
@@ -1414,13 +1414,16 @@ function finish(root, s) {
   heading.focus({ preventScroll: true });
   $('.continue', root).addEventListener('click', () => {
     const go = () => app.go(location.hash.startsWith('#/lab') ? '#/lab' : s.mode === 'practice' ? '#/practice' : '#/learn');
-    // Pop-ups one after the other: daily goal, streak milestone, the quests chest.
-    const steps = [];
-    if (summary.goalReached) steps.push((next) => rewardPopup({ kind: 'bonus', gems: true, title: t('Daily goal reached!'), reward: html`${icon('gem', 30)} +5 gems`, text: t('Come back tomorrow to keep your streak going.'), onDone: next }));
-    if (summary.milestone) steps.push((next) => rewardPopup({ kind: 'bonus', title: t('{n}-day streak!', { n: summary.milestone }), reward: html`${icon('flame', 30)} ${summary.milestone}`, text: t(summary.milestone >= 100 ? 'A hundred days in a row. Legendary!' : summary.milestone >= 30 ? 'A whole month without missing a day. Amazing!' : 'A full week in a row. Keep it going!'), onDone: next }));
-    if (summary.quests.chestReady) steps.push((next) => questChest(next));
-    const run = (i) => (i < steps.length ? steps[i](() => run(i + 1)) : go());
-    run(0);
+    // The rewards of this session as moments, one after another (a tap moves on, "Skip all" drops the rest).
+    const prize = summary.quests.chestReady ? claimQuestChest(app.state, app.now()) : null;
+    if (prize) app.save();
+    const goal = app.state.dailyGoal;
+    for (const m of buildQueue(summary, newAch, {
+      week: weekOf(now, app.state.daily, dayKey), goal, xpToday: app.state.daily[dayKey(now)] || 0, lessonXp: summary.xp,
+      questsChest: prize, perfectGems: summary.bonusChestGems, weeklyGems: summary.weeklyChestGems, maxLevel: MAX_LEVEL, nodeTitle: s.node?.title,
+    })) queueMoment(m);
+    if (summary.luckyGems) queueMoment({ kind: 'gift', title: t('Lucky lesson!'), reward: { gems: summary.luckyGems } });
+    playMoments().then(go, go);
   });
 }
 

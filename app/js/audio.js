@@ -182,6 +182,27 @@ function tone(freq, start, dur, type = 'sine', gain = 0.18) {
   osc.stop(t + dur + 0.05);
 }
 
+// A burst of filtered noise whose centre frequency sweeps from f0 to f1 (whoosh, creak, flame).
+function noise(start, dur, f0, f1, gain = 0.12, q = 1.2) {
+  const t = ctx.currentTime + start;
+  const buf = ctx.createBuffer(1, Math.max(1, Math.floor(ctx.sampleRate * dur)), ctx.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+  const src = ctx.createBufferSource();
+  src.buffer = buf;
+  const filter = ctx.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.Q.value = q;
+  filter.frequency.setValueAtTime(f0, t);
+  filter.frequency.exponentialRampToValueAtTime(f1, t + dur);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(gain, t + dur * 0.35);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  src.connect(filter).connect(g).connect(ctx.destination);
+  src.start(t);
+}
+
 const SOUNDS = {
   correct: () => { tone(880, 0, 0.12); tone(1318, 0.09, 0.22); },
   wrong: () => { tone(220, 0, 0.18, 'square', 0.06); tone(180, 0.12, 0.25, 'square', 0.06); },
@@ -192,7 +213,24 @@ const SOUNDS = {
   chest: () => [523, 659, 784, 1046, 1318].forEach((f, i) => tone(f, i * 0.08, 0.25, 'triangle', 0.12)),
   complete: () => [523, 659, 784, 1046].forEach((f, i) => tone(f, i * 0.11, 0.3, 'triangle', 0.14)),
   stroke: () => tone(990, 0, 0.08, 'sine', 0.1),
+  // Reward moments: a rising three-note chord with a shimmer on top.
+  fanfare: () => {
+    [[523, 0], [659, 0.12], [784, 0.24]].forEach(([f, d]) => tone(f, d, 0.5, 'triangle', 0.13));
+    [1568, 1976, 2349].forEach((f, i) => tone(f, 0.38 + i * 0.07, 0.3, 'sine', 0.05));
+  },
+  // Three quick descending triplets, like coins falling.
+  coins: () => [0, 0.16, 0.32].forEach((d) => [1568, 1318, 1046].forEach((f, i) => tone(f, d + i * 0.04, 0.09, 'square', 0.04))),
+  whoosh: () => noise(0, 0.38, 400, 3200, 0.14),
+  chest: () => {
+    noise(0, 0.28, 180, 420, 0.07, 6); // creak
+    tone(300, 0.26, 0.1, 'triangle', 0.14); // pop
+    [523, 659, 784, 1046, 1318].forEach((f, i) => tone(f, 0.32 + i * 0.08, 0.25, 'triangle', 0.12));
+  },
+  levelup: () => [392, 494, 587, 784, 988, 1175].forEach((f, i) => tone(f, i * 0.07, 0.2, 'triangle', 0.11)),
+  gift: () => [1568, 2093, 1760, 2349, 2637].forEach((f, i) => tone(f, i * 0.06, 0.18, 'sine', 0.07)),
+  flame: () => { noise(0, 0.55, 220, 700, 0.1, 0.8); tone(110, 0, 0.5, 'sine', 0.1); },
 };
+export const SFX_NAMES = Object.keys(SOUNDS);
 
 export function sfx(name) {
   if (!sfxOn) return;
@@ -208,7 +246,7 @@ export function sfx(name) {
 // Vibration for right and wrong answers: a light tap, or a longer double pulse. Off in the Profile settings.
 let hapticsOn = true;
 export const setHaptics = (on) => (hapticsOn = on !== false);
-export const HAPTIC = { right: 12, wrong: [40, 40, 70] };
+export const HAPTIC = { right: 12, wrong: [40, 40, 70], streak: [30, 40, 30, 40, 80], goal: [20, 30, 60], chest: [60, 40, 20, 20, 20, 20, 20], gift: [15, 25, 15, 25, 70], unit: [40, 40, 40, 40, 120], achievement: [25, 30, 70], levelup: 25 };
 
 export function buzz(ms = HAPTIC.wrong) {
   if (!hapticsOn) return;

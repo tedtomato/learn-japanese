@@ -11,6 +11,7 @@ import { icon } from './icons.js';
 import { celebrationHtml, pickCelebration } from './celebrate.js';
 import { APP_RELEASE, APP_RELEASE_DATE } from './version.js';
 import { flyGems } from './motion.js';
+import { sayLine } from './moments.js';
 
 const CHEST = `<svg class="fx-chest" viewBox="0 0 120 100" aria-hidden="true">
   <g class="fx-rays">${Array.from({ length: 12 }, (_, i) => `<rect x="58" y="-30" width="4" height="34" rx="2" transform="rotate(${i * 30} 60 50)"/>`).join('')}</g>
@@ -125,10 +126,11 @@ export function comboBurst(count) {
   el.className = 'combo';
   el.setAttribute('aria-hidden', 'true');
   // Said through the shared live region (no extra element): the burst itself is only for the eyes.
-  announce(`${t('{n} in a row!', { n: count })} ${t(count >= 10 ? 'Unstoppable!' : 'On fire!')}`);
+  const line = sayLine(count >= 10 ? 'run10' : count >= 5 ? 'run5' : 'run3');
+  announce(`${t('{n} in a row!', { n: count })} ${line}`);
   const sparks = Array.from({ length: 12 }, (_, i) => `<i style="--a:${i * 30}deg"></i>`).join('');
   el.innerHTML = `<div class="combo-card"><div class="combo-sparks">${sparks}</div><div class="combo-flame">🔥</div>
-    <b>${t('{n} in a row!', { n: count })}</b><span>${t(count >= 10 ? 'Unstoppable!' : 'On fire!')}</span></div>`;
+    <b>${t('{n} in a row!', { n: count })}</b><span>${line}</span></div>`;
   // Sometimes confetti or fireworks behind the card too (the dance is for the lesson end).
   const extra = pickCelebration('x', lastCombo);
   lastCombo = extra;

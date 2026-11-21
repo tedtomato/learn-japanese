@@ -61,6 +61,20 @@ their quiz, and 20 pronunciation tips.
   motion, scalable type, 44 px touch targets. **Dark mode**, works **offline**, **backup / restore** per
   course, "can't listen / speak now" pauses those tasks.
 
+## Sound effects
+
+The sounds are designed, not beeped: 32 short MP3s in `app/sfx/` (about 210 KB in all, precached with the app
+shell so they work offline). `node scripts/sfx.mjs` makes them from scratch with a small DSP kit
+(marimba, glass and bell partials, FM, filtered noise, a little room reverb; deterministic), encodes them with
+ffmpeg (`libmp3lame`, 64 kbit/s mono) and writes `app/sfx/<name>.mp3`. Add `--wav dir` to keep the lossless
+files, or list names to render only those. Run it only when changing a sound; the MP3s are committed.
+
+`app/js/audio.js` loads them with `fetch` + `decodeAudioData` after the first tap (the common ones first, the
+rest on demand) and plays them through one master gain (`setSfxVolume(0..1)`). While a file is not ready, or if it
+fails to load, the old oscillator beeps play instead. Every press on a button, tab or tile ticks by itself (put
+`data-silent` on a container to turn that off). `sfx(name)` is cheap to call many times a second. Vibration patterns
+are in `HAPTIC`; `buzz()` honours the Profile setting and coalesces calls within 30 ms.
+
 ## Install on your phone
 
 1. Open https://tedtomato.github.io/learn-japanese/ on the phone.

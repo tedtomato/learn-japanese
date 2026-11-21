@@ -2,6 +2,7 @@
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
   { version: '1.1', date: '21 Nov 2026', changes: [
+    'Real sound effects: warm marimba and glass sounds you can hear (and feel, with new vibration patterns) for every tap, tile, right and wrong answer, combo, reward and celebration; they work offline too',
     'Game feel: a right answer flashes the screen green, the answer squashes and pops, a big check stamps the feedback bar and your speaker jumps for joy with raised arms; a wrong one shakes the whole task, cracks a heart and makes Kuri wince',
     'Tiles fly in a real arc and land with a squash, pairs glow when they match, tasks slide in with depth, and the progress bar bounces as it grows',
     'Lesson complete is a party: 80 confetti pieces burst from behind Kuri (party hat for a perfect lesson), the title pops in letter by letter, XP slot-rolls, the accuracy ring draws itself',

@@ -163,11 +163,67 @@ export function speechMatches(heard, targets) {
   });
 }
 
-// ---- Sound effects (generated, no audio files) ----
-let ctx;
-let sfxOn = true;
-export const setSfx = (on) => (sfxOn = on);
+// ---- Sound effects ----
+// Designed sounds: short MP3s in app/sfx/ (made by scripts/sfx.mjs), decoded once and played through a master
+// gain. They load lazily after the first tap (autoplay rules) and never block: while a file is not ready, or if it
+// fails to load, the old generated oscillator beeps below play instead.
+export const SFX_NAMES = [
+  'tap', 'tile', 'tile-off', 'select', 'swoosh', 'pop',
+  'correct', 'correct-combo3', 'correct-combo5', 'correct-combo10', 'wrong', 'almost', 'match', 'heart', 'tick', 'timeup',
+  'complete', 'perfect', 'xp', 'xp-end',
+  'streak', 'milestone', 'goal', 'chest', 'gem', 'gift', 'unlock', 'unit', 'achievement', 'levelup', 'quest', 'flame',
+];
+// Names older call sites use.
+export const SFX_ALIASES = { bonus: 'gem', coins: 'gem', fanfare: 'milestone', whoosh: 'swoosh', stroke: 'select', right: 'correct' };
+// Loudness of each file relative to the others (every file is normalised to -1 dBFS).
+const LEVEL = {
+  tap: 0.5, tile: 0.7, 'tile-off': 0.55, select: 0.55, swoosh: 0.45, pop: 0.6, tick: 0.5, xp: 0.45, wrong: 0.8, almost: 0.7, match: 0.65,
+  heart: 0.75, timeup: 0.85, gem: 0.7, flame: 0.7, quest: 0.75, unlock: 0.75, gift: 0.7, correct: 0.75, 'correct-combo3': 0.78,
+  'correct-combo5': 0.8, 'correct-combo10': 0.82, chest: 0.8, 'xp-end': 0.7, complete: 0.85, perfect: 0.88, streak: 0.85, goal: 0.85,
+  milestone: 0.85, unit: 0.88, achievement: 0.8, levelup: 0.8,
+};
+// Fetched right after the first tap; the rest on demand.
+const COMMON = ['tap', 'tile', 'tile-off', 'select', 'correct', 'wrong', 'swoosh', 'pop', 'complete', 'xp', 'xp-end', 'gem'];
+// Small interface sounds are skipped (rather than beeped) while their file is still loading.
+const UI_ONLY = new Set(['tap', 'tile', 'tile-off', 'select', 'tick', 'xp', 'pop']);
 
+let ctx;
+let master;
+let sfxOn = true;
+let sfxVol = 1;
+export const setSfx = (on) => (sfxOn = on);
+export const setSfxVolume = (v) => {
+  sfxVol = Math.min(1, Math.max(0, Number(v) || 0));
+  if (master) master.gain.value = sfxVol;
+};
+
+function audioContext() {
+  if (!ctx) {
+    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    master = ctx.createGain();
+    master.gain.value = sfxVol;
+    master.connect(ctx.destination);
+  }
+  if (ctx.state === 'suspended') ctx.resume();
+  return ctx;
+}
+
+const buffers = new Map();
+const loading = new Set();
+const failed = new Set();
+const fileUrl = (name) => new URL(`../sfx/${name}.mp3`, import.meta.url).href;
+function load(name) {
+  if (buffers.has(name) || loading.has(name) || failed.has(name) || typeof fetch !== 'function') return;
+  loading.add(name);
+  fetch(fileUrl(name))
+    .then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error(String(r.status)))))
+    .then((data) => new Promise((resolve, reject) => ctx.decodeAudioData(data, resolve, reject)))
+    .then((b) => buffers.set(name, b))
+    .catch(() => failed.add(name))
+    .finally(() => loading.delete(name));
+}
+
+// ---- Fallback: the generated oscillator beeps (used until a file is ready, or if it cannot load) ----
 function tone(freq, start, dur, type = 'sine', gain = 0.18) {
   const t = ctx.currentTime + start;
   const osc = ctx.createOscillator();
@@ -177,7 +233,7 @@ function tone(freq, start, dur, type = 'sine', gain = 0.18) {
   g.gain.setValueAtTime(0.0001, t);
   g.gain.exponentialRampToValueAtTime(gain, t + 0.02);
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  osc.connect(g).connect(ctx.destination);
+  osc.connect(g).connect(master);
   osc.start(t);
   osc.stop(t + dur + 0.05);
 }
@@ -199,7 +255,7 @@ function noise(start, dur, f0, f1, gain = 0.12, q = 1.2) {
   g.gain.setValueAtTime(0.0001, t);
   g.gain.exponentialRampToValueAtTime(gain, t + dur * 0.35);
   g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-  src.connect(filter).connect(g).connect(ctx.destination);
+  src.connect(filter).connect(g).connect(master);
   src.start(t);
 }
 
@@ -210,7 +266,6 @@ const SOUNDS = {
   tick: () => tone(1200, 0, 0.04, 'square', 0.05),
   timeup: () => { tone(440, 0, 0.12, 'sawtooth', 0.06); tone(330, 0.12, 0.25, 'sawtooth', 0.06); },
   bonus: () => [784, 988, 1175].forEach((f, i) => tone(f, i * 0.07, 0.15, 'triangle', 0.12)),
-  chest: () => [523, 659, 784, 1046, 1318].forEach((f, i) => tone(f, i * 0.08, 0.25, 'triangle', 0.12)),
   complete: () => [523, 659, 784, 1046].forEach((f, i) => tone(f, i * 0.11, 0.3, 'triangle', 0.14)),
   stroke: () => tone(990, 0, 0.08, 'sine', 0.1),
   // Reward moments: a rising three-note chord with a shimmer on top.
@@ -230,26 +285,110 @@ const SOUNDS = {
   gift: () => [1568, 2093, 1760, 2349, 2637].forEach((f, i) => tone(f, i * 0.06, 0.18, 'sine', 0.07)),
   flame: () => { noise(0, 0.55, 220, 700, 0.1, 0.8); tone(110, 0, 0.5, 'sine', 0.1); },
 };
-export const SFX_NAMES = Object.keys(SOUNDS);
+// Which beep stands in for each designed sound.
+const FALLBACK = {
+  tile: 'tap', 'tile-off': 'tap', pop: 'tap', select: 'stroke', swoosh: 'whoosh', 'correct-combo3': 'correct', 'correct-combo5': 'correct',
+  'correct-combo10': 'correct', almost: 'wrong', match: 'bonus', heart: 'wrong', perfect: 'complete', xp: 'tick', 'xp-end': 'bonus', streak: 'fanfare',
+  milestone: 'fanfare', goal: 'fanfare', gem: 'bonus', unlock: 'bonus', unit: 'fanfare', achievement: 'levelup', quest: 'bonus',
+};
+
+// ---- Playing ----
+const lastAt = {};
+let autoTapAt = -1e9;
+let xpAt = -1e9;
+let xpCount = 0;
+
+function play(key) {
+  const now = performance.now();
+  if (now - (lastAt[key] ?? -1e9) < (key === 'tap' ? 35 : 25)) return; // cheap to call many times a second
+  lastAt[key] = now;
+  audioContext();
+  const b = buffers.get(key);
+  if (b) {
+    const src = ctx.createBufferSource();
+    src.buffer = b;
+    if (key === 'xp') {
+      // The slot-roll climbs while ticks keep coming, and starts over after a pause.
+      xpCount = now - xpAt > 350 ? 0 : xpCount + 1;
+      xpAt = now;
+      src.playbackRate.value = 1 + Math.min(xpCount, 24) * 0.025;
+    }
+    const g = ctx.createGain();
+    g.gain.value = LEVEL[key] ?? 0.8;
+    src.connect(g).connect(master);
+    src.start();
+    return;
+  }
+  const loadingNow = !failed.has(key);
+  load(key);
+  if (loadingNow && UI_ONLY.has(key)) return;
+  (SOUNDS[key] || SOUNDS[FALLBACK[key]])?.();
+}
 
 export function sfx(name) {
   if (!sfxOn) return;
+  const key = SFX_ALIASES[name] || name;
+  if (!SFX_NAMES.includes(key)) return;
+  if (key === 'tap' && performance.now() - autoTapAt < 400) return; // the tap on pointer-down already played
   try {
-    ctx ||= new (window.AudioContext || window.webkitAudioContext)();
-    if (ctx.state === 'suspended') ctx.resume();
-    SOUNDS[name]?.();
+    play(key);
   } catch {
     /* audio not available */
   }
 }
 
-// Vibration for right and wrong answers: a light tap, or a longer double pulse. Off in the Profile settings.
+// The first tap unlocks audio, starts fetching the common sounds, and from then on every press on a button,
+// tab or tile ticks (with a small buzz) without each screen having to ask. Anything with data-silent is left out.
+const PRESSABLE = 'button, [role="button"], [role="tab"], [role="radio"], [role="option"], a[href], summary, label, .btn, .tab, .tile, .opt, .option';
+if (typeof document !== 'undefined') {
+  const unlock = () => {
+    try {
+      audioContext();
+      if (sfxOn) COMMON.forEach(load);
+      if (ctx.state === 'running') for (const ev of ['pointerdown', 'touchend', 'keydown', 'click']) document.removeEventListener(ev, unlock, true);
+    } catch {
+      /* audio not available */
+    }
+  };
+  for (const ev of ['pointerdown', 'touchend', 'keydown', 'click']) document.addEventListener(ev, unlock, { capture: true, passive: true });
+  document.addEventListener('pointerdown', (e) => {
+    if (e.pointerType === 'mouse' && e.button > 0) return;
+    const el = e.target?.closest?.(PRESSABLE);
+    if (!el || el.disabled || el.getAttribute('aria-disabled') === 'true' || el.closest('[data-silent]')) return;
+    if (sfxOn) {
+      try {
+        play('tap');
+        autoTapAt = performance.now();
+      } catch {
+        /* audio not available */
+      }
+    }
+    buzz(HAPTIC.tap);
+  }, { capture: true, passive: true });
+}
+
+// ---- Vibration ----
+// Patterns in milliseconds, [vibrate, pause, vibrate, ...]. Off in the Profile settings.
 let hapticsOn = true;
 export const setHaptics = (on) => (hapticsOn = on !== false);
-export const HAPTIC = { right: 12, wrong: [40, 40, 70], streak: [30, 40, 30, 40, 80], goal: [20, 30, 60], chest: [60, 40, 20, 20, 20, 20, 20], gift: [15, 25, 15, 25, 70], unit: [40, 40, 40, 40, 120], achievement: [25, 30, 70], levelup: 25 };
+export const HAPTIC = {
+  tap: 8, tile: 12, select: 10, correct: [18, 30, 28], wrong: [70, 40, 90], almost: [25, 30, 25],
+  combo3: [15, 20, 15, 20, 40], combo5: [15, 15, 15, 15, 15, 15, 60], combo10: [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 120],
+  complete: [40, 40, 40, 40, 160], streak: [30, 40, 30, 40, 30, 40, 140], goal: [25, 25, 50, 25, 110],
+  chest: [20, 20, 20, 20, 20, 20, 40, 30, 100], gift: [15, 25, 15, 25, 90], unit: [40, 40, 40, 40, 200],
+  achievement: [25, 30, 25, 30, 120], levelup: 35, heart: [80, 60, 120], tick: 6, unlock: [20, 30, 40],
+};
+HAPTIC.right = HAPTIC.correct; // the older name
 
+const buzzLength = (p) => (Array.isArray(p) ? p.reduce((a, b) => a + b, 0) : p);
+let lastBuzz = { at: -1e9, len: 0 };
+// Calls within 30 ms of each other are coalesced: only a longer pattern replaces the one just started.
 export function buzz(ms = HAPTIC.wrong) {
   if (!hapticsOn) return;
+  const now = performance.now();
+  const len = buzzLength(ms);
+  if (now - lastBuzz.at < 30 && len <= lastBuzz.len) return;
+  lastBuzz = { at: now, len };
   try {
     navigator.vibrate?.(ms);
   } catch {

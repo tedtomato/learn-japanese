@@ -306,6 +306,7 @@ function startTimer(root, s, seconds) {
       tm.lastTick = secs;
       box.classList.add('urgent');
       sfx('tick');
+      buzz(HAPTIC.tick);
     }
     if (left <= 0 && !tm.late) {
       tm.late = true;
@@ -334,6 +335,7 @@ function next(root, s) {
   stopSpeaking();
   sheetOpen(root, false);
   updateProgress(root, s);
+  if (s.done > 0) sfx('swoosh');
   s.current = s.queue.shift();
   s.checked = false;
   s.keyHandler = null;
@@ -457,8 +459,9 @@ function result(root, s, ok, opts = {}) {
       // Only a hint, a typo or a lucky guess brings the item back at the end; merely slow is fine.
       if (ex.hinted || opts.close) ids.forEach((id) => s.missed.add(id));
     }
-    sfx('correct');
-    buzz(HAPTIC.right);
+    const combo = s.combo === 3 ? 3 : s.combo >= 5 && s.combo % 5 === 0 ? (s.combo % 10 ? 5 : 10) : 0;
+    sfx(opts.close ? 'almost' : combo ? `correct-combo${combo}` : 'correct');
+    buzz(opts.close ? HAPTIC.almost : combo ? HAPTIC[`combo${combo}`] : HAPTIC.correct);
     setRun(root, s.combo);
   } else {
     setRun(root, 0);
@@ -480,6 +483,7 @@ function result(root, s, ok, opts = {}) {
     // No hearts in a node's first play, in the retry round, or for speech misses (see costsHeart).
     if (costsHeart({ mode: s.mode, level: s.level, retryRound: s.retryRound, noHeart: opts.noHeart })) {
       loseHeart(app.state, app.now());
+      setTimeout(() => { sfx('heart'); buzz(HAPTIC.heart); }, 260);
       app.save();
     }
   }
@@ -935,7 +939,7 @@ function renderGuess(root, s) {
       if (ex.options[Number(b.dataset.i)] === item.en) markOption(b, 'right');
       else if (b === btn) b.classList.add('guess-miss');
     });
-    sfx(ok ? 'correct' : 'tap');
+    sfx(ok ? 'correct' : 'wrong');
     const foot = $('.lesson-foot', root);
     foot.className = `lesson-foot ${ok ? 'good' : 'guess'}`;
     mount(foot, html`<div class="foot-inner feedback"><div class="fb-text"><span class="fb-icon">${ok ? icon('check', 26) : '💡'}</span>
@@ -996,7 +1000,8 @@ function renderChoice(root, s) {
     });
     if (viaKey) pop($('.key', btn), 'bounce', 600);
     chosen = btn.dataset.id;
-    sfx('tap');
+    sfx('select');
+    buzz(HAPTIC.select);
     if (['jp', 'kana'].includes(ex.answerKind) && ex.prompt !== 'audio') speak(speechOf(optionItem(ex, chosen)), { speaker: s.speaker });
     setCheckEnabled(root, true);
   };
@@ -1054,6 +1059,7 @@ function renderBuild(root, s) {
         if (s.checked) return;
         const i = Number(b.dataset.i);
         placed.splice(placed.indexOf(i), 1);
+        sfx('tile-off');
         // The tile flies back to its slot in the bank.
         flip(b, () => {
           redraw();
@@ -1070,7 +1076,8 @@ function renderBuild(root, s) {
       const i = Number(b.dataset.i);
       if (s.checked || placed.includes(i)) return;
       placed.push(i);
-      sfx('tap');
+      sfx('tile');
+      buzz(HAPTIC.tile);
       if (jpTiles && ex.mode !== 'fast' && ex.mode !== 'audio') speak(ex.tiles[i], { speaker: s.speaker });
       // The tile flies from the bank to the answer line (the bank slot stays as a faint ghost).
       flip(b, () => {
@@ -1128,13 +1135,14 @@ function renderMatch(root, s) {
       b.setAttribute('aria-pressed', 'true');
       sel[side] = b;
       if (side === 'l') speak(speechOf(ITEMS.get(b.dataset.id)), { speaker: s.speaker });
-      else sfx('tap');
+      else sfx('select');
       if (!sel.l || !sel.r) return;
       const [l, r] = [sel.l, sel.r];
       sel.l = sel.r = null;
       if (l.dataset.id === r.dataset.id) {
         [l, r].forEach((x) => { x.classList.remove('selected'); x.classList.add('right'); x.disabled = true; x.insertAdjacentHTML('beforeend', `<span class="sr-only">, ${t('Matched')}</span>`); });
-        sfx('correct');
+        sfx('match');
+        buzz(HAPTIC.correct);
         matched += 1;
         if (matched === left.length) {
           for (const id of left) {
@@ -1367,7 +1375,10 @@ function finish(root, s) {
   pathFx.pending = { id: !s.testOut && s.node ? s.node.id : null, first: !wasDone, prevCurrent, streak: !!summary.streakExtended, at: Date.now() };
   // Google Drive sync (only when the owner has set it up and the learner turned it on): loaded on demand.
   if (!s.testOut) import('../drive.js').then((d) => d.syncOn() && d.autoSync(app.state, now)).catch(() => {});
-  sfx('complete');
+  sfx(summary.perfect ? 'perfect' : 'complete');
+  buzz(HAPTIC.complete);
+  for (let k = 0; k < 7; k++) setTimeout(() => sfx('xp'), 430 + k * 85); // the XP slot-roll while the number counts up
+  setTimeout(() => sfx('xp-end'), 1130);
   const secs = Math.round((now - s.startedAt) / 1000);
   const accuracy = s.answered ? Math.round(((s.answered - s.mistakes) / s.answered) * 100) : 100;
   const title = s.testOut ? t(passed ? 'Unit skipped — nice!' : 'Not quite yet')

@@ -105,6 +105,8 @@ function trailCurve(pts) {
     }
   }
   const total = cum[cum.length - 1];
+  // Arc length at the i-th node (node i sits at sample i × SAMPLES).
+  const lengthAt = (i) => cum[Math.min(cum.length - 1, i * SAMPLES)];
   // Point at arc length s (clamped), linear between samples.
   const at = (s) => {
     if (s <= 0) return { x: xs[0], y: ys[0] };
@@ -119,7 +121,7 @@ function trailCurve(pts) {
     const f = (s - cum[lo]) / ((cum[hi] - cum[lo]) || 1);
     return { x: xs[lo] + (xs[hi] - xs[lo]) * f, y: ys[lo] + (ys[hi] - ys[lo]) * f };
   };
-  return { d, total, at };
+  return { d, total, at, lengthAt };
 }
 
 // Draws the trail behind the nodes of each unit's track (call after the path is on screen).
@@ -142,6 +144,7 @@ export function drawTrails(root) {
     track.__trailSig = sig;
     if (pts.length < 2) continue;
     const curve = trailCurve(pts);
+    track.__curve = { curve, pts, box }; // for trailBetween (the path celebration)
     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
     svg.setAttribute('class', 'trail');
     svg.setAttribute('width', box.width);
@@ -153,6 +156,45 @@ export function drawTrails(root) {
       + edging(curve, box.width, pts, streams) + streams.map((y) => bridge(curve, y)).join('');
     track.prepend(svg);
   }
+}
+
+// The stretch of trail between two nodes of the same track, as an SVG layer over the trail: a path (the CSS draws
+// it with stroke-dashoffset, --len is its length) and dots along it (--i for the order they light up). Null when
+// the nodes are not on one drawn track.
+export function trailBetween(fromEl, toEl) {
+  const track = fromEl?.closest('.track');
+  if (!track || track !== toEl?.closest('.track') || !track.__curve) return null;
+  const { curve, pts } = track.__curve;
+  const nodes = [...track.querySelectorAll('.node')];
+  const a = nodes.indexOf(fromEl);
+  const b = nodes.indexOf(toEl);
+  if (a < 0 || b < 0 || a === b || !pts[a] || !pts[b]) return null;
+  const [i, j] = a < b ? [a, b] : [b, a];
+  // Arc length of each node along the curve: the samples are 64 per segment (see trailCurve).
+  const s0 = curve.lengthAt(i);
+  const s1 = curve.lengthAt(j);
+  const len = s1 - s0;
+  if (len < 10) return null;
+  const steps = 48;
+  let d = '';
+  for (let k = 0; k <= steps; k++) {
+    const p = curve.at(s0 + (len * k) / steps);
+    d += `${k ? ' L' : 'M'}${p.x.toFixed(1)} ${p.y.toFixed(1)}`;
+  }
+  const dots = 4;
+  const circles = Array.from({ length: dots }, (_, k) => {
+    const p = curve.at(s0 + (len * (k + 1)) / (dots + 1));
+    return `<circle class="trail-dot" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="6" style="--i:${k}"/>`;
+  }).join('');
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'trail trail-fx');
+  const base = track.querySelector('.trail');
+  svg.setAttribute('width', base?.getAttribute('width') || track.clientWidth);
+  svg.setAttribute('height', base?.getAttribute('height') || track.clientHeight);
+  svg.setAttribute('aria-hidden', 'true');
+  svg.innerHTML = `<path class="trail-draw" d="${d}" style="--len:${len.toFixed(1)}"/>${circles}`;
+  track.prepend(svg);
+  return svg;
 }
 
 // Same numbers on every redraw, so the pebbles don't jump around.

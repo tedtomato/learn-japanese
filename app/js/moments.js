@@ -144,6 +144,9 @@ const giftSvg = () => `<svg class="mm-gift" viewBox="0 0 120 120" aria-hidden="t
 
 const dots = (n, cls = 'mm-confetti') => `<div class="${cls}" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i style="--a:${(i * 360) / n}deg;--d:${(i % 4) * 50}ms;--c:${['#ffc800', '#1cb0f6', '#ce82ff', '#58cc02', '#ff4b4b'][i % 5]}"></i>`).join('')}</div>`;
 const gemRain = (n = 12) => `<div class="mm-gems" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i style="--a:${(i * 360) / n}deg;--d:${(i % 4) * 45}ms"></i>`).join('')}</div>`;
+// Particles drifting down through the whole card (kind: coins | petals | sparks | confetti), looping while the moment shows.
+const particles = (kind, n = 14) => `<div class="mm-particles ${kind}" aria-hidden="true">${Array.from({ length: n }, (_, i) => `<i style="--x:${(i * 41 + 7) % 100};--i:${i};--pc:${['#ffc800', '#1cb0f6', '#ce82ff', '#58cc02', '#ff4b4b'][i % 5]}"></i>`).join('')}</div>`;
+const PARTICLES = { streak: 'sparks', goal: 'coins', chest: 'coins', gift: 'petals', unit: 'confetti', achievement: 'sparks', levelup: 'sparks' };
 
 const weekHtml = (week) => `<div class="mm-week" role="img" aria-label="${esc(t('Your week'))}">${week.map((d, i) => `<div class="mm-day ${d.today ? 'today' : ''}" data-on="${d.on ? 1 : 0}" style="--i:${i}"><small>${esc(d.label)}</small><i>${icon(d.today ? 'flame' : 'check', 16).__raw}</i></div>`).join('')}</div>`;
 
@@ -159,14 +162,14 @@ const KINDS = {
       line: sayLine('streak'),
       title: badge ? t('{n}-day streak!', { n: m.milestone }) : first ? t('Streak started!') : t('{n} day streak!', { n: m.count }),
       sub: badge ? t(m.milestone >= 100 ? 'A hundred days in a row. Legendary!' : m.milestone >= 30 ? 'A whole month without missing a day. Amazing!' : 'A full week in a row. Keep it going!') : t('Come back tomorrow to keep the flame alive.'),
-      hero: badge ? `<div class="mm-rays-wrap">${raysSvg()}</div>${shieldSvg(m.milestone)}` : `${flameSvg()}<b class="mm-num" data-from="${from}" data-to="${m.count}">${first ? m.count : from}</b>`,
+      hero: badge ? `<div class="mm-rays-wrap">${raysSvg()}</div>${shieldSvg(m.milestone)}` : `<div class="mm-rays-wrap">${raysSvg(12)}</div>${flameSvg()}<b class="mm-num" data-from="${from}" data-to="${m.count}">${first ? m.count : from}</b>`,
       extra: m.week?.length ? weekHtml(m.week) : '',
       action: badge ? shareButton(shareText, t('Share')).__raw : '',
       haptic: HAPTIC.streak,
       setup({ el, later }) {
         later(0, () => sfx(badge ? 'milestone' : 'streak'));
         const num = el.querySelector('.mm-num');
-        if (num && !first) later(750, () => countUp(num, from, m.count, 650));
+        if (num && !first) later(750, () => countUp(num, from, m.count, 650, { punch: true }));
         later(1100, () => {
           const days = [...el.querySelectorAll('.mm-day')];
           days.forEach((d, i) => later(i * 110, () => { if (d.dataset.on === '1') d.classList.add('on'); }));
@@ -184,7 +187,7 @@ const KINDS = {
       line: sayLine('goal'),
       title: t('Daily goal reached!'),
       sub: t('{xp} of {goal} XP today', { xp: Math.max(m.xp || goal, goal), goal }),
-      hero: `${ringSvg()}<div class="mm-ring-in">${icon('star', 44).__raw}</div>${gemRain(12)}`,
+      hero: `<div class="mm-rays-wrap">${raysSvg(12)}</div>${ringSvg()}<div class="mm-ring-in">${icon('star', 44).__raw}</div>${gemRain(12)}`,
       extra: `<div class="mm-reward-chip"><span class="mm-gemcount">${icon('gem', 22).__raw}<b class="mm-gemnum">0</b></span><span class="mm-plus">+${m.gems || 5} ${esc(t('gems'))}</span></div>`,
       haptic: HAPTIC.goal,
       setup({ el, later }) {
@@ -202,7 +205,7 @@ const KINDS = {
           const chip = el.querySelector('.mm-plus');
           const target = el.querySelector('.mm-gemcount');
           flyGems(chip, target, 8);
-          countUp(el.querySelector('.mm-gemnum'), 0, m.gems || 5, 500, { delay: 400 });
+          countUp(el.querySelector('.mm-gemnum'), 0, m.gems || 5, 500, { delay: 400, punch: true });
         });
       },
     };
@@ -228,7 +231,7 @@ const KINDS = {
         });
         later(1250, () => {
           sfx('coins');
-          countUp(el.querySelector('.mm-gemnum'), 0, m.gems || 0, 650);
+          countUp(el.querySelector('.mm-gemnum'), 0, m.gems || 0, 650, { punch: true });
           flyGems(el.querySelector('.mm-plus'), document.querySelector('.stat-gems'), 6);
         });
       },
@@ -295,7 +298,7 @@ const KINDS = {
       line: '',
       title: m.nodeTitle || t('Level up!'),
       sub: t('Level {n}', { n: m.level }),
-      hero: `<div class="mm-crown">${icon('star', 84).__raw}</div>${dots(10)}`,
+      hero: `<div class="mm-rays-wrap">${raysSvg(10)}</div><div class="mm-crown">${icon('star', 84).__raw}</div>${dots(10)}`,
       extra: '',
       haptic: HAPTIC.levelup,
       light: true,
@@ -374,6 +377,7 @@ function show(root, m, remaining) {
     };
     const skipBtn = remaining > 0 ? `<button class="mm-skip" type="button">${esc(t('Skip all'))}</button>` : '';
     root.innerHTML = `<div class="mm-card mm-k-${m.kind} ${spec.light ? 'mm-light' : ''} ${quick ? 'mm-still' : ''}" role="dialog" aria-modal="true" aria-labelledby="moment-title" style="--c:${esc(spec.color || '')}">
+      ${quick ? '' : particles(PARTICLES[m.kind] || 'sparks')}
       <div class="mm-hero ${spec.closed ? 'closed' : ''}">${spec.hero}</div>
       <div class="mm-text">
         ${spec.eyebrow ? `<p class="mm-eyebrow">${esc(spec.eyebrow)}</p>` : ''}
@@ -381,7 +385,7 @@ function show(root, m, remaining) {
         ${spec.sub ? `<p class="mm-sub">${esc(spec.sub)}</p>` : ''}
       </div>
       <div class="mm-extra">${spec.extra}</div>
-      ${spec.mood ? `<div class="mm-mascot">${mascotSvg(spec.mood, 104)}<p class="mm-bubble">${esc(spec.line)}</p></div>` : '<div class="mm-mascot-gap"></div>'}
+      ${spec.mood ? `<div class="mm-mascot"><span class="mm-dog">${mascotSvg(spec.mood, 104)}</span><p class="mm-bubble">${esc(spec.line)}</p></div>` : '<div class="mm-mascot-gap"></div>'}
       <div class="mm-actions">${spec.action || ''}<button class="btn btn-primary btn-block mm-go" type="button">${esc(spec.primary || t('Continue'))}</button>${skipBtn}</div>
     </div>`;
     const card = root.firstElementChild;
@@ -409,7 +413,7 @@ function show(root, m, remaining) {
       hero.classList.add('shake');
       sfx('whoosh');
       buzz(HAPTIC.gift);
-      later(520, () => {
+      later(640, () => { // after the three shakes (mm-shake, .62 s)
         hero.classList.remove('shake');
         hero.classList.add('opened');
         sfx('gift');

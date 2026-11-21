@@ -1498,7 +1498,7 @@ html.course-zh { --font-jp: system-ui, 'PingFang SC', 'Hiragino Sans GB', 'Noto 
 @keyframes fb-up { 0% { transform: translateY(120%); opacity: 0; } 45% { transform: translateY(-9%); opacity: 1; } 68% { transform: translateY(4%); } 86% { transform: translateY(-1.5%); } 100% { transform: none; opacity: 1; } }
 @keyframes fb-up-soft { 0% { transform: translateY(100%); opacity: 0; } 60% { transform: translateY(-4%); opacity: 1; } 100% { transform: none; opacity: 1; } }
 @keyframes icon-pop { from { scale: 0; rotate: -25deg; } }
-@keyframes stamp-in { 0% { scale: 2.2; rotate: -22deg; opacity: 0; } 45% { scale: .9; rotate: 6deg; opacity: 1; } 70% { scale: 1.12; rotate: -3deg; } 100% { scale: 1; rotate: 0deg; opacity: 1; } }
+@keyframes stamp-in { 0% { scale: 2.6; rotate: -22deg; opacity: 0; } 12% { scale: 2.3; opacity: 1; } 45% { scale: .88; rotate: 6deg; opacity: 1; } 70% { scale: 1.14; rotate: -3deg; } 100% { scale: 1; rotate: 0deg; opacity: 1; } }
 @keyframes draw-check { to { stroke-dashoffset: 0; } }
 @keyframes person-cheer { 0% { transform: translateY(0) scale(1); } 14% { transform: translateY(2px) scale(1.1, .9); } 38% { transform: translateY(-22px) scale(.9, 1.15); } 56% { transform: translateY(-22px) scale(1, 1.02); } 74% { transform: translateY(0) scale(1.12, .88); } 88% { transform: translateY(-3px) scale(.98, 1.03); } 100% { transform: translateY(0) scale(1); } }
 @keyframes person-oops { 0% { transform: rotate(0); } 22% { transform: rotate(-8deg) translateY(3px) scale(1.02, .97); } 48% { transform: rotate(5deg) translateY(1px); } 72% { transform: rotate(-3deg); } 100% { transform: rotate(0); } }
@@ -1598,10 +1598,11 @@ html.course-zh { --font-jp: system-ui, 'PingFang SC', 'Hiragino Sans GB', 'Noto 
 .node.just-done .node-check { animation: icon-pop .5s .5s var(--ease-spring) backwards; }
 .node.just-done.replay { --c: var(--gold); }
 .node.just-done.replay::before { display: none; }
-.node.just-unlocked { animation: node-bounce .7s .5s var(--ease-bounce) backwards; }
-.node.just-unlocked > :not(.lock-ghost) { animation: icon-pop .45s .62s var(--ease-spring) backwards; }
-.lock-ghost { position: absolute; inset: 0; border-radius: inherit; z-index: 3; display: grid; place-items: center; background: var(--locked); color: var(--locked-icon); pointer-events: none; animation: lock-away .5s .3s var(--ease-in-out) forwards; }
-.start-bubble.enter { animation: bubble-in .6s .8s var(--ease-out) backwards; }
+/* The unlock waits for the trail to draw (0.15–0.85 s) and the camera to glide down (0.9–1.5 s): lock away at 1.1 s, pop at 1.3 s, bubble at 1.7 s. */
+.node.just-unlocked { animation: node-bounce .7s 1.3s var(--ease-bounce) backwards; }
+.node.just-unlocked > :not(.lock-ghost) { animation: icon-pop .45s 1.45s var(--ease-spring) backwards; }
+.lock-ghost { position: absolute; inset: 0; border-radius: inherit; z-index: 3; display: grid; place-items: center; background: var(--locked); color: var(--locked-icon); pointer-events: none; animation: lock-away .5s 1.1s var(--ease-in-out) forwards; }
+.start-bubble.enter { animation: bubble-in .6s 1.7s var(--ease-out) backwards; }
 .node-chest.st-current { animation: bob 2.4s ease-in-out infinite, chest-wobble 3.2s 1s ease-in-out infinite; }
 .unit-banner.enter { animation: banner-in .45s var(--ease-out) backwards; }
 .node-mascot.left { animation: peek-left .5s .2s var(--ease-out) backwards; }
@@ -1871,7 +1872,7 @@ body:not(.in-lesson) .screen { animation: screen-in .18s var(--ease-out) backwar
 /* Bigger amplitudes, real overshoots (--ease-bounce), squash-and-stretch, and beats that touch the whole screen.
    Still transform / opacity (clip-path and box-shadow only on small things). Everything short-lived is removed
    by js/motion.js; the Calm setting (html.calm) and the OS switch flatten all of it at the end of this file. */
-@keyframes flash-good { 0% { opacity: 0; } 35% { opacity: .18; } 100% { opacity: 0; } }
+@keyframes flash-good { 0% { opacity: 0; } 35% { opacity: .22; } 100% { opacity: 0; } }
 @keyframes flash-bad { 0% { opacity: 0; } 30% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes flash-combo { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0; } }
 .screen-flash { position: fixed; inset: 0; z-index: 70; pointer-events: none; opacity: 0; }
@@ -2001,6 +2002,7 @@ body:not(.in-lesson) .screen { animation: screen-in .18s var(--ease-out) backwar
 @keyframes mm-num-in { from { opacity: 0; transform: scale(.2) translateY(20px); } }
 
 /* The path: the camera glides (js), the trail to the new node draws itself and its dots light up, the current node breathes. */
+.trail-fx { z-index: 1; }
 .trail-draw { fill: none; stroke: var(--gold); stroke-width: 10; stroke-linecap: round; stroke-dasharray: var(--len) var(--len); stroke-dashoffset: var(--len); animation: trail-draw .7s .15s var(--ease-in-out) forwards; filter: drop-shadow(0 0 6px color-mix(in srgb, var(--gold) 70%, transparent)); }
 @keyframes trail-draw { to { stroke-dashoffset: 0; } }
 .trail-dot { fill: var(--gold); stroke: var(--card); stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: trail-dot .45s calc(.3s + var(--i) * .12s) var(--ease-bounce) both; }

@@ -4,7 +4,7 @@ import { SECTIONS, ITEMS, MAX_LEVEL, NODE_BY_ID, NODES } from '../course.js';
 import { jpItem, speechOf } from '../lesson/text.js';
 import { queueMoment, playMoments, sayLine } from '../moments.js';
 import { giftSvg, cloverSvg, cupSvg } from '../rewardicons.js';
-import { decorFor, drawTrails, ROADBLOCK } from '../scenery.js';
+import { decorFor, drawTrails, trailBetween, ROADBLOCK } from '../scenery.js';
 import { app, statsBar, toast, modal, flagSvg } from '../app.js';
 import { html, mount, raw, $, $$, fitText } from '../dom.js';
 import { icon } from '../icons.js';
@@ -22,7 +22,7 @@ import { strength } from '../srs.js';
 import { questsCard, tripBanner, repairCard, doRepair, questChest, lessonRate } from './quests.js';
 import { readResume, clearResume } from '../resume.js';
 import { maybeShowIntro } from './intro.js';
-import { pathFx, pop, reduced } from '../motion.js';
+import { pathFx, pop, reduced, smoothScrollTo } from '../motion.js';
 
 const OFFSETS = [0, 44, 70, 44, 0, -44, -70, -44];
 const CHEERS = L.cheers;
@@ -302,6 +302,14 @@ function pathCelebration(root, fx, current) {
   }
   const cur = $('.st-current', root);
   if (cur && fx.id && current !== fx.prevCurrent) {
+    // The trail from the finished node to the new one draws itself, dots lighting up along it, before the node pops.
+    if (done) {
+      const seg = trailBetween(done, cur);
+      if (seg) {
+        seg.classList.add('trail-fx');
+        later(() => seg.remove(), 2600);
+      }
+    }
     cur.classList.add('just-unlocked');
     sfx('unlock'); buzz(HAPTIC.unlock);
     if (!cur.classList.contains('node-chest')) cur.insertAdjacentHTML('beforeend', `<span class="lock-ghost" aria-hidden="true">${icon('lock', 30).__raw}</span>`);
@@ -310,7 +318,7 @@ function pathCelebration(root, fx, current) {
       cur.classList.remove('just-unlocked');
       $('.lock-ghost', cur)?.remove();
       cur.closest('.node-wrap')?.querySelector('.start-bubble')?.classList.remove('enter');
-    }, 1500);
+    }, 2600);
   }
   if (fx.streak) pop($('.stat-streak', root), 'flare', 900);
   return timers;
@@ -408,6 +416,7 @@ export function renderLearn(root) {
     el.addEventListener('click', (e) => {
       e.stopPropagation();
       const node = NODE_BY_ID.get(el.dataset.node);
+      pop(el, 'tapped', 400); // the node pops before its popover springs in
       nodePopover(el, node, [...el.classList].find((c) => c.startsWith('st-')).slice(3));
     }),
   );
@@ -459,13 +468,22 @@ export function renderLearn(root) {
   const fx = pathFx.pending;
   pathFx.pending = null;
   const fxOn = fx && !reduced() && Date.now() - fx.at < 120000;
+  let cameraMoved = false;
   const reveal = () => {
     const finished = fxOn && fx.id && $(`.node[data-node="${fx.id}"]`, root);
     if (resume) window.scrollTo(0, 0);
     else if (finished && target?.classList.contains('st-current')) {
       const a = finished.getBoundingClientRect();
       const b = target.getBoundingClientRect();
-      window.scrollBy(0, (a.top + b.bottom) / 2 - window.innerHeight / 2 + 40);
+      // The camera frames the finished node first, then glides down to the one that opened (600 ms) while the trail draws.
+      window.scrollBy(0, (a.top + a.bottom) / 2 - window.innerHeight / 2);
+      if (!cameraMoved) {
+        cameraMoved = true;
+        setTimeout(() => {
+          const r = target.getBoundingClientRect();
+          smoothScrollTo(window.scrollY + (r.top + r.bottom) / 2 - window.innerHeight / 2 + 20, 600);
+        }, 900);
+      }
     } else target?.scrollIntoView({ block: 'center' });
   };
   reveal();

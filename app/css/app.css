@@ -1888,6 +1888,8 @@ body:not(.in-lesson) .screen { animation: screen-in .18s var(--ease-out) backwar
 .answer-line.wrong { animation: shake-x .5s var(--ease-out); }
 .answer-line.right .tile { animation: ans-pop .55s var(--ease-out) both; animation-delay: calc(var(--k, 0) * 55ms); }
 .shake { animation: shake-x .5s var(--ease-out); }
+/* The gift hero shakes the gift itself (mm-shake on the svg): the generic .shake colours are for answers and the trace box. */
+.mm-hero.shake { animation: none; background: none; border-color: transparent !important; color: inherit; }
 
 /* Sparkles out of the feedback bar at 5 in a row. */
 .sparkle-ring { position: absolute; left: 50%; top: 0; width: 0; height: 0; pointer-events: none; z-index: 2; }

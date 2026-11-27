@@ -1,6 +1,9 @@
 // What changed in each release — shown when tapping the app version in Profile.
 // Newest first. Keep entries short: they are read on a phone.
 export const CHANGELOG = [
+  { version: '1.1.1', date: '27 Nov 2026', changes: [
+    'Fixed: finished units showed as a giant box on the learning path',
+  ] },
   { version: '1.1', date: '21 Nov 2026', changes: [
     'Real sound effects: warm marimba and glass sounds you can hear (and feel, with new vibration patterns) for every tap, tile, right and wrong answer, combo, reward and celebration; they work offline too',
     'Game feel: a right answer flashes the screen green, the answer squashes and pops, a big check stamps the feedback bar and your speaker jumps for joy with raised arms; a wrong one shakes the whole task, cracks a heart and makes Kuri wince',

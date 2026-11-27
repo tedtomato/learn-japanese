@@ -40,6 +40,8 @@ try {
       // Compare with the document width, not innerWidth: when something overflows, the phone widens the
       // layout viewport (innerWidth grows with it) and zooms the whole page out.
       const DW = document.documentElement.clientWidth;
+      // A unit banner is a card, never a screen: a class collision once made finished units fill the viewport.
+      for (const b of document.querySelectorAll('.unit-banner')) if (b.getBoundingClientRect().height > 420) out.push(`unit banner is ${Math.round(b.getBoundingClientRect().height)}px tall`);
       if (document.documentElement.scrollWidth > DW + 1 || W > DW + 1) out.push(`page scrolls sideways or zoomed out (${document.documentElement.scrollWidth}px wide, viewport ${W}px)`);
       const seen = new Set();
       const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);

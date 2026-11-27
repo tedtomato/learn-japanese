@@ -399,7 +399,7 @@ export function renderLearn(root) {
       <h2 class="section-title"><span>${t('Section {n}', { n: s + 1 })}</span>${section.title}</h2>
       ${section.units.map((unit, u) => html`
         <section class="unit" id="unit-${unit.id}">
-          <div class="unit-banner c-${unit.color} ${bannerEnter(unit, current)} ${unitFinished(state, unit) ? 'complete' : ''}">
+          <div class="unit-banner c-${unit.color} ${bannerEnter(unit, current)} ${unitFinished(state, unit) ? 'unit-done' : ''}">
             <div><span class="unit-kicker"><span class="flag-chip">${raw(flagSvg(L.flag, 22))}</span>${t('Section {n} – Unit {m}', { n: s + 1, m: u + 1 })}</span>${unitFinished(state, unit) ? html`<span class="unit-ribbon">${cupSvg(16)} ${t('Complete')}</span>` : ''}<h3>${unit.title}</h3><p>${unit.desc}</p>${unitGoal(unit, state)}</div>
             <div class="banner-btns">
               <button class="btn-guide" data-guide="${unit.id}">${icon('book', 18)}<span>${t('Guide')}</span></button>

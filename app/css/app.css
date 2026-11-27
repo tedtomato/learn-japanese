@@ -1673,7 +1673,7 @@ body:not(.in-lesson) .screen { animation: screen-in .18s var(--ease-out) backwar
 @keyframes chest-glow { 0%, 100% { opacity: .5; transform: scale(.95); } 50% { opacity: 1; transform: scale(1.12); } }
 
 /* A finished unit: ribbon on the banner, and a gift box at the end of its path. */
-.unit-ribbon { display: inline-flex; align-items: center; gap: 4px; margin: 4px 0 0 8px; padding: 2px 10px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font-size: 0.75rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; animation: banner-in .45s var(--ease-spring) backwards; }
+.unit-ribbon { display: inline-flex; align-items: center; gap: 4px; margin: 4px 0 0 8px; padding: 2px 10px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font-size: 0.8125rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; vertical-align: middle; animation: banner-in .45s var(--ease-spring) backwards; }
 .unit-gift { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; font: inherit; color: inherit; cursor: pointer; border-color: var(--purple); background: var(--purple-soft); }
 .unit-gift b { display: block; color: var(--text-strong); font-size: 1.0625rem; }
 .unit-gift small { display: block; color: var(--muted); font-size: 0.875rem; }

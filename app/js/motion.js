@@ -74,7 +74,9 @@ export function countUp(el, from, to, ms = 600, { delay = 0, format = String, do
       if (p < 1) frame(tick);
       else land();
     };
-    tick();
+    // The first value (`from`) is already on screen; the count starts on the next frame, so a slow
+    // machine never shows "1" before the caller has even seen "0".
+    frame(tick);
   };
   if (delay > 0) timer = setTimeout(run, delay);
   else run();
